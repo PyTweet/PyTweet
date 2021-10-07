@@ -25,6 +25,35 @@ class UserPublicMetrics:
         return f"<UserPublicMetrics: user={self.original_payload.get('username')} followers_count={self._payload.get('followers_count')} following_count={self._payload.get('following_count')} tweet_count={self._payload.get('tweet_count')}>"
 
 class User:
+    """
+    Represent a user in Twitter. 
+    This user is an account that has created by other person, not from an apps.
+
+    Parameters:
+    ===================
+    data: Dict[str, Any] -> The complete data of the user through a dictionary!
+
+    Attributes:
+    ====================
+    :property: name -> Return the user's name.
+
+    :property: username -> Return the user's username, this usually start with '@' follow by their username.
+
+    :property: description -> Return the user's description.
+    
+    :property: id -> Return the user's id.
+
+    :property: verified -> Return True if the user is verified account, else False.
+
+    :property: protected -> Return True if the user is protected account, else False.
+
+    :property: profile_image -> Return the user profile image.
+
+    :property: created_at -> Return datetime.datetime object with user's account date.
+
+    :property: public_metrics -> Return :class: UserPublicMetrics.
+
+    """
     def __init__(self, data:Dict[str, Any]): 
         self._payload=data
 
@@ -60,7 +89,8 @@ class User:
     def created_at(self) -> datetime.datetime:
         date=str(parser.parse(self._payload['created_at']))
         y, mo, d=date.split("-")
-        h, mi, s, null=d.split(" ")[1].replace("0", " ").replace("+", " ").strip(" ").split(":")
+        h, mi, s=date.split(" ")[1].split('+')[0].split(":")
+        
         return datetime.datetime(year=int(y), month=int(mo), day=int(d.split(" ")[0]), hour=int(h), minute=int(mi), second=int(s))
 
     @property

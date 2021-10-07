@@ -12,4 +12,3 @@ client=twitter.Client(token="Your Bearer Token Here!!!") #if you dont have one m
 user=client.get_user_by_username("TheGenocides")
 print(user.name, user.username, user.id)
 #Return The User's name, username, and id
-```
