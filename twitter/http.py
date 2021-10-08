@@ -1,7 +1,8 @@
 import requests
 import json
 from typing import Dict, Any, Optional
-from .errors import Unauthorized, UserNotFound
+from .errors import Unauthorized, UserNotFound 
+from .oauth import Oauth
 
 class Route:
     def __init__(self, method:str, path:str):
@@ -35,15 +36,16 @@ class HTTPClient:
     
 
     """
-    def __init__(self, bearer_token:str, *, api_key=Optional[str], api_key_secret=Optional[str], access_token=Optional[str], access_token_secret=Optional[str]):
+    def __init__(self, bearer_token:str, *, consumer_key=Optional[str], consumer_key_secret=Optional[str], access_token=Optional[str], access_token_secret=Optional[str]):
         self.bearer_token = bearer_token
-        self.api_key = api_key
-        self.api_key_secret = api_key_secret
+        self.consumer_key = consumer_key
+        self.consumer_key_secret = consumer_key_secret
         self.access_token = access_token
-        self.access_token_secret = access_token_secret
+        self.access_token_secret = access_token_secret 
+        self.oauth=Oauth(self.consumer_key, self.consumer_key_secret)
         
     
-    def request(self, route:Route, *,payload:Dict[str, Any], params:Dict[str, str]={"user.fields":"id,name,username"}, is_json: bool = True) -> Any:
+    def request(self, route:Route, *,payload:Dict[str, Any], params:Dict[str, str], is_json: bool = True) -> Any:
         method=getattr(route, 'method', None)
         if not method:
             raise TypeError("Method isnt recognizable")
@@ -51,7 +53,7 @@ class HTTPClient:
         res=getattr(requests, method.lower(), None)
         if not res:
             raise TypeError("Method isnt recognizable")
-
+        
         respond=res(route.url, headers=payload, params=params)
         
         self.is_error(respond)
@@ -59,7 +61,7 @@ class HTTPClient:
         if 'data' not in respond.text:
             error=json.loads(respond.text)["errors"][0]
             raise UserNotFound(error["detail"])
-        print(respond.json())
+            
         if is_json:
             return respond.json()['data']
         return respond
@@ -68,5 +70,5 @@ class HTTPClient:
         code=respond.status_code
         if code == 401:
             raise Unauthorized("Invalid api-key passed!")
-            
         
+    
