@@ -11,4 +11,4 @@ client=twitter.Client("Your Bearer Token Here!!!", consumer_key="Your consumer_k
 
 user=client.get_user_by_username("TheGenocides")
 print(user.name, user.username, user.id)
-#Return The User's name, username, and id
+#Return The user's name, username, and id
