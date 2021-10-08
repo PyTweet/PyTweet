@@ -9,7 +9,7 @@ class Route:
         self.path: str = path
         url="https://api.twitter.com/2"
         self.url: str = url + self.path
-    
+
 class HTTPClient:
     """
     Represent the http/base client for :class: Client! 
@@ -59,10 +59,9 @@ class HTTPClient:
         if 'data' not in respond.text:
             error=json.loads(respond.text)["errors"][0]
             raise UserNotFound(error["detail"])
-
+        print(respond.json())
         if is_json:
-            return json.loads(respond.text)['data']
-        
+            return respond.json()['data']
         return respond
     
     def is_error(self, respond: requests.models.Response):
