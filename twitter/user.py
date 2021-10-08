@@ -1,7 +1,6 @@
 import datetime
 from typing import Dict, Any, Optional
 from dateutil import parser
-from .errors import UserNotFound
 
 #Continue Later...
 class Messageable:
