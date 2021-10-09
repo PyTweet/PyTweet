@@ -1,17 +1,16 @@
 import datetime
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from dateutil import parser
 
 #Continue Later...
 class Messageable:
     """
     Represent an object that can send and receive a message through DM.
-
     """
     def __init__(self, data:Dict[str, Any]):
         self._payload = data
 
-    # def send(self, text):
+    # async def send(self, text):
     #     ...
 
 
@@ -32,8 +31,11 @@ class UserPublicMetrics:
     def tweet_count(self) -> int:
         return self._public.get('tweet_count')
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return f"<UserPublicMetrics: user={self.original_payload.get('username')} followers_count={self._payload.get('followers_count')} following_count={self._payload.get('following_count')} tweet_count={self._payload.get('tweet_count')}>"
+
+    def __repr__(self) -> str:
+        return f"<UserPublicMetrics: User={self.original_payload.get}>"
 
 class User(UserPublicMetrics, Messageable):
     """
@@ -51,6 +53,8 @@ class User(UserPublicMetrics, Messageable):
     :property: username -> Return the user's username, this usually start with '@' follow by their username.
 
     :property: description -> Return the user's description.
+
+    :property: url -> Return url where the user put in links, return None if there isnt a url.
     
     :property: id -> Return the user's id.
 
@@ -61,6 +65,10 @@ class User(UserPublicMetrics, Messageable):
     :property: profile_image -> Return the user profile image.
 
     :property: created_at -> Return datetime.datetime object with user's account date.
+
+    :property: location -> Return a user's location, Somehow it return None in get_user_by_username and get_user function, Get it using get_tweet function. Will fix that soon!  
+
+    :property: followers -> Returns a list of users who are followers of the specified user ID.
     """
     def __init__(self, data:Dict[str, Any]): 
         self._payload=data
@@ -81,6 +89,10 @@ class User(UserPublicMetrics, Messageable):
     @property
     def description(self) -> str:
         return self._payload.get('description')
+   
+    @property
+    def url(self) -> str:
+        return self._payload.get('url')
 
     @property
     def verified(self) -> bool:
@@ -93,6 +105,10 @@ class User(UserPublicMetrics, Messageable):
     @property
     def profile_mage(self) -> Optional[str]:
         return self._payload.get('profile_image_url')    
+    
+    @property
+    def location(self) -> Optional[str]:
+        return self._payload.get('location')
 
     @property
     def created_at(self) -> datetime.datetime:
@@ -102,7 +118,12 @@ class User(UserPublicMetrics, Messageable):
         
         return datetime.datetime(year=int(y), month=int(mo), day=int(d.split(" ")[0]), hour=int(h), minute=int(mi), second=int(s))
 
-    def __repr__(self) -> str: #Return the repr of User, repr called when we print the class!
-        return "<User: name={0.name} username={0.username} description={0.description} id={0.id} created_at={0.created_at} verified={0.verified} protected={0.protected} profile_mage={0.profile_mage} <UserPublicMetrics: followers_count={0.followers_count} following_count={0.following_count} tweet_count={0.tweet_count}>>".format(self)
+    @property
+    def followers(self) -> Optional[list]:
+        return self._payload.get("followers")
 
-   
+    def __str__(self) -> str:
+        return "<User: name={0.name} username={0.username} description={0.description} id={0.id} created_at={0.created_at} verified={0.verified} protected={0.protected} profile_mage={0.profile_mage} location={0.location} followers_count={0.followers_count} following_count={0.following_count} tweet_count={0.tweet_count}>".format(self)
+
+    def __repr__(self) -> str:
+        return "<User Object: {0.username}>".format(self)
