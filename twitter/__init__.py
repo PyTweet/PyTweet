@@ -4,4 +4,5 @@ from .tweet import *
 from .http import *
 from .errors import *
 
-__version__="1.0.0"
+__version__ = "1.0.0"
+__authors__ = ["TheFarGG", "TheGenocides"]
