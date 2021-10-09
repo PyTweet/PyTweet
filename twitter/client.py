@@ -24,7 +24,7 @@ class Client(HTTPClient): #Parent Class
  
     Functions:
     ====================
-    def get_user_by_id() -> Gets the user info through their id.
+    def get_user() -> Gets the user info through their id.
 
     def get_user_by_username() -> Gets the user info through their username.
 
