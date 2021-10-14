@@ -23,7 +23,7 @@ SOFTWARE.
 """
 
 from .user import User
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 
 class Tweet:
     """
@@ -36,24 +36,37 @@ class Tweet:
 
     Attributes:
     ===================
+    :property: text: str -> Return the tweet's text. 
+
+    :property: id: int -> Return the tweet's id. 
+
     :property: author: Optional[User] -> Return a user (object) who posted the tweet.
 
-    :property: text: str -> Return the tweet's text. 
-    
-    :property: id: int -> Return the tweet's id. 
+    :property: retweeted_by: List[User] -> Return a list of users thats retweeted the specified tweet's id.
+
+    :property: liking_users: List[User] -> Return a list of users that liked the specified tweet's id.
+
     """
     def __init__(self, data: Dict[str, Any]):
         self.original_payload = data
-        self._payload = data['data']
+        self._payload = data["data"] or data
     
     @property
     def author(self) -> Optional[User]:
         return User(self.original_payload.get("includes").get("users")[0])
-    #)
+    
     @property
     def text(self) -> str:
-        return self._payload.get('text')
+        return self._payload.get("text")
 
     @property
     def id(self) -> int:
-        return self._payload.get('id')
+        return self._payload.get("id")
+
+    @property
+    def retweeted_by(self) -> List[User]:
+        return self._payload.get("retweeted_by")
+
+    @property
+    def liking_users(self) -> List[User]:
+        return self._payload.get("liking_users")
