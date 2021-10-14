@@ -23,23 +23,15 @@ SOFTWARE.
 """
 
 import datetime
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, TYPE_CHECKING
 from dateutil import parser
+from .type import Messageable
 
-#Continue Later...
-class Messageable:
-    """
-    Represent an object that can send and receive a message through DM.
-    """
-    def __init__(self, data:Dict[str, Any]):
-        self._payload = data
-
-    # async def send(self, text):
-    #     ...
-
+if TYPE_CHECKING: #prevent circular import error
+    from .client import Client
 
 class UserPublicMetrics:
-    def __init__(self, data=Dict[str, Any]):
+    def __init__(self, data=Dict[str, Any], **kwargs):
         self.original_payload=data
         self._public=data.get('public_metrics')
 
@@ -93,10 +85,14 @@ class User(UserPublicMetrics, Messageable):
     :property: location -> Return a user's location, Somehow it return None in get_user_by_username and get_user function, Get it using get_tweet function. Will fix that soon!  
 
     :property: followers -> Returns a list of users who are followers of the specified user ID.
+
+    :property: following -> Returns a list of users thats followed by the specified user ID.  
     """
-    def __init__(self, data:Dict[str, Any]): 
+    def __init__(self, data:Dict[str, Any], **kwargs): 
+        super().__init__(data, **kwargs)
         self._payload=data
-        super().__init__(self._payload)
+        self.provider: Optional[Client] = kwargs.get('provider') or None
+        self.description=self.bio
 
     @property
     def name(self) -> str:
@@ -111,11 +107,15 @@ class User(UserPublicMetrics, Messageable):
         return self._payload.get('id')
 
     @property
-    def description(self) -> str:
+    def bio(self) -> str:
         return self._payload.get('description')
    
     @property
-    def url(self) -> str:
+    def link(self) -> str:
+        return f"https://twitter.com/{self.username}" 
+
+    @property
+    def website(self) -> str:
         return self._payload.get('url')
 
     @property
@@ -128,8 +128,8 @@ class User(UserPublicMetrics, Messageable):
 
     @property
     def profile_mage(self) -> Optional[str]:
-        return self._payload.get('profile_image_url')    
-    
+        return self._payload.get('profile_image_url')
+
     @property
     def location(self) -> Optional[str]:
         return self._payload.get('location')
@@ -146,8 +146,22 @@ class User(UserPublicMetrics, Messageable):
     def followers(self) -> Optional[list]:
         return self._payload.get("followers")
 
+    @property
+    def following(self) -> Optional[list]:
+        return self._payload.get("following")
+
+    # def follow(self) -> Any:
+    #     r=Route("POST", "2", f"/users/22146191/following")
+    #     headers={"Consumer Key": self.provider.consumer_key, "Consumer Secret": self.provider.consumer_key_secret, "Token": self.provider.access_token, "Token Secret": self.provider.access_token_secret, "content-type":"application/x-www-form-urlencoded"}
+    #     print(r.url)
+    #     req=requests.request("POST", r.url, headers=headers, json={"target_user_id": str(self.id)})
+    #     print(req.text)
+   
+    #     return req.json()
+
     def __str__(self) -> str:
         return "<User: name={0.name} username={0.username} description={0.description} id={0.id} created_at={0.created_at} verified={0.verified} protected={0.protected} profile_mage={0.profile_mage} location={0.location} followers_count={0.followers_count} following_count={0.following_count} tweet_count={0.tweet_count}>".format(self)
 
     def __repr__(self) -> str:
         return "<User Object: {0.username}>".format(self)
+    
