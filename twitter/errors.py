@@ -22,18 +22,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+
 class Unauthorized(Exception):
     """Raised when the Credentials is invalid!"""
+
     pass
+
 
 class NotFoundError(Exception):
     """Raised when it cant find the object in some functions."""
+
     pass
+
 
 class MissingCredentials(Exception):
     """Raised upon using function that needed certain Credentials like consumer_key or consumer_key_secret"""
+
     pass
 
 class UnfinishFunctionError(Exception):
     """Raised upon using unfinish function"""
+
     pass
