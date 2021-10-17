@@ -23,9 +23,8 @@ SOFTWARE.
 """
 
 import requests
-from typing import Dict, Any, Optional
-from .errors import Unauthorized, NotFoundError 
-from requests import Session
+from typing import Dict, Any, Union, Optional
+from .errors import Unauthorized, NotFoundError , UnfinishFunctionError
 
 def is_error(respond: requests.models.Response):
     code=respond.status_code
@@ -42,11 +41,11 @@ class Route:
 class HTTPClient():
     """
     Represent the http/base client for :class: Client! 
-    This http/base client will be the parent class for :class: Client.
+    This http/base client have methods for making requests to twitter's api!
 
     Parameters:
     ===================
-    bearer_token: str -> The Bearer Token of the app. The most important one, Make sure to put the right credentials
+    bearer_token: str -> The Bearer Token of the app. The most important one, because this make most of the requests for twitter's api version 2.
 
     consumer_key: Optional[str] -> The Consumer Key of the app.
 
@@ -67,8 +66,7 @@ class HTTPClient():
         self.access_token = access_token
         self.access_token_secret = access_token_secret 
         
-    
-    def request(self, route:Route, *,headers:Dict[str, Any], params:Dict[str, str], is_json: bool = True) -> Any:
+    def request(self, route:Route, *,headers:Dict[str, Any], params:Dict[str, str] = {}, is_json: bool = True) -> Any:
         method=getattr(route, 'method', None)
         if not method:
             raise TypeError("Method isnt recognizable")
@@ -91,3 +89,6 @@ class HTTPClient():
         if is_json:
             return res['data']
         return res
+
+    def send_message(self, text: Union[str, int], **kwargs):
+        raise UnfinishFunctionError("This function is not finish yet")
