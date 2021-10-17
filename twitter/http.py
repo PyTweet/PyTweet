@@ -24,23 +24,26 @@ SOFTWARE.
 
 import requests
 from typing import Dict, Any, Union, Optional
-from .errors import Unauthorized, NotFoundError , UnfinishFunctionError
+from .errors import Unauthorized, NotFoundError, UnfinishFunctionError
+
 
 def is_error(respond: requests.models.Response):
-    code=respond.status_code
+    code = respond.status_code
     if code == 401:
         raise Unauthorized("Invalid credentials passed!")
 
+
 class Route:
-    def __init__(self, method:str, version: str, path:str):
+    def __init__(self, method: str, version: str, path: str):
         self.method: str = method
         self.path: str = path
-        self.base_url=f"https://api.twitter.com/{version}"
+        self.base_url = f"https://api.twitter.com/{version}"
         self.url: str = self.base_url + self.path
 
-class HTTPClient():
+
+class HTTPClient:
     """
-    Represent the http/base client for :class: Client! 
+    Represent the http/base client for :class: Client!
     This http/base client have methods for making requests to twitter's api!
 
     Parameters:
@@ -59,36 +62,56 @@ class HTTPClient():
     ====================
     def request() -> make a requests with the given paramaters.
     """
-    def __init__(self, bearer_token:str, *, consumer_key=Optional[str], consumer_key_secret=Optional[str], access_token=Optional[str], access_token_secret=Optional[str]):
+
+    def __init__(
+        self,
+        bearer_token: str,
+        *,
+        consumer_key: Optional[str],
+        consumer_key_secret: Optional[str],
+        access_token: Optional[str],
+        access_token_secret: Optional[str],
+    ):  
+        credentials={"bearer_token": bearer_token, "consumer_key": consumer_key, "consumer_key_secret": consumer_key_secret, "access_token": access_token, "access_token_secret": access_token_secret}
+        for k, v in credentials.items():
+            if isinstance(v, int):
+                raise Unauthorized(f"Wrong authorization passed for credential: {k}.")
+                
         self.bearer_token = bearer_token
         self.consumer_key = consumer_key
         self.consumer_key_secret = consumer_key_secret
         self.access_token = access_token
-        self.access_token_secret = access_token_secret 
-        
-    def request(self, route:Route, *,headers:Dict[str, Any], params:Dict[str, str] = {}, is_json: bool = True) -> Any:
-        method=getattr(route, 'method', None)
-        if not method:
-            raise TypeError("Method isnt recognizable")
+        self.access_token_secret = access_token_secret
 
-        res=getattr(requests, method.lower(), None)
+    def request(
+        self,
+        route: Route,
+        *,
+        headers: Dict[str, Any],
+        params: Dict[str, str] = {},
+        is_json: bool = True,
+    ):
+        res = getattr(requests, route.method.lower(), None)
         if not res:
             raise TypeError("Method isnt recognizable")
-        
-        respond=res(route.url, headers=headers, params=params)
-        is_error(respond)
-        res=respond.json()
-        
-        if 'errors' in res.keys():
-            raise NotFoundError(res["errors"][0]["detail"]) 
 
-        elif 'meta' in res.keys(): 
+        respond = res(route.url, headers=headers, params=params)
+        is_error(respond)
+        res = respond.json()
+
+        if "errors" in res.keys():
+            raise NotFoundError(res["errors"][0]["detail"])
+
+        elif "meta" in res.keys():
             if res["meta"]["result_count"] == 0:
                 return 0
-        
+
         if is_json:
             return res['data']
-        return res
+        return respond
 
-    def send_message(self, text: Union[str, int], **kwargs):
+    def send_message(self, text: str, **kwargs):
+        raise UnfinishFunctionError("This function is not finish yet")
+
+    def post_tweet(self, text: str, **kwargs):
         raise UnfinishFunctionError("This function is not finish yet")
