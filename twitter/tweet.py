@@ -40,16 +40,16 @@ class Tweet:
 
     :property: id: int -> Return the tweet's id. 
 
-    :property: author: Optional[User] -> Return a user (object) who posted the tweet.
+    :property: author: Optional[User] -> Return a user (object) who posted the tweet. 
 
-    :property: retweeted_by: List[User] -> Return a list of users thats retweeted the specified tweet's id.
+    :property: retweeted_by: List[User] -> Return a list of users thats retweeted the specified tweet's id. Maximum user is 100.
 
-    :property: liking_users: List[User] -> Return a list of users that liked the specified tweet's id.
+    :property: liking_users: List[User] -> Return a list of users that liked the specified tweet's id. Maximum user is 100.
 
     """
     def __init__(self, data: Dict[str, Any]):
         self.original_payload = data
-        self._payload = data["data"] or data
+        self._payload = data.get("data") or None
     
     @property
     def author(self) -> Optional[User]:
