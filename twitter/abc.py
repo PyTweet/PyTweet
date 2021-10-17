@@ -2,6 +2,7 @@ from typing import Optional, Dict, Any, Protocol, runtime_checkable
 from .errors import UnfinishFunctionError
 from .http import HTTPClient
 
+
 @runtime_checkable
 class Messageable(Protocol):
     """
@@ -15,13 +16,14 @@ class Messageable(Protocol):
 
     Functions:
     ===================
-    
+
     def send() -> Send a message to a specific user.
 
     """
-    def __init__(self, data:Dict[str, Any], **kwargs):
-        self._payload = data
-        self.http_client: Optional[HTTPClient] = kwargs.get('http_client') or None
 
-    def send(self, text: Optional[str] = None, **kwargs) -> Optional[None]:
-        raise UnfinishFunctionError("This function is not finish yet")
+    def __init__(self, data: Dict[str, Any], **kwargs):
+        self._payload = data
+        self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
+
+    def send(self, text: str = None, **kwargs) -> Optional[None]:
+        self.http_client.send_message(text, **kwargs)
