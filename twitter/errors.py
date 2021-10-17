@@ -23,7 +23,7 @@ SOFTWARE.
 """
 
 class Unauthorized(Exception):
-    """Raised when the api-key is invalid!"""
+    """Raised when the Credentials is invalid!"""
     pass
 
 class NotFoundError(Exception):
@@ -34,3 +34,6 @@ class MissingCredentials(Exception):
     """Raised upon using function that needed certain Credentials like consumer_key or consumer_key_secret"""
     pass
 
+class UnfinishFunctionError(Exception):
+    """Raised upon using unfinish function"""
+    pass
