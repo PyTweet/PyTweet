@@ -28,7 +28,7 @@ from .http import HTTPClient, Route, is_error
 from .user import User
 from .tweet import Tweet
 
-class Client(HTTPClient): #Parent Class
+class Client(): 
     """
     Represent a client that connected to Twitter! 
     This client will interact with other through twitter's api version 2!
@@ -52,9 +52,11 @@ class Client(HTTPClient): #Parent Class
     def get_user_by_username() -> Gets the user info through their username.
 
     def get_tweet() -> Gets a tweet info through the tweet's id.
+
+    def run() -> Stream in real-time, roughly a 1% sample of all public Tweets.
     """
     def __init__(self, bearer_token:str, *, consumer_key=Optional[str], consumer_key_secret=Optional[str], access_token=Optional[str], access_token_secret=Optional[str]):
-        super().__init__(bearer_token, consumer_key=consumer_key, consumer_key_secret=consumer_key_secret, access_token=access_token, access_token_secret=access_token_secret)
+        self.http = HTTPClient(bearer_token, consumer_key=consumer_key, consumer_key_secret=consumer_key_secret, access_token=access_token, access_token_secret=access_token_secret)
     
     def __repr__(self) -> str:
         return "<Client: Credentials=SECRET>"
@@ -63,62 +65,67 @@ class Client(HTTPClient): #Parent Class
         if isinstance(id, str):
             raise ValueError("Id paramater should be an integer!")
 
-        data=self.request(
+        data=self.http.request(
             Route('GET', "2", f"/users/{id}"),
-            headers={"Authorization": f"Bearer {self.bearer_token}"}, params={"user.fields": "created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"},
+            headers={"Authorization": f"Bearer {self.http.bearer_token}"}, 
+            params={"user.fields": "created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"},
             is_json=True
         ) 
         
-        followers=self.request(
+        followers=self.http.request(
             Route("GET", "2", f"/users/{id}/followers"), 
-            headers={"Authorization": f"Bearer {self.bearer_token}"}, params={"user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"}
+            headers={"Authorization": f"Bearer {self.http.bearer_token}"}, 
+            params={"user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"}
         )
 
-        following=self.request(
+        following=self.http.request(
             Route("GET", "2", f"/users/{id}/following"), 
-            headers={"Authorization": f"Bearer {self.bearer_token}"}, 
+            headers={"Authorization": f"Bearer {self.http.bearer_token}"}, 
             params={"user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"}
         )
         
         data.update({'followers': [User(follower) for follower in followers] if followers != 0 else 0})
         data.update({'following': [User(following) for following in following] if following != 0 else 0})
-        return User(data, provider=self)
+        return User(data, http_client=self.http)
  
         
     def get_user_by_username(self, username: str) -> User: 
+        if '@' in username:
+            username=username.replace("@", "", 1)
+        
         route=Route("GET", "2", f"/users/by/username/{username}")
-        data=self.request(
+        data=self.http.request(
             route,
-            headers={"Authorization": f"Bearer {self.bearer_token}"}, 
+            headers={"Authorization": f"Bearer {self.http.bearer_token}"}, 
             params={"user.fields": "created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"}, 
             is_json=True
         ) 
-        user_payload=self.get_user(data.get('id'))
+        user_payload=self.get_user(int(data.get('id')))
         
         data.update({"followers": user_payload.followers})
         data.update({"following": user_payload.following})
-        return User(data, provider=self)
+        return User(data, http_client=self.http)
 
-    def get_tweet(self, id: int): 
+    def get_tweet(self, id: int) -> Tweet: 
         r=Route("GET", "2", f"/tweets/{id}")
         res=requests.get(
             r.url, 
             params={"user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld", "expansions": "author_id,referenced_tweets.id.author_id"}, 
-            headers={"Authorization": f"Bearer {self.bearer_token}"})
+            headers={"Authorization": f"Bearer {self.http.bearer_token}"})
         is_error(res)
 
         r=Route("GET", "2", f"/tweets/{id}/retweeted_by")
         res2=requests.get(
             r.url, 
             params={"user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"}, 
-            headers={"Authorization": f"Bearer {self.bearer_token}"})
+            headers={"Authorization": f"Bearer {self.http.bearer_token}"})
         is_error(res2)
 
         r=Route("GET", "2", f"/tweets/{id}/liking_users")
         res3=requests.get(
             r.url, 
             params={"user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"}, 
-            headers={"Authorization": f"Bearer {self.bearer_token}"})
+            headers={"Authorization": f"Bearer {self.http.bearer_token}"})
         is_error(res3)
         
         json_response = res.json()
@@ -128,6 +135,12 @@ class Client(HTTPClient): #Parent Class
         
         json_response["includes"]["users"][0].update({"followers": user.followers})
         json_response["includes"]["users"][0].update({"following": user.following})
-        json_response['data'].update({"retweeted_by": [User(user, provider=self) for user in res2.json()['data']]})
-        json_response['data'].update({"liking_users": [User(user, provider=self) for user in res3.json()['data']]})
+        json_response['data'].update({"retweeted_by": [User(user, http_client=self.http) for user in res2.json()['data']]})
+        json_response['data'].update({"liking_users": [User(user, http_client=self.http) for user in res3.json()['data']]})
         return Tweet(json_response)
+
+    def run(self):
+        self.http.request(
+            Route("GET", "2", "/tweets/sample/stream"),
+            headers={"Authorization": f"Bearer {self.http.bearer_token}"}
+        )
