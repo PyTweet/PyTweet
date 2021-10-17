@@ -15,6 +15,7 @@ python -m pip install PyTweet
 
 ## Usage
 
+How to get a user information.
 ```py
 import twitter
 
@@ -24,6 +25,13 @@ user=client.get_user_by_username("TheGenocides")
 print(user.name, user.username, user.id)
 #Return The user's name, username, and id
 ```
+How to get a tweet information.
+```py
+tweet=client.get_tweet(Tweet ID Here)
+print(tweet.text, tweet.id, tweet.author.username)
+# Return the tweet's text, id, and the author's username.
+```
+
 
 # Contribute
 You can Contribute or open an issue regarding this wrapper in [github](https://github.com/TheFarGG/PyTweet)! 
