@@ -53,6 +53,8 @@ class Client:
 
     def get_tweet() -> Gets a tweet info through the tweet's id.
 
+    def tweet() -> Post a tweet directly to twitter. 
+
     def run() -> Stream in real-time, roughly a 1% sample of all public Tweets.
     """
 
