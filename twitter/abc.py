@@ -1,5 +1,4 @@
 from typing import Optional, Dict, Any, Protocol, runtime_checkable
-from .errors import UnfinishFunctionError
 from .http import HTTPClient
 
 
@@ -17,7 +16,13 @@ class Messageable(Protocol):
     Functions:
     ===================
 
-    def send() -> Send a message to a specific user.
+    def send() -> Send a message to a specific Messageable object.
+    
+    def delete_message() -> Delete a message from a Messageable object.
+    
+    def follow() -> Follow a Messageable object.
+    
+    def unfollow() -> Unfollow a Messageable object.
 
     """
 
@@ -27,3 +32,12 @@ class Messageable(Protocol):
 
     def send(self, text: str = None, **kwargs) -> Optional[None]:
         self.http_client.send_message(text, **kwargs)
+
+    def delete_message(self, id: int, **kwargs):
+        self.http_client.delete_message(id, kwargs)
+
+    def follow(self, **kwargs):
+        self.http_client.follow_user(self._payload.get('id'), kwargs)
+
+    def unfollow_user(self, **kwargs):
+        self.http_client.unfollow_user(self._payload.get('id'), kwargs)
