@@ -23,7 +23,7 @@ SOFTWARE.
 """
 
 import requests
-from typing import Dict, Any, Union, Optional
+from typing import Dict, Any, Optional
 from .errors import Unauthorized, NotFoundError, UnfinishFunctionError
 
 
@@ -61,6 +61,17 @@ class HTTPClient:
     Functions:
     ====================
     def request() -> make a requests with the given paramaters.
+
+    WARNING: These following functions isnt finish yet!
+    def send_message() -> Send a message to Messageable object.
+
+    def delete_message() -> Delete a certain message in Messageable object.
+
+    def post_tweet() -> Post a tweet directly to twitter through your client.
+
+    def follow_user() -> Follow a Messageable object
+    
+    def unfollow_user() -> Unfollow a Messageable object.
     """
 
     def __init__(
@@ -113,5 +124,14 @@ class HTTPClient:
     def send_message(self, text: str, **kwargs):
         raise UnfinishFunctionError("This function is not finish yet")
 
+    def delete_message(self, id: int, **kwargs):
+        raise UnfinishFunctionError("This function is not finish yet")
+
     def post_tweet(self, text: str, **kwargs):
+        raise UnfinishFunctionError("This function is not finish yet")
+
+    def follow_user(self, id:int, **kwargs):
+        raise UnfinishFunctionError("This function is not finish yet")
+
+    def unfollow_user(self, id:int, **kwargs):
         raise UnfinishFunctionError("This function is not finish yet")
