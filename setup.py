@@ -33,7 +33,7 @@ setup(name='PyTweet',
         "tweet.py",
         "twitter.py"
     ],
-    python_requires='>=3.8.0',
+    python_requires='>=3.7.0',
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
