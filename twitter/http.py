@@ -24,13 +24,16 @@ SOFTWARE.
 
 import requests
 from typing import Dict, Any, Optional
-from .errors import Unauthorized, NotFoundError, UnfinishFunctionError
+from .errors import Unauthorized, NotFoundError, UnfinishFunctionError, TooManyRequests
 
 
 def is_error(respond: requests.models.Response):
     code = respond.status_code
     if code == 401:
         raise Unauthorized("Invalid credentials passed!")
+
+    elif code == 429:
+        raise TooManyRequests(respond.text)
 
 
 class Route:
