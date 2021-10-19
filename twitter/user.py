@@ -27,50 +27,9 @@ from typing import Dict, Any, Optional, List
 from dateutil import parser
 from .abc import Messageable
 from .http import HTTPClient
+from .metrics import UserPublicMetrics
 
-
-class UserPublicMetrics:
-    """
-    Represent a PublicMetrics for a User.
-    This PublicMetrics contain public info about the user.
-
-    Parameters:
-    ===================
-    data: Dict[str, Any] -> The complete data of the user's public metrics through a dictionary!
-
-    Attributes:
-    ===================
-    :property: tweet_count -> Return total tweet that the user tweeted.
-
-    :property: follower_count -> Returns total of followers that a user has.
-
-    :property: following_count -> Returns total of following that a user has.
-    """
-
-    def __init__(self, data=Dict[str, Any], **kwargs):
-        self.original_payload = data
-        self._public = data.get("public_metrics")
-
-    @property
-    def followers_count(self) -> int:
-        return self._public.get("followers_count")
-
-    @property
-    def following_count(self) -> int:
-        return self._public.get("following_count")
-
-    @property
-    def tweet_count(self) -> int:
-        return self._public.get("tweet_count")
-
-    def __str__(self) -> str:
-        return f"<UserPublicMetrics: user={self.original_payload.get('username')} followers_count={self._payload.get('followers_count')} following_count={self._payload.get('following_count')} tweet_count={self._payload.get('tweet_count')}>"
-
-    def __repr__(self) -> str:
-        return f"<UserPublicMetrics: User={self.original_payload.get('username')}>"
-
-
-class User(UserPublicMetrics, Messageable):
+class User(Messageable):
     """
     Represent a user in Twitter.
     This user is an account that has created by other person, not from an apps.
@@ -110,8 +69,9 @@ class User(UserPublicMetrics, Messageable):
 
     def __init__(self, data: Dict[str, Any], **kwargs):
         super().__init__(data, **kwargs)
-        self._payload = data
+        self.original_payload = data
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
+        self.user_metrics = UserPublicMetrics(self.original_payload)
         self.description = self.bio
 
     def __str__(self) -> str:
@@ -124,19 +84,19 @@ class User(UserPublicMetrics, Messageable):
 
     @property
     def name(self) -> str:
-        return self._payload.get("name")
+        return self.original_payload.get("name")
 
     @property
     def username(self) -> str:
-        return "@" + self._payload.get("username")
+        return "@" + self.original_payload.get("username")
 
     @property
     def id(self) -> int:
-        return self._payload.get("id")
+        return int(self.original_payload.get("id"))
 
     @property
     def bio(self) -> str:
-        return self._payload.get("description")
+        return self.original_payload.get("description")
 
     @property
     def profile_link(self) -> str:
@@ -144,27 +104,27 @@ class User(UserPublicMetrics, Messageable):
 
     @property
     def link(self) -> str:
-        return self._payload.get("url")
+        return self.original_payload.get("url")
 
     @property
     def verified(self) -> bool:
-        return self._payload.get("verified")
+        return self.original_payload.get("verified")
 
     @property
     def protected(self) -> bool:
-        return self._payload.get("protected")
+        return self.original_payload.get("protected")
 
     @property
     def avatar_url(self) -> Optional[str]:
-        return self._payload.get("profile_image_url")
+        return self.original_payload.get("profile_image_url")
 
     @property
     def location(self) -> Optional[str]:
-        return self._payload.get("location")
+        return self.original_payload.get("location")
 
     @property
     def created_at(self) -> datetime.datetime:
-        date = str(parser.parse(self._payload.get("created_at")))
+        date = str(parser.parse(self.original_payload.get("created_at")))
         y, mo, d = date.split("-")
         h, mi, s = date.split(" ")[1].split("+")[0].split(":")
 
@@ -179,8 +139,24 @@ class User(UserPublicMetrics, Messageable):
 
     @property
     def followers(self) -> List[object]:
-        return self._payload.get("followers")
+        return self.original_payload.get("followers")
 
     @property
     def following(self) -> List[object]:
-        return self._payload.get("following")
+        return self.original_payload.get("following")
+
+    @property
+    def followers_count(self) -> int:
+        return int(self.user_metrics.followers_count)
+
+    @property
+    def following_count(self) -> int:
+        return int(self.user_metrics.following_count)
+
+    @property
+    def tweet_count(self) -> int:
+        return int(self.user_metrics.tweet_count)
+
+    @property
+    def listed_count(self) -> int:
+        return int(self._metrics.listed_count)

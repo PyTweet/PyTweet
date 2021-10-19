@@ -136,8 +136,8 @@ class Client:
             },
             is_json=True,
         )
-        user_payload = self.get_user(int(data.get("id")))
 
+        user_payload = self.get_user(int(data.get("id")))
         data.update({"followers": user_payload.followers})
         data.update({"following": user_payload.following})
         return User(data, http_client=self.http)
@@ -147,8 +147,12 @@ class Client:
         res = requests.get(
             r.url,
             params={
+                "tweet.fields": "attachments,author_id,context_annotations,conversation_id,created_at,geo,entities,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,reply_settings,source,text,withheld",
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld",
-                "expansions": "author_id,referenced_tweets.id.author_id",
+                "expansions": "attachments.poll_ids,attachments.media_keys,author_id,geo.place_id,in_reply_to_user_id,referenced_tweets.id,entities.mentions.username,referenced_tweets.id.author_id",
+                "media.fields": "duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width",
+                "place.fields": "contained_within,country,country_code,full_name,geo,id,name,place_type",
+                "poll.fields": "duration_minutes,end_datetime,id,options,voting_status"
             },
             headers={"Authorization": f"Bearer {self.http.bearer_token}"},
         )
@@ -162,6 +166,7 @@ class Client:
             },
             headers={"Authorization": f"Bearer {self.http.bearer_token}"},
         )
+
         is_error(res2)
 
         r = Route("GET", "2", f"/tweets/{id}/liking_users")
@@ -176,25 +181,42 @@ class Client:
 
         json_response = res.json()
         user_id = json_response["includes"]["users"][0].get("id")
-
         user = self.get_user(int(user_id))
-
+        
         json_response["includes"]["users"][0].update({"followers": user.followers})
         json_response["includes"]["users"][0].update({"following": user.following})
-        json_response["data"].update(
-            {
-                "retweeted_by": [
-                    User(user, http_client=self.http) for user in res2.json()["data"]
-                ]
-            }
-        )
-        json_response["data"].update(
-            {
-                "liking_users": [
-                    User(user, http_client=self.http) for user in res3.json()["data"]
-                ]
-            }
-        )
+        
+        try:
+            res2.json()["data"]
+            res3.json()["data"]
+
+            json_response["data"].update(
+                {
+                    "retweeted_by": [
+                        User(user, http_client=self.http) for user in res2.json()["data"]
+                    ]
+                }
+            )
+            json_response["data"].update(
+                {
+                    "liking_users": [
+                        User(user, http_client=self.http) for user in res3.json()["data"]
+                    ]
+                }
+            )
+        except KeyError:
+            json_response["data"].update(
+                {
+                    "retweeted_by": 0
+                }
+            )
+
+            json_response["data"].update(
+                {
+                    "liking_users": 0
+                }
+            )
+
         return Tweet(json_response)
 
     def post_tweet(self, text:str, **kwargs):
