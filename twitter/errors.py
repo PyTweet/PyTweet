@@ -24,7 +24,7 @@ SOFTWARE.
 
 
 class Unauthorized(Exception):
-    """Raised when the Credentials is invalid!"""
+    """Raised when the Credentials you passed is invalid!"""
 
     pass
 
@@ -36,5 +36,10 @@ class NotFoundError(Exception):
 
 class UnfinishFunctionError(Exception):
     """Raised upon using unfinish function"""
+
+    pass
+
+class TooManyRequests(Exception):
+    """Raised when you made TooManyRequest"""
 
     pass
