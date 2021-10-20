@@ -27,6 +27,25 @@ from dateutil import parser
 from typing import Dict, List, Any
 
 class Media:
+    """
+    Represent a Media attachment in a tweet.
+
+    Parameters:
+    ===================
+    data: Dict[str, Any] -> The full data of the media in a dictionary. 
+
+    Attributes:
+    ====================
+    :property: type: str -> Return the media's type.
+
+    :property: url: str -> Return the media's url.
+
+    :property: width: int -> Return the media's width. 
+
+    :property: height: int -> Return the media's height.
+
+    :property: media_key: str -> Return the media's unique key.
+    """
     def __init__(self, data: Dict[str, Any]):
         self._payload = data
 
@@ -57,6 +76,25 @@ class PollOptions:
         self.votes = options.get("votes")
 
 class Poll:
+    """
+    Represent a Poll attachment in a tweet.
+
+    Parameters:
+    ===================
+    data: Dict[str, Any] -> The full data of the poll in a dictionary. 
+
+    Attributes:
+    ====================
+    :property: id: int -> Return the poll unique ID.
+
+    :property: options: List[PollOptions] -> Return a list of :class: PollOptions 
+
+    :property: voting_status: bool -> Return True if the poll is still open for voting, if its closed it return False
+
+    :property: duration: int -> Return the poll duration in seconds.
+
+    :property: end_date: datetime.datetime -> Return the end date in datetime.datetime object. 
+    """
     def __init__(self, data: Dict[str, Any]):
         self._payload = data
 
@@ -65,7 +103,7 @@ class Poll:
         return int(self._payload.get("id"))
 
     @property
-    def options(self) -> PollOptions:
+    def options(self) -> List[PollOptions]:
         return [PollOptions(option) for option in self._payload.get("options")]
 
     @property
