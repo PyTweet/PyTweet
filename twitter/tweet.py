@@ -48,7 +48,31 @@ class Tweet:
 
     :property: retweeted_by: Optional[List[User]] -> Return a list of users thats retweeted the specified tweet's id. Maximum user is 100. Return 0 if no one retweeted.
 
-    :property: liking_users: Optional[List[User]] -> Return a list of users that liked the specified tweet's id. Maximum user is 100. Return 0 if no one retweeted.
+    :property: liking_users: Optional[List[User]] -> Return a list of users that liked the specified tweet's id. Maximum user is 100. Return 0 if no one retweeted. 
+
+	:property: sensitive: bool -> Return True if the tweet is possible sensitive to some users, else False 
+
+	:property: created_at: datetime.datetime -> Return a datetime object with the tweet posted age.
+
+	:property: source: str -> Return the source of the tweet. e.g if you post a tweet from a website, the source is gonna be "Twitter Web App"
+
+	:property: reply_setting: str -> Return the reply setting, if everyone can replied reply_setting return "Everyone".
+
+	:property: lang: str -> Return the tweet's lang, if its english it return en.
+
+	:property: convertion_id: int -> Return the convertion id.
+
+	:property: poll: Poll -> Return a Poll object with the tweet's poll.
+
+	:property: media: List[Media] -> Return a list of media(s) in a tweet.
+
+	:property: like_count: int -> Return the total of likes in a tweet.
+
+    :property: retweeted_count: int -> Return the total of retweeted in a tweet.
+
+    :property: reply_count: int -> Return the total of replies in a tweet.
+
+    :property: quote_count: int -> Return the total of quotes in a tweet.
     """
     def __init__(self, data: Dict[str, Any]):
         self.original_payload = data
@@ -112,8 +136,8 @@ class Tweet:
         return self._payload.get("convertion_id")
 
     @property
-    def polls(self) -> Poll:
-        return [Poll(poll) for poll in self._includes.get('polls')]
+    def poll(self) -> Poll:
+        return Poll(self._includes.get('polls')[0])
 
     @property
     def media(self) -> Media:

@@ -40,31 +40,37 @@ class User(Messageable):
 
     Attributes:
     ===================
-    :property: name -> Return the user's name.
+    :property: name: str -> Return the user's name.
 
-    :property: username -> Return the user's username, this usually start with '@' follow by their username.
+    :property: username: str -> Return the user's username, this usually start with '@' follow by their username.
 
-    :property: description -> Return the user's description.
+    :property: description: str -> Return the user's description.
 
-    :property: link -> Return url where the user put in links, return None if there isnt a url.
+    :property: link: str -> Return url where the user put in links, return None if there isnt a url.
 
-    :property: id -> Return the user's id.
+    :property: id: int -> Return the user's id.
 
-    :property: verified -> Return True if the user is verified account, else False.
+    :property: verified: bool -> Return True if the user is verified account, else False.
 
-    :property: protected -> Return True if the user is protected, else False.
+    :property: protected: bool -> Return True if the user is protected, else False.
 
-    :property: profile_image -> Return the user profile image.
+    :property: profile_image: str -> Return the user profile image.
 
-    :property: created_at -> Return datetime.datetime object with user's account date.
+    :property: created_at: datetime.datetime -> Return datetime.datetime object with user's account date.
 
-    :property: location -> Return a user's location, Somehow it return None in get_user_by_username and get_user function, Get it using get_tweet function. Will fix that soon!
+    :property: location: str -> Return a user's location, Somehow it return None in get_user_by_username and get_user function, Get it using get_tweet function. Will fix that soon!
 
-    :property: tweet_count -> Return total tweet that the user tweeted.
+    :property: followers: List[Object] -> Returns a list of users object who are followers of the specified user ID.
 
-    :property: followers -> Returns a list of users who are followers of the specified user ID.
+    :property: following: List[Object] -> Returns a list of users thats followed by the specified user ID.
 
-    :property: following -> Returns a list of users thats followed by the specified user ID.
+	:property: followers_count: int -> Return total of followers that a user has.
+
+	:property: following_count: int -> Return total of followings that a user has.
+
+	:property: tweet_count: int -> Return total of tweets that a user has.
+
+	:property: listed_count: int -> Return total of listed that a user has.
     """
 
     def __init__(self, data: Dict[str, Any], **kwargs):
@@ -75,7 +81,7 @@ class User(Messageable):
         self.description = self.bio
 
     def __str__(self) -> str:
-        return "<User: name={0.name} username={0.username} description={0.description} id={0.id} created_at={0.created_at} verified={0.verified} protected={0.protected} avatar_url={0.avatar_url} location={0.location} followers_count={0.followers_count} following_count={0.following_count} tweet_count={0.tweet_count}>".format(
+        return "<User: name={0.name} username={0.username} bio={0.bio} id={0.id} created_at={0.created_at} verified={0.verified} protected={0.protected} avatar_url={0.avatar_url} location={0.location} followers_count={0.followers_count} following_count={0.following_count} tweet_count={0.tweet_count}>".format(
             self
         )
 
@@ -100,7 +106,7 @@ class User(Messageable):
 
     @property
     def profile_link(self) -> str:
-        return f"https://twitter.com/{self.username.replace('@', '')}"
+        return f"https://twitter.com/{self.username.replace('@', '', 1)}"
 
     @property
     def link(self) -> str:
