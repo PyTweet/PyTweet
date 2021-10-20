@@ -219,7 +219,7 @@ class Client:
 
         return Tweet(json_response)
 
-    def post_tweet(self, text:str, **kwargs):
+    def tweet(self, text:str, **kwargs):
         self.http.post_tweet(text, kwargs)
 
     def run(self):
