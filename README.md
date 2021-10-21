@@ -20,11 +20,11 @@ python -m pip install PyTweet
 
 ## Usage
 
-#### First we create our client instance using twitter.Client()
+#### First we create our client instance using pytweet.Client()
 ```py
-import twitter
+import pytweet
 
-client=twitter.Client("Your Bearer Token Here!!!", consumer_key="Your consumer_key here", consumer_key_secret="Your consumer_key_secret here", access_token="Your access_token here", access_token_secret="Your access_token_secret here") #if you dont have one make an application in https://apps.twitter.com
+client=pytweet.Client("Your Bearer Token Here!!!", consumer_key="Your consumer_key here", consumer_key_secret="Your consumer_key_secret here", access_token="Your access_token here", access_token_secret="Your access_token_secret here") #if you dont have one make an application in https://apps.pytweet.com
 ```
 
 #### After that we use functions to get info from twitter api.
