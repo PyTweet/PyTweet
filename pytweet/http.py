@@ -111,10 +111,13 @@ class HTTPClient:
         res = respond.json()
 
         if "errors" in res.keys():
-            if "Could not find user with" in res["errors"][0]["detail"]:
-                raise NotFoundError(res["errors"][0]["detail"])
-            else:
-                raise Exception(res["errors"][0]["detail"])
+            try:
+                if res["errors"][0]["detail"].startswith("Could not find"):
+                    raise NotFoundError(res["errors"][0]["detail"])
+                else:
+                    raise Exception(res["errors"][0]["detail"])
+            except KeyError:
+                print(res)
                 
 
         elif "meta" in res.keys():
@@ -151,7 +154,7 @@ class HTTPClient:
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld",
-                "expansions": "pinned_tweet_id ",
+                "expansions": "pinned_tweet_id",
                 "tweet.fields": "attachments,author_id,context_annotations,conversation_id,created_at,entities,geo,id,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,source,text,withheld"
             },
         )
@@ -161,7 +164,7 @@ class HTTPClient:
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld",
-                "expansions": "pinned_tweet_id ",
+                "expansions": "pinned_tweet_id",
                 "tweet.fields": "attachments,author_id,context_annotations,conversation_id,created_at,entities,geo,id,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,source,text,withheld"
             },
         )
