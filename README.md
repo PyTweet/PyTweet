@@ -1,11 +1,16 @@
-<img src="https://img.shields.io/badge/code%20style-black-000000.svg" align="right"/>
-
-<img src="https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white" align="right"/>
-
-
 # PyTweet
 
-PyTweet is an api wrapper made for receiving info from twitter using twitter's api version 2! 
+<img src="https://img.shields.io/pypi/v/PyTweet?logo=pypi&style=plastic">  
+
+<img src="https://img.shields.io/badge/code%20style-black-000000.svg">  
+
+<img alt="PyPI - License" src="https://img.shields.io/pypi/l/PyTweet"> 
+
+<img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/PyTweet">
+<br />
+<br />
+
+PyTweet is a Synchronous python API wrapper for twitter's api, Its fill with rich features and very easy to use.
 
 ## Installation
 
