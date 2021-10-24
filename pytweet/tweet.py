@@ -23,9 +23,8 @@ SOFTWARE.
 """
 
 import datetime
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Union
 from dateutil import parser
-from .user import User
 from .attachments import Poll, Media
 from .metrics import TweetPublicMetrics
 
@@ -216,17 +215,18 @@ class Tweet:
         return self._payload.get("id")
 
     @property
-    def author(self) -> Optional[User]:
+    def author(self) -> Optional[object]:
         """Optional[:class:User]: Return a user (object) who posted the tweet."""
+        from .user import User #Prevent circular import error.
         return User(self._includes.get("users")[0], http_client=self.http_client)
 
     @property
-    def retweeted_by(self) -> Optional[List[User]]:
+    def retweeted_by(self) -> Union[List[object], int]:
         """Optional[List[:class:User]]: Return a list of users thats retweeted the specified tweet's id. Maximum user is 100. Return 0 if no one retweeted."""
         return self._payload.get("retweeted_by")
 
     @property
-    def liking_users(self) -> Optional[List[User]]:
+    def liking_users(self) -> Union[List[object], int]:
         """Optional[List[:class:User]]: Return a list of users that liked the specified tweet's id. Maximum user is 100. Return 0 if no one liked."""
         return self._payload.get("liking_users")
 

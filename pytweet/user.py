@@ -27,7 +27,6 @@ from typing import Dict, Any, Optional, List, TYPE_CHECKING
 from dateutil import parser
 from .abc import Messageable
 from .metrics import UserPublicMetrics
-from .tweet import Tweet
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -142,11 +141,12 @@ class User(Messageable):
         )
 
     @property
-    def pinned_tweet(self) -> Optional[Tweet]:
+    def pinned_tweet(self) -> Optional[object]:
         """Optional[:class:Tweet]: Returns the user's pinned tweet.
         Version Added: 1.1.3"""
-        pinned=self._payload.get("includes").get("tweets")
-        return Tweet(pinned, http_client=self.http_client) if pinned else None
+        
+        id=self._payload.get("pinned_tweet_id")
+        return None if not id else self.http_client.fetch_tweet(int(id), http_client=self.http_client)
 
     @property
     def followers(self) -> List[object]:
