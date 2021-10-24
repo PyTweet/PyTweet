@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import re
 
 version = ''
-with open('twitter/__init__.py') as f:
+with open('pytweet/__init__.py') as f:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
 
 if not version:
@@ -14,12 +14,12 @@ with open('README.md') as f:
 
 
 setup(name='PyTweet',
-    authors=['Genofield','TheFarGG'],
+    authors=['TheGenocide','TheFarGG'],
     url='https://github.com/TheFarGG/PyTweet/',
     version=version,
     packages=find_packages(),
     license='MIT',
-    description='A Python wrapper for the Twitter API using twitter APi version 1.1 and 2!',
+    description="A Synchronous python API wrapper for twitter's api",
     long_description=readme,
     long_description_content_type="text/markdown",
     include_package_data=True,
