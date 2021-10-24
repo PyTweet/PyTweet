@@ -92,7 +92,7 @@ class PollOptions:
     options: List[dict]
         An array of dictionary filled with position, label, and votes.
     """
-    def __init__(self, options: List[dict]):
+    def __init__(self, options: Dict[str, Any]):
         self.options = options
 
     def __repr__(self) -> str:
