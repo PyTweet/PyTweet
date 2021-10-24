@@ -128,7 +128,7 @@ class HTTPClient:
             return res
         return respond
 
-    def fetch_user(self, id: int, http_client) -> User:
+    def fetch_user(self, id: int, http_client, pinned_tweet: bool = False) -> User:
         """Make a Request to optain the user from the given user id.
         Version Added: 1.0.0
 
@@ -141,21 +141,16 @@ class HTTPClient:
             Route("GET", "2", f"/users/{id}"),
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
-                "user.fields": "created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld",
-                "expansions": "pinned_tweet_id"
+                "user.fields": "created_at,description,entities,id,location,name,profile_image_url,protected,public_metrics,url,username,verified,withheld,pinned_tweet_id"
             },
             is_json=True,
         )
-
-        data['data']
 
         followers = self.request(
             Route("GET", "2", f"/users/{id}/followers"),
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
-                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld",
-                "expansions": "pinned_tweet_id",
-                "tweet.fields": "attachments,author_id,context_annotations,conversation_id,created_at,entities,geo,id,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,source,text,withheld"
+                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
             },
         )
 
@@ -163,9 +158,7 @@ class HTTPClient:
             Route("GET", "2", f"/users/{id}/following"),
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
-                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld",
-                "expansions": "pinned_tweet_id",
-                "tweet.fields": "attachments,author_id,context_annotations,conversation_id,created_at,entities,geo,id,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,source,text,withheld"
+                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
             },
         )
 
@@ -199,9 +192,7 @@ class HTTPClient:
             route,
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
-                "user.fields": "created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld",
-                "expansions": "pinned_tweet_id",
-                "tweet.fields": "attachments,author_id,context_annotations,conversation_id,created_at,entities,geo,id,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,reply_settings,source,text,withheld"
+                "user.fields": "created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
             },
             is_json=True,
         )
@@ -217,81 +208,73 @@ class HTTPClient:
 
         This function return a :class: Tweet. 
         """
-        r = Route("GET", "2", f"/tweets/{id}")
-        res = requests.get(
-            r.url,
+        res = self.request(
+            Route("GET", "2", f"/tweets/{id}"),
+            headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "tweet.fields": "attachments,author_id,context_annotations,conversation_id,created_at,geo,entities,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,reply_settings,source,text,withheld",
-                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld",
+                "user.fields": "created_at,description,id,location,name,profile_image_url,protected,public_metrics,url,username,verified,withheld",
                 "expansions": "attachments.poll_ids,attachments.media_keys,author_id,geo.place_id,in_reply_to_user_id,referenced_tweets.id,entities.mentions.username,referenced_tweets.id.author_id",
                 "media.fields": "duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width",
                 "place.fields": "contained_within,country,country_code,full_name,geo,id,name,place_type",
                 "poll.fields": "duration_minutes,end_datetime,id,options,voting_status"
-            },
-            headers={"Authorization": f"Bearer {self.bearer_token}"},
+            }
         )
-        is_error(res)
 
-        r = Route("GET", "2", f"/tweets/{id}/retweeted_by")
-        res2 = requests.get(
-            r.url,
+        res2 = self.request(
+            Route("GET", "2", f"/tweets/{id}/retweeted_by"),
+            headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
-            },
-            headers={"Authorization": f"Bearer {self.bearer_token}"},
+            }
         )
 
-        is_error(res2)
-
-        r = Route("GET", "2", f"/tweets/{id}/liking_users")
-        res3 = requests.get(
-            r.url,
+        res3 = self.request(
+            Route("GET", "2", f"/tweets/{id}/liking_users"),
+            headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
-            },
-            headers={"Authorization": f"Bearer {self.bearer_token}"},
+            }
         )
-        is_error(res3)
 
-        json_response = res.json()
-        user_id = json_response["includes"]["users"][0].get("id")
+        user_id = res["includes"]["users"][0].get("id")
         user = self.fetch_user(int(user_id), http_client)
         
-        json_response["includes"]["users"][0].update({"followers": user.followers})
-        json_response["includes"]["users"][0].update({"following": user.following})
+        res["includes"]["users"][0].update({"followers": user.followers})
+        res["includes"]["users"][0].update({"following": user.following})
         
         try:
-            res2.json()["data"]
-            res3.json()["data"]
+            res2["data"]
+            res3["data"]
 
-            json_response["data"].update(
+            res["data"].update(
                 {
                     "retweeted_by": [
-                        User(user, http_client=http_client) for user in res2.json()["data"]
+                        User(user, http_client=http_client) for user in res2["data"]
                     ]
                 }
             )
-            json_response["data"].update(
+            res["data"].update(
                 {
                     "liking_users": [
-                        User(user, http_client=http_client) for user in res3.json()["data"]
+                        User(user, http_client=http_client) for user in res3["data"]
                     ]
                 }
             )
-        except KeyError:
-            json_response["data"].update(
+        except (KeyError, TypeError):
+            res["data"].update(
                 {
                     "retweeted_by": 0
                 }
             )
 
-            json_response["data"].update(
+            res["data"].update(
                 {
                     "liking_users": 0
                 }
             )
 
-        return Tweet(json_response)
+        return Tweet(res)
 
     def send_message(self, text: str, **kwargs):
         """WARNING: this function isnt finish yet!
