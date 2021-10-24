@@ -218,8 +218,6 @@ class Tweet:
     @property
     def author(self) -> Optional[User]:
         """Optional[:class:User]: Return a user (object) who posted the tweet."""
-        if not self.http_client:
-            raise Exception("You didnt provide http_client kwargs in your Tweet's object!")
         return User(self._includes.get("users")[0], http_client=self.http_client)
 
     @property
