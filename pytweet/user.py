@@ -23,10 +23,11 @@ SOFTWARE.
 """
 
 import datetime
-from typing import Dict, Any, Optional, List, TYPE_CHECKING
+from typing import Optional, List, TYPE_CHECKING
 from .abc import Messageable
 from .metrics import UserPublicMetrics
 from .utils import time_parse_todt
+from .types.user import UserPayload
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -52,7 +53,7 @@ class User(Messageable):
 	    Represent the public metrics of the user.
     """
 
-    def __init__(self, data: Dict[str, Any], **kwargs):
+    def __init__(self, data: UserPayload, **kwargs):
         super().__init__(data, **kwargs)
         self.original_payload = data
         self._payload = self.original_payload.get('data') if self.original_payload.get('data') != None else self.original_payload
