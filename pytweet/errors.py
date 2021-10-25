@@ -34,11 +34,6 @@ class NotFoundError(Exception):
 
     pass
 
-class UnfinishFunctionError(Exception):
-    """Raised upon using unfinish function"""
-
-    pass
-
 class TooManyRequests(Exception):
     """Raised when you made TooManyRequest"""
 
