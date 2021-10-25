@@ -27,7 +27,7 @@ from typing import Optional, List, TYPE_CHECKING
 from .abc import Messageable
 from .metrics import UserPublicMetrics
 from .utils import time_parse_todt
-from .types.user import UserPayload
+from .types.user import User as UserPayload
 
 if TYPE_CHECKING:
     from .http import HTTPClient
