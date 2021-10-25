@@ -34,12 +34,12 @@ if TYPE_CHECKING:
     
 class User(Messageable):
     """Represent a user in Twitter.
-    This user is an account that has created by other person, not from an apps.
+    User is an identity in twitter, its very interactive. Can send message, post a tweet, and even send messages to other user through Dms.
 
     Parameters:
     ===================
-    data: Dict[str, Any]
-        The complete data of the user through a dictionary!
+    data: UserPayload
+        The complete data of the user through a dictionary in a UserPayload format form!
 
     Attributes:
     ===================
