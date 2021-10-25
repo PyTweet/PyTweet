@@ -24,7 +24,7 @@ SOFTWARE.
 
 import requests
 from typing import Dict, Any, Optional
-from .errors import Unauthorized, NotFoundError, UnfinishFunctionError, TooManyRequests
+from .errors import Unauthorized, NotFoundError, TooManyRequests
 from .user import User
 from .tweet import Tweet
 
@@ -274,7 +274,7 @@ class HTTPClient:
                 }
             )
 
-        return Tweet(res)
+        return Tweet(res, http_client=self)
 
     def send_message(self, text: str, **kwargs):
         """WARNING: this function isnt finish yet!
@@ -282,7 +282,7 @@ class HTTPClient:
 
         Make a post Request for sending a message to a Messageable object.
         """
-        raise UnfinishFunctionError("This function is not finish yet")
+        raise NotImplementedError("This function is not finish yet")
 
     def delete_message(self, id: int, **kwargs):
         """WARNING: this function isnt finish yet!
@@ -290,7 +290,7 @@ class HTTPClient:
 
         Make a DELETE Request for deleting a certain message in a Messageable object.
         """
-        raise UnfinishFunctionError("This function is not finish yet")
+        raise NotImplementedError("This function is not finish yet")
 
     def post_tweet(self, text: str, **kwargs):
         """WARNING: this function isnt finish yet!
@@ -298,7 +298,7 @@ class HTTPClient:
         
         Make a POST Request to post a tweet to twitter from the client itself.
         """
-        raise UnfinishFunctionError("This function is not finish yet")
+        raise NotImplementedError("This function is not finished yet")
 
     def follow_user(self, id:int, **kwargs):
         """WARNING: this function isnt finish yet!
@@ -306,12 +306,12 @@ class HTTPClient:
 
         Make a POST Request to follow a Messageable object.
         """
-        raise UnfinishFunctionError("This function is not finish yet")
+        raise NotImplementedError("This function is not finish yet")
 
     def unfollow_user(self, id:int, **kwargs):
-        """WARNING: this function isnt finish yet!
+        """WARNING: This function is not finish yet!
         Version Added: 1.1.0
 
         Make a POST Request to unfollow a Messageable object.
         """
-        raise UnfinishFunctionError("This function is not finish yet")
+        raise NotImplementedError("This function is not finish yet")
