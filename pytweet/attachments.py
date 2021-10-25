@@ -23,7 +23,7 @@ SOFTWARE.
 """
 
 import datetime
-from dateutil import parser
+from .utils import time_parse_todt
 from typing import Dict, List, Any
 
 class Media:
@@ -89,8 +89,8 @@ class PollOptions:
 
     Parameters:
     ===================
-    options: List[dict]
-        An array of dictionary filled with position, label, and votes.
+    options: Dict[str, Any]
+        An dictionary filled with the option's: position, label, and votes.
     """
     def __init__(self, options: Dict[str, Any]):
         self.options = options
@@ -204,15 +204,4 @@ class Poll:
         """datetime.datetime: Return the end date in datetime.datetime object.
         Version Added: 1.1.0
         """
-        date = str(parser.parse(self._payload.get("end_datetime")))
-        y, mo, d = date.split("-")
-        h, mi, s = date.split(" ")[1].split("+")[0].split(":")
-
-        return datetime.datetime(
-            year=int(y),
-            month=int(mo),
-            day=int(d.split(" ")[0]),
-            hour=int(h),
-            minute=int(mi),
-            second=int(s),
-        )
+        return time_parse_todt(self._payload.get("end_datetime"))

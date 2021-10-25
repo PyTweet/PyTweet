@@ -24,9 +24,10 @@ SOFTWARE.
 
 import datetime
 from typing import Optional, Dict, Any, List, Union
-from dateutil import parser
 from .attachments import Poll, Media
+from .user import User
 from .metrics import TweetPublicMetrics
+from .utils import time_parse_todt
 
 class EmbedsImages:
     """Represent the tweets embed images
@@ -167,7 +168,6 @@ class Embed:
         """int: Return the embed's url HTTP status code"""
         return int(self._payload.get('status'))
 
-    
 class Tweet:
     """Represent a tweet message from Twitter.
     A Tweet is any message posted to Twitter which may contain photos, videos, links, and text.
@@ -215,19 +215,18 @@ class Tweet:
         return self._payload.get("id")
 
     @property
-    def author(self) -> Optional[object]:
+    def author(self) -> Optional[User]:
         """Optional[:class:User]: Return a user (object) who posted the tweet."""
-        from .user import User #Prevent circular import error.
         return User(self._includes.get("users")[0], http_client=self.http_client)
 
     @property
-    def retweeted_by(self) -> Union[List[object], int]:
-        """Optional[List[:class:User]]: Return a list of users thats retweeted the specified tweet's id. Maximum user is 100. Return 0 if no one retweeted."""
+    def retweeted_by(self) -> Union[List[User], int]:
+        """Optional[List[:class:User]]: Return a list of users thats retweeted the specified tweet's id. Maximum users is 100. Return 0 if no one retweeted."""
         return self._payload.get("retweeted_by")
 
     @property
-    def liking_users(self) -> Union[List[object], int]:
-        """Optional[List[:class:User]]: Return a list of users that liked the specified tweet's id. Maximum user is 100. Return 0 if no one liked."""
+    def liking_users(self) -> Union[List[User], int]:
+        """Optional[List[:class:User]]: Return a list of users that liked the specified tweet's id. Maximum users is 100. Return 0 if no one liked."""
         return self._payload.get("liking_users")
 
     @property
@@ -238,18 +237,7 @@ class Tweet:
     @property
     def created_at(self) -> datetime.datetime:
         """:class: datetime.datetime: Return a datetime object with the tweet posted age."""
-        date = str(parser.parse(self._payload.get("created_at")))
-        y, mo, d = date.split("-")
-        h, mi, s = date.split(" ")[1].split("+")[0].split(":")
-
-        return datetime.datetime(
-            year=int(y),
-            month=int(mo),
-            day=int(d.split(" ")[0]),
-            hour=int(h),
-            minute=int(mi),
-            second=int(s),
-        )
+        return time_parse_todt(self._payload.get("created_at"))
         
     @property
     def source(self) -> str:
@@ -270,6 +258,23 @@ class Tweet:
     def convertion_id(self) -> int:
         """int: Return the tweet's convertion id."""
         return self._payload.get("convertion_id")
+
+    @property
+    def reply_to(self) -> Optional[User]:
+        """Optional[:class:User]: Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
+        Version Added: 1.1.3
+        """
+        user=self.http_client.fetch_user(int(self._payload.get("in_reply_to_user_id")), http_client=self.http_client) if self._payload.get("in_reply_to_user_id") else None
+        return user 
+
+    @property
+    def mentions(self) -> Union[List[User], bool]:
+        """Union[List[:class:User], bool]: Return the mentioned users, if there isnt it return False.
+        Version Added: 1.1.3
+        """
+        if self._includes:
+            return [self.http_client.fetch_user_byusername(user.get("username"), http_client=self.http_client) for user in self._includes.get("mentions")]
+        return False
 
     @property
     def poll(self) -> Poll:

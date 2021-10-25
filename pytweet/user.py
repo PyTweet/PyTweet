@@ -24,15 +24,13 @@ SOFTWARE.
 
 import datetime
 from typing import Dict, Any, Optional, List, TYPE_CHECKING
-from dateutil import parser
 from .abc import Messageable
 from .metrics import UserPublicMetrics
+from .utils import time_parse_todt
 
 if TYPE_CHECKING:
     from .http import HTTPClient
     
-
-
 class User(Messageable):
     """Represent a user in Twitter.
     This user is an account that has created by other person, not from an apps.
@@ -127,18 +125,7 @@ class User(Messageable):
     @property
     def created_at(self) -> datetime.datetime:
         """:class:datetime.datetime: Return datetime.datetime object with the user's account date."""
-        date = str(parser.parse(self._payload.get("created_at")))
-        y, mo, d = date.split("-")
-        h, mi, s = date.split(" ")[1].split("+")[0].split(":")
-
-        return datetime.datetime(
-            year=int(y),
-            month=int(mo),
-            day=int(d.split(" ")[0]),
-            hour=int(h),
-            minute=int(mi),
-            second=int(s),
-        )
+        return time_parse_todt(self._payload.get("created_at"))
 
     @property
     def pinned_tweet(self) -> Optional[object]:
@@ -177,6 +164,3 @@ class User(Messageable):
     def listed_count(self) -> int:
         """int: Return total of listed that a user has."""
         return int(self._metrics.listed_count)
-
-class Author(User): #prevent circular import error.
-    pass
