@@ -22,19 +22,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from typing import Optional, Union, Dict, TypedDict, Any
 
-class PartialUser(TypedDict, total=False):
+ 
+
+
+
+
+
+
+
+import datetime
+from typing import Union, Any, Dict, TypedDict
+
+class Tweet(TypedDict, total=False):
     data = Dict[str, Any]
-    id = Union[str, int]
-    name = str
-    username = str
-    description = str
-
-class User(PartialUser, total=False):
-    link = str
-    verified = bool
-    protected = bool
-    avatar_url = Optional[str]
-    location = Optional[str]
-    created_at = str
+    id : Union[str, int]
+    text: str
+    author: object
+    sensitive: bool
+    created_at: datetime.datetime
+    source: str
+    reply_setting: str
+    lang: str
+    convertion_id: Union[str, int]
