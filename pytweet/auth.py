@@ -1,0 +1,21 @@
+from requests_oauthlib import OAuth1, OAuth1Session
+
+class OauthHandler:
+    def __init__(self, consumer_key : str, consumer_secret: str, callback=None):
+        self.consumer_key = consumer_key
+        self.consumer_key_secret = consumer_secret
+        self.access_token = None
+        self.access_token_secret = None
+        self.callback = callback
+        self.oauth = OAuth1Session(consumer_key, client_secret=consumer_secret,callback_uri=self.callback)
+
+    def set_access_token(self, key, secret):
+        self.access_token = key
+        self.access_token_secret = secret
+
+    def apply_auth(self):
+        return OAuth1(self.consumer_key,
+        client_secret=self.consumer_key_secret,
+        resource_owner_key=self.access_token,
+        resource_owner_secret=self.access_token_secret,
+        decoding=None)
