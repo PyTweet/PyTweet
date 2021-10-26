@@ -1,5 +1,5 @@
-from .user import *
 from .tweet import *
+from .user import *
 
 
 __title__ = "PyTweet"
