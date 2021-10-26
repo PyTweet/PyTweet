@@ -24,7 +24,7 @@ SOFTWARE.
 
 import requests
 from typing import Dict, Any, Optional, Union
-from .errors import Unauthorized, NotFoundError, TooManyRequests
+from .errors import Unauthorized, NotFoundError, TooManyRequests, Forbidden, PytweetExceptions
 from .user import User
 from .tweet import Tweet
 from .auth import OauthHandler
@@ -33,6 +33,9 @@ def is_error(respond: requests.models.Response):
     code = respond.status_code
     if code == 401:
         raise Unauthorized("Invalid credentials passed!")
+
+    elif code == 403:
+        raise Forbidden("Forbidden to interact with that User!")
 
     elif code == 429:
         raise TooManyRequests(respond.text)
@@ -89,6 +92,7 @@ class HTTPClient:
         self.consumer_key_secret = consumer_key_secret
         self.access_token = access_token
         self.access_token_secret = access_token_secret
+        self.followed_cache = {}
 
     def request(
         self,
@@ -98,7 +102,8 @@ class HTTPClient:
         params: RequestModel = {},
         json: RequestModel = {},
         auth: bool = False,
-        is_json: bool = True
+        is_json: bool = True,
+        mode: str = None
     ):
         """Make an HTTP Requests to the api.
         Version Added: 1.0.0
@@ -125,12 +130,15 @@ class HTTPClient:
                 else:
                     raise Exception(res["errors"][0]["detail"])
             except KeyError:
-                print(res)
+                raise PytweetExceptions(res)
                 
 
         elif "meta" in res.keys():
             if res["meta"]["result_count"] == 0:
                 return 0
+
+        if route.method.upper() == "POST" and mode == "follow":
+            self.followed_cache[str(json["target_user_id"])] = res["data"]
 
         if is_json:
             return res
@@ -318,9 +326,10 @@ class HTTPClient:
         post=self.request(
             Route("POST", "2", f"/users/{my_id}/following"),\
             json={"target_user_id": str(user_id)},
-            auth=True
-
+            auth=True,
+            mode="follow"
         ) 
+        
         return post
 
     def unfollow_user(self, id:int, **kwargs):
