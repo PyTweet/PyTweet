@@ -60,7 +60,7 @@ class Messageable(Protocol):
     def follow(self, **kwargs):
         """Follow a Messageable object.
         Version Added: 1.1.0"""
-        self.http_client.follow_user(self._payload.get('id'), kwargs)
+        self.http_client.follow_user(self._payload.get('id'), **kwargs)
 
     def unfollow(self, **kwargs):
         """Unfollow a Messageable object.

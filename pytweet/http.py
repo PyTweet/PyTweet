@@ -23,11 +23,11 @@ SOFTWARE.
 """
 
 import requests
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Union
 from .errors import Unauthorized, NotFoundError, TooManyRequests
 from .user import User
 from .tweet import Tweet
-
+from .auth import OauthHandler
 
 def is_error(respond: requests.models.Response):
     code = respond.status_code
@@ -37,6 +37,7 @@ def is_error(respond: requests.models.Response):
     elif code == 429:
         raise TooManyRequests(respond.text)
 
+RequestModel: Dict[str, Any] = Any
 
 class Route:
     def __init__(self, method: str, version: str, path: str):
@@ -93,9 +94,11 @@ class HTTPClient:
         self,
         route: Route,
         *,
-        headers: Dict[str, Any],
-        params: Dict[str, str] = {},
-        is_json: bool = True,
+        headers: RequestModel = {},
+        params: RequestModel = {},
+        json: RequestModel = {},
+        auth: bool = False,
+        is_json: bool = True
     ):
         """Make an HTTP Requests to the api.
         Version Added: 1.0.0
@@ -106,7 +109,12 @@ class HTTPClient:
         if not res:
             raise TypeError("Method isnt recognizable")
 
-        respond = res(route.url, headers=headers, params=params)
+        if auth:
+            auth = OauthHandler(self.consumer_key, self.consumer_key_secret)
+            auth.set_access_token(self.access_token, self.access_token_secret)
+            auth = auth.apply_auth()
+
+        respond = res(route.url, headers=headers, params=params, json=json, auth=auth)
         is_error(respond)
         res = respond.json()
 
@@ -300,13 +308,20 @@ class HTTPClient:
         """
         raise NotImplementedError("This function is not finished yet")
 
-    def follow_user(self, id:int, **kwargs):
+    def follow_user(self, user_id:Union[str, int], **kwargs):
         """WARNING: this function isnt finish yet!
         Version Added: 1.1.0
 
         Make a POST Request to follow a Messageable object.
         """
-        raise NotImplementedError("This function is not finish yet")
+        my_id=self.access_token.partition('-')[0]
+        post=self.request(
+            Route("POST", "2", f"/users/{my_id}/following"),\
+            json={"target_user_id": str(user_id)},
+            auth=True
+
+        ) 
+        return post
 
     def unfollow_user(self, id:int, **kwargs):
         """WARNING: This function is not finish yet!
