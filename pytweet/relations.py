@@ -1,14 +1,7 @@
-from typing import Dict, Any
-from enum import Enum
+from typing import Dict, Any, Union, Type
+from .enums import RelationsTypeEnum
 
-
-class RelationsType(Enum):
-    PENDING = 0
-    ACCEPT = 1
-    NUL = None
-
-
-Payload: Dict[str, Any] = Any
+Payload: Union[Dict[str, Any], Any] = Any
 
 
 class RelationFollow:
@@ -41,16 +34,16 @@ class RelationFollow:
         return "Followed(type: {0.type} following: {0.following} pending: {0.pending})".format(self)
 
     @property
-    def pending(self):
+    def pending(self) -> bool:
         """bool: Check if the relation is pending."""
         return self._payload.get("pending") if self._payload.get("pending") else False
 
     @property
-    def following(self):
+    def following(self) -> bool:
         """bool: Check if the relation is following."""
         return self._payload.get("following") if self._payload.get("following") else False
 
     @property
     def type(self):
         """RelationType: Check what relation type it is."""
-        return RelationsType(1 if self._payload["following"] else 0)
+        return RelationsTypeEnum(1 if self._payload["following"] else 0)
