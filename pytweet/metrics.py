@@ -24,18 +24,19 @@ SOFTWARE.
 
 from typing import Dict, Any
 
+
 class UserPublicMetrics:
     """Represent a PublicMetrics for a User.
     This PublicMetrics contain public info about the user.
-    Version Added: 1.1.0
+    Verion Added:::
 
     Parameters:
-    ===================
+    -----------
     data: Dict[str, Any]
         The complete data of the user's public metrics through a dictionary!
 
     Attributes:
-    ===================
+    -----------
     original_payload
         Return the original payload of the user.
 
@@ -55,43 +56,44 @@ class UserPublicMetrics:
     @property
     def followers_count(self) -> int:
         """int: Returns total of followers that a user has.
-        Version Added: 1.1.0
+        Verion Added:: 1.1.0
         """
         return int(self._public.get("followers_count"))
 
     @property
     def following_count(self) -> int:
         """int: Returns total of following that a user has.
-        Version Added: 1.1.0
+        Verion Added:: 1.1.0
         """
         return int(self._public.get("following_count"))
 
     @property
     def tweet_count(self) -> int:
         """int: Returns total of tweet that a user has.
-        Version Added: 1.1.0
+        Verion Added:: 1.1.0
         """
         return int(self._public.get("tweet_count"))
 
     @property
     def listed_count(self) -> int:
         """int: Returns total of listed that a user has.
-        Version Added: 1.1.0
+        Verion Added:: 1.1.0
         """
         return int(self._public.get("listed_count"))
+
 
 class TweetPublicMetrics:
     """Represent a PublicMetrics for a tweet.
     This PublicMetrics contain public info about the tweet.
-    Version Added: 1.1.0
+    Verion Added:: 1.1.0
 
     Parameters:
-    ===================
+    -----------
     data: Dict[str, Any]:
         The complete data of the tweet's public metrics keep in a dictionary.
 
     Attributes:
-    ===================
+    -----------
     original_payload
         Return the original payload of the tweet.
 
@@ -111,27 +113,27 @@ class TweetPublicMetrics:
     @property
     def like_count(self) -> int:
         """int: Return total of likes that the tweet has.
-        Version Added: 1.1.0
+        Verion Added:: 1.1.0
         """
         return int(self._public.get("like_count"))
 
     @property
     def retweet_count(self) -> int:
         """int: Return total of retweetes that the tweet has.
-        Version Added: 1.1.0
+        Verion Added:: 1.1.0
         """
         return int(self._public.get("retweet_count"))
 
     @property
     def reply_count(self) -> int:
         """int: Return total of replies that the tweet has.
-        Version Added: 1.1.0
+        Verion Added:: 1.1.0
         """
         return int(self._public.get("reply_count"))
 
     @property
     def quote_count(self) -> int:
         """int: Return total of quotes that the tweet has.
-        Version Added: 1.1.0
+        Verion Added:: 1.1.0
         """
         return int(self._public.get("quote_count"))

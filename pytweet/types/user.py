@@ -23,7 +23,9 @@ SOFTWARE.
 """
 
 from typing import Optional, Union, Dict, TypedDict, Any
+
 ObjectID: Union[str, int] = None
+
 
 class PartialUser(TypedDict, total=False):
     data: Dict[str, Any]
@@ -31,6 +33,7 @@ class PartialUser(TypedDict, total=False):
     name: str
     username: str
     description: str
+
 
 class User(PartialUser, total=False):
     link: str
