@@ -304,9 +304,9 @@ class Tweet:
         return self.tweet_metrics.like_count
 
     @property
-    def retweeted_count(self) -> int:
+    def retweet_count(self) -> int:
         """int: Return the total of retweetes in a tweet."""
-        return self.tweet_metrics.retweeted_count
+        return self.tweet_metrics.retweet_count
 
     @property
     def reply_count(self) -> int:
