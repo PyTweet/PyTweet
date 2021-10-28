@@ -25,9 +25,10 @@ SOFTWARE.
 import datetime
 from typing import Union, Any, Dict, TypedDict
 
+
 class Tweet(TypedDict, total=False):
-    data : Dict[str, Any]
-    id : Union[str, int]
+    data: Dict[str, Any]
+    id: Union[str, int]
     text: str
     author: object
     sensitive: bool

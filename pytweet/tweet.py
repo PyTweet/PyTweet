@@ -30,9 +30,10 @@ from .metrics import TweetPublicMetrics
 from .utils import time_parse_todt
 from .types.tweet import Tweet as TweetPayload
 
+
 class EmbedsImages:
     """Represent the tweets embed images
-    Version Added: 1.1.3
+    .. versionadded: 1.1.3
 
     Parameters:
     =============
@@ -44,13 +45,12 @@ class EmbedsImages:
     _payload
         The data paramaters.
     """
+
     def __init__(self, data: Dict[str, Any]):
         self._payload = data
 
     def __repr__(self) -> str:
-        return "EmbedsImages(url={0.url} width={0.width} height={0.height})".format(
-            self
-        )
+        return "EmbedsImages(url={0.url} width={0.width} height={0.height})".format(self)
 
     def __str__(self) -> str:
         return self.url
@@ -58,27 +58,28 @@ class EmbedsImages:
     @property
     def width(self) -> int:
         """int: Return the image's width
-        Version Added: 1.1.3
+        .. versionadded: 1.1.3
         """
-        return int(self._payload.get('width'))
+        return int(self._payload.get("width"))
 
     @property
     def height(self) -> int:
         """int: Return the image's height
-        Version Added: 1.1.3
-        """        
-        return int(self._payload.get('height'))
+        .. versionadded: 1.1.3
+        """
+        return int(self._payload.get("height"))
 
     @property
     def url(self) -> str:
         """int: Return the image's url
-        Version Added: 1.1.3
+        .. versionadded: 1.1.3
         """
-        return self._payload.get('url')
+        return self._payload.get("url")
+
 
 class Embed:
     """Represent the embeded urls in a tweet.
-    Version Added: 1.1.3
+    .. versionadded: 1.1.3
 
     Parameters:
     =============
@@ -90,13 +91,12 @@ class Embed:
     _payload
         The data paramaters.
     """
+
     def __init__(self, data: Dict[str, Any]):
         self._payload = data
 
     def __repr__(self) -> str:
-        return "Embed(title={0.title} description={0.description} url={0.url})".format(
-            self
-        )
+        return "Embed(title={0.title} description={0.description} url={0.url})".format(self)
 
     def __str__(self) -> str:
         return self.url
@@ -104,95 +104,97 @@ class Embed:
     @property
     def title(self) -> str:
         """str: Return the embed's title
-        Version Added: 1.1.3
+        .. versionadded: 1.1.3
         """
-        return self._payload.get('title')
+        return self._payload.get("title")
 
     @property
     def description(self) -> str:
         """str: Return the embed's description
-        Version Added: 1.1.3
+        .. versionadded: 1.1.3
         """
-        return self._payload.get('description')
+        return self._payload.get("description")
 
     @property
     def start(self) -> int:
         """int: Return the embed's start
-        Version Added: 1.1.3
+        .. versionadded: 1.1.3
         """
-        return int(self._payload.get('start'))
+        return int(self._payload.get("start"))
 
     @property
     def end(self) -> int:
         """int: Return the embed's end
-        Version Added: 1.1.3
+        .. versionadded: 1.1.3
         """
-        return int(self._payload.get('end'))
+        return int(self._payload.get("end"))
 
     @property
     def url(self) -> str:
         """str: Return the embed's url
-        Version Added: 1.1.3
+        .. versionadded: 1.1.3
         """
-        return self._payload.get('url')
+        return self._payload.get("url")
 
     @property
     def expanded_url(self) -> str:
         """str: Return the expanded url
-        Version Added: 1.1.3
+        .. versionadded: 1.1.3
         """
-        return self._payload.get('expanded_url')
+        return self._payload.get("expanded_url")
 
     @property
     def display_url(self) -> str:
         """str: Return the display url
-        Version Added: 1.1.3
+        .. versionadded: 1.1.3
         """
-        return self._payload.get('display_url')
+        return self._payload.get("display_url")
 
     @property
     def unwound_url(self) -> str:
         """str: Return the unwound url
-        Version Added: 1.1.3
+        .. versionadded: 1.1.3
         """
-        return self._payload.get('unwound_url')
+        return self._payload.get("unwound_url")
 
     @property
     def images(self) -> List[EmbedsImages]:
         """List[:class:EmbedsImages]: Return a list of Embed's Images
-        Version Added: 1.1.3
+        .. versionadded: 1.1.3
         """
-        return [EmbedsImages(data) for data in self._payload.get('images')]
+        return [EmbedsImages(data) for data in self._payload.get("images")]
 
     @property
     def status_code(self) -> int:
         """int: Return the embed's url HTTP status code"""
-        return int(self._payload.get('status'))
+        return int(self._payload.get("status"))
+
 
 class Tweet:
     """Represent a tweet message from Twitter.
     A Tweet is any message posted to Twitter which may contain photos, videos, links, and text.
-    Version Added: 1.0.0
+    .. versionadded: 1.0.0
 
     Parameters:
-    ===================
+    -----------
     data: TweetPayload
         The complete data of a tweet keep inside a dictionary.
 
     Attributes:
-    ===================
+    -----------
     original_payload
-	    Represent the main data of a tweet. 
+            Represent the main data of a tweet.
 
-	_payload
-	    Same as original_payload but its inside the 'data' key.
+        _payload
+            Same as original_payload but its inside the 'data' key.
 
-	_includes
-	    Same as original_payload but its inside the '_includes' key..
+        _includes
+            Same as original_payload but its inside the '_includes' key..
 
-	tweet_metrics
-	    Represent the public metrics of the tweet.
+        tweet_metrics
+            Represent the public metrics of the tweet.
     """
+
     def __init__(self, data: TweetPayload, **kwargs):
         self.original_payload = data
         self._payload = data.get("data") or None
@@ -201,10 +203,8 @@ class Tweet:
         self.http_client = kwargs.get("http_client") or None
 
     def __repr__(self) -> str:
-        return "Tweet(text={0.text} id={0.id} author={0.author})".format(
-            self
-        )
-    
+        return "Tweet(text={0.text} id={0.id} author={0.author})".format(self)
+
     @property
     def text(self) -> str:
         """str: Return the tweet's text."""
@@ -239,7 +239,7 @@ class Tweet:
     def created_at(self) -> datetime.datetime:
         """:class: datetime.datetime: Return a datetime object with the tweet posted age."""
         return time_parse_todt(self._payload.get("created_at"))
-        
+
     @property
     def source(self) -> str:
         """str: Return the source of the tweet. e.g if you post a tweet from a website, the source is gonna be 'Twitter Web App'"""
@@ -263,38 +263,48 @@ class Tweet:
     @property
     def reply_to(self) -> Optional[User]:
         """Optional[:class:User]: Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
-        Version Added: 1.1.3
+        .. versionadded: 1.1.3
         """
-        user=self.http_client.fetch_user(int(self._payload.get("in_reply_to_user_id")), http_client=self.http_client) if self._payload.get("in_reply_to_user_id") else None
-        return user 
+        user = (
+            self.http_client.fetch_user(
+                int(self._payload.get("in_reply_to_user_id")),
+                http_client=self.http_client,
+            )
+            if self._payload.get("in_reply_to_user_id")
+            else None
+        )
+        return user
 
     @property
     def mentions(self) -> Union[List[User], bool]:
         """Union[List[:class:User], bool]: Return the mentioned users, if there isnt it return False.
-        Version Added: 1.1.3
+        .. versionadded: 1.1.3
         """
         if self._includes.get("mentions"):
-            return [self.http_client.fetch_user_byusername(user.get("username"), http_client=self.http_client) for user in self._includes.get("mentions")]
+            return [
+                self.http_client.fetch_user_byusername(user.get("username"), http_client=self.http_client)
+                for user in self._includes.get("mentions")
+            ]
         return False
 
     @property
     def poll(self) -> Poll:
         """:class:Poll: Return a Poll object with the tweet's poll.
-        Version Added: 1.1.0
+        .. versionadded: 1.1.0
         """
-        return Poll(self._includes.get('polls')[0])
+        return Poll(self._includes.get("polls")[0])
 
     @property
     def media(self) -> Media:
         """List[:class:Media] -> Return a list of media(s) in a tweet.
-        Version Added: 1.1.0
+        .. versionadded: 1.1.0
         """
         return [Media(img) for img in self._includes.get("media")]
 
     @property
     def embeds(self) -> List[Embed]:
         """List[:class:Embed]: Return a list of Embeded url from that tweet
-        Version Added: 1.1.3
+        .. versionadded: 1.1.3
         """
         return [Embed(url) for url in self._payload.get("entities").get("urls")]
 

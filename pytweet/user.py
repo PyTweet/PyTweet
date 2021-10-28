@@ -31,32 +31,35 @@ from .types.user import User as UserPayload
 
 if TYPE_CHECKING:
     from .http import HTTPClient
-    
+
+
 class User(Messageable):
     """Represent a user in Twitter.
     User is an identity in twitter, its very interactive. Can send message, post a tweet, and even send messages to other user through Dms.
 
     Parameters:
-    ===================
+    -----------
     data: UserPayload
         The complete data of the user through a dictionary in a UserPayload format form!
 
     Attributes:
-    ===================
+    -----------
     original_payload
         Represent the main data of a tweet.
 
     http_client
         Represent a :class: HTTPClient that make the request.
-    
+
     user_metrics
-	    Represent the public metrics of the user.
+            Represent the public metrics of the user.
     """
 
     def __init__(self, data: UserPayload, **kwargs):
         super().__init__(data, **kwargs)
         self.original_payload = data
-        self._payload = self.original_payload.get('data') if self.original_payload.get('data') != None else self.original_payload
+        self._payload = (
+            self.original_payload.get("data") if self.original_payload.get("data") != None else self.original_payload
+        )
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
         self._metrics = UserPublicMetrics(self._payload) if self._payload != None else self.original_payload
 
@@ -64,9 +67,7 @@ class User(Messageable):
         return self.username
 
     def __repr__(self) -> str:
-        return "User(name={0.name} username={0.username} id={0.id})".format(
-            self
-        )
+        return "User(name={0.name} username={0.username} id={0.id})".format(self)
 
     @property
     def name(self) -> str:
@@ -131,9 +132,9 @@ class User(Messageable):
     @property
     def pinned_tweet(self) -> Optional[object]:
         """Optional[:class:Tweet]: Returns the user's pinned tweet.
-        Version Added: 1.1.3"""
-        
-        id=self._payload.get("pinned_tweet_id")
+        Verion Added: 1.1.3"""
+
+        id = self._payload.get("pinned_tweet_id")
         return None if not id else self.http_client.fetch_tweet(int(id), http_client=self.http_client)
 
     @property
