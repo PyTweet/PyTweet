@@ -9,4 +9,4 @@ Submitting a pull request is simple, just make sure it focuses on a single aspec
 #### Git Commit Guidelines
 - Try to Limit comments on PRs to 120 chars or less.
 - Make sure all commit messages are formal.
-- Please reference issues or pull requests using the number (e.g `#123`) and not the real url.
+- Please reference issues or pull requests using the number (e.g `#123`) and not the full url.
