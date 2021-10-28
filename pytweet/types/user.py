@@ -23,18 +23,19 @@ SOFTWARE.
 """
 
 from typing import Optional, Union, Dict, TypedDict, Any
+ObjectID: Union[str, int] = None
 
 class PartialUser(TypedDict, total=False):
-    data = Dict[str, Any]
-    id = Union[str, int]
-    name = str
-    username = str
-    description = str
+    data: Dict[str, Any]
+    id: ObjectID
+    name: str
+    username: str
+    description: str
 
 class User(PartialUser, total=False):
-    link = str
-    verified = bool
-    protected = bool
-    avatar_url = Optional[str]
-    location = Optional[str]
-    created_at = str
+    link: str
+    verified: bool
+    protected: bool
+    avatar_url: Optional[str]
+    location: Optional[str]
+    created_at: str
