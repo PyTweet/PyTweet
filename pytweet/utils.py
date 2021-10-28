@@ -21,8 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-import datetime 
+import datetime
 from dateutil import parser
+
 
 def time_parse_todt(date: str) -> datetime.datetime:
     date = str(parser.parse(date))

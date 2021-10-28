@@ -27,32 +27,33 @@ from .http import HTTPClient, Route
 from .user import User
 from .tweet import Tweet
 
+
 class Client:
     """Represent a client that connected to Twitter!
     This client will interact with other through twitter's api version 2!
     Version Added: 1.0.0
 
     Parameters:
-    ===================
+    -----------
     bearer_token: str
         The Bearer Token of the app. The most important one, because this make most of the requests for twitter's api version 2.
 
-    consumer_key: Optional[str] 
+    consumer_key: Optional[str]
         The Consumer Key of the app.
 
-    consumer_key_secret: Optional[str] 
+    consumer_key_secret: Optional[str]
         The Consumer Key Secret of the app.
 
-    access_token: Optional[str] 
+    access_token: Optional[str]
         The Access Token of the app.
 
-    access_token_secret: Optional[str] 
+    access_token_secret: Optional[str]
         The Access Token Secret of the app.
 
     Attributes:
-    ====================
+    -----------=
     http: Optional[HTTPClient]
-        Return a :class: HTTPClient, HTTPClient is responsible for making most of the Requests to twitter's api. 
+        Return a :class: HTTPClient, HTTPClient is responsible for making most of the Requests to twitter's api.
     """
 
     def __init__(
@@ -82,16 +83,22 @@ class Client:
         """
         if not self.http.access_token:
             return None
-
-        my_id=self.http.access_token.partition('-')[0]
-        return self.get_user(my_id)
-        
+        my_id = self.http.access_token.partition("-")[0]
+        res = self.request(
+            Route("GET", "2", f"/users/{my_id}"),
+            headers={"Authorization": f"Bearer {self.bearer_token}"},
+            params={
+                "user.fields": "created_at,description,entities,id,location,name,profile_image_url,protected,public_metrics,url,username,verified,withheld,pinned_tweet_id"
+            },
+            is_json=True,
+        )
+        return User(res, http_client=self)
 
     def get_user(self, user_id: Union[str, int]) -> User:
         """A function for HTTPClient.get_user().
         Version Added: 1.0.0
 
-        This function return a :class: User object. 
+        This function return a :class: User object.
         """
         return self.http.fetch_user(user_id, self.http)
 
@@ -99,20 +106,20 @@ class Client:
         """A function for HTTPClient.fetch_user_byusername().
         Version Added: 1.0.0
 
-        This function return a :class: User object. 
+        This function return a :class: User object.
         """
         return self.http.fetch_user_byusername(username, self.http)
 
     def get_tweet(self, tweet_id: Union[str, int]) -> Tweet:
         """A function for HTTPClient.fetch_tweet().
-        Version Added: 1.0.0 
+        Version Added: 1.0.0
 
-        This function return a :class: Tweet. 
+        This function return a :class: Tweet.
         """
         return self.http.fetch_tweet(tweet_id, self.http)
 
-    def tweet(self, text:str, **kwargs):
-        """Post a tweet directly to twitter from the given paramaters. 
+    def tweet(self, text: str, **kwargs):
+        """Post a tweet directly to twitter from the given paramaters.
         Version Added: 1.1.0
 
         text: str

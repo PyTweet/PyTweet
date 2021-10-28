@@ -27,18 +27,19 @@ from typing import Optional, Dict, Any, Protocol, TYPE_CHECKING, runtime_checkab
 if TYPE_CHECKING:
     from .http import HTTPClient
 
+
 @runtime_checkable
 class Messageable(Protocol):
     """Represent an object that can send and receive a message through DM.
-    Version Added: 1.0.0
+    Verion Added: 1.0.0
 
     Parameters:
-    ===================
+    -----------
     data: Dict[str, Any]
         The complete data of a Messageable that can send and receive a message.
 
     Attributes:
-    ===================
+    -----------
     http_client: Optional[HTTPClient]
         The HTTPClient that make the request.
     """
@@ -49,36 +50,36 @@ class Messageable(Protocol):
 
     def send(self, text: str = None, **kwargs) -> None:
         """Send a message to a specific Messageable object.
-        Version Added: 1.1.0
+        Verion Added: 1.1.0
         """
         self.http_client.send_message(self._payload.get("id"), text, **kwargs)
 
     def delete_message(self, message_id: int, **kwargs) -> None:
         """Delete a message from a Messageable object.
-        Version Added: 1.1.0
+        Verion Added: 1.1.0
         """
         self.http_client.delete_message(self._payload.get("id"), message_id, **kwargs)
 
     def follow(self) -> None:
         """Follow a Messageable object.
-        Version Added: 1.1.0
+        Verion Added: 1.1.0
         """
         self.http_client.follow_user(self._payload.get("id"))
 
     def unfollow(self) -> None:
         """Unfollow a Messageable object.
-        Version Added: 1.1.0
+        Verion Added: 1.1.0
         """
         self.http_client.unfollow_user(self._payload.get("id"))
 
     def block(self) -> None:
         """Block a Messageable object.
-        Version Added: 1.2.0
+        Verion Added: 1.2.0
         """
         self.http_client.block_user(self._payload.get("id"))
 
     def unblock(self) -> None:
         """Unblock a Messageable object.
-        Version Added: 1.2.0
+        Verion Added: 1.2.0
         """
         self.http_client.unblock_user(self._payload.get("id"))
