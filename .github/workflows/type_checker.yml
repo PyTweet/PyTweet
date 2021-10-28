@@ -1,0 +1,17 @@
+name: Run Type_Checking
+
+on: [push, pull_request]
+
+
+jobs:
+  job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Run the Type Checker
+        uses: wearerequired/lint-action@v1
+        with:
+          mypy: true
