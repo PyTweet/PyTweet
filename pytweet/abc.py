@@ -47,22 +47,38 @@ class Messageable(Protocol):
         self._payload = data
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
 
-    def send(self, text: str = None, **kwargs) -> Optional[None]:
+    def send(self, text: str = None, **kwargs) -> None:
         """Send a message to a specific Messageable object.
-        Version Added: 1.1.0"""
-        self.http_client.send_message(text, **kwargs)
+        Version Added: 1.1.0
+        """
+        self.http_client.send_message(self._payload.get("id"), text, **kwargs)
 
-    def delete_message(self, id: int, **kwargs):
+    def delete_message(self, message_id: int, **kwargs) -> None:
         """Delete a message from a Messageable object.
-        Version Added: 1.1.0"""
-        self.http_client.delete_message(id, kwargs)
+        Version Added: 1.1.0
+        """
+        self.http_client.delete_message(self._payload.get("id"), message_id, **kwargs)
 
-    def follow(self, **kwargs):
+    def follow(self) -> None:
         """Follow a Messageable object.
-        Version Added: 1.1.0"""
-        self.http_client.follow_user(self._payload.get('id'), **kwargs)
+        Version Added: 1.1.0
+        """
+        self.http_client.follow_user(self._payload.get("id"))
 
-    def unfollow(self, **kwargs):
+    def unfollow(self) -> None:
         """Unfollow a Messageable object.
-        Version Added: 1.1.0"""
-        self.http_client.unfollow_user(self._payload.get('id'), kwargs)
+        Version Added: 1.1.0
+        """
+        self.http_client.unfollow_user(self._payload.get("id"))
+
+    def block(self) -> None:
+        """Block a Messageable object.
+        Version Added: 1.2.0
+        """
+        self.http_client.block_user(self._payload.get("id"))
+
+    def unblock(self) -> None:
+        """Unblock a Messageable object.
+        Version Added: 1.2.0
+        """
+        self.http_client.unblock_user(self._payload.get("id"))

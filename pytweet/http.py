@@ -23,13 +23,16 @@ SOFTWARE.
 """
 
 import requests
-from typing import Dict, Any, Optional, Union
-from .errors import Unauthorized, NotFoundError, TooManyRequests, Forbidden, PytweetExceptions
+from typing import Dict, Any, Optional
+from .errors import Unauthorized, NotFoundError, TooManyRequests, Forbidden, PytweetException
 from .user import User
 from .tweet import Tweet
-from .auth import OauthHandler
+from .auth import OauthSession
+from .relations import RelationFollow
+from .types.user import ObjectID
 
-def is_error(respond: requests.models.Response):
+
+def check_error(respond: requests.models.Response):
     code = respond.status_code
     if code == 401:
         raise Unauthorized("Invalid credentials passed!")
@@ -71,6 +74,9 @@ class HTTPClient:
 
     access_token_secret: Optional[str] 
         The Access Token Secret of the app.
+
+    credentials
+        The credentials in a dictionary
     """
 
     def __init__(
@@ -82,8 +88,8 @@ class HTTPClient:
         access_token: Optional[str],
         access_token_secret: Optional[str],
     ):  
-        credentials={"bearer_token": bearer_token, "consumer_key": consumer_key, "consumer_key_secret": consumer_key_secret, "access_token": access_token, "access_token_secret": access_token_secret}
-        for k, v in credentials.items():
+        self.credentials={"bearer_token": bearer_token, "consumer_key": consumer_key, "consumer_key_secret": consumer_key_secret, "access_token": access_token, "access_token_secret": access_token_secret}
+        for k, v in self.credentials.items():
             if not isinstance(v, str) and not isinstance(v, type(None)):
                 raise Unauthorized(f"Wrong authorization passed for credential: {k}.")
                 
@@ -93,6 +99,7 @@ class HTTPClient:
         self.access_token = access_token
         self.access_token_secret = access_token_secret
         self.followed_cache = {}
+        self.blocked_cache = {}
 
     def request(
         self,
@@ -115,36 +122,55 @@ class HTTPClient:
             raise TypeError("Method isnt recognizable")
 
         if auth:
-            auth = OauthHandler(self.consumer_key, self.consumer_key_secret)
+            auth = OauthSession(self.consumer_key, self.consumer_key_secret)
             auth.set_access_token(self.access_token, self.access_token_secret)
-            auth = auth.apply_auth()
+            auth = auth.oauth1
 
         respond = res(route.url, headers=headers, params=params, json=json, auth=auth)
-        is_error(respond)
+        check_error(respond)
         res = respond.json()
+        
 
         if "errors" in res.keys():
             try:
                 if res["errors"][0]["detail"].startswith("Could not find"):
                     raise NotFoundError(res["errors"][0]["detail"])
+                    
                 else:
-                    raise Exception(res["errors"][0]["detail"])
+                    raise PytweetException(res["errors"][0]["detail"])
             except KeyError:
-                raise PytweetExceptions(res)
+                raise PytweetException(res)
                 
 
         elif "meta" in res.keys():
             if res["meta"]["result_count"] == 0:
                 return 0
 
-        if route.method.upper() == "POST" and mode == "follow":
-            self.followed_cache[str(json["target_user_id"])] = res["data"]
+        if route.method.upper() == "POST":
+            if mode.lower() == "follow":
+                self.followed_cache[str(json["target_user_id"])] = res
+
+            elif mode.lower() == "block":
+                self.blocked_cache[str(json["target_user_id"])] = res
+
+        elif route.method.upper() == "DELETE":
+            if mode.lower() == "unfollow":
+                try:
+                    self.followed_cache.pop(route.url.split("/")[3])
+                except KeyError:
+                    pass
+            
+            elif mode.lower() == "unblock":
+                try:
+                    self.blocked_cache.pop(route.url.split("/")[3])
+                except KeyError:
+                    pass
 
         if is_json:
             return res
         return respond
 
-    def fetch_user(self, id: int, http_client, pinned_tweet: bool = False) -> User:
+    def fetch_user(self, user_id: ObjectID, http_client, pinned_tweet: bool = False) -> User:
         """Make a Request to optain the user from the given user id.
         Version Added: 1.0.0
 
@@ -154,7 +180,7 @@ class HTTPClient:
             raise ValueError("Id paramater should be an integer!")
 
         data = self.request(
-            Route("GET", "2", f"/users/{id}"),
+            Route("GET", "2", f"/users/{user_id}"),
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,entities,id,location,name,profile_image_url,protected,public_metrics,url,username,verified,withheld,pinned_tweet_id"
@@ -163,7 +189,7 @@ class HTTPClient:
         )
 
         followers = self.request(
-            Route("GET", "2", f"/users/{id}/followers"),
+            Route("GET", "2", f"/users/{user_id}/followers"),
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
@@ -171,7 +197,7 @@ class HTTPClient:
         )
 
         following = self.request(
-            Route("GET", "2", f"/users/{id}/following"),
+            Route("GET", "2", f"/users/{user_id}/following"),
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
@@ -218,14 +244,23 @@ class HTTPClient:
         data['data'].update({"following": user_payload.following})
         return User(data, http_client=http_client)
 
-    def fetch_tweet(self, id:int, http_client) -> Tweet:
-        """Fetch a tweet info from the specified id.
+    def fetch_tweet(self, tweet_id:ObjectID, http_client) -> Tweet:
+        """Fetch a tweet info from the specified id. Return if consumer_key or consumer_key_secret or access_token or access_token_secret is not specified.
         Version Added: 1.0.0 
+
+        tweet_id: ObjectID
+            The tweet id you wish to fetch it.
+
+        http_client
+            The http client that make the request.
 
         This function return a :class: Tweet. 
         """
+        if not any([v for v in self.credentials.values()]):
+            return None
+
         res = self.request(
-            Route("GET", "2", f"/tweets/{id}"),
+            Route("GET", "2", f"/tweets/{tweet_id}"),
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "tweet.fields": "attachments,author_id,context_annotations,conversation_id,created_at,geo,entities,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,reply_settings,source,text,withheld",
@@ -234,11 +269,12 @@ class HTTPClient:
                 "media.fields": "duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width",
                 "place.fields": "contained_within,country,country_code,full_name,geo,id,name,place_type",
                 "poll.fields": "duration_minutes,end_datetime,id,options,voting_status"
-            }
+            },
+            auth=True
         )
 
         res2 = self.request(
-            Route("GET", "2", f"/tweets/{id}/retweeted_by"),
+            Route("GET", "2", f"/tweets/{tweet_id}/retweeted_by"),
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
@@ -246,7 +282,7 @@ class HTTPClient:
         )
 
         res3 = self.request(
-            Route("GET", "2", f"/tweets/{id}/liking_users"),
+            Route("GET", "2", f"/tweets/{tweet_id}/liking_users"),
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
@@ -292,13 +328,33 @@ class HTTPClient:
 
         return Tweet(res, http_client=self)
 
-    def send_message(self, text: str, **kwargs):
+    def send_message(self, user_id: ObjectID, text: str, **kwargs):
         """WARNING: this function isnt finish yet!
         Version Added: 1.1.0
 
         Make a post Request for sending a message to a Messageable object.
         """
-        raise NotImplementedError("This function is not finish yet")
+        raise NotImplementedError("This function is not finished yet")
+
+        data={
+            "event": {
+            "type": "message_create",
+            "message_create": {
+                "target": {
+                "recipient_id": str(user_id)
+            },
+                "message_data": {
+                "text": text,
+                    }
+                }
+            }
+        }
+        self.request(
+            Route("POST", "1.1", "/direct_messages/events/new"),
+            headers={"content-type": "application/json"},
+            json=data,
+            auth=True
+        )
 
     def delete_message(self, id: int, **kwargs):
         """WARNING: this function isnt finish yet!
@@ -316,26 +372,63 @@ class HTTPClient:
         """
         raise NotImplementedError("This function is not finished yet")
 
-    def follow_user(self, user_id:Union[str, int], **kwargs):
-        """WARNING: this function isnt finish yet!
+    def follow_user(self, user_id:ObjectID):
+        """Make a POST Request to follow a Messageable object.
         Version Added: 1.1.0
+        Updated: 1.2.0
 
-        Make a POST Request to follow a Messageable object.
+        user_id: ObjectID
+            The user's id that you wish to follow, better to make it a string.
         """
         my_id=self.access_token.partition('-')[0]
-        post=self.request(
-            Route("POST", "2", f"/users/{my_id}/following"),\
+        self.request(
+            Route("POST", "2", f"/users/{my_id}/following"),
             json={"target_user_id": str(user_id)},
             auth=True,
             mode="follow"
         ) 
-        
-        return post
 
-    def unfollow_user(self, id:int, **kwargs):
-        """WARNING: This function is not finish yet!
+    def unfollow_user(self, user_id:ObjectID):
+        """Make a DELETE Request to unfollow a Messageable object.
         Version Added: 1.1.0
+        Updated: 1.2.0
 
-        Make a POST Request to unfollow a Messageable object.
+        user_id: ObjectID
+            The user's id that you wish to unfollow, better to make it a string.
         """
-        raise NotImplementedError("This function is not finish yet")
+        my_id=self.access_token.partition('-')[0]
+        self.request(
+            Route("DELETE", "2", f"/users/{my_id}/following/{user_id}"),
+            auth=True,
+            mode="unfollow"
+        ) 
+
+    def block_user(self, user_id:ObjectID):
+        """Make a POST Request to Block a Messageable object.
+        Version Added: 1.2.0
+
+        user_id: ObjectID
+            The user's id that you wish to block, better to make it a string.
+        """
+        my_id=self.access_token.partition('-')[0]
+        self.request(
+            Route("POST", "2", f"/users/{my_id}/blocking"),
+            json={"target_user_id": str(user_id)},
+            auth=True,
+            mode="block"
+        )
+
+    def unblock_user(self, user_id:ObjectID):
+        """Make a DELETE Request to unblock a Messageable object.
+        Version Added: 1.2.0
+
+        user_id: ObjectID
+            The user's id that you wish to unblock, better to make it a string.
+        """
+        my_id=self.access_token.partition('-')[0]
+        self.request(
+            Route("DELETE", "2", f"/users/{my_id}/blocking/{user_id}"),
+            auth=True,
+            mode="unblock"
+        ) 
+        
