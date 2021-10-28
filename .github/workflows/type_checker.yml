@@ -10,6 +10,15 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
+      
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install Python dependencies
+        run: pip install mypy
 
       - name: Run the Type Checker
         uses: wearerequired/lint-action@v1
