@@ -84,8 +84,7 @@ class Client:
             return None
 
         my_id=self.http.access_token.partition('-')[0]
-        res=self.get_user(my_id)
-        return res
+        return self.get_user(my_id)
         
 
     def get_user(self, user_id: Union[str, int]) -> User:
