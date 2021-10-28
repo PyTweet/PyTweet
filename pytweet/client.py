@@ -83,7 +83,7 @@ class Client:
         if not self.http.access_token:
             return None
 
-        my_id=self.access_token.partition('-')[0]
+        my_id=self.http.access_token.partition('-')[0]
         res=self.request(
             Route("GET", "2", f"/users/{my_id}"),
             headers={"Authorization": f"Bearer {self.bearer_token}"},
