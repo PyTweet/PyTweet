@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+from typing import Optional, Union
 from .http import HTTPClient, Route
 from .user import User
 from .tweet import Tweet
@@ -74,13 +75,33 @@ class Client:
     def __repr__(self) -> str:
         return "Client(bearer_token=SECRET consumer_key=SECRET consumer_key_secret=SECRET access_token=SECRET access_token_secret=SECRET)"
 
-    def get_user(self, id: int) -> User:
+    @property
+    def user(self) -> Optional[User]:
+        """:class:User: Return the client in user object, return None if access token isnt specified.
+        Version Added: 1.2.0
+        """
+        if not self.http.access_token:
+            return None
+
+        my_id=self.access_token.partition('-')[0]
+        res=self.request(
+            Route("GET", "2", f"/users/{my_id}"),
+            headers={"Authorization": f"Bearer {self.bearer_token}"},
+            params={
+                "user.fields": "created_at,description,entities,id,location,name,profile_image_url,protected,public_metrics,url,username,verified,withheld,pinned_tweet_id"
+            },
+            is_json=True,
+        )
+        return User(res, http_client=self)
+        
+
+    def get_user(self, user_id: Union[str, int]) -> User:
         """A function for HTTPClient.get_user().
         Version Added: 1.0.0
 
         This function return a :class: User object. 
         """
-        return self.http.fetch_user(id, self.http)
+        return self.http.fetch_user(user_id, self.http)
 
     def get_user_by_username(self, username: str) -> User:
         """A function for HTTPClient.fetch_user_byusername().
@@ -90,13 +111,13 @@ class Client:
         """
         return self.http.fetch_user_byusername(username, self.http)
 
-    def get_tweet(self, id: int) -> Tweet:
+    def get_tweet(self, tweet_id: Union[str, int]) -> Tweet:
         """A function for HTTPClient.fetch_tweet().
         Version Added: 1.0.0 
 
         This function return a :class: Tweet. 
         """
-        return self.http.fetch_tweet(id, self.http)
+        return self.http.fetch_tweet(tweet_id, self.http)
 
     def tweet(self, text:str, **kwargs):
         """Post a tweet directly to twitter from the given paramaters. 
@@ -105,7 +126,7 @@ class Client:
         text: str
             The tweets text, it will showup as the main text in a tweet.
         """
-        self.http.post_tweet(text, kwargs)
+        self.http.post_tweet(text, **kwargs)
 
     def stream(self):
         """Stream in real-time, roughly a 1% sample of all public Tweets.
