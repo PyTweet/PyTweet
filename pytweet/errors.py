@@ -44,7 +44,7 @@ class Forbidden(Exception):
 
     pass
 
-class PytweetExceptions(Exception):
+class PytweetException(Exception):
     """Raised when you made TooManyRequest"""
 
     pass
