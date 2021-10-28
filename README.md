@@ -18,9 +18,9 @@ PyTweet is a Synchronous python API wrapper for twitter's api, Its filled with r
 ```bash
 py3 -m pip install PyTweet
 ```
-### Linux
+### Linux/MacOS
 ```bash
-python -m pip install PyTweet
+python3 -m pip install PyTweet
 ```
 
 ## Usage
