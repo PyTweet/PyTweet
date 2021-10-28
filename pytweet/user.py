@@ -58,7 +58,7 @@ class User(Messageable):
         self.original_payload = data
         self._payload = self.original_payload.get('data') if self.original_payload.get('data') != None else self.original_payload
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
-        self.user_metrics = UserPublicMetrics(self._payload) if self._payload != None else self.original_payload
+        self._metrics = UserPublicMetrics(self._payload) if self._payload != None else self.original_payload
 
     def __str__(self) -> str:
         return self.username
@@ -149,17 +149,17 @@ class User(Messageable):
     @property
     def followers_count(self) -> int:
         """int: Return total of followers that a user has."""
-        return int(self.user_metrics.followers_count)
+        return int(self._metrics.followers_count)
 
     @property
     def following_count(self) -> int:
         """int: Return total of following that a user has."""
-        return int(self.user_metrics.following_count)
+        return int(self._metrics.following_count)
 
     @property
     def tweet_count(self) -> int:
         """int: Return total of tweet that a user has."""
-        return int(self.user_metrics.tweet_count)
+        return int(self._metrics.tweet_count)
 
     @property
     def listed_count(self) -> int:

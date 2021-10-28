@@ -197,7 +197,7 @@ class Tweet:
         self.original_payload = data
         self._payload = data.get("data") or None
         self._includes = self.original_payload.get("includes")
-        self.tweet_metrics = TweetPublicMetrics(self._payload.get("public_metrics"))
+        self.tweet_metrics = TweetPublicMetrics(self._payload)
         self.http_client = kwargs.get("http_client") or None
 
     def __repr__(self) -> str:
