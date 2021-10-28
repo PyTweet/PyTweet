@@ -116,11 +116,11 @@ class TweetPublicMetrics:
         return int(self._public.get("like_count"))
 
     @property
-    def retweeted_count(self) -> int:
+    def retweet_count(self) -> int:
         """int: Return total of retweetes that the tweet has.
         Version Added: 1.1.0
         """
-        return int(self._public.get("retweeted_count"))
+        return int(self._public.get("retweet_count"))
 
     @property
     def reply_count(self) -> int:
