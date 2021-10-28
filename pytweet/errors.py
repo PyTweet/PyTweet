@@ -34,15 +34,18 @@ class NotFoundError(Exception):
 
     pass
 
+
 class TooManyRequests(Exception):
     """Raised when you made TooManyRequest"""
 
     pass
 
+
 class Forbidden(Exception):
     """Raised when a request return status code: 403"""
 
     pass
+
 
 class PytweetException(Exception):
     """Raised when you made TooManyRequest"""
