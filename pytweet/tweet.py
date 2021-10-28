@@ -273,7 +273,7 @@ class Tweet:
         """Union[List[:class:User], bool]: Return the mentioned users, if there isnt it return False.
         Version Added: 1.1.3
         """
-        if self._includes:
+        if self._includes.get("mentions"):
             return [self.http_client.fetch_user_byusername(user.get("username"), http_client=self.http_client) for user in self._includes.get("mentions")]
         return False
 
