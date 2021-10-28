@@ -23,7 +23,7 @@ SOFTWARE.
 """
 
 import requests
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, NoReturn, Union
 from .errors import (
     Unauthorized,
     NotFoundError,
@@ -95,8 +95,8 @@ class HTTPClient:
         consumer_key_secret: Optional[str],
         access_token: Optional[str],
         access_token_secret: Optional[str],
-    ):
-        self.credentials = {
+    ) -> None:
+        self.credentials: Dict[str, Optional[str]] = {
             "bearer_token": bearer_token,
             "consumer_key": consumer_key,
             "consumer_key_secret": consumer_key_secret,
@@ -125,7 +125,7 @@ class HTTPClient:
         auth: bool = False,
         is_json: bool = True,
         mode: str = None,
-    ):
+    ) -> Union[str, Dict[Any, Any], NoReturn]:
         """Make an HTTP Requests to the api.
         Verion Added: 1.0.0
 
@@ -228,7 +228,7 @@ class HTTPClient:
         )
         return User(data, http_client=http_client)
 
-    def fetch_user_byusername(self, username: str, http_client):
+    def fetch_user_byusername(self, username: str, http_client) -> User:
         """Make a Request to optain the user from their username, A Username usually start with '@' before any letters. If a username named @Jack, then the username argument must be 'Jack'.
         Verion Added:1.0.0
 
@@ -358,7 +358,7 @@ class HTTPClient:
         """
         raise NotImplementedError("This function is not finished yet")
 
-    def follow_user(self, user_id: ObjectID):
+    def follow_user(self, user_id: ObjectID) -> None:
         """Make a POST Request to follow a Messageable object.
         Verion Added:1.1.0
         Updated: 1.2.0
@@ -374,7 +374,7 @@ class HTTPClient:
             mode="follow",
         )
 
-    def unfollow_user(self, user_id: ObjectID):
+    def unfollow_user(self, user_id: ObjectID) -> None:
         """Make a DELETE Request to unfollow a Messageable object.
         Verion Added:1.1.0
         Updated: 1.2.0
@@ -389,7 +389,7 @@ class HTTPClient:
             mode="unfollow",
         )
 
-    def block_user(self, user_id: ObjectID):
+    def block_user(self, user_id: ObjectID) -> None:
         """Make a POST Request to Block a Messageable object.
         Verion Added:1.2.0
 
@@ -404,7 +404,7 @@ class HTTPClient:
             mode="block",
         )
 
-    def unblock_user(self, user_id: ObjectID):
+    def unblock_user(self, user_id: ObjectID) -> None:
         """Make a DELETE Request to unblock a Messageable object.
         Verion Added:1.2.0
 

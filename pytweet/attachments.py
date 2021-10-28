@@ -37,7 +37,7 @@ class Media:
         The full data of the media in a dictionary.
 
     Attributes:
-    -----------=
+    -----------
     _payload
         Represent the main data of a Media.
     """
@@ -157,7 +157,7 @@ class Poll:
         The full data of the poll in a dictionary.
 
     Attributes:
-    -----------=
+    -----------
     _payload
         The complete data of a Poll keep inside a dictionary.
     """

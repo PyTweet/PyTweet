@@ -51,7 +51,7 @@ class Client:
         The Access Token Secret of the app.
 
     Attributes:
-    -----------=
+    -----------
     http: Optional[HTTPClient]
         Return a :class: HTTPClient, HTTPClient is responsible for making most of the Requests to twitter's api.
     """

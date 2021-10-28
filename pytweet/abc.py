@@ -44,17 +44,17 @@ class Messageable(Protocol):
         The HTTPClient that make the request.
     """
 
-    def __init__(self, data: Dict[str, Any], **kwargs):
+    def __init__(self, data: Dict[str, Any], **kwargs: Any):
         self._payload = data
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
 
-    def send(self, text: str = None, **kwargs) -> None:
+    def send(self, text: str = None, **kwargs: Any) -> None:
         """Send a message to a specific Messageable object.
         Verion Added: 1.1.0
         """
         self.http_client.send_message(self._payload.get("id"), text, **kwargs)
 
-    def delete_message(self, message_id: int, **kwargs) -> None:
+    def delete_message(self, message_id: int, **kwargs: Any) -> None:
         """Delete a message from a Messageable object.
         Verion Added: 1.1.0
         """

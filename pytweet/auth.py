@@ -11,7 +11,7 @@ class OauthSession(OAuth1Session):
         self.callback = callback
 
     @property
-    def oauth1(self):
+    def oauth1(self) -> OAuth1:
         return OAuth1(
             self.consumer_key,
             client_secret=self.consumer_key_secret,
@@ -21,5 +21,5 @@ class OauthSession(OAuth1Session):
         )
 
     def set_access_token(self, key, secret):
-        self.access_token = key
-        self.access_token_secret = secret
+        self.access_token: str = key
+        self.access_token_secret: str = secret
