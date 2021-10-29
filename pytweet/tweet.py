@@ -28,6 +28,7 @@ from .attachments import Poll, Media
 from .user import User
 from .metrics import TweetPublicMetrics
 from .utils import time_parse_todt
+from .enums import MessageTypeEnum
 
 
 class EmbedsImages:
@@ -116,14 +117,14 @@ class Embed:
 
     @property
     def start(self) -> int:
-        """int: Return the embed's start
+        """int: Return the embed's url startpoint start
         .. versionadded: 1.1.3
         """
         return int(self._payload.get("start"))
 
     @property
     def end(self) -> int:
-        """int: Return the embed's end
+        """int: Return the embed's url endpoint.
         .. versionadded: 1.1.3
         """
         return int(self._payload.get("end"))
@@ -306,6 +307,11 @@ class Tweet:
         .. versionadded: 1.1.3
         """
         return [Embed(url) for url in self._payload.get("entities").get("urls")]
+
+    @property
+    def type(self) -> MessageTypeEnum:
+        """str: Return the reply setting. If everyone can replied, reply_setting return 'Everyone'"""
+        return MessageTypeEnum(1)
 
     @property
     def like_count(self) -> int:
