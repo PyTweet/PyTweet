@@ -12,8 +12,7 @@ A Baisc PyTweet Client
 
 A Baisc PyTweet Client
 
-
-.. code:: python3
+.. code-block:: python3
     import pytweet
 
     client = pytweet.Client(
