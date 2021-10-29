@@ -1,5 +1,5 @@
 """
-MIT License
+The MIT License (MIT)
 
 Copyright (c) 2021 TheFarGG & TheGenocides
 
@@ -26,11 +26,6 @@ import datetime
 from typing import Optional, List, Dict, Any, TYPE_CHECKING
 from .metrics import UserPublicMetrics
 from .utils import time_parse_todt
-
-if TYPE_CHECKING:
-    from .http import HTTPClient
-
-from typing import Optional, Dict, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .http import HTTPClient
