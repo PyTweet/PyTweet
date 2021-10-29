@@ -68,6 +68,11 @@ class User(Messageable):
     def __repr__(self) -> str:
         return "User(name={0.name} username={0.username} id={0.id})".format(self)
 
+    def __eq__(self, other):
+        if not isinstance(other, self):
+            raise ValueError("== operation cannot be done with one of the element not a valid User object")
+        return self.id == other.id
+
     @property
     def name(self) -> str:
         """str: Return the user's name."""
@@ -76,7 +81,7 @@ class User(Messageable):
     @property
     def username(self) -> str:
         """str: Return the user's username, this usually start with '@' follow by their username."""
-        return "@" + self._payload.get("username") # type: ignore
+        return "@" + self._payload.get("username")
 
     @property
     def id(self) -> int:
@@ -130,7 +135,7 @@ class User(Messageable):
 
     @property
     def pinned_tweet(self) -> Optional[object]:
-        """Optional[:class:Tweet]: Returns the user's pinned tweet.
+        """Optional[object]: Returns the user's pinned tweet.
         Version Added: 1.1.3"""
 
         id = self._payload.get("pinned_tweet_id")
