@@ -1,6 +1,5 @@
 from requests_oauthlib import OAuth1, OAuth1Session
 
-
 class OauthSession(OAuth1Session):
     def __init__(self, consumer_key: str, consumer_secret: str, callback=None):
         super().__init__(consumer_key, client_secret=consumer_secret, callback_uri=callback)
