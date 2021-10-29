@@ -141,7 +141,7 @@ class HTTPClient:
         Parameters:
         -----------
         route: Route
-            Represent the Route class, this will be use to figure out the endpoint, method, and version of the api.
+            Represent the Route class, this will be use to configure the endpoint, method, and version of the api.
 
         headers: RequestModel
             Represent the http request headers, it usually filled with your bearer token. If this isnt specified then the default argument will be an empty dictionary. Later in the code it will update and gets your bearer token.
@@ -292,12 +292,7 @@ class HTTPClient:
             }
         )
 
-        check=isinstance(http_client, self)
-        
-        if check == False:
-            check = issubclass(http_client, self)
-
-        return User(data, http_client=http_client if check else self)
+        return User(data, http_client=http_client)
 
     def fetch_user_byusername(self, username: str, http_client) -> User:
         """Make a Request to optain the user from their username.
@@ -334,13 +329,9 @@ class HTTPClient:
         user_payload = self.fetch_user(int(data["data"].get("id")), http_client)
         data["data"].update({"followers": user_payload.followers})
         data["data"].update({"following": user_payload.following})
+    
 
-        check=isinstance(http_client, self)
-
-        if check == False:
-            check = issubclass(http_client, self)
-
-        return User(data, http_client=http_client if check else self)
+        return User(data, http_client=http_client)
 
     def fetch_tweet(self, tweet_id: Union[str, int], http_client) -> Tweet:
         """Fetch a tweet info from the specified id. Return if consumer_key or consumer_key_secret or access_token or access_token_secret is not specified.
@@ -411,11 +402,7 @@ class HTTPClient:
 
             res["data"].update({"liking_users": 0})
 
-        check=isinstance(http_client, self)
-
-        if check == False:
-            check = issubclass(http_client, self)
-        return Tweet(res, http_client=http_client if check else self)
+        return Tweet(res, http_client=http_client)
 
     def send_message(self, user_id: Union[str, int], text: str, **kwargs):
         """WARNING: this function isnt finish yet!
