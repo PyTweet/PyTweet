@@ -10,7 +10,7 @@ This page is a simple and brief quickstart to pytweet!
 A Baisc PyTweet Client
 ---------------
 
-.. code:: py
+.. code-block:: py
    import pytweet
 
     client = pytweet.Client(
@@ -24,7 +24,7 @@ A Baisc PyTweet Client
 
 Now that you have your basic client lets get some data with import
 
-..code:: py
+..code-block:: py
     user = client.get_user_by_username("TheGenocides")
     print(user.name, user.username, user.id)
     # Return The user's name, username, and id
