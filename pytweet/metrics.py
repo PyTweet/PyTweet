@@ -1,18 +1,14 @@
 """
-MIT License
-
+The MIT License (MIT)
 Copyright (c) 2021 TheFarGG & TheGenocides
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,17 +25,14 @@ class UserPublicMetrics:
     """Represent a PublicMetrics for a User.
     This PublicMetrics contain public info about the user.
     Version Added:: 1.1.0
-
     Parameters:
     -----------
     data: Dict[str, Any]
         The complete data of the user's public metrics through a dictionary!
-
     Attributes:
     -----------
     original_payload
         Return the original payload of the user.
-
     _public
         Returns the user public metrics.
     """
@@ -84,17 +77,14 @@ class TweetPublicMetrics:
     """Represent a PublicMetrics for a tweet.
     This PublicMetrics contain public info about the tweet.
     Version Added:: 1.1.0
-
     Parameters:
     -----------
     data: Dict[str, Any]:
         The complete data of the tweet's public metrics keep in a dictionary.
-
     Attributes:
     -----------
     original_payload
         Return the original payload of the tweet.
-
     _public
         Returns the user public metrics.
     """
