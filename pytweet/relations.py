@@ -33,12 +33,12 @@ class RelationFollow:
     @property
     def pending(self) -> bool:
         """bool: Check if the relation is pending."""
-        return self._payload.get("pending") if self._payload.get("pending") else False
+        return self._payload.get("pending", False)
 
     @property
     def following(self) -> bool:
         """bool: Check if the relation is following."""
-        return self._payload.get("following") if self._payload.get("following") else False
+        return self._payload.get("following", False)
 
     @property
     def type(self):

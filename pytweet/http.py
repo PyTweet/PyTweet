@@ -129,6 +129,9 @@ class HTTPClient:
 
         This function make an HTTP Request with the given paramaters then return a dictionary in a json format.
         """
+        if headers == {}:
+            headers = {"Authorization": f"Bearer {self.bearer_token}"}
+
         res = getattr(requests, route.method.lower(), None)
         if not res:
             raise TypeError("Method isnt recognizable")
@@ -178,6 +181,7 @@ class HTTPClient:
 
         if is_json:
             return res
+            
         return respond
 
     def fetch_user(self, user_id: Union[str, int], http_client, pinned_tweet: bool = False) -> User:
@@ -316,7 +320,7 @@ class HTTPClient:
 
     def send_message(self, user_id: Union[str, int], text: str, **kwargs):
         """WARNING: this function isnt finish yet!
-        Verion Added:1.1.0
+        Verion Added: 1.1.0
 
         Make a post Request for sending a message to a Messageable object.
         """
