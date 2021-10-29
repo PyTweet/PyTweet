@@ -10,7 +10,7 @@ This page is a simple and brief quickstart to pytweet!
 A Baisc PyTweet Client
 ---------------
 
-.. code-block:: python3
+.. code:: python3
    import pytweet
 
     client = pytweet.Client(
