@@ -16,6 +16,7 @@ Features:
 Getting started
 -----------------
 - Is this your first time using PyTweet? This is the place to get started!
+- *Quickstart* :doc:`quickstart`
 - **First steps:** :doc:`pytweet`
 
 Indices and tables
