@@ -24,13 +24,71 @@ SOFTWARE.
 
 import datetime
 from typing import Optional, List, Dict, Any, TYPE_CHECKING
-from .abc import Messageable
 from .metrics import UserPublicMetrics
 from .utils import time_parse_todt
 
 if TYPE_CHECKING:
     from .http import HTTPClient
 
+from typing import Optional, Dict, Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .http import HTTPClient
+
+class Messageable:
+    """Represent an object that can send and receive a message through DM.
+    Version Added: 1.0.0
+
+    Parameters:
+    -----------
+    data: Dict[str, Any]
+        The complete data of a Messageable object.
+
+    Attributes:
+    -----------
+    http_client: Optional[HTTPClient]
+        The HTTPClient that make the request.
+    """
+
+    def __init__(self, data: Dict[str, Any], **kwargs: Any):
+        self._payload = data
+        self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
+
+    def send(self, text: str = None, **kwargs: Any) -> None:
+        """Send a message to a specific Messageable object.
+        Version Added: 1.1.0
+        """
+        self.http_client.send_message(self._payload.get("id"), text, **kwargs)
+
+    def delete_message(self, message_id: int, **kwargs: Any) -> None:
+        """Delete a message from a Messageable object.
+        Version Added: 1.1.0
+        """
+        self.http_client.delete_message(self._payload.get("id"), message_id, **kwargs)
+
+    def follow(self) -> None:
+        """Follow a Messageable object.
+        Version Added: 1.1.0
+        """
+        self.http_client.follow_user(self._payload.get("id"))
+
+    def unfollow(self) -> None:
+        """Unfollow a Messageable object.
+        Version Added: 1.1.0
+        """
+        self.http_client.unfollow_user(self._payload.get("id"))
+
+    def block(self) -> None:
+        """Block a Messageable object.
+        Version Added: 1.2.0
+        """
+        self.http_client.block_user(self._payload.get("id"))
+
+    def unblock(self) -> None:
+        """Unblock a Messageable object.
+        Version Added: 1.2.0
+        """
+        self.http_client.unblock_user(self._payload.get("id"))
 
 class User(Messageable):
     """Represent a user in Twitter.
