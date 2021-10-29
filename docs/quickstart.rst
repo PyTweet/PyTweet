@@ -7,7 +7,7 @@ Quickstart
 
 This page is a simple and brief quickstart to pytweet!
 
-A Baisc PyTweet Client
+A Basic PyTweet Client
 ---------------
 
 .. code-block:: python3
@@ -21,7 +21,7 @@ A Baisc PyTweet Client
         access_token="Your access_token here", 
         access_token_secret="Your access_token_secret here",
     )
-    #if you dont have one make an application in https://apps.pytweet.com
+    #if you dont have one make an application in https://apps.twitter.com.
 
     user = client.get_user_by_username("TheGenocides")
     print(user.name, user.username, user.id)

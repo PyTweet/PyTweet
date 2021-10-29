@@ -35,7 +35,7 @@ client = pytweet.Client(
     consumer_key_secret="Your consumer_key_secret here", 
     access_token="Your access_token here", 
     access_token_secret="Your access_token_secret here",
-) #if you dont have one make an application in https://apps.pytweet.com
+) #if you dont have one make an application in https://apps.twitter.com.
 ```
 
 #### After that we use functions to get info from twitter api.
