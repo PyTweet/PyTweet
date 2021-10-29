@@ -11,7 +11,7 @@ A Baisc PyTweet Client
 ---------------
 
 .. code:: python3
-   import pytweet
+    import pytweet
 
     client = pytweet.Client(
         "Your Bearer Token Here!!!", 
