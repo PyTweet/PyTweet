@@ -21,7 +21,7 @@ A Basic PyTweet Client
         access_token="Your access_token here", 
         access_token_secret="Your access_token_secret here",
     )
-    #if you dont have one make an application in https://apps.twitter.com.
+    #if you dont have one make an application in https://apps.twitter.com
 
     user = client.get_user_by_username("TheGenocides")
     print(user.name, user.username, user.id)
