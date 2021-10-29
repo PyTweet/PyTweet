@@ -1,4 +1,4 @@
-sphinx_material
+sphinx_rtd_theme
 requests
 requests_oauthlib 
 python-dateutil
