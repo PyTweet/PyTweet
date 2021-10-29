@@ -67,10 +67,10 @@ class Client:
     ):
         self.http = HTTPClient(
             bearer_token,
-            consumer_key=consumer_key,
-            consumer_key_secret=consumer_key_secret,
-            access_token=access_token,
-            access_token_secret=access_token_secret,
+            consumer_key = consumer_key,
+            consumer_key_secret = consumer_key_secret,
+            access_token = access_token,
+            access_token_secret = access_token_secret,
         )
 
     def __repr__(self) -> str:
@@ -84,7 +84,7 @@ class Client:
         if not self.http.access_token:
             return None
         my_id = self.http.access_token.partition("-")[0]
-        res = self.request(
+        res = self.http.request(
             Route("GET", "2", f"/users/{my_id}"),
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={

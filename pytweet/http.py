@@ -35,8 +35,6 @@ from .user import User
 from .tweet import Tweet
 from .auth import OauthSession
 from .relations import RelationFollow
-from .types.user import ObjectID
-
 
 def check_error(respond: requests.models.Response):
     code = respond.status_code
@@ -182,7 +180,7 @@ class HTTPClient:
             return res
         return respond
 
-    def fetch_user(self, user_id: ObjectID, http_client, pinned_tweet: bool = False) -> User:
+    def fetch_user(self, user_id: Union[str, int], http_client, pinned_tweet: bool = False) -> User:
         """Make a Request to optain the user from the given user id.
         Verion Added:1.0.0
 
@@ -252,11 +250,11 @@ class HTTPClient:
         data["data"].update({"following": user_payload.following})
         return User(data, http_client=http_client)
 
-    def fetch_tweet(self, tweet_id: ObjectID, http_client) -> Tweet:
+    def fetch_tweet(self, tweet_id: Union[str, int], http_client) -> Tweet:
         """Fetch a tweet info from the specified id. Return if consumer_key or consumer_key_secret or access_token or access_token_secret is not specified.
         Verion Added:1.0.0
 
-        tweet_id: ObjectID
+        tweet_id: Union[str, int]
             The tweet id you wish to fetch it.
 
         http_client
@@ -316,7 +314,7 @@ class HTTPClient:
 
         return Tweet(res, http_client=self)
 
-    def send_message(self, user_id: ObjectID, text: str, **kwargs):
+    def send_message(self, user_id: Union[str, int], text: str, **kwargs):
         """WARNING: this function isnt finish yet!
         Verion Added:1.1.0
 
@@ -358,12 +356,12 @@ class HTTPClient:
         """
         raise NotImplementedError("This function is not finished yet")
 
-    def follow_user(self, user_id: ObjectID) -> None:
+    def follow_user(self, user_id: Union[str, int]) -> None:
         """Make a POST Request to follow a Messageable object.
         Verion Added:1.1.0
         Updated: 1.2.0
 
-        user_id: ObjectID
+        user_id: Union[str, int]
             The user's id that you wish to follow, better to make it a string.
         """
         my_id = self.access_token.partition("-")[0]
@@ -374,12 +372,12 @@ class HTTPClient:
             mode="follow",
         )
 
-    def unfollow_user(self, user_id: ObjectID) -> None:
+    def unfollow_user(self, user_id: Union[str, int]) -> None:
         """Make a DELETE Request to unfollow a Messageable object.
         Verion Added:1.1.0
         Updated: 1.2.0
 
-        user_id: ObjectID
+        user_id: Union[str, int]
             The user's id that you wish to unfollow, better to make it a string.
         """
         my_id = self.access_token.partition("-")[0]
@@ -389,11 +387,11 @@ class HTTPClient:
             mode="unfollow",
         )
 
-    def block_user(self, user_id: ObjectID) -> None:
+    def block_user(self, user_id: Union[str, int]) -> None:
         """Make a POST Request to Block a Messageable object.
         Verion Added:1.2.0
 
-        user_id: ObjectID
+        user_id: Union[str, int]
             The user's id that you wish to block, better to make it a string.
         """
         my_id = self.access_token.partition("-")[0]
@@ -404,11 +402,11 @@ class HTTPClient:
             mode="block",
         )
 
-    def unblock_user(self, user_id: ObjectID) -> None:
+    def unblock_user(self, user_id: Union[str, int]) -> None:
         """Make a DELETE Request to unblock a Messageable object.
         Verion Added:1.2.0
 
-        user_id: ObjectID
+        user_id: Union[str, int]
             The user's id that you wish to unblock, better to make it a string.
         """
         my_id = self.access_token.partition("-")[0]

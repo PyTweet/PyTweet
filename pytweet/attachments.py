@@ -24,7 +24,7 @@ SOFTWARE.
 
 import datetime
 from .utils import time_parse_todt
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional, Any
 
 
 class Media:
@@ -46,17 +46,17 @@ class Media:
         self._payload = data
 
     def __repr__(self) -> str:
-        return "Media(type={0.type} url={0.url} width={0.widht} height={0.height} media_key={0.media_key})".format(self)
+        return "Media(type={0.type} url={0.url} width={0.width} height={0.height} media_key={0.media_key})".format(self)
 
     @property
-    def type(self) -> str:
+    def type(self) -> Optional[Any]:
         """str: Return the media's type.
         Verion Added: 1.1.0
         """
         return self._payload.get("type")
 
     @property
-    def url(self) -> str:
+    def url(self) -> Optional[Any]:
         """str: Return the media's url.
         Verion Added: 1.1.0
         """
@@ -67,17 +67,17 @@ class Media:
         """int: Return the media's width.
         Verion Added: 1.1.0
         """
-        return int(self._payload.get("width"))
+        return self._payload.get("width")
 
     @property
     def height(self) -> int:
         """int: Return the media's height.
         Verion Added: 1.1.0
         """
-        return int(self._payload.get("height"))
+        return self._payload.get("height")
 
     @property
-    def media_key(self) -> str:
+    def media_key(self) -> Optional[Any]:
         """Return the media's unique key.
         Verion Added: 1.1.0
         """
@@ -105,7 +105,7 @@ class PollOptions:
         """int: The option's position.
         Verion Added: 1.1.0
         """
-        return int(self.options.get("position"))
+        return self.options.get("position")
 
     @property
     def label(self) -> str:
@@ -119,7 +119,7 @@ class PollOptions:
         """int: The option's votes.
         Verion Added: 1.1.0
         """
-        return int(self.options.get("votes"))
+        return self.options.get("votes")
 
     def __eq__(self, other):
         if not isinstance(other, PollOptions):
@@ -178,14 +178,14 @@ class Poll:
         """int: Return the poll's unique ID.
         Verion Added: 1.1.0.
         """
-        return int(self._payload.get("id"))
+        return self._payload.get("id") 
 
     @property
     def options(self) -> List[PollOptions]:
         """List[PollOptions]: Return a list of :class: PollOptions.
         Verion Added: 1.1.0.
         """
-        return [PollOptions(option) for option in self._payload.get("options")]
+        return [PollOptions(option) for option in self._payload.get("options")] # type: ignore
 
     @property
     def voting_status(self) -> bool:

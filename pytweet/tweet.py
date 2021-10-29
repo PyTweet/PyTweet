@@ -28,7 +28,6 @@ from .attachments import Poll, Media
 from .user import User
 from .metrics import TweetPublicMetrics
 from .utils import time_parse_todt
-from .types.tweet import Tweet as TweetPayload
 
 
 class EmbedsImages:
@@ -177,25 +176,25 @@ class Tweet:
 
     Parameters:
     -----------
-    data: TweetPayload
+    data: Dict[str, Any]
         The complete data of a tweet keep inside a dictionary.
 
     Attributes:
     -----------
     original_payload
-            Represent the main data of a tweet.
+        Represent the main data of a tweet.
 
-        _payload
-            Same as original_payload but its inside the 'data' key.
+    _payload
+        Same as original_payload but its inside the 'data' key.
 
-        _includes
-            Same as original_payload but its inside the '_includes' key..
+    _includes
+        Same as original_payload but its inside the '_includes' key..
 
-        tweet_metrics
-            Represent the public metrics of the tweet.
+    tweet_metrics
+        Represent the public metrics of the tweet.
     """
 
-    def __init__(self, data: TweetPayload, **kwargs: Any) -> None:
+    def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
         self.original_payload = data
         self._payload = data.get("data") or None
         self._includes = self.original_payload.get("includes")

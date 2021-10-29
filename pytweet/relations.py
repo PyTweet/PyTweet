@@ -1,8 +1,5 @@
-from typing import Dict, Any, Union, Type
+from typing import Dict, Any
 from .enums import RelationsTypeEnum
-
-Payload: Union[Dict[str, Any], Any] = Any
-
 
 class RelationFollow:
     """Represent the follow relation from a follow request.
@@ -23,7 +20,7 @@ class RelationFollow:
         The data paramater in data key.
     """
 
-    def __init__(self, data: Payload):
+    def __init__(self, data: Dict[str, Any]):
         self.original_payload = data
         self._payload = data["data"]
 

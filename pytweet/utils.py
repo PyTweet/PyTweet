@@ -23,9 +23,10 @@ SOFTWARE.
 """
 import datetime
 from dateutil import parser
+from typing import Optional, Any
 
 
-def time_parse_todt(date: str) -> datetime.datetime:
+def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
     date = str(parser.parse(date))
     y, mo, d = date.split("-")
     h, mi, s = date.split(" ")[1].split("+")[0].split(":")

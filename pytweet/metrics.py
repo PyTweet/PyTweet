@@ -49,9 +49,7 @@ class UserPublicMetrics:
         self._public = self.original_payload.get("public_metrics")
 
     def __repr__(self) -> str:
-        return "UserPublicMetrics(user={0.original_payload.get('username')} followers_count={0._payload.get('followers_count')} following_count={0._payload.get('following_count')} tweet_count={0._payload.get('tweet_count')})".format(
-            self
-        )
+        return f"UserPublicMetrics(user={self.original_payload.get('username')} followers_count={self._payload.get('followers_count')} following_count={self._payload.get('following_count')} tweet_count={self._payload.get('tweet_count')})"
 
     @property
     def followers_count(self) -> int:
@@ -106,9 +104,7 @@ class TweetPublicMetrics:
         self._public = data.get("public_metrics")
 
     def __repr__(self) -> str:
-        return "TweetPublicMetrics(like_count={0.like_count} retweeted_count={0.retweeted_count} reply_count={0.reply_count}> quote_count={0.quote_count})".format(
-            self
-        )
+        return f"TweetPublicMetrics(like_count={self.like_count} retweet_count={self.retweet_count} reply_count={self.reply_count}> quote_count={self.quote_count})"
 
     @property
     def like_count(self) -> int:

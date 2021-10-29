@@ -23,11 +23,10 @@ SOFTWARE.
 """
 
 import datetime
-from typing import Optional, List, TYPE_CHECKING
+from typing import Optional, List, Dict, Any, TYPE_CHECKING
 from .abc import Messageable
 from .metrics import UserPublicMetrics
 from .utils import time_parse_todt
-from .types.user import User as UserPayload
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -39,22 +38,22 @@ class User(Messageable):
 
     Parameters:
     -----------
-    data: UserPayload
-        The complete data of the user through a dictionary in a UserPayload format form!
+    data: Dict[str, Any]
+        The complete data of the user through a dictionary in a dictionary.
 
     Attributes:
     -----------
     original_payload
-        Represent the main data of a tweet.
+        Represent the main data of a user.
 
     http_client
         Represent a :class: HTTPClient that make the request.
 
     user_metrics
-            Represent the public metrics of the user.
+        Represent the public metrics of the user.
     """
 
-    def __init__(self, data: UserPayload, **kwargs):
+    def __init__(self, data: Dict[str, Any], **kwargs):
         super().__init__(data, **kwargs)
         self.original_payload = data
         self._payload = (
@@ -77,12 +76,12 @@ class User(Messageable):
     @property
     def username(self) -> str:
         """str: Return the user's username, this usually start with '@' follow by their username."""
-        return "@" + self._payload.get("username")
+        return "@" + self._payload.get("username") # type: ignore
 
     @property
     def id(self) -> int:
         """id: Return the user's id."""
-        return int(self._payload.get("id"))
+        return self._payload.get("id")
 
     @property
     def bio(self) -> str:
