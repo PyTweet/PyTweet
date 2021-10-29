@@ -1,5 +1,5 @@
 """
-MIT License
+The MIT License (MIT)
 
 Copyright (c) 2021 TheFarGG & TheGenocides
 
