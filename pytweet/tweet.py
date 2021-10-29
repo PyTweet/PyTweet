@@ -261,6 +261,11 @@ class Tweet:
         return self._payload.get("convertion_id")
 
     @property
+    def link(self) -> str:
+        """str: Return the tweet's link."""
+        return f"https://twitter.com/{self.author.username.split('@', 1)[1]}/status/{self.id}"
+
+    @property
     def reply_to(self) -> Optional[User]:
         """Optional[:class:User]: Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
         .. versionadded: 1.1.3
