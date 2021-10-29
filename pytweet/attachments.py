@@ -121,7 +121,7 @@ class PollOptions:
         """
         return self.options.get("votes")
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: object) -> Union[bool, NoReturn]:
         if not isinstance(other, PollOptions):
             raise ValueError("== operation cannot be done with one of the element not a valid PollOptions")
         return self.position == other.position
@@ -131,17 +131,17 @@ class PollOptions:
             raise ValueError("< operation cannot be done with one of the element not a valid PollOptions")
         return self.position < other.position
 
-    def __gt__(self, other) -> Union[bool, NoReturn]:
+    def __gt__(self, other: object) -> Union[bool, NoReturn]:
         if not isinstance(other, PollOptions):
             raise ValueError("> operation cannot be done with one of the element not a valid PollOptions")
         return self.position > other.position
 
-    def __le__(self, other) -> Union[bool, NoReturn]:
+    def __le__(self, other: object) -> Union[bool, NoReturn]:
         if not isinstance(other, PollOptions):
             raise ValueError("<= operation cannot be done with one of the element not a valid PollOptions")
         return self.position <= other.position
 
-    def __ge__(self, other) -> Union[bool, NoReturn]:
+    def __ge__(self, other: object) -> Union[bool, NoReturn]:
         if not isinstance(other, PollOptions):
             raise ValueError(">= operation cannot be done with one of the element not a valid PollOptions")
         return self.position >= other.position
