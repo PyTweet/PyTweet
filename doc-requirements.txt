@@ -1,4 +1,3 @@
-sphinx
 sphinx_material
 requests
 requests_oauthlib 
