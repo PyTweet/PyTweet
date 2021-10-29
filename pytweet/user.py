@@ -30,11 +30,6 @@ from .utils import time_parse_todt
 if TYPE_CHECKING:
     from .http import HTTPClient
 
-from typing import Optional, Dict, Any, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .http import HTTPClient
-
 class Messageable:
     """Represent an object that can send and receive a message through DM.
     Version Added: 1.0.0

@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-
 class Unauthorized(Exception):
     """Raised when the Credentials you passed is invalid!"""
 
