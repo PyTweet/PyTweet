@@ -24,7 +24,7 @@ SOFTWARE.
 
 import datetime
 from .utils import time_parse_todt
-from typing import Dict, List, Any, Optional, Any
+from typing import Dict, List, Any, Optional
 
 
 class Media:
@@ -63,14 +63,14 @@ class Media:
         return self._payload.get("url")
 
     @property
-    def width(self) -> int:
+    def width(self) -> Optional[Any]:
         """int: Return the media's width.
         Verion Added: 1.1.0
         """
         return self._payload.get("width")
 
     @property
-    def height(self) -> int:
+    def height(self) -> Optional[Any]:
         """int: Return the media's height.
         Verion Added: 1.1.0
         """
@@ -101,21 +101,21 @@ class PollOptions:
         return "PollOption({0.position} {0.label} {0.votes})".format(self)
 
     @property
-    def position(self) -> int:
+    def position(self) -> Optional[Any]:
         """int: The option's position.
         Verion Added: 1.1.0
         """
         return self.options.get("position")
 
     @property
-    def label(self) -> str:
+    def label(self) -> Optional[Any]:
         """str: The option's label.
         Verion Added: 1.1.0
         """
         return self.options.get("label")
 
     @property
-    def votes(self) -> int:
+    def votes(self) -> Optional[Any]:
         """int: The option's votes.
         Verion Added: 1.1.0
         """
@@ -174,7 +174,7 @@ class Poll:
         return len(self.options)
 
     @property
-    def id(self) -> int:
+    def id(self) -> Optional[Any]:
         """int: Return the poll's unique ID.
         Verion Added: 1.1.0.
         """
@@ -190,7 +190,7 @@ class Poll:
     @property
     def voting_status(self) -> bool:
         """bool: Return True if the poll is still open for voting, if its closed it return False.
-        Verion Added: 1.1.0
+        Version Added: 1.1.0
         """
         return True if self._payload.get("voting_status") == "open" else False
 
@@ -199,7 +199,7 @@ class Poll:
         """int: Return the poll duration in seconds.
         Verion Added: 1.1.0
         """
-        return int(self._payload.get("duration_minutes")) * 60
+        return int(self._payload.get("duration_minutes")) * 60 # type: ignore
 
     @property
     def end_date(self) -> datetime.datetime:

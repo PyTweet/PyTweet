@@ -69,7 +69,7 @@ class User(Messageable):
         return "User(name={0.name} username={0.username} id={0.id})".format(self)
 
     @property
-    def name(self) -> str:
+    def name(self) -> Optional[Any]:
         """str: Return the user's name."""
         return self._payload.get("name")
 
@@ -80,7 +80,7 @@ class User(Messageable):
 
     @property
     def id(self) -> int:
-        """id: Return the user's id."""
+        """int: Return the user's id."""
         return self._payload.get("id")
 
     @property
