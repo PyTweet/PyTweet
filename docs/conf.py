@@ -54,19 +54,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_material'
-
-html_theme_options = {
-    'nav_title': project,
-    'base_url': 'https://pypi.org/project/PyTweet/',
-    'color_primary': 'blue',
-    'color_accent': 'light-blue',
-    'repo_url': 'https://github.com/TheFarGG/PyTweet/',
-    'repo_name': project,
-    'globaltoc_depth': 3,
-    'globaltoc_collapse': False,
-    'globaltoc_includehidden': False,
-}
+html_theme = 'sphinx_rtd_theme'
 
 
 # Add any paths that contain custom static files (such as style sheets) here,
