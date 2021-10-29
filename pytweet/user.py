@@ -69,7 +69,7 @@ class User(Messageable):
         return "User(name={0.name} username={0.username} id={0.id})".format(self)
 
     @property
-    def name(self) -> Optional[Any]:
+    def name(self) -> str:
         """str: Return the user's name."""
         return self._payload.get("name")
 
@@ -131,7 +131,7 @@ class User(Messageable):
     @property
     def pinned_tweet(self) -> Optional[object]:
         """Optional[:class:Tweet]: Returns the user's pinned tweet.
-        Verion Added: 1.1.3"""
+        Version Added: 1.1.3"""
 
         id = self._payload.get("pinned_tweet_id")
         return None if not id else self.http_client.fetch_tweet(int(id), http_client=self.http_client)

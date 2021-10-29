@@ -95,7 +95,7 @@ class Client:
         return User(res, http_client=self)
 
     def get_user(self, user_id: Union[str, int]) -> User:
-        """A function for HTTPClient.get_user().
+        """A function for HTTPClient.fetch_user().
         Version Added: 1.0.0
 
         This function return a :class: User object.

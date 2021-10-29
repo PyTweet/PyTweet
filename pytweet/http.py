@@ -62,7 +62,7 @@ class Route:
 class HTTPClient:
     """Represent the http/base client for :class: Client!
     This http/base client have methods for making requests to twitter's api!
-    Verion Added: 1.0.0
+    version Added: 1.0.0
 
     Parameters:
     -----------
@@ -82,7 +82,12 @@ class HTTPClient:
         The Access Token Secret of the app.
 
     credentials
-        The credentials in a dictionary
+        The credentials in a dictionary.
+
+    Exceptions Raise:
+    ----------------
+    pytweet.errors.Unauthorized:
+        Raise when the api return code: 401. This usually because you passed invalid credentials.
     """
 
     def __init__(
@@ -125,7 +130,41 @@ class HTTPClient:
         mode: str = None,
     ) -> Union[str, Dict[Any, Any], NoReturn]:
         """Make an HTTP Requests to the api.
-        Verion Added: 1.0.0
+        version Added: 1.0.0
+
+        Parameters:
+        -----------
+        route: Route
+            Represent the Route class, this will be use to figure out the endpoint, method, and version of the api.
+
+        headers: RequestModel
+            Represent the http request headers, it usually filled with your bearer token. If this isnt specified then the default argument will be an empty dictionary. Later in the code it will update and gets your bearer token.
+
+        params: RequestModel
+            Represent the http request paramaters, If this isnt specified then the default argument will be an empty dictionary.
+
+        json: RequestModel
+            Represent the Json data. This usually use for request with POST method.
+
+        auth: bool
+           Represent a toggle, if auth is True then the request will be handler with Oauth1 particularly OauthSession.
+
+        is_json: bool
+            Represent a toggle, if its True then the return will be in a json format else its going to be a requests.models.Response object. Default to True. 
+
+        mode: str
+            This mode argument usually use in a POST request, its going to specified whats the request action, then it log into a cache. For example, if a mode is 'follow' then it log the request to a follow cache.         
+
+        Exceptions Raise:
+        ----------------
+        pytweet.errors.Unauthorized:
+            Raise when the api return code: 401. This usually because you passed invalid credentials
+
+        pytweet.errors.Forbidden:
+            Raise when the api return code: 403. Theres alot of reason why, This usually happen when the client cannot do the request due to twitter's limitation e.g trying to follow someone that you blocked etc. 
+
+        pytweet.errors.TooManyRequests:
+            Raise when the api return code: 429. This usually happen when you made too much request thus the api ratelimit you. The ratelimit will ware off in a couple of minutes.
 
         This function make an HTTP Request with the given paramaters then return a dictionary in a json format.
         """
@@ -184,14 +223,32 @@ class HTTPClient:
             
         return respond
 
-    def fetch_user(self, user_id: Union[str, int], http_client, pinned_tweet: bool = False) -> User:
+    def fetch_user(self, user_id: Union[str, int], http_client = None) -> User:
         """Make a Request to optain the user from the given user id.
-        Verion Added:1.0.0
+        version Added:1.0.0
+        
+        Parameters:
+        -----------
+        user_id: Union[str, int]
+            Represent the user id. If you dont have it you may use `fetch_user_byusername` because it only required the user's username.
+
+        http_client:
+            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isnt a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
+
+        Exceptions Raise:
+        ----------------
+        pytweet.errors.NotFoundError:
+            Raise when the api cant find a user with that id.
+
+        ValueError:
+            Raise when user_id is not an int and is not a string of digits.
 
         This function return a :class: User object.
         """
-        if isinstance(id, str):
-            raise ValueError("Id paramater should be an integer!")
+        try:
+            int(user_id)
+        except ValueError:
+            raise ValueError("user_id have to be an int, or a string of digits!")
 
         data = self.request(
             Route("GET", "2", f"/users/{user_id}"),
@@ -228,13 +285,32 @@ class HTTPClient:
                 else 0
             }
         )
-        return User(data, http_client=http_client)
+
+        check=isinstance(http_client, self)
+        
+        if check == False:
+            check = issubclass(http_client, self)
+
+        return User(data, http_client=http_client if check else self)
 
     def fetch_user_byusername(self, username: str, http_client) -> User:
-        """Make a Request to optain the user from their username, A Username usually start with '@' before any letters. If a username named @Jack, then the username argument must be 'Jack'.
-        Verion Added:1.0.0
+        """Make a Request to optain the user from their username.
+        version Added:1.0.0
 
-        This function return a :class: User.
+        Parameters:
+        -----------
+        username: str
+            Represent the user's username. A Username usually start with '@' before any letters. If a username named @Jack, then the username argument must be 'Jack'.
+
+        http_client:
+            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isnt a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
+
+        Exceptions Raise:
+        ----------------
+        pytweet.errors.NotFoundError:
+            Raise when the api cant find a user with that username.
+
+        This function return a :class: User object.
         """
         if "@" in username:
             username = username.replace("@", "", 1)
@@ -252,17 +328,30 @@ class HTTPClient:
         user_payload = self.fetch_user(int(data["data"].get("id")), http_client)
         data["data"].update({"followers": user_payload.followers})
         data["data"].update({"following": user_payload.following})
-        return User(data, http_client=http_client)
+
+        check=isinstance(http_client, self)
+
+        if check == False:
+            check = issubclass(http_client, self)
+
+        return User(data, http_client=http_client if check else self)
 
     def fetch_tweet(self, tweet_id: Union[str, int], http_client) -> Tweet:
         """Fetch a tweet info from the specified id. Return if consumer_key or consumer_key_secret or access_token or access_token_secret is not specified.
-        Verion Added:1.0.0
+        version Added:1.0.0
 
+        Parameters:
+        -----------
         tweet_id: Union[str, int]
-            The tweet id you wish to fetch it.
+            Represent the tweet's id.
 
         http_client
-            The http client that make the request.
+            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isnt a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
+
+        Exceptions Raise:
+        ----------------
+        pytweet.errors.NotFoundError:
+            Raise when the api cant find a tweet with that id.
 
         This function return a :class: Tweet.
         """
@@ -316,11 +405,15 @@ class HTTPClient:
 
             res["data"].update({"liking_users": 0})
 
-        return Tweet(res, http_client=self)
+        check=isinstance(http_client, self)
+
+        if check == False:
+            check = issubclass(http_client, self)
+        return Tweet(res, http_client=http_client if check else self)
 
     def send_message(self, user_id: Union[str, int], text: str, **kwargs):
         """WARNING: this function isnt finish yet!
-        Verion Added: 1.1.0
+        version Added: 1.1.0
 
         Make a post Request for sending a message to a Messageable object.
         """
@@ -346,7 +439,7 @@ class HTTPClient:
 
     def delete_message(self, id: int, **kwargs):
         """WARNING: this function isnt finish yet!
-        Verion Added:1.1.0
+        version Added:1.1.0
 
         Make a DELETE Request for deleting a certain message in a Messageable object.
         """
@@ -354,7 +447,7 @@ class HTTPClient:
 
     def post_tweet(self, text: str, **kwargs):
         """WARNING: this function isnt finish yet!
-        Verion Added:1.1.0
+        version Added:1.1.0
 
         Make a POST Request to post a tweet to twitter from the client itself.
         """
@@ -362,7 +455,7 @@ class HTTPClient:
 
     def follow_user(self, user_id: Union[str, int]) -> None:
         """Make a POST Request to follow a Messageable object.
-        Verion Added:1.1.0
+        version Added:1.1.0
         Updated: 1.2.0
 
         user_id: Union[str, int]
@@ -378,7 +471,7 @@ class HTTPClient:
 
     def unfollow_user(self, user_id: Union[str, int]) -> None:
         """Make a DELETE Request to unfollow a Messageable object.
-        Verion Added:1.1.0
+        version Added:1.1.0
         Updated: 1.2.0
 
         user_id: Union[str, int]
@@ -393,7 +486,7 @@ class HTTPClient:
 
     def block_user(self, user_id: Union[str, int]) -> None:
         """Make a POST Request to Block a Messageable object.
-        Verion Added:1.2.0
+        version Added:1.2.0
 
         user_id: Union[str, int]
             The user's id that you wish to block, better to make it a string.
@@ -408,7 +501,7 @@ class HTTPClient:
 
     def unblock_user(self, user_id: Union[str, int]) -> None:
         """Make a DELETE Request to unblock a Messageable object.
-        Verion Added:1.2.0
+        version Added:1.2.0
 
         user_id: Union[str, int]
             The user's id that you wish to unblock, better to make it a string.

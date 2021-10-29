@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 @runtime_checkable
 class Messageable(Protocol):
     """Represent an object that can send and receive a message through DM.
-    Verion Added: 1.0.0
+    Version Added: 1.0.0
 
     Parameters:
     -----------
@@ -50,36 +50,36 @@ class Messageable(Protocol):
 
     def send(self, text: str = None, **kwargs: Any) -> None:
         """Send a message to a specific Messageable object.
-        Verion Added: 1.1.0
+        Version Added: 1.1.0
         """
         self.http_client.send_message(self._payload.get("id"), text, **kwargs)
 
     def delete_message(self, message_id: int, **kwargs: Any) -> None:
         """Delete a message from a Messageable object.
-        Verion Added: 1.1.0
+        Version Added: 1.1.0
         """
         self.http_client.delete_message(self._payload.get("id"), message_id, **kwargs)
 
     def follow(self) -> None:
         """Follow a Messageable object.
-        Verion Added: 1.1.0
+        Version Added: 1.1.0
         """
         self.http_client.follow_user(self._payload.get("id"))
 
     def unfollow(self) -> None:
         """Unfollow a Messageable object.
-        Verion Added: 1.1.0
+        Version Added: 1.1.0
         """
         self.http_client.unfollow_user(self._payload.get("id"))
 
     def block(self) -> None:
         """Block a Messageable object.
-        Verion Added: 1.2.0
+        Version Added: 1.2.0
         """
         self.http_client.block_user(self._payload.get("id"))
 
     def unblock(self) -> None:
         """Unblock a Messageable object.
-        Verion Added: 1.2.0
+        Version Added: 1.2.0
         """
         self.http_client.unblock_user(self._payload.get("id"))

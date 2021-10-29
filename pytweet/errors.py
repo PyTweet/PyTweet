@@ -30,13 +30,13 @@ class Unauthorized(Exception):
 
 
 class NotFoundError(Exception):
-    """Raised when it cant find the object in some functions."""
+    """Raised when the api return NotFoundError, meaning it cant find an object in the database."""
 
     pass
 
 
 class TooManyRequests(Exception):
-    """Raised when you made TooManyRequest"""
+    """Raised when ratelimit exceeded and a request return status code: 429"""
 
     pass
 
@@ -48,6 +48,6 @@ class Forbidden(Exception):
 
 
 class PytweetException(Exception):
-    """Raised when you made TooManyRequest"""
+    """Raise whenever the client failed executing a function. This usually happen due to user input."""
 
     pass

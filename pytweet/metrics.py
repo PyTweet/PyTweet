@@ -28,7 +28,7 @@ from typing import Dict, Any
 class UserPublicMetrics:
     """Represent a PublicMetrics for a User.
     This PublicMetrics contain public info about the user.
-    Verion Added:::
+    Version Added:: 1.1.0
 
     Parameters:
     -----------
@@ -54,28 +54,28 @@ class UserPublicMetrics:
     @property
     def followers_count(self) -> int:
         """int: Returns total of followers that a user has.
-        Verion Added:: 1.1.0
+        Version Added:: 1.1.0
         """
         return int(self._public.get("followers_count"))
 
     @property
     def following_count(self) -> int:
         """int: Returns total of following that a user has.
-        Verion Added:: 1.1.0
+        Version Added:: 1.1.0
         """
         return int(self._public.get("following_count"))
 
     @property
     def tweet_count(self) -> int:
         """int: Returns total of tweet that a user has.
-        Verion Added:: 1.1.0
+        Version Added:: 1.1.0
         """
         return int(self._public.get("tweet_count"))
 
     @property
     def listed_count(self) -> int:
         """int: Returns total of listed that a user has.
-        Verion Added:: 1.1.0
+        Version Added:: 1.1.0
         """
         return int(self._public.get("listed_count"))
 
@@ -83,7 +83,7 @@ class UserPublicMetrics:
 class TweetPublicMetrics:
     """Represent a PublicMetrics for a tweet.
     This PublicMetrics contain public info about the tweet.
-    Verion Added:: 1.1.0
+    Version Added:: 1.1.0
 
     Parameters:
     -----------
@@ -109,27 +109,27 @@ class TweetPublicMetrics:
     @property
     def like_count(self) -> int:
         """int: Return total of likes that the tweet has.
-        Verion Added:: 1.1.0
+        Version Added:: 1.1.0
         """
         return int(self._public.get("like_count"))
 
     @property
     def retweet_count(self) -> int:
         """int: Return total of retweetes that the tweet has.
-        Verion Added:: 1.1.0
+        Version Added:: 1.1.0
         """
         return int(self._public.get("retweet_count"))
 
     @property
     def reply_count(self) -> int:
         """int: Return total of replies that the tweet has.
-        Verion Added:: 1.1.0
+        Version Added:: 1.1.0
         """
         return int(self._public.get("reply_count"))
 
     @property
     def quote_count(self) -> int:
         """int: Return total of quotes that the tweet has.
-        Verion Added:: 1.1.0
+        Version Added:: 1.1.0
         """
         return int(self._public.get("quote_count"))

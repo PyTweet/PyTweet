@@ -3,7 +3,7 @@ from .enums import RelationsTypeEnum
 
 class RelationFollow:
     """Represent the follow relation from a follow request.
-    Verion Added: 1.2.0
+    Version Added: 1.2.0
 
     Parameters
     -----------

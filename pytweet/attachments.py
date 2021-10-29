@@ -29,7 +29,7 @@ from typing import Dict, List, Any, Optional
 
 class Media:
     """Represent a Media attachment in a tweet.
-    Verion Added: 1.1.0
+    Version Added: 1.1.0
 
     Parameters:
     -----------
@@ -51,42 +51,42 @@ class Media:
     @property
     def type(self) -> Optional[Any]:
         """str: Return the media's type.
-        Verion Added: 1.1.0
+        Version Added: 1.1.0
         """
         return self._payload.get("type")
 
     @property
     def url(self) -> Optional[Any]:
         """str: Return the media's url.
-        Verion Added: 1.1.0
+        Version Added: 1.1.0
         """
         return self._payload.get("url")
 
     @property
     def width(self) -> Optional[Any]:
         """int: Return the media's width.
-        Verion Added: 1.1.0
+        Version Added: 1.1.0
         """
         return self._payload.get("width")
 
     @property
     def height(self) -> Optional[Any]:
         """int: Return the media's height.
-        Verion Added: 1.1.0
+        Version Added: 1.1.0
         """
         return self._payload.get("height")
 
     @property
     def media_key(self) -> Optional[Any]:
         """Return the media's unique key.
-        Verion Added: 1.1.0
+        Version Added: 1.1.0
         """
         return self._payload.get("media_key")
 
 
 class PollOptions:
     """Represent the Poll Options, The minimum option of a poll is 2 and maximum is 4.
-    Verion Added: 1.1.0
+    Version Added: 1.1.0
 
     Parameters:
     -----------
@@ -103,21 +103,21 @@ class PollOptions:
     @property
     def position(self) -> Optional[Any]:
         """int: The option's position.
-        Verion Added: 1.1.0
+        Version Added: 1.1.0
         """
         return self.options.get("position")
 
     @property
     def label(self) -> Optional[Any]:
         """str: The option's label.
-        Verion Added: 1.1.0
+        Version Added: 1.1.0
         """
         return self.options.get("label")
 
     @property
     def votes(self) -> Optional[Any]:
         """int: The option's votes.
-        Verion Added: 1.1.0
+        Version Added: 1.1.0
         """
         return self.options.get("votes")
 
@@ -149,7 +149,7 @@ class PollOptions:
 
 class Poll:
     """Represent a Poll attachment in a tweet.
-    Verion Added: 1.1.0
+    Version Added: 1.1.0
 
     Parameters:
     -----------
@@ -176,14 +176,14 @@ class Poll:
     @property
     def id(self) -> Optional[Any]:
         """int: Return the poll's unique ID.
-        Verion Added: 1.1.0.
+        Version Added: 1.1.0.
         """
         return self._payload.get("id") 
 
     @property
     def options(self) -> List[PollOptions]:
         """List[PollOptions]: Return a list of :class: PollOptions.
-        Verion Added: 1.1.0.
+        Version Added: 1.1.0.
         """
         return [PollOptions(option) for option in self._payload.get("options")] # type: ignore
 
@@ -197,13 +197,13 @@ class Poll:
     @property
     def duration(self) -> int:
         """int: Return the poll duration in seconds.
-        Verion Added: 1.1.0
+        Version Added: 1.1.0
         """
         return int(self._payload.get("duration_minutes")) * 60 # type: ignore
 
     @property
     def end_date(self) -> datetime.datetime:
         """datetime.datetime: Return the end date in datetime.datetime object.
-        Verion Added: 1.1.0
+        Version Added: 1.1.0
         """
         return time_parse_todt(self._payload.get("end_datetime"))
