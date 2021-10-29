@@ -84,6 +84,12 @@ class HTTPClient:
     credentials
         The credentials in a dictionary.
 
+    followed_cache
+        The followed cache, will be update when the client follow someone.
+
+    blocked_cache
+        The blocked cache, will be update when the client block someone.
+
     Exceptions Raise:
     ----------------
     pytweet.errors.Unauthorized:
