@@ -7,3 +7,7 @@ __pycache__/
 docs/_build
 docs/_static
 docs/_templates
+*.inv
+*.buildinfo
+*.doctree
+*.pickle
