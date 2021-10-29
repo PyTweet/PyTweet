@@ -1,89 +1,236 @@
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
-<head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pytweet package &mdash; PyTweet  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-    <script src="_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
-</head>
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> PyTweet
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">pytweet package</a><ul>
-<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-pytweet.abc">pytweet.abc module</a></li>
-<li><a class="reference internal" href="#module-pytweet.attachments">pytweet.attachments module</a></li>
-<li><a class="reference internal" href="#module-pytweet.auth">pytweet.auth module</a></li>
-<li><a class="reference internal" href="#module-pytweet.client">pytweet.client module</a></li>
-<li><a class="reference internal" href="#module-pytweet.errors">pytweet.errors module</a></li>
-<li><a class="reference internal" href="#module-pytweet.http">pytweet.http module</a></li>
-<li><a class="reference internal" href="#module-pytweet.metrics">pytweet.metrics module</a></li>
-<li><a class="reference internal" href="#module-pytweet.relations">pytweet.relations module</a></li>
-<li><a class="reference internal" href="#module-pytweet.tweet">pytweet.tweet module</a></li>
-<li><a class="reference internal" href="#module-pytweet.user">pytweet.user module</a></li>
-<li><a class="reference internal" href="#module-pytweet.utils">pytweet.utils module</a></li>
-<li><a class="reference internal" href="#module-pytweet">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>pytweet package &#8212; PyTweet  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/material.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=blue-grey data-md-color-accent=blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#pytweet" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="index.html" title="PyTweet  documentation"
+           class="md-header-nav__button md-logo">
+          
+            &nbsp;
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">PyTweet  documentation</span>
+          <span class="md-header-nav__topic"> pytweet package </span>
         </div>
       </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">PyTweet</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>pytweet package</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="_sources/pytweet.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="search.html" method="get" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder="Search"
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+
+      </div>
+      
+      
+  
+  <script src="_static/javascripts/version_dropdown.js"></script>
+  <script>
+    var json_loc = ""versions.json"",
+        target_loc = "../",
+        text = "Versions";
+    $( document ).ready( add_version_dropdown(json_loc, target_loc, text));
+  </script>
+  
+
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list">
+          <li class="md-tabs__item"><a href="index.html" class="md-tabs__link">PyTweet  documentation</a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="index.html" title="PyTweet documentation" class="md-nav__button md-logo">
+      
+        <img src="_static/" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="index.html"
+       title="PyTweet documentation">PyTweet  documentation</a>
+  </label>
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">Contents</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#pytweet--page-root" class="md-nav__link">pytweet package</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#subpackages" class="md-nav__link">Subpackages</a>
+        </li>
+        <li class="md-nav__item"><a href="#submodules" class="md-nav__link">Submodules</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-pytweet.abc" class="md-nav__link">pytweet.abc module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-pytweet.attachments" class="md-nav__link">pytweet.attachments module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-pytweet.auth" class="md-nav__link">pytweet.auth module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-pytweet.client" class="md-nav__link">pytweet.client module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-pytweet.errors" class="md-nav__link">pytweet.errors module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-pytweet.http" class="md-nav__link">pytweet.http module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-pytweet.metrics" class="md-nav__link">pytweet.metrics module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-pytweet.relations" class="md-nav__link">pytweet.relations module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-pytweet.tweet" class="md-nav__link">pytweet.tweet module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-pytweet.user" class="md-nav__link">pytweet.user module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-pytweet.utils" class="md-nav__link">pytweet.utils module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-pytweet" class="md-nav__link">Module contents</a>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="_sources/pytweet.rst.txt">Show Source</a> </li>
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
   <section id="pytweet-package">
-<h1>pytweet package<a class="headerlink" href="#pytweet-package" title="Permalink to this headline"></a></h1>
+<h1 id="pytweet--page-root">pytweet package<a class="headerlink" href="#pytweet--page-root" title="Permalink to this headline">¶</a></h1>
 <section id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline"></a></h2>
+<h2 id="subpackages">Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pytweet.types.html">pytweet.types package</a><ul>
@@ -97,10 +244,10 @@
 </div>
 </section>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+<h2 id="submodules">Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </section>
 <section id="module-pytweet.abc">
-<span id="pytweet-abc-module"></span><h2>pytweet.abc module<a class="headerlink" href="#module-pytweet.abc" title="Permalink to this headline"></a></h2>
+<span id="pytweet-abc-module"></span><h2 id="module-pytweet.abc">pytweet.abc module<a class="headerlink" href="#module-pytweet.abc" title="Permalink to this headline">¶</a></h2>
 <p>MIT License</p>
 <p>Copyright (c) 2021 TheFarGG &amp; TheGenocides</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -120,7 +267,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pytweet.abc.Messageable">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.abc.</span></span><span class="sig-name descname"><span class="pre">Messageable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.abc.Messageable" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.abc.</span></span><span class="sig-name descname"><span class="pre">Messageable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.abc.Messageable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></p>
 <p>Represent an object that can send and receive a message through DM.
 Verion Added: 1.0.0</p>
@@ -134,51 +281,44 @@ Verion Added: 1.0.0</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.abc.Messageable.send">
-<span class="sig-name descname"><span class="pre">send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.abc.Messageable.send" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.abc.Messageable.send" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send a message to a specific Messageable object.
 Verion Added: 1.1.0</p>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.abc.Messageable.delete_message">
-<span class="sig-name descname"><span class="pre">delete_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message_id</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.abc.Messageable.delete_message" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">delete_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message_id</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.abc.Messageable.delete_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete a message from a Messageable object.
 Verion Added: 1.1.0</p>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.abc.Messageable.follow">
-<span class="sig-name descname"><span class="pre">follow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.abc.Messageable.follow" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">follow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.abc.Messageable.follow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Follow a Messageable object.
 Verion Added: 1.1.0</p>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.abc.Messageable.unfollow">
-<span class="sig-name descname"><span class="pre">unfollow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.abc.Messageable.unfollow" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">unfollow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.abc.Messageable.unfollow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unfollow a Messageable object.
 Verion Added: 1.1.0</p>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.abc.Messageable.block">
-<span class="sig-name descname"><span class="pre">block</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.abc.Messageable.block" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">block</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.abc.Messageable.block" title="Permalink to this definition">¶</a></dt>
 <dd><p>Block a Messageable object.
 Verion Added: 1.2.0</p>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.abc.Messageable.unblock">
-<span class="sig-name descname"><span class="pre">unblock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.abc.Messageable.unblock" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">unblock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.abc.Messageable.unblock" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unblock a Messageable object.
 Verion Added: 1.2.0</p>
 </dd></dl>
-
 </dd></dl>
-
 </section>
 <section id="module-pytweet.attachments">
-<span id="pytweet-attachments-module"></span><h2>pytweet.attachments module<a class="headerlink" href="#module-pytweet.attachments" title="Permalink to this headline"></a></h2>
+<span id="pytweet-attachments-module"></span><h2 id="module-pytweet.attachments">pytweet.attachments module<a class="headerlink" href="#module-pytweet.attachments" title="Permalink to this headline">¶</a></h2>
 <p>MIT License</p>
 <p>Copyright (c) 2021 TheFarGG &amp; TheGenocides</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -198,7 +338,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pytweet.attachments.Media">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.attachments.</span></span><span class="sig-name descname"><span class="pre">Media</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.attachments.Media" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.attachments.</span></span><span class="sig-name descname"><span class="pre">Media</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.attachments.Media" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represent a Media attachment in a tweet.
 Verion Added: 1.1.0</p>
@@ -212,7 +352,7 @@ Verion Added: 1.1.0</p>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.attachments.Media.type">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#pytweet.attachments.Media.type" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#pytweet.attachments.Media.type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the media’s type.
 Verion Added: 1.1.0</p>
 <dl class="field-list simple">
@@ -221,10 +361,9 @@ Verion Added: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.attachments.Media.url">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">url</span></span><a class="headerlink" href="#pytweet.attachments.Media.url" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">url</span></span><a class="headerlink" href="#pytweet.attachments.Media.url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the media’s url.
 Verion Added: 1.1.0</p>
 <dl class="field-list simple">
@@ -233,10 +372,9 @@ Verion Added: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.attachments.Media.width">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#pytweet.attachments.Media.width" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#pytweet.attachments.Media.width" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the media’s width.
 Verion Added: 1.1.0</p>
 <dl class="field-list simple">
@@ -245,10 +383,9 @@ Verion Added: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.attachments.Media.height">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">height</span></span><a class="headerlink" href="#pytweet.attachments.Media.height" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">height</span></span><a class="headerlink" href="#pytweet.attachments.Media.height" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the media’s height.
 Verion Added: 1.1.0</p>
 <dl class="field-list simple">
@@ -257,19 +394,16 @@ Verion Added: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.attachments.Media.media_key">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">media_key</span></span><a class="headerlink" href="#pytweet.attachments.Media.media_key" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">media_key</span></span><a class="headerlink" href="#pytweet.attachments.Media.media_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the media’s unique key.
 Verion Added: 1.1.0</p>
 </dd></dl>
-
 </dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="pytweet.attachments.PollOptions">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.attachments.</span></span><span class="sig-name descname"><span class="pre">PollOptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.attachments.PollOptions" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.attachments.</span></span><span class="sig-name descname"><span class="pre">PollOptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.attachments.PollOptions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represent the Poll Options, The minimum option of a poll is 2 and maximum is 4.
 Verion Added: 1.1.0</p>
@@ -279,7 +413,7 @@ Verion Added: 1.1.0</p>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.attachments.PollOptions.position">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">position</span></span><a class="headerlink" href="#pytweet.attachments.PollOptions.position" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">position</span></span><a class="headerlink" href="#pytweet.attachments.PollOptions.position" title="Permalink to this definition">¶</a></dt>
 <dd><p>The option’s position.
 Verion Added: 1.1.0</p>
 <dl class="field-list simple">
@@ -288,10 +422,9 @@ Verion Added: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.attachments.PollOptions.label">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">label</span></span><a class="headerlink" href="#pytweet.attachments.PollOptions.label" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">label</span></span><a class="headerlink" href="#pytweet.attachments.PollOptions.label" title="Permalink to this definition">¶</a></dt>
 <dd><p>The option’s label.
 Verion Added: 1.1.0</p>
 <dl class="field-list simple">
@@ -300,10 +433,9 @@ Verion Added: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.attachments.PollOptions.votes">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">votes</span></span><a class="headerlink" href="#pytweet.attachments.PollOptions.votes" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">votes</span></span><a class="headerlink" href="#pytweet.attachments.PollOptions.votes" title="Permalink to this definition">¶</a></dt>
 <dd><p>The option’s votes.
 Verion Added: 1.1.0</p>
 <dl class="field-list simple">
@@ -312,12 +444,10 @@ Verion Added: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 </dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="pytweet.attachments.Poll">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.attachments.</span></span><span class="sig-name descname"><span class="pre">Poll</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.attachments.Poll" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.attachments.</span></span><span class="sig-name descname"><span class="pre">Poll</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.attachments.Poll" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represent a Poll attachment in a tweet.
 Verion Added: 1.1.0</p>
@@ -331,7 +461,7 @@ Verion Added: 1.1.0</p>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.attachments.Poll.id">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#pytweet.attachments.Poll.id" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#pytweet.attachments.Poll.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the poll’s unique ID.
 Verion Added: 1.1.0.</p>
 <dl class="field-list simple">
@@ -340,10 +470,9 @@ Verion Added: 1.1.0.</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.attachments.Poll.options">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">options</span></span><a class="headerlink" href="#pytweet.attachments.Poll.options" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">options</span></span><a class="headerlink" href="#pytweet.attachments.Poll.options" title="Permalink to this definition">¶</a></dt>
 <dd><p>class: PollOptions.
 Verion Added: 1.1.0.</p>
 <dl class="field-list simple">
@@ -355,10 +484,9 @@ Verion Added: 1.1.0.</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.attachments.Poll.voting_status">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">voting_status</span></span><a class="headerlink" href="#pytweet.attachments.Poll.voting_status" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">voting_status</span></span><a class="headerlink" href="#pytweet.attachments.Poll.voting_status" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if the poll is still open for voting, if its closed it return False.
 Verion Added: 1.1.0</p>
 <dl class="field-list simple">
@@ -367,10 +495,9 @@ Verion Added: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.attachments.Poll.duration">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">duration</span></span><a class="headerlink" href="#pytweet.attachments.Poll.duration" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">duration</span></span><a class="headerlink" href="#pytweet.attachments.Poll.duration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the poll duration in seconds.
 Verion Added: 1.1.0</p>
 <dl class="field-list simple">
@@ -379,10 +506,9 @@ Verion Added: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.attachments.Poll.end_date">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">end_date</span></span><a class="headerlink" href="#pytweet.attachments.Poll.end_date" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">end_date</span></span><a class="headerlink" href="#pytweet.attachments.Poll.end_date" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the end date in datetime.datetime object.
 Verion Added: 1.1.0</p>
 <dl class="field-list simple">
@@ -391,31 +517,26 @@ Verion Added: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 </dd></dl>
-
 </section>
 <section id="module-pytweet.auth">
-<span id="pytweet-auth-module"></span><h2>pytweet.auth module<a class="headerlink" href="#module-pytweet.auth" title="Permalink to this headline"></a></h2>
+<span id="pytweet-auth-module"></span><h2 id="module-pytweet.auth">pytweet.auth module<a class="headerlink" href="#module-pytweet.auth" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pytweet.auth.OauthSession">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.auth.</span></span><span class="sig-name descname"><span class="pre">OauthSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">consumer_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consumer_secret</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.auth.OauthSession" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.auth.</span></span><span class="sig-name descname"><span class="pre">OauthSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">consumer_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consumer_secret</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.auth.OauthSession" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">requests_oauthlib.oauth1_session.OAuth1Session</span></code></p>
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.auth.OauthSession.oauth1">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">oauth1</span></span><a class="headerlink" href="#pytweet.auth.OauthSession.oauth1" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">oauth1</span></span><a class="headerlink" href="#pytweet.auth.OauthSession.oauth1" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.auth.OauthSession.set_access_token">
-<span class="sig-name descname"><span class="pre">set_access_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secret</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.auth.OauthSession.set_access_token" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_access_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secret</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.auth.OauthSession.set_access_token" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 </dd></dl>
-
 </section>
 <section id="module-pytweet.client">
-<span id="pytweet-client-module"></span><h2>pytweet.client module<a class="headerlink" href="#module-pytweet.client" title="Permalink to this headline"></a></h2>
+<span id="pytweet-client-module"></span><h2 id="module-pytweet.client">pytweet.client module<a class="headerlink" href="#module-pytweet.client" title="Permalink to this headline">¶</a></h2>
 <p>MIT License</p>
 <p>Copyright (c) 2021 TheFarGG &amp; TheGenocides</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -435,7 +556,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pytweet.client.Client">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.client.</span></span><span class="sig-name descname"><span class="pre">Client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bearer_token</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consumer_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consumer_key_secret</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">access_token</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">access_token_secret</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.client.Client" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.client.</span></span><span class="sig-name descname"><span class="pre">Client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bearer_token</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consumer_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consumer_key_secret</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">access_token</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">access_token_secret</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.client.Client" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represent a client that connected to Twitter!
 This client will interact with other through twitter’s api version 2!
@@ -458,7 +579,7 @@ Version Added: 1.0.0</p>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.client.Client.user">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">user</span></span><a class="headerlink" href="#pytweet.client.Client.user" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">user</span></span><a class="headerlink" href="#pytweet.client.Client.user" title="Permalink to this definition">¶</a></dt>
 <dd><p>User: Return the client in user object, return None if access token isnt specified.
 Version Added: 1.2.0</p>
 <dl class="field-list simple">
@@ -467,34 +588,30 @@ Version Added: 1.2.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.client.Client.get_user">
-<span class="sig-name descname"><span class="pre">get_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.client.Client.get_user" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.client.Client.get_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>A function for HTTPClient.get_user().
 Version Added: 1.0.0</p>
 <p>This function return a :class: User object.</p>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.client.Client.get_user_by_username">
-<span class="sig-name descname"><span class="pre">get_user_by_username</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.client.Client.get_user_by_username" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_user_by_username</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.client.Client.get_user_by_username" title="Permalink to this definition">¶</a></dt>
 <dd><p>A function for HTTPClient.fetch_user_byusername().
 Version Added: 1.0.0</p>
 <p>This function return a :class: User object.</p>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.client.Client.get_tweet">
-<span class="sig-name descname"><span class="pre">get_tweet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tweet_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.client.Client.get_tweet" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_tweet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tweet_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.client.Client.get_tweet" title="Permalink to this definition">¶</a></dt>
 <dd><p>A function for HTTPClient.fetch_tweet().
 Version Added: 1.0.0</p>
 <p>This function return a :class: Tweet.</p>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.client.Client.tweet">
-<span class="sig-name descname"><span class="pre">tweet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.client.Client.tweet" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">tweet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.client.Client.tweet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Post a tweet directly to twitter from the given paramaters.
 Version Added: 1.1.0</p>
 <dl class="simple">
@@ -502,19 +619,16 @@ Version Added: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.client.Client.stream">
-<span class="sig-name descname"><span class="pre">stream</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.client.Client.stream" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">stream</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.client.Client.stream" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stream in real-time, roughly a 1% sample of all public Tweets.
 Version Added: 1.1.0</p>
 </dd></dl>
-
 </dd></dl>
-
 </section>
 <section id="module-pytweet.errors">
-<span id="pytweet-errors-module"></span><h2>pytweet.errors module<a class="headerlink" href="#module-pytweet.errors" title="Permalink to this headline"></a></h2>
+<span id="pytweet-errors-module"></span><h2 id="module-pytweet.errors">pytweet.errors module<a class="headerlink" href="#module-pytweet.errors" title="Permalink to this headline">¶</a></h2>
 <p>MIT License</p>
 <p>Copyright (c) 2021 TheFarGG &amp; TheGenocides</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -534,42 +648,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="pytweet.errors.Unauthorized">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.errors.</span></span><span class="sig-name descname"><span class="pre">Unauthorized</span></span><a class="headerlink" href="#pytweet.errors.Unauthorized" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.errors.</span></span><span class="sig-name descname"><span class="pre">Unauthorized</span></span><a class="headerlink" href="#pytweet.errors.Unauthorized" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>Raised when the Credentials you passed is invalid!</p>
 </dd></dl>
-
 <dl class="py exception">
 <dt class="sig sig-object py" id="pytweet.errors.NotFoundError">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.errors.</span></span><span class="sig-name descname"><span class="pre">NotFoundError</span></span><a class="headerlink" href="#pytweet.errors.NotFoundError" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.errors.</span></span><span class="sig-name descname"><span class="pre">NotFoundError</span></span><a class="headerlink" href="#pytweet.errors.NotFoundError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>Raised when it cant find the object in some functions.</p>
 </dd></dl>
-
 <dl class="py exception">
 <dt class="sig sig-object py" id="pytweet.errors.TooManyRequests">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.errors.</span></span><span class="sig-name descname"><span class="pre">TooManyRequests</span></span><a class="headerlink" href="#pytweet.errors.TooManyRequests" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.errors.</span></span><span class="sig-name descname"><span class="pre">TooManyRequests</span></span><a class="headerlink" href="#pytweet.errors.TooManyRequests" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>Raised when you made TooManyRequest</p>
 </dd></dl>
-
 <dl class="py exception">
 <dt class="sig sig-object py" id="pytweet.errors.Forbidden">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.errors.</span></span><span class="sig-name descname"><span class="pre">Forbidden</span></span><a class="headerlink" href="#pytweet.errors.Forbidden" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.errors.</span></span><span class="sig-name descname"><span class="pre">Forbidden</span></span><a class="headerlink" href="#pytweet.errors.Forbidden" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>Raised when a request return status code: 403</p>
 </dd></dl>
-
 <dl class="py exception">
 <dt class="sig sig-object py" id="pytweet.errors.PytweetException">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.errors.</span></span><span class="sig-name descname"><span class="pre">PytweetException</span></span><a class="headerlink" href="#pytweet.errors.PytweetException" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">exception</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.errors.</span></span><span class="sig-name descname"><span class="pre">PytweetException</span></span><a class="headerlink" href="#pytweet.errors.PytweetException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>Raised when you made TooManyRequest</p>
 </dd></dl>
-
 </section>
 <section id="module-pytweet.http">
-<span id="pytweet-http-module"></span><h2>pytweet.http module<a class="headerlink" href="#module-pytweet.http" title="Permalink to this headline"></a></h2>
+<span id="pytweet-http-module"></span><h2 id="module-pytweet.http">pytweet.http module<a class="headerlink" href="#module-pytweet.http" title="Permalink to this headline">¶</a></h2>
 <p>MIT License</p>
 <p>Copyright (c) 2021 TheFarGG &amp; TheGenocides</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -589,18 +698,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pytweet.http.check_error">
-<span class="sig-prename descclassname"><span class="pre">pytweet.http.</span></span><span class="sig-name descname"><span class="pre">check_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">respond</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.check_error" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pytweet.http.</span></span><span class="sig-name descname"><span class="pre">check_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">respond</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.check_error" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="pytweet.http.Route">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.http.</span></span><span class="sig-name descname"><span class="pre">Route</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.Route" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.http.</span></span><span class="sig-name descname"><span class="pre">Route</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.Route" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="pytweet.http.HTTPClient">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.http.</span></span><span class="sig-name descname"><span class="pre">HTTPClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bearer_token</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consumer_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consumer_key_secret</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">access_token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">access_token_secret</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.http.</span></span><span class="sig-name descname"><span class="pre">HTTPClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bearer_token</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consumer_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consumer_key_secret</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">access_token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">access_token_secret</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represent the http/base client for :class: Client!
 This http/base client have methods for making requests to twitter’s api!
@@ -621,31 +728,28 @@ Verion Added: 1.0.0</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.http.HTTPClient.request">
-<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">route</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_json</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.request" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">route</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_json</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.request" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make an HTTP Requests to the api.
 Verion Added: 1.0.0</p>
 <p>This function make an HTTP Request with the given paramaters then return a dictionary in a json format.</p>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.http.HTTPClient.fetch_user">
-<span class="sig-name descname"><span class="pre">fetch_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pinned_tweet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.fetch_user" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">fetch_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pinned_tweet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.fetch_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make a Request to optain the user from the given user id.
 Verion Added:1.0.0</p>
 <p>This function return a :class: User object.</p>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.http.HTTPClient.fetch_user_byusername">
-<span class="sig-name descname"><span class="pre">fetch_user_byusername</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_client</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.fetch_user_byusername" title="Permalink to this definition"></a></dt>
-<dd><p>Make a Request to optain the user from their username, A Username usually start with ‘&#64;’ before any letters. If a username named &#64;Jack, then the username argument must be ‘Jack’.
+<span class="sig-name descname"><span class="pre">fetch_user_byusername</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_client</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.fetch_user_byusername" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a Request to optain the user from their username, A Username usually start with ‘@’ before any letters. If a username named @Jack, then the username argument must be ‘Jack’.
 Verion Added:1.0.0</p>
 <p>This function return a :class: User.</p>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.http.HTTPClient.fetch_tweet">
-<span class="sig-name descname"><span class="pre">fetch_tweet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tweet_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_client</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.fetch_tweet" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">fetch_tweet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tweet_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_client</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.fetch_tweet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch a tweet info from the specified id. Return if consumer_key or consumer_key_secret or access_token or access_token_secret is not specified.
 Verion Added:1.0.0</p>
 <dl class="simple">
@@ -656,34 +760,30 @@ Verion Added:1.0.0</p>
 </dl>
 <p>This function return a :class: Tweet.</p>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.http.HTTPClient.send_message">
-<span class="sig-name descname"><span class="pre">send_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.send_message" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">send_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.send_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>WARNING: this function isnt finish yet!
 Verion Added:1.1.0</p>
 <p>Make a post Request for sending a message to a Messageable object.</p>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.http.HTTPClient.delete_message">
-<span class="sig-name descname"><span class="pre">delete_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.delete_message" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">delete_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.delete_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>WARNING: this function isnt finish yet!
 Verion Added:1.1.0</p>
 <p>Make a DELETE Request for deleting a certain message in a Messageable object.</p>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.http.HTTPClient.post_tweet">
-<span class="sig-name descname"><span class="pre">post_tweet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.post_tweet" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">post_tweet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.post_tweet" title="Permalink to this definition">¶</a></dt>
 <dd><p>WARNING: this function isnt finish yet!
 Verion Added:1.1.0</p>
 <p>Make a POST Request to post a tweet to twitter from the client itself.</p>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.http.HTTPClient.follow_user">
-<span class="sig-name descname"><span class="pre">follow_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.follow_user" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">follow_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.follow_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make a POST Request to follow a Messageable object.
 Verion Added:1.1.0
 Updated: 1.2.0</p>
@@ -692,10 +792,9 @@ Updated: 1.2.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.http.HTTPClient.unfollow_user">
-<span class="sig-name descname"><span class="pre">unfollow_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.unfollow_user" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">unfollow_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.unfollow_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make a DELETE Request to unfollow a Messageable object.
 Verion Added:1.1.0
 Updated: 1.2.0</p>
@@ -704,10 +803,9 @@ Updated: 1.2.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.http.HTTPClient.block_user">
-<span class="sig-name descname"><span class="pre">block_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.block_user" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">block_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.block_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make a POST Request to Block a Messageable object.
 Verion Added:1.2.0</p>
 <dl class="simple">
@@ -715,10 +813,9 @@ Verion Added:1.2.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="pytweet.http.HTTPClient.unblock_user">
-<span class="sig-name descname"><span class="pre">unblock_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.unblock_user" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">unblock_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.http.HTTPClient.unblock_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make a DELETE Request to unblock a Messageable object.
 Verion Added:1.2.0</p>
 <dl class="simple">
@@ -726,12 +823,10 @@ Verion Added:1.2.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 </dd></dl>
-
 </section>
 <section id="module-pytweet.metrics">
-<span id="pytweet-metrics-module"></span><h2>pytweet.metrics module<a class="headerlink" href="#module-pytweet.metrics" title="Permalink to this headline"></a></h2>
+<span id="pytweet-metrics-module"></span><h2 id="module-pytweet.metrics">pytweet.metrics module<a class="headerlink" href="#module-pytweet.metrics" title="Permalink to this headline">¶</a></h2>
 <p>MIT License</p>
 <p>Copyright (c) 2021 TheFarGG &amp; TheGenocides</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -751,7 +846,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pytweet.metrics.UserPublicMetrics">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.metrics.</span></span><span class="sig-name descname"><span class="pre">UserPublicMetrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typing.Dict[str,</span> <span class="pre">typing.Any]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.metrics.UserPublicMetrics" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.metrics.</span></span><span class="sig-name descname"><span class="pre">UserPublicMetrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typing.Dict[str,</span> <span class="pre">typing.Any]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.metrics.UserPublicMetrics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represent a PublicMetrics for a User.
 This PublicMetrics contain public info about the user.
@@ -768,7 +863,7 @@ Verion Added::</p>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.metrics.UserPublicMetrics.followers_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">followers_count</span></span><a class="headerlink" href="#pytweet.metrics.UserPublicMetrics.followers_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">followers_count</span></span><a class="headerlink" href="#pytweet.metrics.UserPublicMetrics.followers_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns total of followers that a user has.
 Verion Added:: 1.1.0</p>
 <dl class="field-list simple">
@@ -777,10 +872,9 @@ Verion Added:: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.metrics.UserPublicMetrics.following_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">following_count</span></span><a class="headerlink" href="#pytweet.metrics.UserPublicMetrics.following_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">following_count</span></span><a class="headerlink" href="#pytweet.metrics.UserPublicMetrics.following_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns total of following that a user has.
 Verion Added:: 1.1.0</p>
 <dl class="field-list simple">
@@ -789,10 +883,9 @@ Verion Added:: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.metrics.UserPublicMetrics.tweet_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tweet_count</span></span><a class="headerlink" href="#pytweet.metrics.UserPublicMetrics.tweet_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tweet_count</span></span><a class="headerlink" href="#pytweet.metrics.UserPublicMetrics.tweet_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns total of tweet that a user has.
 Verion Added:: 1.1.0</p>
 <dl class="field-list simple">
@@ -801,10 +894,9 @@ Verion Added:: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.metrics.UserPublicMetrics.listed_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">listed_count</span></span><a class="headerlink" href="#pytweet.metrics.UserPublicMetrics.listed_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">listed_count</span></span><a class="headerlink" href="#pytweet.metrics.UserPublicMetrics.listed_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns total of listed that a user has.
 Verion Added:: 1.1.0</p>
 <dl class="field-list simple">
@@ -813,12 +905,10 @@ Verion Added:: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 </dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="pytweet.metrics.TweetPublicMetrics">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.metrics.</span></span><span class="sig-name descname"><span class="pre">TweetPublicMetrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typing.Dict[str,</span> <span class="pre">typing.Any]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.metrics.TweetPublicMetrics" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.metrics.</span></span><span class="sig-name descname"><span class="pre">TweetPublicMetrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">typing.Dict[str,</span> <span class="pre">typing.Any]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.metrics.TweetPublicMetrics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represent a PublicMetrics for a tweet.
 This PublicMetrics contain public info about the tweet.
@@ -835,7 +925,7 @@ Verion Added:: 1.1.0</p>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.metrics.TweetPublicMetrics.like_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">like_count</span></span><a class="headerlink" href="#pytweet.metrics.TweetPublicMetrics.like_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">like_count</span></span><a class="headerlink" href="#pytweet.metrics.TweetPublicMetrics.like_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return total of likes that the tweet has.
 Verion Added:: 1.1.0</p>
 <dl class="field-list simple">
@@ -844,10 +934,9 @@ Verion Added:: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.metrics.TweetPublicMetrics.retweet_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">retweet_count</span></span><a class="headerlink" href="#pytweet.metrics.TweetPublicMetrics.retweet_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">retweet_count</span></span><a class="headerlink" href="#pytweet.metrics.TweetPublicMetrics.retweet_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return total of retweetes that the tweet has.
 Verion Added:: 1.1.0</p>
 <dl class="field-list simple">
@@ -856,10 +945,9 @@ Verion Added:: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.metrics.TweetPublicMetrics.reply_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reply_count</span></span><a class="headerlink" href="#pytweet.metrics.TweetPublicMetrics.reply_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reply_count</span></span><a class="headerlink" href="#pytweet.metrics.TweetPublicMetrics.reply_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return total of replies that the tweet has.
 Verion Added:: 1.1.0</p>
 <dl class="field-list simple">
@@ -868,10 +956,9 @@ Verion Added:: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.metrics.TweetPublicMetrics.quote_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">quote_count</span></span><a class="headerlink" href="#pytweet.metrics.TweetPublicMetrics.quote_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">quote_count</span></span><a class="headerlink" href="#pytweet.metrics.TweetPublicMetrics.quote_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return total of quotes that the tweet has.
 Verion Added:: 1.1.0</p>
 <dl class="field-list simple">
@@ -880,15 +967,13 @@ Verion Added:: 1.1.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 </dd></dl>
-
 </section>
 <section id="module-pytweet.relations">
-<span id="pytweet-relations-module"></span><h2>pytweet.relations module<a class="headerlink" href="#module-pytweet.relations" title="Permalink to this headline"></a></h2>
+<span id="pytweet-relations-module"></span><h2 id="module-pytweet.relations">pytweet.relations module<a class="headerlink" href="#module-pytweet.relations" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pytweet.relations.RelationFollow">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.relations.</span></span><span class="sig-name descname"><span class="pre">RelationFollow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.relations.RelationFollow" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.relations.</span></span><span class="sig-name descname"><span class="pre">RelationFollow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.relations.RelationFollow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represent the follow relation from a follow request.
 Verion Added: 1.2.0</p>
@@ -899,19 +984,17 @@ Verion Added: 1.2.0</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pytweet.relations.RelationFollow.original_payload">
-<span class="sig-name descname"><span class="pre">original_payload</span></span><a class="headerlink" href="#pytweet.relations.RelationFollow.original_payload" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">original_payload</span></span><a class="headerlink" href="#pytweet.relations.RelationFollow.original_payload" title="Permalink to this definition">¶</a></dt>
 <dd><p>The data paramater.</p>
 </dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pytweet.relations.RelationFollow._payload">
-<span class="sig-name descname"><span class="pre">_payload</span></span><a class="headerlink" href="#pytweet.relations.RelationFollow._payload" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">_payload</span></span><a class="headerlink" href="#pytweet.relations.RelationFollow._payload" title="Permalink to this definition">¶</a></dt>
 <dd><p>The data paramater in data key.</p>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.relations.RelationFollow.pending">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">pending</span></span><a class="headerlink" href="#pytweet.relations.RelationFollow.pending" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">pending</span></span><a class="headerlink" href="#pytweet.relations.RelationFollow.pending" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the relation is pending.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -919,10 +1002,9 @@ Verion Added: 1.2.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.relations.RelationFollow.following">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">following</span></span><a class="headerlink" href="#pytweet.relations.RelationFollow.following" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">following</span></span><a class="headerlink" href="#pytweet.relations.RelationFollow.following" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the relation is following.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -930,10 +1012,9 @@ Verion Added: 1.2.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.relations.RelationFollow.type">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#pytweet.relations.RelationFollow.type" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#pytweet.relations.RelationFollow.type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check what relation type it is.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -941,12 +1022,10 @@ Verion Added: 1.2.0</p>
 </dd>
 </dl>
 </dd></dl>
-
 </dd></dl>
-
 </section>
 <section id="module-pytweet.tweet">
-<span id="pytweet-tweet-module"></span><h2>pytweet.tweet module<a class="headerlink" href="#module-pytweet.tweet" title="Permalink to this headline"></a></h2>
+<span id="pytweet-tweet-module"></span><h2 id="module-pytweet.tweet">pytweet.tweet module<a class="headerlink" href="#module-pytweet.tweet" title="Permalink to this headline">¶</a></h2>
 <p>MIT License</p>
 <p>Copyright (c) 2021 TheFarGG &amp; TheGenocides</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -966,7 +1045,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pytweet.tweet.EmbedsImages">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.tweet.</span></span><span class="sig-name descname"><span class="pre">EmbedsImages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.tweet.EmbedsImages" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.tweet.</span></span><span class="sig-name descname"><span class="pre">EmbedsImages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.tweet.EmbedsImages" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represent the tweets embed images
 .. versionadded: 1.1.3</p>
@@ -980,7 +1059,7 @@ SOFTWARE.</p>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.EmbedsImages.width">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#pytweet.tweet.EmbedsImages.width" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#pytweet.tweet.EmbedsImages.width" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the image’s width
 .. versionadded: 1.1.3</p>
 <dl class="field-list simple">
@@ -989,10 +1068,9 @@ SOFTWARE.</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.EmbedsImages.height">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">height</span></span><a class="headerlink" href="#pytweet.tweet.EmbedsImages.height" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">height</span></span><a class="headerlink" href="#pytweet.tweet.EmbedsImages.height" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the image’s height
 .. versionadded: 1.1.3</p>
 <dl class="field-list simple">
@@ -1001,10 +1079,9 @@ SOFTWARE.</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.EmbedsImages.url">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">url</span></span><a class="headerlink" href="#pytweet.tweet.EmbedsImages.url" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">url</span></span><a class="headerlink" href="#pytweet.tweet.EmbedsImages.url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the image’s url
 .. versionadded: 1.1.3</p>
 <dl class="field-list simple">
@@ -1013,12 +1090,10 @@ SOFTWARE.</p>
 </dd>
 </dl>
 </dd></dl>
-
 </dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="pytweet.tweet.Embed">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.tweet.</span></span><span class="sig-name descname"><span class="pre">Embed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.tweet.Embed" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.tweet.</span></span><span class="sig-name descname"><span class="pre">Embed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.tweet.Embed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represent the embeded urls in a tweet.
 .. versionadded: 1.1.3</p>
@@ -1032,7 +1107,7 @@ SOFTWARE.</p>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Embed.title">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#pytweet.tweet.Embed.title" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#pytweet.tweet.Embed.title" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the embed’s title
 .. versionadded: 1.1.3</p>
 <dl class="field-list simple">
@@ -1041,10 +1116,9 @@ SOFTWARE.</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Embed.description">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#pytweet.tweet.Embed.description" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#pytweet.tweet.Embed.description" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the embed’s description
 .. versionadded: 1.1.3</p>
 <dl class="field-list simple">
@@ -1053,10 +1127,9 @@ SOFTWARE.</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Embed.start">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">start</span></span><a class="headerlink" href="#pytweet.tweet.Embed.start" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">start</span></span><a class="headerlink" href="#pytweet.tweet.Embed.start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the embed’s start
 .. versionadded: 1.1.3</p>
 <dl class="field-list simple">
@@ -1065,10 +1138,9 @@ SOFTWARE.</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Embed.end">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">end</span></span><a class="headerlink" href="#pytweet.tweet.Embed.end" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">end</span></span><a class="headerlink" href="#pytweet.tweet.Embed.end" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the embed’s end
 .. versionadded: 1.1.3</p>
 <dl class="field-list simple">
@@ -1077,10 +1149,9 @@ SOFTWARE.</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Embed.url">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">url</span></span><a class="headerlink" href="#pytweet.tweet.Embed.url" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">url</span></span><a class="headerlink" href="#pytweet.tweet.Embed.url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the embed’s url
 .. versionadded: 1.1.3</p>
 <dl class="field-list simple">
@@ -1089,10 +1160,9 @@ SOFTWARE.</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Embed.expanded_url">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">expanded_url</span></span><a class="headerlink" href="#pytweet.tweet.Embed.expanded_url" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">expanded_url</span></span><a class="headerlink" href="#pytweet.tweet.Embed.expanded_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the expanded url
 .. versionadded: 1.1.3</p>
 <dl class="field-list simple">
@@ -1101,10 +1171,9 @@ SOFTWARE.</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Embed.display_url">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">display_url</span></span><a class="headerlink" href="#pytweet.tweet.Embed.display_url" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">display_url</span></span><a class="headerlink" href="#pytweet.tweet.Embed.display_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the display url
 .. versionadded: 1.1.3</p>
 <dl class="field-list simple">
@@ -1113,10 +1182,9 @@ SOFTWARE.</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Embed.unwound_url">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">unwound_url</span></span><a class="headerlink" href="#pytweet.tweet.Embed.unwound_url" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">unwound_url</span></span><a class="headerlink" href="#pytweet.tweet.Embed.unwound_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the unwound url
 .. versionadded: 1.1.3</p>
 <dl class="field-list simple">
@@ -1125,10 +1193,9 @@ SOFTWARE.</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Embed.images">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">images</span></span><a class="headerlink" href="#pytweet.tweet.Embed.images" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">images</span></span><a class="headerlink" href="#pytweet.tweet.Embed.images" title="Permalink to this definition">¶</a></dt>
 <dd><p>EmbedsImages]: Return a list of Embed’s Images
 .. versionadded: 1.1.3</p>
 <dl class="field-list simple">
@@ -1140,10 +1207,9 @@ SOFTWARE.</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Embed.status_code">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">status_code</span></span><a class="headerlink" href="#pytweet.tweet.Embed.status_code" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">status_code</span></span><a class="headerlink" href="#pytweet.tweet.Embed.status_code" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the embed’s url HTTP status code</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1151,12 +1217,10 @@ SOFTWARE.</p>
 </dd>
 </dl>
 </dd></dl>
-
 </dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.tweet.</span></span><span class="sig-name descname"><span class="pre">Tweet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.tweet.Tweet" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.tweet.</span></span><span class="sig-name descname"><span class="pre">Tweet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.tweet.Tweet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represent a tweet message from Twitter.
 A Tweet is any message posted to Twitter which may contain photos, videos, links, and text.
@@ -1181,7 +1245,7 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.text">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">text</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.text" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">text</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.text" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the tweet’s text.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1189,10 +1253,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.id">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.id" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the tweet’s id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1200,10 +1263,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.author">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">author</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.author" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">author</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.author" title="Permalink to this definition">¶</a></dt>
 <dd><p>User]: Return a user (object) who posted the tweet.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1214,10 +1276,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.retweeted_by">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">retweeted_by</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.retweeted_by" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">retweeted_by</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.retweeted_by" title="Permalink to this definition">¶</a></dt>
 <dd><p>User]]: Return a list of users thats retweeted the specified tweet’s id. Maximum users is 100. Return 0 if no one retweeted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1228,10 +1289,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.liking_users">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">liking_users</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.liking_users" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">liking_users</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.liking_users" title="Permalink to this definition">¶</a></dt>
 <dd><p>User]]: Return a list of users that liked the specified tweet’s id. Maximum users is 100. Return 0 if no one liked.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1242,10 +1302,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.sensitive">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">sensitive</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.sensitive" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">sensitive</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.sensitive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if the tweet is possible sensitive to some users, else False</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1253,10 +1312,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.created_at">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">created_at</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.created_at" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">created_at</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.created_at" title="Permalink to this definition">¶</a></dt>
 <dd><p>datetime.datetime: Return a datetime object with the tweet posted age.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1264,10 +1322,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.source">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">source</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.source" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">source</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the source of the tweet. e.g if you post a tweet from a website, the source is gonna be ‘Twitter Web App’</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1275,10 +1332,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.reply_setting">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reply_setting</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.reply_setting" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reply_setting</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.reply_setting" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the reply setting. If everyone can replied, reply_setting return ‘Everyone’</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1286,10 +1342,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.lang">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">lang</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.lang" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">lang</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.lang" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the tweet’s lang, if its english it return en.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1297,10 +1352,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.convertion_id">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">convertion_id</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.convertion_id" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">convertion_id</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.convertion_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the tweet’s convertion id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1308,11 +1362,10 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.reply_to">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reply_to</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.reply_to" title="Permalink to this definition"></a></dt>
-<dd><p>User]: Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith &#64;Username or mention a user.
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reply_to</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.reply_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>User]: Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
 .. versionadded: 1.1.3</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1323,10 +1376,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.mentions">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">mentions</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.mentions" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">mentions</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.mentions" title="Permalink to this definition">¶</a></dt>
 <dd><p>User], bool]: Return the mentioned users, if there isnt it return False.
 .. versionadded: 1.1.3</p>
 <dl class="field-list simple">
@@ -1338,10 +1390,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.poll">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">poll</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.poll" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">poll</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.poll" title="Permalink to this definition">¶</a></dt>
 <dd><p>Poll: Return a Poll object with the tweet’s poll.
 .. versionadded: 1.1.0</p>
 <dl class="field-list simple">
@@ -1350,10 +1401,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.media">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.media" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.media" title="Permalink to this definition">¶</a></dt>
 <dd><p>Media] -&gt; Return a list of media(s) in a tweet.
 .. versionadded: 1.1.0</p>
 <dl class="field-list simple">
@@ -1365,10 +1415,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.embeds">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">embeds</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.embeds" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">embeds</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.embeds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Embed]: Return a list of Embeded url from that tweet
 .. versionadded: 1.1.3</p>
 <dl class="field-list simple">
@@ -1380,10 +1429,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.like_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">like_count</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.like_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">like_count</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.like_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the total of likes in a tweet.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1391,10 +1439,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.retweet_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">retweet_count</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.retweet_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">retweet_count</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.retweet_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the total of retweetes in a tweet.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1402,10 +1449,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.reply_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reply_count</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.reply_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reply_count</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.reply_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the total of replies in a tweet.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1413,10 +1459,9 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.tweet.Tweet.quote_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">quote_count</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.quote_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">quote_count</span></span><a class="headerlink" href="#pytweet.tweet.Tweet.quote_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the total of quotes in a tweet.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1424,12 +1469,10 @@ A Tweet is any message posted to Twitter which may contain photos, videos, links
 </dd>
 </dl>
 </dd></dl>
-
 </dd></dl>
-
 </section>
 <section id="module-pytweet.user">
-<span id="pytweet-user-module"></span><h2>pytweet.user module<a class="headerlink" href="#module-pytweet.user" title="Permalink to this headline"></a></h2>
+<span id="pytweet-user-module"></span><h2 id="module-pytweet.user">pytweet.user module<a class="headerlink" href="#module-pytweet.user" title="Permalink to this headline">¶</a></h2>
 <p>MIT License</p>
 <p>Copyright (c) 2021 TheFarGG &amp; TheGenocides</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1449,7 +1492,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pytweet.user.User">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.user.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.user.User" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pytweet.user.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.user.User" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pytweet.abc.Messageable" title="pytweet.abc.Messageable"><code class="xref py py-class docutils literal notranslate"><span class="pre">pytweet.abc.Messageable</span></code></a></p>
 <p>Represent a user in Twitter.
 User is an identity in twitter, its very interactive. Can send message, post a tweet, and even send messages to other user through Dms.</p>
@@ -1467,7 +1510,7 @@ User is an identity in twitter, its very interactive. Can send message, post a t
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.name">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pytweet.user.User.name" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pytweet.user.User.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the user’s name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1475,21 +1518,19 @@ User is an identity in twitter, its very interactive. Can send message, post a t
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.username">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">username</span></span><a class="headerlink" href="#pytweet.user.User.username" title="Permalink to this definition"></a></dt>
-<dd><p>Return the user’s username, this usually start with ‘&#64;’ follow by their username.</p>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">username</span></span><a class="headerlink" href="#pytweet.user.User.username" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the user’s username, this usually start with ‘@’ follow by their username.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>str</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.id">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#pytweet.user.User.id" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#pytweet.user.User.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the user’s id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1497,10 +1538,9 @@ User is an identity in twitter, its very interactive. Can send message, post a t
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.bio">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">bio</span></span><a class="headerlink" href="#pytweet.user.User.bio" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">bio</span></span><a class="headerlink" href="#pytweet.user.User.bio" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the user’s bio.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1508,10 +1548,9 @@ User is an identity in twitter, its very interactive. Can send message, post a t
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.description">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#pytweet.user.User.description" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#pytweet.user.User.description" title="Permalink to this definition">¶</a></dt>
 <dd><p>an alias to User.bio</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1519,10 +1558,9 @@ User is an identity in twitter, its very interactive. Can send message, post a t
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.profile_link">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">profile_link</span></span><a class="headerlink" href="#pytweet.user.User.profile_link" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">profile_link</span></span><a class="headerlink" href="#pytweet.user.User.profile_link" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the user’s profile link</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1530,10 +1568,9 @@ User is an identity in twitter, its very interactive. Can send message, post a t
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.link">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">link</span></span><a class="headerlink" href="#pytweet.user.User.link" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">link</span></span><a class="headerlink" href="#pytweet.user.User.link" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return url where the user put links, return an empty string if there isnt a url</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1541,10 +1578,9 @@ User is an identity in twitter, its very interactive. Can send message, post a t
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.verified">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">verified</span></span><a class="headerlink" href="#pytweet.user.User.verified" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">verified</span></span><a class="headerlink" href="#pytweet.user.User.verified" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if the user is verified account, else False.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1552,10 +1588,9 @@ User is an identity in twitter, its very interactive. Can send message, post a t
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.protected">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">protected</span></span><a class="headerlink" href="#pytweet.user.User.protected" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">protected</span></span><a class="headerlink" href="#pytweet.user.User.protected" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if the user is protected, else False.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1563,10 +1598,9 @@ User is an identity in twitter, its very interactive. Can send message, post a t
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.avatar_url">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">avatar_url</span></span><a class="headerlink" href="#pytweet.user.User.avatar_url" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">avatar_url</span></span><a class="headerlink" href="#pytweet.user.User.avatar_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the user profile image.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1574,10 +1608,9 @@ User is an identity in twitter, its very interactive. Can send message, post a t
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.location">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">location</span></span><a class="headerlink" href="#pytweet.user.User.location" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">location</span></span><a class="headerlink" href="#pytweet.user.User.location" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the user’s location</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1585,10 +1618,9 @@ User is an identity in twitter, its very interactive. Can send message, post a t
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.created_at">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">created_at</span></span><a class="headerlink" href="#pytweet.user.User.created_at" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">created_at</span></span><a class="headerlink" href="#pytweet.user.User.created_at" title="Permalink to this definition">¶</a></dt>
 <dd><p>datetime.datetime: Return datetime.datetime object with the user’s account date.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1596,10 +1628,9 @@ User is an identity in twitter, its very interactive. Can send message, post a t
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.pinned_tweet">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">pinned_tweet</span></span><a class="headerlink" href="#pytweet.user.User.pinned_tweet" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">pinned_tweet</span></span><a class="headerlink" href="#pytweet.user.User.pinned_tweet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tweet]: Returns the user’s pinned tweet.
 Verion Added: 1.1.3</p>
 <dl class="field-list simple">
@@ -1611,10 +1642,9 @@ Verion Added: 1.1.3</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.followers">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">followers</span></span><a class="headerlink" href="#pytweet.user.User.followers" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">followers</span></span><a class="headerlink" href="#pytweet.user.User.followers" title="Permalink to this definition">¶</a></dt>
 <dd><p>User]: Returns a list of users who are followers of the specified user ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1625,10 +1655,9 @@ Verion Added: 1.1.3</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.following">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">following</span></span><a class="headerlink" href="#pytweet.user.User.following" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">following</span></span><a class="headerlink" href="#pytweet.user.User.following" title="Permalink to this definition">¶</a></dt>
 <dd><p>object]: Returns a list of users thats followed by the specified user ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1639,10 +1668,9 @@ Verion Added: 1.1.3</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.followers_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">followers_count</span></span><a class="headerlink" href="#pytweet.user.User.followers_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">followers_count</span></span><a class="headerlink" href="#pytweet.user.User.followers_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return total of followers that a user has.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1650,10 +1678,9 @@ Verion Added: 1.1.3</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.following_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">following_count</span></span><a class="headerlink" href="#pytweet.user.User.following_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">following_count</span></span><a class="headerlink" href="#pytweet.user.User.following_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return total of following that a user has.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1661,10 +1688,9 @@ Verion Added: 1.1.3</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.tweet_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tweet_count</span></span><a class="headerlink" href="#pytweet.user.User.tweet_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tweet_count</span></span><a class="headerlink" href="#pytweet.user.User.tweet_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return total of tweet that a user has.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1672,10 +1698,9 @@ Verion Added: 1.1.3</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="pytweet.user.User.listed_count">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">listed_count</span></span><a class="headerlink" href="#pytweet.user.User.listed_count" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">listed_count</span></span><a class="headerlink" href="#pytweet.user.User.listed_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return total of listed that a user has.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1683,12 +1708,10 @@ Verion Added: 1.1.3</p>
 </dd>
 </dl>
 </dd></dl>
-
 </dd></dl>
-
 </section>
 <section id="module-pytweet.utils">
-<span id="pytweet-utils-module"></span><h2>pytweet.utils module<a class="headerlink" href="#module-pytweet.utils" title="Permalink to this headline"></a></h2>
+<span id="pytweet-utils-module"></span><h2 id="module-pytweet.utils">pytweet.utils module<a class="headerlink" href="#module-pytweet.utils" title="Permalink to this headline">¶</a></h2>
 <p>MIT License</p>
 <p>Copyright (c) 2021 TheFarGG &amp; TheGenocides</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1708,41 +1731,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pytweet.utils.time_parse_todt">
-<span class="sig-prename descclassname"><span class="pre">pytweet.utils.</span></span><span class="sig-name descname"><span class="pre">time_parse_todt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.utils.time_parse_todt" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pytweet.utils.</span></span><span class="sig-name descname"><span class="pre">time_parse_todt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytweet.utils.time_parse_todt" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 </section>
 <section id="module-pytweet">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pytweet" title="Permalink to this headline"></a></h2>
+<span id="module-contents"></span><h2 id="module-pytweet">Module contents<a class="headerlink" href="#module-pytweet" title="Permalink to this headline">¶</a></h2>
 </section>
 </section>
 
 
-           </div>
-          </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2021, TheGenocide, TheFarGG.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
+          </article>
         </div>
       </div>
-    </section>
+    </main>
   </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2021, TheGenocide, TheFarGG.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
 </html>
