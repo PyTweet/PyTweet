@@ -44,7 +44,7 @@ Steps in our code
 ---------------
 
 1. We are importing pytweet using ``pytweet``
-2. We are making our Client instance using ``client = pytweet.Clien``
+2. We are making our Client instance using ``client = pytweet.Client(...)``
 3. We are fetching a user using ``client.get_user_by_username``
 4. We are printing out the user name and ID
 5. We are fetching a tweet using ``client.get_tweet``
