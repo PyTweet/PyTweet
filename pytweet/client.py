@@ -22,10 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from typing import Optional, Union
+from typing import Any, Optional, Union
+
 from .http import HTTPClient, Route
-from .user import User
 from .tweet import Tweet
+from .user import User
 
 
 class Client:
@@ -58,19 +59,19 @@ class Client:
 
     def __init__(
         self,
-        bearer_token: str,
+        bearer_token: Optional[str],
         *,
-        consumer_key: str = None,
-        consumer_key_secret: str = None,
-        access_token: str = None,
-        access_token_secret: str = None,
-    ):
+        consumer_key: Optional[str] = None,
+        consumer_key_secret: Optional[str] = None,
+        access_token: Optional[str] = None,
+        access_token_secret: Optional[str] = None,
+    ) -> None:
         self.http = HTTPClient(
             bearer_token,
-            consumer_key = consumer_key,
-            consumer_key_secret = consumer_key_secret,
-            access_token = access_token,
-            access_token_secret = access_token_secret,
+            consumer_key=consumer_key,
+            consumer_key_secret=consumer_key_secret,
+            access_token=access_token,
+            access_token_secret=access_token_secret,
         )
 
     def __repr__(self) -> str:
@@ -83,9 +84,9 @@ class Client:
         """
         if not self.http.access_token:
             return None
-            
+
         my_id = self.http.access_token.partition("-")[0]
-        me=self.get_user(my_id)
+        me = self.get_user(my_id)
         return me
 
     def get_user(self, user_id: Union[str, int]) -> User:
@@ -112,7 +113,7 @@ class Client:
         """
         return self.http.fetch_tweet(tweet_id, self.http)
 
-    def tweet(self, text: str, **kwargs):
+    def tweet(self, text: str, **kwargs: Any) -> None:
         """Post a tweet directly to twitter from the given paramaters.
         Version Added: 1.1.0
 
@@ -121,7 +122,7 @@ class Client:
         """
         self.http.post_tweet(text, **kwargs)
 
-    def stream(self):
+    def stream(self) -> None:
         """Stream in real-time, roughly a 1% sample of all public Tweets.
         Version Added: 1.1.0
         """

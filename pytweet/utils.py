@@ -23,8 +23,9 @@ SOFTWARE.
 """
 
 import datetime
+from typing import Any, Optional
+
 from dateutil import parser
-from typing import Optional, Any
 
 
 def time_parse_todt(date: Optional[Any]) -> datetime.datetime:

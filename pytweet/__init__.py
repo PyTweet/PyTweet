@@ -10,7 +10,6 @@ from .tweet import *
 from .user import *
 from .utils import *
 
-
 __title__ = "PyTweet"
 __version__ = "1.2.0"
 __authors__ = ["TheFarGG", "TheGenocides"]
