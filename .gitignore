@@ -4,6 +4,10 @@ __pycache__/
 *poetry.lock
 *pyproject.toml
 *.breakpoints
-docs/_build
+# docs/_build
 docs/_static
 docs/_templates
+*.inv
+*.buildinfo
+*.doctree
+*.pickle
