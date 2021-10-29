@@ -86,13 +86,13 @@ class Client:
         my_id = self.http.access_token.partition("-")[0]
         res = self.http.request(
             Route("GET", "2", f"/users/{my_id}"),
-            headers={"Authorization": f"Bearer {self.bearer_token}"},
+            headers={"Authorization": f"Bearer {self.http.bearer_token}"},
             params={
                 "user.fields": "created_at,description,entities,id,location,name,profile_image_url,protected,public_metrics,url,username,verified,withheld,pinned_tweet_id"
             },
             is_json=True,
         )
-        return User(res, http_client=self)
+        return User(res, http_client=self.http)
 
     def get_user(self, user_id: Union[str, int]) -> User:
         """A function for HTTPClient.fetch_user().
