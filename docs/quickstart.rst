@@ -3,7 +3,7 @@
 .. currentmodule:: pytweet
 
 Quickstart
-============
+====================================
 
 This page is a simple and brief quickstart to pytweet!
 
