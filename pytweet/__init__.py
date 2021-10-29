@@ -1,4 +1,3 @@
-from .abc import *
 from .attachments import *
 from .auth import *
 from .client import *
