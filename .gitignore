@@ -11,3 +11,6 @@ docs/_templates
 *.buildinfo
 *.doctree
 *.pickle
+build/
+*.egg-info
+tests/
