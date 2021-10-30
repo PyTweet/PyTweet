@@ -33,7 +33,7 @@ setup(
     author="TheGenocide & TheFarGG",
     url="https://github.com/TheFarGG/PyTweet/",
     version=version,
-    packages=["pytweet", "pytweet.types"],
+    packages=["pytweet"],
     include_package_data=True,
     license="MIT",
     description="A Synchronous python API wrapper for twitter's api",
