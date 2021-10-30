@@ -23,8 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from typing import Dict, Any
+from typing import Any, Dict
+
 from .enums import RelationsTypeEnum
+
 
 class RelationFollow:
     """Represent the follow relation from a follow request.
@@ -66,6 +68,6 @@ class RelationFollow:
         return self._payload.get("following", False)
 
     @property
-    def type(self):
-        """RelationType: Check what relation type it is."""
+    def type(self) -> RelationsTypeEnum:
+        """RelationTypeEnum: Check what relation type it is."""
         return RelationsTypeEnum(1 if self._payload["following"] else 0)

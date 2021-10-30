@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from typing import Dict, Any
+from typing import Any, Dict
 
 
 class UserPublicMetrics:
@@ -41,7 +41,7 @@ class UserPublicMetrics:
         Returns the user public metrics.
     """
 
-    def __init__(self, data=Dict[str, Any], **kwargs):
+    def __init__(self, data: Dict[str, Any] = {}, **kwargs: Any):
         self.original_payload = data
         self._public = self.original_payload.get("public_metrics")
 
@@ -93,7 +93,7 @@ class TweetPublicMetrics:
         Returns the user public metrics.
     """
 
-    def __init__(self, data=Dict[str, Any], **kwargs):
+    def __init__(self, data: Dict[str, Any] = {}, **kwargs: Any) -> None:
         self.original_payload = data
         self._public = data.get("public_metrics")
 

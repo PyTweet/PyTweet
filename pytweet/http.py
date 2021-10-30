@@ -22,21 +22,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import requests
-from typing import Dict, Any, Optional, NoReturn, Union
-from .errors import (
-    Unauthorized,
-    NotFoundError,
-    TooManyRequests,
-    Forbidden,
-    PytweetException,
-)
-from .user import User
-from .tweet import Tweet
-from .auth import OauthSession
-from .relations import RelationFollow
+from typing import Any, Dict, NoReturn, Optional, Union
 
-def check_error(respond: requests.models.Response):
+import requests
+
+from .auth import OauthSession
+from .errors import (Forbidden, NotFoundError, PytweetException,
+                     TooManyRequests, Unauthorized)
+from .relations import RelationFollow
+from .tweet import Tweet
+from .user import User
+
+
+def check_error(respond: requests.models.Response) -> NoReturn:
     code = respond.status_code
     if code == 401:
         raise Unauthorized("Invalid credentials passed!")
@@ -48,7 +46,7 @@ def check_error(respond: requests.models.Response):
         raise TooManyRequests(respond.text)
 
 
-RequestModel: Dict[str, Any] = Any
+RequestModel: Union[Dict[str, Any], Any] = Any
 
 
 class Route:
@@ -104,7 +102,7 @@ class HTTPClient:
         consumer_key_secret: Optional[str],
         access_token: Optional[str],
         access_token_secret: Optional[str],
-    ) -> None:
+    ) -> Union[None, NoReturn]:
         self.credentials: Dict[str, Optional[str]] = {
             "bearer_token": bearer_token,
             "consumer_key": consumer_key,
@@ -116,13 +114,13 @@ class HTTPClient:
             if not isinstance(v, str) and not isinstance(v, type(None)):
                 raise Unauthorized(f"Wrong authorization passed for credential: {k}.")
 
-        self.bearer_token = bearer_token
-        self.consumer_key = consumer_key
-        self.consumer_key_secret = consumer_key_secret
-        self.access_token = access_token
-        self.access_token_secret = access_token_secret
-        self.followed_cache = {}
-        self.blocked_cache = {}
+        self.bearer_token: Optional[str] = bearer_token
+        self.consumer_key: Optional[str] = consumer_key
+        self.consumer_key_secret: Optional[str] = consumer_key_secret
+        self.access_token: Optional[str] = access_token
+        self.access_token_secret: Optional[str] = access_token_secret
+        self.followed_cache: Dict[Any, Any] = {}
+        self.blocked_cache: Dict[Any, Any] = {}
 
     def request(
         self,
@@ -156,10 +154,10 @@ class HTTPClient:
            Represent a toggle, if auth is True then the request will be handler with Oauth1 particularly OauthSession.
 
         is_json: bool
-            Represent a toggle, if its True then the return will be in a json format else its going to be a requests.models.Response object. Default to True. 
+            Represent a toggle, if its True then the return will be in a json format else its going to be a requests.models.Response object. Default to True.
 
         mode: str
-            This mode argument usually use in a POST request, its going to specified whats the request action, then it log into a cache. For example, if a mode is 'follow' then it log the request to a follow cache.         
+            This mode argument usually use in a POST request, its going to specified whats the request action, then it log into a cache. For example, if a mode is 'follow' then it log the request to a follow cache.
 
         Exceptions Raise:
         ----------------
@@ -167,7 +165,7 @@ class HTTPClient:
             Raise when the api return code: 401. This usually because you passed invalid credentials
 
         pytweet.errors.Forbidden:
-            Raise when the api return code: 403. Theres alot of reason why, This usually happen when the client cannot do the request due to twitter's limitation e.g trying to follow someone that you blocked etc. 
+            Raise when the api return code: 403. Theres alot of reason why, This usually happen when the client cannot do the request due to twitter's limitation e.g trying to follow someone that you blocked etc.
 
         pytweet.errors.TooManyRequests:
             Raise when the api return code: 429. This usually happen when you made too much request thus the api ratelimit you. The ratelimit will ware off in a couple of minutes.
@@ -188,7 +186,7 @@ class HTTPClient:
 
         respond = res(route.url, headers=headers, params=params, json=json, auth=auth)
         check_error(respond)
-        res = respond.json()
+        res: Dict[str, Any] = respond.json()
 
         if "errors" in res.keys():
             try:
@@ -226,13 +224,13 @@ class HTTPClient:
 
         if is_json:
             return res
-            
+
         return respond
 
-    def fetch_user(self, user_id: Union[str, int], http_client = None) -> User:
+    def fetch_user(self, user_id: Union[str, int], http_client=None) -> User:
         """Make a Request to optain the user from the given user id.
         version Added:1.0.0
-        
+
         Parameters:
         -----------
         user_id: Union[str, int]
@@ -316,7 +314,7 @@ class HTTPClient:
         if "@" in username:
             username = username.replace("@", "", 1)
 
-        route = Route("GET", "2", f"/users/by/username/{username}")
+        route: Route = Route("GET", "2", f"/users/by/username/{username}")
         data = self.request(
             route,
             headers={"Authorization": f"Bearer {self.bearer_token}"},
@@ -329,7 +327,6 @@ class HTTPClient:
         user_payload = self.fetch_user(int(data["data"].get("id")), http_client)
         data["data"].update({"followers": user_payload.followers})
         data["data"].update({"following": user_payload.following})
-    
 
         return User(data, http_client=http_client)
 

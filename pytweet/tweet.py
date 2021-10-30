@@ -23,12 +23,13 @@ SOFTWARE.
 """
 
 import datetime
-from typing import Optional, Dict, Any, List, Union
-from .attachments import Poll, Media
-from .user import User
-from .metrics import TweetPublicMetrics
-from .utils import time_parse_todt
+from typing import Any, Dict, List, Optional, Union
+
+from .attachments import Media, Poll
 from .enums import MessageTypeEnum
+from .metrics import TweetPublicMetrics
+from .user import User
+from .utils import time_parse_todt
 
 
 class EmbedsImages:
@@ -36,18 +37,18 @@ class EmbedsImages:
     .. versionadded: 1.1.3
 
     Parameters:
-    =============
+    -----------
     data: Dict[str, Any]
         The full data of the images keep inside a dictionary.
 
     Attributes:
-    =============
+    -----------
     _payload
         The data paramaters.
     """
 
-    def __init__(self, data: Dict[str, Any]):
-        self._payload = data
+    def __init__(self, data: Dict[str, Any]) -> None:
+        self._payload: Dict[str, Any] = data
 
     def __repr__(self) -> str:
         return "EmbedsImages(url={0.url} width={0.width} height={0.height})".format(self)

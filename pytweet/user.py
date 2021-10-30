@@ -23,12 +23,14 @@ SOFTWARE.
 """
 
 import datetime
-from typing import Optional, List, Dict, Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
+
 from .metrics import UserPublicMetrics
 from .utils import time_parse_todt
 
 if TYPE_CHECKING:
     from .http import HTTPClient
+
 
 class Messageable:
     """Represent an object that can send and receive a message through DM.
@@ -85,6 +87,7 @@ class Messageable:
         """
         self.http_client.unblock_user(self._payload.get("id"))
 
+
 class User(Messageable):
     """Represent a user in Twitter.
     User is an identity in twitter, its very interactive. Can send message, post a tweet, and even send messages to other user through Dms.
@@ -106,7 +109,7 @@ class User(Messageable):
         Represent the public metrics of the user.
     """
 
-    def __init__(self, data: Dict[str, Any], **kwargs):
+    def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
         super().__init__(data, **kwargs)
         self.original_payload = data
         self._payload = (
@@ -121,7 +124,7 @@ class User(Messageable):
     def __repr__(self) -> str:
         return "User(name={0.name} username={0.username} id={0.id})".format(self)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError("== operation cannot be done with one of the element not a valid User object")
         return self.id == other.id

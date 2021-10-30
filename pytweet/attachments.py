@@ -23,8 +23,9 @@ SOFTWARE.
 """
 
 import datetime
+from typing import Any, Dict, List, NoReturn, Optional, Union
+
 from .utils import time_parse_todt
-from typing import Dict, List, Any, NoReturn, Optional, Union
 
 
 class Media:
@@ -178,14 +179,14 @@ class Poll:
         """int: Return the poll's unique ID.
         Version Added: 1.1.0.
         """
-        return self._payload.get("id") 
+        return self._payload.get("id")
 
     @property
     def options(self) -> List[PollOptions]:
         """List[PollOptions]: Return a list of :class: PollOptions.
         Version Added: 1.1.0.
         """
-        return [PollOptions(option) for option in self._payload.get("options")] # type: ignore
+        return [PollOptions(option) for option in self._payload.get("options")]  # type: ignore
 
     @property
     def voting_status(self) -> bool:
@@ -199,7 +200,7 @@ class Poll:
         """int: Return the poll duration in seconds.
         Version Added: 1.1.0
         """
-        return int(self._payload.get("duration_minutes")) * 60 # type: ignore
+        return int(self._payload.get("duration_minutes")) * 60  # type: ignore
 
     @property
     def end_date(self) -> datetime.datetime:
