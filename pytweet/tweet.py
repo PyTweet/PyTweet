@@ -48,7 +48,7 @@ class EmbedsImages:
     """
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        self._payload: Dict[str, Any] = data
+        self._payload = data
 
     def __repr__(self) -> str:
         return "EmbedsImages(url={0.url} width={0.width} height={0.height})".format(self)
@@ -83,12 +83,12 @@ class Embed:
     .. versionadded: 1.1.3
 
     Parameters:
-    =============
+    ------------
     data: Dict[str, Any]
         The full data of the embed keep inside a dictionary.
 
     Attributes:
-    =============
+    ------------
     _payload
         The data paramaters.
     """
@@ -159,11 +159,13 @@ class Embed:
         return self._payload.get("unwound_url")
 
     @property
-    def images(self) -> List[EmbedsImages]:
+    def images(self) -> Optional[List[EmbedsImages]]:
         """List[:class:EmbedsImages]: Return a list of Embed's Images
         .. versionadded: 1.1.3
         """
-        return [EmbedsImages(data) for data in self._payload.get("images")]
+        if self._payload.get("images"):
+            return [EmbedsImages(data) for data in self._payload.get("images")]
+        return None
 
     @property
     def status_code(self) -> int:
@@ -282,41 +284,52 @@ class Tweet:
         return user
 
     @property
-    def mentions(self) -> Union[List[User], bool]:
-        """Union[List[:class:User], bool]: Return the mentioned users, if there isnt it return False.
+    def mentions(self) -> Optional[List[User]]:
+        """Optional[List[:class:User]]: Return the mentioned users, if there isnt it return None.
         .. versionadded: 1.1.3
         """
-        if self._includes.get("mentions"):
-            return [
-                self.http_client.fetch_user_byusername(user.get("username"), http_client=self.http_client)
-                for user in self._includes.get("mentions")
-            ]
-        return False
+        if self._includes:
+            if self._includes.get("mentions"):
+                return [
+                    self.http_client.fetch_user_byusername(user.get("username"), http_client=self.http_client)
+                    for user in self._includes.get("mentions")
+                ]
+        return None
 
     @property
-    def poll(self) -> Poll:
+    def poll(self) -> Optional[Poll]:
         """:class:Poll: Return a Poll object with the tweet's poll.
         .. versionadded: 1.1.0
         """
-        return Poll(self._includes.get("polls")[0])
+        if self._includes:
+            if self._includes.get("polls"):
+                return Poll(self._includes.get("polls")[0])
+
+        return None
 
     @property
-    def media(self) -> Media:
+    def media(self) -> Optional[Media]:
         """List[:class:Media] -> Return a list of media(s) in a tweet.
         .. versionadded: 1.1.0
         """
-        return [Media(img) for img in self._includes.get("media")]
+        if self._includes:
+            if self._includes.get("media"):
+                return [Media(img) for img in self._includes.get("media")]
+        return None
 
     @property
-    def embeds(self) -> List[Embed]:
+    def embeds(self) -> Optional[List[Embed]]:
         """List[:class:Embed]: Return a list of Embeded url from that tweet
         .. versionadded: 1.1.3
         """
-        return [Embed(url) for url in self._payload.get("entities").get("urls")]
+        if self._payload.get("entities"):
+            if self._payload.get("entities").get("urls"):
+                return [Embed(url) for url in self._payload.get("entities").get("urls")]
+        return None
 
     @property
     def type(self) -> MessageTypeEnum:
-        """str: Return the reply setting. If everyone can replied, reply_setting return 'Everyone'"""
+        """MessageTypeEnum: Return the Message type."""
         return MessageTypeEnum(1)
 
     @property

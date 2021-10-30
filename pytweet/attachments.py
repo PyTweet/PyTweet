@@ -186,7 +186,7 @@ class Poll:
         """List[PollOptions]: Return a list of :class: PollOptions.
         Version Added: 1.1.0.
         """
-        return [PollOptions(option) for option in self._payload.get("options")]  # type: ignore
+        return [PollOptions(option) for option in self._payload.get("options")]
 
     @property
     def voting_status(self) -> bool:
