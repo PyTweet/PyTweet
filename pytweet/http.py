@@ -27,8 +27,7 @@ from typing import Any, Dict, NoReturn, Optional, Union
 import requests
 
 from .auth import OauthSession
-from .errors import (Forbidden, NotFoundError, PytweetException,
-                     TooManyRequests, Unauthorized)
+from .errors import Forbidden, NotFoundError, PytweetException, TooManyRequests, Unauthorized
 from .relations import RelationFollow
 from .tweet import Tweet
 from .user import User
