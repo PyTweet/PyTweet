@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 import re
 
 version = ""
@@ -16,25 +16,31 @@ requirements = []
 with open("requirements.txt") as f:
     requirements = f.read().splitlines()
 
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Operating System :: OS Independent",
+    "Topic :: Internet",
+    "Topic :: Utilities",
+]
+
+
 setup(
     name="PyTweet",
-    authors=["TheGenocide", "TheFarGG"],
+    author="TheGenocide & TheFarGG",
     url="https://github.com/TheFarGG/PyTweet/",
     version=version,
-    packages=find_packages(),
+    packages=["pytweet", "pytweet.types"],
+    include_package_data=True,
     license="MIT",
     description="A Synchronous python API wrapper for twitter's api",
     long_description=readme,
     long_description_content_type="text/markdown",
-    include_package_data=True,
     install_requires=requirements,
-    keywords=["PyTweet", "pytweet", "twitter", "tweet.py", "twitter.py"],
+    keywords="PyTweet, pytweet, twitter, tweet.py twitter.py",
     python_requires=">=3.7.0",
-    classifiers=[
-        "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-    ],
+    classifiers=classifiers
 )
