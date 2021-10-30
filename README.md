@@ -9,8 +9,8 @@
 <img alt="PyPI - License" src="https://img.shields.io/pypi/l/PyTweet"> 
 
 <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/PyTweet">
-<br />
-<br />
+
+
 ## Installation
 
 ### Windows
