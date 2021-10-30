@@ -1,4 +1,6 @@
-# PyTweet
+<h2 align="center">Pytweet</h2>
+<p align="center">PyTweet is a Synchronous python API wrapper for twitter's api, Its filled with rich features and is very easy to use.</p>
+
 
 <img src="https://img.shields.io/pypi/v/PyTweet?logo=pypi&style=plastic">  
 
@@ -9,9 +11,6 @@
 <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/PyTweet">
 <br />
 <br />
-
-PyTweet is a Synchronous python API wrapper for twitter's api, Its filled with rich features and is very easy to use.
-
 ## Installation
 
 ### Windows
