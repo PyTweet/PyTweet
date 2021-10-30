@@ -24,12 +24,12 @@ SOFTWARE.
 
 import datetime
 from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    List,
-    NoReturn,
-    Optional,
+    TYPE_CHECKING, 
+    Any, 
+    Dict, 
+    List, 
+    NoReturn, 
+    Optional, 
     Union,
     TypeVar,
 )
@@ -42,7 +42,6 @@ if TYPE_CHECKING:
 
 
 U = TypeVar("U", bound="User")
-
 
 class Messageable:
     """Represent an object that can send and receive a message through DM.
@@ -106,11 +105,11 @@ class User(Messageable):
 
     .. describe:: x == y
         Check if one user id is equal to another.
-
+    
 
     .. describe:: x != y
         Check if one user id is not equal to another.
-
+    
 
     .. describe:: str(x)
         Get the user's name.
@@ -131,7 +130,7 @@ class User(Messageable):
 
     user_metrics
         Represent the public metrics of the user.
-
+    
     """
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
@@ -153,11 +152,13 @@ class User(Messageable):
         if not isinstance(other, self):
             raise ValueError("== operation cannot be done with one of the element not a valid User object")
         return self.id == other.id
+    
 
     def __ne__(self, other: U) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
+
 
     @property
     def name(self) -> str:
