@@ -78,6 +78,8 @@ class HTTPClient:
     access_token_secret: Optional[str]
         The Access Token Secret of the app.
 
+    Attributes:
+    -----------
     credentials
         The credentials in a dictionary.
 

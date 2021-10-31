@@ -28,15 +28,18 @@ from typing import Any, Dict
 class UserPublicMetrics:
     """Represent a PublicMetrics for a User.
     This PublicMetrics contain public info about the user.
-    Version Added:: 1.1.0
+    Version Added: 1.1.0
+
     Parameters:
     -----------
     data: Dict[str, Any]
         The complete data of the user's public metrics through a dictionary!
+            
     Attributes:
     -----------
     original_payload
         Return the original payload of the user.
+        
     _public
         Returns the user public metrics.
     """
@@ -80,15 +83,18 @@ class UserPublicMetrics:
 class TweetPublicMetrics:
     """Represent a PublicMetrics for a tweet.
     This PublicMetrics contain public info about the tweet.
-    Version Added:: 1.1.0
+    Version Added: 1.1.0
+    
     Parameters:
     -----------
     data: Dict[str, Any]:
         The complete data of the tweet's public metrics keep in a dictionary.
+    
     Attributes:
     -----------
     original_payload
         Return the original payload of the tweet.
+        
     _public
         Returns the user public metrics.
     """

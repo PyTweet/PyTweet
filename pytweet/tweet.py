@@ -160,11 +160,12 @@ class Embed:
 
     @property
     def images(self) -> Optional[List[EmbedsImages]]:
-        """List[:class:EmbedsImages]: Return a list of Embed's Images
+        """List[EmbedsImages]: Return a list of Embed's Images
         .. versionadded: 1.1.3
         """
         if self._payload.get("images"):
             return [EmbedsImages(data) for data in self._payload.get("images")]
+
         return None
 
     @property
@@ -219,18 +220,18 @@ class Tweet:
         return self._payload.get("id")
 
     @property
-    def author(self) -> Optional[User]:
-        """Optional[:class:User]: Return a user (object) who posted the tweet."""
+    def author(self) -> User:
+        """Optional[User]: Return a user (object) who posted the tweet."""
         return User(self._includes.get("users")[0], http_client=self.http_client)
 
     @property
     def retweeted_by(self) -> Union[List[User], int]:
-        """Optional[List[:class:User]]: Return a list of users thats retweeted the specified tweet's id. Maximum users is 100. Return 0 if no one retweeted."""
+        """Optional[List[User]]: Return a list of users thats retweeted the specified tweet's id. Maximum users is 100. Return 0 if no one retweeted."""
         return self._payload.get("retweeted_by")
 
     @property
     def liking_users(self) -> Union[List[User], int]:
-        """Optional[List[:class:User]]: Return a list of users that liked the specified tweet's id. Maximum users is 100. Return 0 if no one liked."""
+        """Optional[List[User]]: Return a list of users that liked the specified tweet's id. Maximum users is 100. Return 0 if no one liked."""
         return self._payload.get("liking_users")
 
     @property
@@ -261,7 +262,7 @@ class Tweet:
     @property
     def convertion_id(self) -> int:
         """int: Return the tweet's convertion id."""
-        return self._payload.get("convertion_id")
+        return int(self._payload.get("convertion_id"))
 
     @property
     def link(self) -> str:
@@ -329,7 +330,9 @@ class Tweet:
 
     @property
     def type(self) -> MessageTypeEnum:
-        """MessageTypeEnum: Return the Message type."""
+        """MessageTypeEnum: Return the Message type.
+        .. versionadded: 1.2.0
+        """
         return MessageTypeEnum(1)
 
     @property
