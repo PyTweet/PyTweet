@@ -32,6 +32,10 @@ class RelationFollow:
     """Represent the follow relation from a follow request.
     Version Added: 1.2.0
 
+    .. describe:: str(x)
+        Returns the type.
+
+
     Parameters
     -----------
     data: Payload
