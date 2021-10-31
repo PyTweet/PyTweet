@@ -1,5 +1,5 @@
 """
-Here's another example of what you can make using pytweet, In Twitter i've seen a lot of giveaways fromm crypto to an item like iphone, computer etc. This is a giveaway function that is very easy to do using the user's followers! 
+Here's another example of what you can make using pytweet, In Twitter i've seen a lot of giveaways from crypto to an item like iphone, computer etc. This is a very simple giveaway function using the user's followers! 
 Code Explanation:
 The client will get a user, from user we use the followers `property` then using time.sleep it make a delay then using random.choice it will pick one user from a list of users. 
 """
