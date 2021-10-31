@@ -22,13 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 from typing import Any
-
 from requests_oauthlib import OAuth1, OAuth1Session
 
 
 class OauthSession(OAuth1Session):
     def __init__(self, consumer_key: str, consumer_secret: str, callback=None) -> None:
-        super().__init__(consumer_key, client_secret=consumer_secret, callback_uri=callback)
+        super().__init__(
+            consumer_key, client_secret=consumer_secret, callback_uri=callback
+        )
         self.consumer_key: str = consumer_key
         self.consumer_key_secret: str = consumer_secret
         self.access_token: str = None
@@ -46,5 +47,5 @@ class OauthSession(OAuth1Session):
         )
 
     def set_access_token(self, key: str, secret: str) -> None:
-        self.access_token: str = key
-        self.access_token_secret: str = secret
+        self.access_token = key
+        self.access_token_secret = secret

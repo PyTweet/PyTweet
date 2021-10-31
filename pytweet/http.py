@@ -27,7 +27,13 @@ from typing import Any, Dict, NoReturn, Optional, Union
 import requests
 
 from .auth import OauthSession
-from .errors import Forbidden, NotFoundError, PytweetException,TooManyRequests, Unauthorized
+from .errors import (
+    Forbidden,
+    NotFoundError,
+    PytweetException,
+    TooManyRequests,
+    Unauthorized,
+)
 from .relations import RelationFollow
 from .tweet import Tweet
 from .user import User
@@ -281,11 +287,19 @@ class HTTPClient:
         )
 
         data["data"].update(
-            {"followers": [User(follower, http_client=self) for follower in followers["data"]] if followers != 0 else 0}
+            {
+                "followers": [
+                    User(follower, http_client=self) for follower in followers["data"]
+                ]
+                if followers != 0
+                else 0
+            }
         )
         data["data"].update(
             {
-                "following": [User(following, http_client=self) for following in following["data"]]
+                "following": [
+                    User(following, http_client=self) for following in following["data"]
+                ]
                 if following != 0
                 else 0
             }
@@ -390,12 +404,24 @@ class HTTPClient:
         res["includes"]["users"][0].update({"following": user.following})
 
         try:
-            
+
             res2["data"]
             res3["data"]
 
-            res["data"].update({"retweeted_by": [User(user, http_client=http_client) for user in res2["data"]]})
-            res["data"].update({"liking_users": [User(user, http_client=http_client) for user in res3["data"]]})
+            res["data"].update(
+                {
+                    "retweeted_by": [
+                        User(user, http_client=http_client) for user in res2["data"]
+                    ]
+                }
+            )
+            res["data"].update(
+                {
+                    "liking_users": [
+                        User(user, http_client=http_client) for user in res3["data"]
+                    ]
+                }
+            )
 
         except (KeyError, TypeError):
             res["data"].update({"retweeted_by": 0})

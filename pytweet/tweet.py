@@ -23,13 +23,15 @@ SOFTWARE.
 """
 
 import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, NoReturn, TypeVar
 
 from .attachments import Media, Poll
 from .enums import MessageTypeEnum
 from .metrics import TweetPublicMetrics
 from .user import User
 from .utils import time_parse_todt
+
+T = TypeVar("T", bound="Tweet")
 
 
 class EmbedsImages:
@@ -51,7 +53,9 @@ class EmbedsImages:
         self._payload = data
 
     def __repr__(self) -> str:
-        return "EmbedsImages(url={0.url} width={0.width} height={0.height})".format(self)
+        return "EmbedsImages(url={0.url} width={0.width} height={0.height})".format(
+            self
+        )
 
     def __str__(self) -> str:
         return self.url
@@ -97,7 +101,9 @@ class Embed:
         self._payload = data
 
     def __repr__(self) -> str:
-        return "Embed(title={0.title} description={0.description} url={0.url})".format(self)
+        return "Embed(title={0.title} description={0.description} url={0.url})".format(
+            self
+        )
 
     def __str__(self) -> str:
         return self.url
@@ -179,6 +185,17 @@ class Tweet:
     A Tweet is any message posted to Twitter which may contain photos, videos, links, and text.
     .. versionadded: 1.0.0
 
+    .. describe:: x == y
+        Check if one tweet id is equal to another.
+
+
+    .. describe:: x != y
+        Check if one tweet id is not equal to another.
+
+
+    .. describe:: str(x)
+        Get the Tweet's text.
+
     Parameters:
     -----------
     data: Dict[str, Any]
@@ -209,6 +226,23 @@ class Tweet:
     def __repr__(self) -> str:
         return "Tweet(text={0.text} id={0.id} author={0.author})".format(self)
 
+    def __str__(self) -> str:
+        return self.text
+
+    def __eq__(self, other: T) -> Union[bool, NoReturn]:
+        if not isinstance(other, self):
+            raise ValueError(
+                "== operation cannot be done with one of the element not a valid Tweet object"
+            )
+        return self.id == other.id
+
+    def __ne__(self, other: T) -> Union[bool, NoReturn]:
+        if not isinstance(other, self):
+            raise ValueError(
+                "!= operation cannot be done with one of the element not a valid User object"
+            )
+        return self.id != other.id
+
     @property
     def text(self) -> str:
         """str: Return the tweet's text."""
@@ -217,7 +251,7 @@ class Tweet:
     @property
     def id(self) -> int:
         """int: Return the tweet's id."""
-        return self._payload.get("id")
+        return int(self._payload.get("id"))
 
     @property
     def author(self) -> User:
@@ -292,7 +326,9 @@ class Tweet:
         if self._includes:
             if self._includes.get("mentions"):
                 return [
-                    self.http_client.fetch_user_byusername(user.get("username"), http_client=self.http_client)
+                    self.http_client.fetch_user_byusername(
+                        user.get("username"), http_client=self.http_client
+                    )
                     for user in self._includes.get("mentions")
                 ]
         return None

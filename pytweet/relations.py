@@ -59,7 +59,9 @@ class RelationFollow:
         return self.type
 
     def __repr__(self) -> str:
-        return "Followed(type: {0.type} following: {0.following} pending: {0.pending})".format(self)
+        return "Followed(type: {0.type} following: {0.following} pending: {0.pending})".format(
+            self
+        )
 
     @property
     def pending(self) -> bool:
