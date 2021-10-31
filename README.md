@@ -12,6 +12,8 @@
 
 <img src="https://img.shields.io/github/issues-pr/TheFarGG/PyTweet?color=yellow&label=Pull%20Requests&logo=github&logoColor=black">
 
+<img src="https://img.shields.io/discord/858312394236624957?color=blue&label=PyTweet&logo=discord">
+
 </div>
 <br>
 <br>
