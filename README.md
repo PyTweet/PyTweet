@@ -7,6 +7,11 @@
 <img alt="PyPI - License" src="https://img.shields.io/pypi/l/PyTweet"> 
 
 <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/PyTweet">
+
+<img src="https://img.shields.io/github/commit-activity/m/TheFarGG/PyTweet?color=turquoise&logo=github&logoColor=black">
+
+<img src="https://img.shields.io/github/issues-pr/TheFarGG/PyTweet?color=yellow&label=Pull%20Requests&logo=github&logoColor=black">
+
 </div>
 <br>
 <br>
