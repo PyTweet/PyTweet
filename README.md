@@ -54,6 +54,8 @@ print(tweet.text, tweet.id, tweet.author.username)
 # Return the tweet's text, id, and the author's username.
 ```
 
+You can check in `example` dir for more example code.
+
 # Links
 
 - [Documentation](https://py-tweet.readthedocs.io/en/latest/)
