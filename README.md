@@ -1,7 +1,7 @@
 <h2 align="center">Pytweet</h2>
 <p align="center">PyTweet is a Synchronous python API wrapper for twitter's api, Its filled with rich features and is very easy to use.</p>
 
-
+<div>
 <img src="https://img.shields.io/pypi/v/PyTweet?logo=pypi&style=plastic">  
 
 <img src="https://img.shields.io/badge/code%20style-black-000000.svg">  
@@ -9,7 +9,7 @@
 <img alt="PyPI - License" src="https://img.shields.io/pypi/l/PyTweet"> 
 
 <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/PyTweet">
-
+</div>
 
 ## Installation
 
@@ -47,6 +47,16 @@ tweet = client.get_tweet(Tweet ID Here)
 print(tweet.text, tweet.id, tweet.author.username)
 # Return the tweet's text, id, and the author's username.
 ```
+
+# Links
+
+- [Documentation](https://py-tweet.readthedocs.io/en/latest/)
+
+- [Support Server](https://discord.gg/XHBhg6A4jJ)
+
+- [github](https://github.com/TheFarGG/PyTweet) 
+
+- [Pypi](https://pypi.org/project/PyTweet) 
 
 # Contribute
 You can Contribute or open an issue regarding this wrapper in [github](https://github.com/TheFarGG/PyTweet)! 
