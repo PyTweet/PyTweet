@@ -54,7 +54,7 @@ print(tweet.text, tweet.id, tweet.author.username)
 # Return the tweet's text, id, and the author's username.
 ```
 
-You can check in `example` dir for more example code.
+You can check in `examples` directory for more example code.
 
 # Links
 
@@ -69,5 +69,5 @@ You can check in `example` dir for more example code.
 # Contribute
 You can Contribute or open an issue regarding this wrapper in [github](https://github.com/TheFarGG/PyTweet)! 
 
-# Licence
-[MIT](https://opensource.org/licenses/MIT)
+# Licence & Copyright
+All files of this repo are protected by the [MIT](https://opensource.org/licenses/MIT) license.
