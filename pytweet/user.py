@@ -43,7 +43,8 @@ class Messageable:
         """Send a message to a specific Messageable object.
         Version Added: 1.1.0
         """
-        self.http_client.send_message(self._payload.get("id"), text, **kwargs)
+        res=self.http_client.send_message(self._payload.get("id"), text, **kwargs)
+        return res
 
     def delete_message(self, message_id: int, **kwargs: Any) -> None:
         """Delete a message from a Messageable object.
@@ -55,25 +56,29 @@ class Messageable:
         """Follow a Messageable object.
         Version Added: 1.1.0
         """
-        self.http_client.follow_user(self._payload.get("id"))
+        follow=self.http_client.follow_user(self._payload.get("id"))
+        return follow
 
     def unfollow(self) -> None:
         """Unfollow a Messageable object.
         Version Added: 1.1.0
         """
-        self.http_client.unfollow_user(self._payload.get("id"))
+        unfollow=self.http_client.unfollow_user(self._payload.get("id"))
+        return unfollow
 
     def block(self) -> None:
         """Block a Messageable object.
         Version Added: 1.2.0
         """
-        self.http_client.block_user(self._payload.get("id"))
+        block=self.http_client.block_user(self._payload.get("id"))
+        return block
 
     def unblock(self) -> None:
         """Unblock a Messageable object.
         Version Added: 1.2.0
         """
-        self.http_client.unblock_user(self._payload.get("id"))
+        unblock=self.http_client.unblock_user(self._payload.get("id"))
+        return unblock
 
 
 class User(Messageable):

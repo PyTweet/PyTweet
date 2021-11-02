@@ -17,7 +17,19 @@ from .user import User
 
 def check_error(respond: requests.models.Response) -> NoReturn:
     code = respond.status_code
-    if code == 401:
+    if code == 200:
+        res= respond.json()
+        if "errors" in res.keys():
+            try:
+                if res["errors"][0]["detail"].startswith("Could not find"):
+                    raise NotFoundError(res["errors"][0]["detail"])
+
+                else:
+                    raise PytweetException(res["errors"][0]["detail"])
+            except KeyError:
+                raise PytweetException(res)
+
+    elif code == 401:
         raise Unauthorized("Invalid credentials passed!")
 
     elif code == 403:
@@ -169,46 +181,18 @@ class HTTPClient:
 
         respond = res(route.url, headers=headers, params=params, json=json, auth=auth)
         check_error(respond)
-        res: Dict[str, Any] = respond.json()
+        res = respond.json()
 
-        if "errors" in res.keys():
-            try:
-                if res["errors"][0]["detail"].startswith("Could not find"):
-                    raise NotFoundError(res["errors"][0]["detail"])
-
-                else:
-                    raise PytweetException(res["errors"][0]["detail"])
-            except KeyError:
-                raise PytweetException(res)
-
-        elif "meta" in res.keys():
+        if "meta" in res.keys():
             if res["meta"]["result_count"] == 0:
                 return 0
-
-        if route.method.upper() == "POST":
-            if mode.lower() == "follow":
-                self.followed_cache[str(json["target_user_id"])] = res
-
-            elif mode.lower() == "block":
-                self.blocked_cache[str(json["target_user_id"])] = res
-
-        elif route.method.upper() == "DELETE":
-            if mode.lower() == "unfollow":
-                try:
-                    self.followed_cache.pop(route.url.split("/")[3])
-                except KeyError:
-                    pass
-
-            elif mode.lower() == "unblock":
-                try:
-                    self.blocked_cache.pop(route.url.split("/")[3])
-                except KeyError:
-                    pass
 
         if is_json:
             return res
 
         return respond
+
+    
 
     def fetch_user(self, user_id: Union[str, int], http_client=None) -> User:
         """Make a Request to optain the user from the given user id.
@@ -406,12 +390,16 @@ class HTTPClient:
         return Tweet(res, http_client=http_client)
 
     def send_message(self, user_id: Union[str, int], text: str, **kwargs):
-        """WARNING: this function isnt finish yet!
+        """Make a post Request for sending a message to a Messageable object.
         version Added: 1.1.0
+        Updated: 1.2.0
 
-        Make a post Request for sending a message to a Messageable object.
+        user_id: Union[str, int]
+            The user id that you wish to send message to.
+
+        text: str
+            The text that will be send to that user.
         """
-        raise NotImplementedError("This function is not finished yet")
 
         data = {
             "event": {
@@ -424,12 +412,12 @@ class HTTPClient:
                 },
             }
         }
-        self.request(
-            Route("POST", "1.1", "/direct_messages/events/new"),
-            headers={"content-type": "application/json"},
+        res=self.request(
+            Route("POST", "1.1", "/direct_messages/events/new.json"),
             json=data,
             auth=True,
         )
+        return res
 
     def delete_message(self, id: int, **kwargs):
         """WARNING: this function isnt finish yet!
@@ -456,12 +444,13 @@ class HTTPClient:
             The user's id that you wish to follow, better to make it a string.
         """
         my_id = self.access_token.partition("-")[0]
-        self.request(
+        res=self.request(
             Route("POST", "2", f"/users/{my_id}/following"),
             json={"target_user_id": str(user_id)},
             auth=True,
             mode="follow",
         )
+        return RelationFollow(res)
 
     def unfollow_user(self, user_id: Union[str, int]) -> None:
         """Make a DELETE Request to unfollow a Messageable object.
@@ -472,26 +461,28 @@ class HTTPClient:
             The user's id that you wish to unfollow, better to make it a string.
         """
         my_id = self.access_token.partition("-")[0]
-        self.request(
+        res=self.request(
             Route("DELETE", "2", f"/users/{my_id}/following/{user_id}"),
             auth=True,
             mode="unfollow",
         )
+        return RelationFollow(res)
 
     def block_user(self, user_id: Union[str, int]) -> None:
         """Make a POST Request to Block a Messageable object.
-        version Added:1.2.0
+        version Added: 1.2.0
 
         user_id: Union[str, int]
             The user's id that you wish to block, better to make it a string.
         """
         my_id = self.access_token.partition("-")[0]
-        self.request(
+        res=self.request(
             Route("POST", "2", f"/users/{my_id}/blocking"),
             json={"target_user_id": str(user_id)},
             auth=True,
             mode="block",
         )
+        return res
 
     def unblock_user(self, user_id: Union[str, int]) -> None:
         """Make a DELETE Request to unblock a Messageable object.
@@ -501,8 +492,9 @@ class HTTPClient:
             The user's id that you wish to unblock, better to make it a string.
         """
         my_id = self.access_token.partition("-")[0]
-        self.request(
+        res=self.request(
             Route("DELETE", "2", f"/users/{my_id}/blocking/{user_id}"),
             auth=True,
             mode="unblock",
         )
+        return res

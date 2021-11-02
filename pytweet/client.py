@@ -30,7 +30,7 @@ class Client:
     Attributes:
     -----------
     http: Optional[HTTPClient]
-        Return a :class: HTTPClient, HTTPClient is responsible for making most of the Requests to twitter's api.
+        Return a :class: HTTPClient, HTTPClient is responsible for making most of the Requests.
     """
 
     def __init__(
@@ -55,7 +55,7 @@ class Client:
 
     @property
     def user(self) -> Optional[User]:
-        """:class:User: Return the client in user object, return None if access token isnt specified.
+        """:class:User: Returns the client in user object, return None if access token isn't specified.
         Version Added: 1.2.0
         """
         if not self.http.access_token:
@@ -69,7 +69,7 @@ class Client:
         """A function for HTTPClient.fetch_user().
         Version Added: 1.0.0
 
-        This function return a :class: User object.
+        This function returns a :class: User object.
         """
         return self.http.fetch_user(user_id, self.http)
 
@@ -77,7 +77,7 @@ class Client:
         """A function for HTTPClient.fetch_user_byusername().
         Version Added: 1.0.0
 
-        This function return a :class: User object.
+        This function returns a :class:User object.
         """
         return self.http.fetch_user_byusername(username, self.http)
 
@@ -85,7 +85,7 @@ class Client:
         """A function for HTTPClient.fetch_tweet().
         Version Added: 1.0.0
 
-        This function return a :class: Tweet.
+        This function returns a :class:Tweet.
         """
         return self.http.fetch_tweet(tweet_id, self.http)
 
@@ -97,12 +97,3 @@ class Client:
             The tweets text, it will showup as the main text in a tweet.
         """
         self.http.post_tweet(text, **kwargs)
-
-    def stream(self) -> None:
-        """Stream in real-time, roughly a 1% sample of all public Tweets.
-        Version Added: 1.1.0
-        """
-        self.http.request(
-            Route("GET", "2", "/tweets/sample/stream"),
-            headers={"Authorization": f"Bearer {self.http.bearer_token}"},
-        )
