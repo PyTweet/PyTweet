@@ -13,6 +13,7 @@ from .client import *
 from .enums import *
 from .errors import *
 from .http import *
+from .message import *
 from .metrics import *
 from .relations import *
 from .tweet import *
