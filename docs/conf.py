@@ -35,9 +35,13 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "sphinx.ext.extlinks",
+    "sphinx_rtd_dark_mode",
 ]
 autodoc_member_order = 'bysource'
 autodoc_typehints = 'none'
+
+# User starts in light mode
+default_dark_mode = False
 
 # The suffix of source filenames.
 source_suffix = '.rst'
