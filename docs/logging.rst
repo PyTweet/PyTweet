@@ -34,3 +34,8 @@ You can do this like this
         encoding="utf-8",
         format="%(asctime)s:%(levelname)s:%(name)s: %(message)s",
         )
+
+Why logs?
+----------------
+
+Logging might show you parts of pytweet that you are using wrong. This will make debugging a whole lot easier.
