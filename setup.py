@@ -32,7 +32,7 @@ classifiers = [
 setup(
     name="PyTweet",
     author="TheGenocide & TheFarGG",
-    maintainer=", ".join(['TheGenocide', 'Sengolda']),
+    maintainer="TheGenocide",
     url="https://github.com/TheFarGG/PyTweet/",
     version=version,
     packages=["pytweet"],
