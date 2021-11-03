@@ -112,7 +112,7 @@ class HTTPClient:
             _log.warning("Access token is missing this is recommended to have")
         if not access_token_secret:
             _log.warning(
-                "Access token scrcret is missing this is required if you have passed in the access_toke param."
+                "Access token secret is missing this is required if you have passed in the access_toke param."
             )
 
         for k, v in self.credentials.items():
