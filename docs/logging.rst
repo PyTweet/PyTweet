@@ -12,7 +12,7 @@ However, you will not see these logs since they are muted.
 
 To it up you can do
 
-.. code:: py
+.. code-block:: py
 
     import logging
 
@@ -23,7 +23,7 @@ This will log everything being logged my pytweet!
 More advanced logging setups are possible by logging them to a file.
 You can do this like this
 
-.. code:: py
+.. code-block:: py
 
     import logging
 
