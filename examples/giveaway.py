@@ -22,7 +22,7 @@ client = pytweet.Client(
 def giveaway():
     user = client.get_user_by_username("TheGenocides")
     followers = user.followers
-    if followers == 0:  # Check if the user doesnt have a followers.
+    if len(followers) == 0:  # Check if the user doesnt have a followers.
         return print("This user doesnt have a followers!")
 
     seconds = 60 * 3  # mark for 60 seconds and 3 minutes. You can change to whatever minutes you like.
