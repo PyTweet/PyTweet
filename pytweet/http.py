@@ -185,7 +185,7 @@ class HTTPClient:
 
         if "meta" in res.keys():
             if res["meta"]["result_count"] == 0:
-                return 0
+                return []
 
         if is_json:
             return res
@@ -194,14 +194,14 @@ class HTTPClient:
 
     
 
-    def fetch_user(self, user_id: Union[str, int], http_client=None) -> User:
+    def fetch_user(self, user_id: Union[str, int], *,http_client=None) -> User:
         """Make a Request to optain the user from the given user id.
         version Added:1.0.0
 
         Parameters:
         -----------
         user_id: Union[str, int]
-            Represent the user id. If you dont have it you may use `fetch_user_byusername` because it only required the user's username.
+            Represent the user id that you wish to get info to, If you dont have it you may use `fetch_user_byusername` because it only required the user's username.
 
         http_client:
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isnt a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
@@ -249,7 +249,7 @@ class HTTPClient:
         data["data"].update(
             {
                 "followers": [
-                    User(follower, http_client=self) for follower in followers["data"]
+                    User(follower, http_client=http_client) for follower in followers["data"]
                 ]
                 if followers != 0
                 else 0
@@ -258,7 +258,7 @@ class HTTPClient:
         data["data"].update(
             {
                 "following": [
-                    User(following, http_client=self) for following in following["data"]
+                    User(following, http_client=http_client) for following in following["data"]
                 ]
                 if following != 0
                 else 0
@@ -267,7 +267,7 @@ class HTTPClient:
 
         return User(data, http_client=http_client)
 
-    def fetch_user_byusername(self, username: str, http_client) -> User:
+    def fetch_user_byusername(self, username: str, *,http_client=None) -> User:
         """Make a Request to optain the user from their username.
         Version Added: 1.0.0
 
@@ -299,20 +299,20 @@ class HTTPClient:
             is_json=True,
         )
 
-        user_payload = self.fetch_user(int(data["data"].get("id")), http_client)
+        user_payload = self.fetch_user(int(data["data"].get("id")), http_client=http_client)
         data["data"].update({"followers": user_payload.followers})
         data["data"].update({"following": user_payload.following})
 
         return User(data, http_client=http_client)
 
-    def fetch_tweet(self, tweet_id: Union[str, int], http_client) -> Tweet:
+    def fetch_tweet(self, tweet_id: Union[str, int], *,http_client=None) -> Tweet:
         """Fetch a tweet info from the specified id. Return if consumer_key or consumer_key_secret or access_token or access_token_secret is not specified.
         version Added:1.0.0
 
         Parameters:
         -----------
         tweet_id: Union[str, int]
-            Represent the tweet's id.
+            Represent the tweet's id that you wish .
 
         http_client
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isnt a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
@@ -358,7 +358,7 @@ class HTTPClient:
         )
 
         user_id = res["includes"]["users"][0].get("id")
-        user = self.fetch_user(int(user_id), http_client)
+        user = self.fetch_user(int(user_id), http_client=http_client)
 
         res["includes"]["users"][0].update({"followers": user.followers})
         res["includes"]["users"][0].update({"following": user.following})
@@ -399,8 +399,11 @@ class HTTPClient:
 
         text: str
             The text that will be send to that user.
-        """
 
+        http_client
+            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isnt a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
+        """
+        http_client=kwargs.get('http_client', None)
         data = {
             "event": {
                 "type": "message_create",
@@ -417,7 +420,7 @@ class HTTPClient:
             json=data,
             auth=True,
         )
-        return DirectMessage(res, http_client=self)
+        return DirectMessage(res, http_client=http_client if http_client else self)
 
     def delete_message(self, id: int, **kwargs):
         """WARNING: this function isnt finish yet!
