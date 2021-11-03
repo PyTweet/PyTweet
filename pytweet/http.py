@@ -394,6 +394,8 @@ class HTTPClient:
         version Added: 1.1.0
         Updated: 1.2.0
 
+        Parameters:
+        -----------
         user_id: Union[str, int]
             The user id that you wish to send message to.
 
@@ -402,6 +404,8 @@ class HTTPClient:
 
         http_client
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isnt a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
+
+        This function return a :class: `DirrectMessage` object.
         """
         http_client=kwargs.get('http_client', None)
         data = {
@@ -443,8 +447,13 @@ class HTTPClient:
         version Added:1.1.0
         Updated: 1.2.0
 
+        Paramaters:
+        -----------
+
         user_id: Union[str, int]
             The user's id that you wish to follow, better to make it a string.
+
+        This function return a :class: `RelationFollow` object.
         """
         my_id = self.access_token.partition("-")[0]
         res=self.request(
@@ -460,8 +469,12 @@ class HTTPClient:
         version Added:1.1.0
         Updated: 1.2.0
 
+        Parameters:
+        -----------
         user_id: Union[str, int]
             The user's id that you wish to unfollow, better to make it a string.
+
+        This function return a :class: `RelationFollow` object.
         """
         my_id = self.access_token.partition("-")[0]
         res=self.request(
@@ -475,29 +488,36 @@ class HTTPClient:
         """Make a POST Request to Block a Messageable object.
         version Added: 1.2.0
 
+        Parameters:
+        -----------
         user_id: Union[str, int]
             The user's id that you wish to block, better to make it a string.
+
+        This function return a :class: `RelationBlock` object.
         """
         my_id = self.access_token.partition("-")[0]
-        res=self.request(
+        self.request(
             Route("POST", "2", f"/users/{my_id}/blocking"),
             json={"target_user_id": str(user_id)},
             auth=True,
             mode="block",
         )
-        return res
 
     def unblock_user(self, user_id: Union[str, int]) -> None:
         """Make a DELETE Request to unblock a Messageable object.
         version Added:1.2.0
 
+        Parameters:
+        -----------
         user_id: Union[str, int]
             The user's id that you wish to unblock, better to make it a string.
+
+        This function return a :class: `RelationBlock` object.
         """
         my_id = self.access_token.partition("-")[0]
-        res=self.request(
+        self.request(
             Route("DELETE", "2", f"/users/{my_id}/blocking/{user_id}"),
             auth=True,
             mode="unblock",
         )
-        return res
+        
