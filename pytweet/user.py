@@ -69,15 +69,13 @@ class Messageable:
         """Block a Messageable object.
         Version Added: 1.2.0
         """
-        block=self.http_client.block_user(self._payload.get("id"))
-        return block
+        self.http_client.block_user(self._payload.get("id"))
 
     def unblock(self) -> None:
         """Unblock a Messageable object.
         Version Added: 1.2.0
         """
-        unblock=self.http_client.unblock_user(self._payload.get("id"))
-        return unblock
+        self.http_client.unblock_user(self._payload.get("id"))
 
 
 class User(Messageable):
@@ -223,7 +221,7 @@ class User(Messageable):
 
     @property
     def followers(self) -> Union[List[U], List]:
-        """:class:`List[User]: Returns a list of users who are followers of the specified user ID. Maximum users is 100 users."""
+        """:class:`List[User]`: Returns a list of users who are followers of the specified user ID. Maximum users is 100 users."""
         return self._payload.get("followers")
 
     @property
