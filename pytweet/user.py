@@ -107,7 +107,7 @@ class User(Messageable):
         Represent the main data of a user.
 
     http_client
-        Represent a :class: HTTPClient that make the request.
+        Represent a :class:HTTPClient that make the request.
 
     user_metrics
         Represent the public metrics of the user.
@@ -223,12 +223,12 @@ class User(Messageable):
 
     @property
     def followers(self) -> List[object]:
-        """List[:class:User]: Returns a list of users who are followers of the specified user ID."""
+        """:class:`List[User]: Returns a list of users who are followers of the specified user ID."""
         return self._payload.get("followers")
 
     @property
     def following(self) -> List[object]:
-        """List[:class:object]: Returns a list of users thats followed by the specified user ID."""
+        """:class:`List[User]`: Returns a list of users thats followed by the specified user ID."""
         return self._payload.get("following")
 
     @property

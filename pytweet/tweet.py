@@ -251,7 +251,7 @@ class Tweet:
 
     @property
     def created_at(self) -> datetime.datetime:
-        """:class: datetime.datetime: Return a datetime object with the tweet posted age."""
+        """:class:`datetime.datetime`: Return a datetime object with the tweet posted age."""
         return time_parse_todt(self._payload.get("created_at"))
 
     @property
@@ -281,7 +281,7 @@ class Tweet:
 
     @property
     def reply_to(self) -> Optional[User]:
-        """Optional[:class:User]: Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
+        """:class:`Optional[User]`: Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
         .. versionadded: 1.1.3
         """
         user = (
@@ -296,7 +296,7 @@ class Tweet:
 
     @property
     def mentions(self) -> Optional[List[User]]:
-        """Optional[List[:class:User]]: Return the mentioned users, if there isnt it return None.
+        """:class:`Optional[List[User]]`: Return the mentioned users, if there isnt it return None.
         .. versionadded: 1.1.3
         """
         if self._includes:
@@ -311,7 +311,7 @@ class Tweet:
 
     @property
     def poll(self) -> Optional[Poll]:
-        """:class:Poll: Return a Poll object with the tweet's poll.
+        """:class:`Poll`: Return a Poll object with the tweet's poll.
         .. versionadded: 1.1.0
         """
         if self._includes:
@@ -322,7 +322,7 @@ class Tweet:
 
     @property
     def media(self) -> Optional[Media]:
-        """List[:class:Media] -> Return a list of media(s) in a tweet.
+        """:class:`List[Media]` -> Return a list of media(s) in a tweet.
         .. versionadded: 1.1.0
         """
         if self._includes:
@@ -332,7 +332,7 @@ class Tweet:
 
     @property
     def embeds(self) -> Optional[List[Embed]]:
-        """List[:class:Embed]: Return a list of Embeded url from that tweet
+        """:class:`List[Embed]`: Return a list of Embeded url from that tweet
         .. versionadded: 1.1.3
         """
         if self._payload.get("entities"):

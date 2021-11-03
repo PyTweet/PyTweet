@@ -29,7 +29,7 @@ class Client:
     Attributes:
     -----------
     http: Optional[HTTPClient]
-        Return a :class: HTTPClient, HTTPClient is responsible for making most of the Requests.
+        Return a :class:`HTTPClient`, HTTPClient is responsible for making most of the Requests.
     """
 
     def __init__(
@@ -54,7 +54,7 @@ class Client:
 
     @property
     def user(self) -> Optional[User]:
-        """:class:User: Returns the client in user object, return None if access token isn't specified.
+        """:class:`User`: Returns the client in user object, return None if access token isn't specified.
         Version Added: 1.2.0
         """
         if not self.http.access_token:
@@ -68,7 +68,7 @@ class Client:
         """A function for HTTPClient.fetch_user().
         Version Added: 1.0.0
 
-        This function returns a :class:User object.
+        This function returns a :class:`User` object.
         """
         return self.http.fetch_user(user_id, self.http)
 
@@ -76,7 +76,7 @@ class Client:
         """A function for HTTPClient.fetch_user_byusername().
         Version Added: 1.0.0
 
-        This function returns a :class:User object.
+        This function returns a :class:`User` object.
         """
         return self.http.fetch_user_byusername(username, self.http)
 
@@ -84,7 +84,7 @@ class Client:
         """A function for HTTPClient.fetch_tweet().
         Version Added: 1.0.0
 
-        This function returns a :class:Tweet.
+        This function returns a :class:`Tweet`.
         """
         return self.http.fetch_tweet(tweet_id, self.http)
 
