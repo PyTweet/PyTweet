@@ -251,8 +251,8 @@ class HTTPClient:
                 "followers": [
                     User(follower, http_client=http_client) for follower in followers["data"]
                 ]
-                if followers != 0
-                else 0
+                if followers != []
+                else []
             }
         )
         data["data"].update(
@@ -260,8 +260,8 @@ class HTTPClient:
                 "following": [
                     User(following, http_client=http_client) for following in following["data"]
                 ]
-                if following != 0
-                else 0
+                if following != []
+                else []
             }
         )
 
