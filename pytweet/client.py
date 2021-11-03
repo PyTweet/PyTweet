@@ -1,6 +1,5 @@
 from typing import Any, Optional, Union
-
-from .http import HTTPClient, Route
+from .http import HTTPClient
 from .tweet import Tweet
 from .user import User
 
@@ -69,7 +68,7 @@ class Client:
         """A function for HTTPClient.fetch_user().
         Version Added: 1.0.0
 
-        This function returns a :class: User object.
+        This function returns a :class:User object.
         """
         return self.http.fetch_user(user_id, self.http)
 
