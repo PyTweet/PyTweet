@@ -222,31 +222,31 @@ class User(Messageable):
         )
 
     @property
-    def followers(self) -> List[object]:
-        """:class:`List[User]: Returns a list of users who are followers of the specified user ID."""
+    def followers(self) -> Union[List[U], List]:
+        """:class:`List[User]: Returns a list of users who are followers of the specified user ID. Maximum users is 100 users."""
         return self._payload.get("followers")
 
     @property
-    def following(self) -> List[object]:
-        """:class:`List[User]`: Returns a list of users thats followed by the specified user ID."""
+    def following(self) -> Union[List[U], List]:
+        """:class:`List[User]`: Returns a list of users thats followed by the specified user ID. Maximum users is 100 users."""
         return self._payload.get("following")
 
     @property
-    def followers_count(self) -> int:
+    def follower_count(self) -> int:
         """int: Return total of followers that a user has."""
-        return int(self._metrics.followers_count)
+        return self._metrics.follower_count
 
     @property
     def following_count(self) -> int:
         """int: Return total of following that a user has."""
-        return int(self._metrics.following_count)
+        return self._metrics.following_count
 
     @property
     def tweet_count(self) -> int:
         """int: Return total of tweet that a user has."""
-        return int(self._metrics.tweet_count)
+        return self._metrics.tweet_count
 
     @property
     def listed_count(self) -> int:
         """int: Return total of listed that a user has."""
-        return int(self._metrics.listed_count)
+        return self._metrics.listed_count

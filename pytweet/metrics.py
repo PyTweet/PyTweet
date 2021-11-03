@@ -10,14 +10,6 @@ class UserPublicMetrics:
     -----------
     data: Dict[str, Any]
         The complete data of the user's public metrics through a dictionary!
-
-    Attributes:
-    -----------
-    original_payload
-        Return the original payload of the user.
-
-    _public
-        Returns the user public metrics.
     """
 
     def __init__(self, data: Dict[str, Any] = {}, **kwargs: Any):
@@ -25,10 +17,10 @@ class UserPublicMetrics:
         self._public = self.original_payload.get("public_metrics")
 
     def __repr__(self) -> str:
-        return f"UserPublicMetrics(user={self.original_payload.get('username')} followers_count={self.followers_count} following_count={self.following_count} tweet_count={self.tweet_count})"
+        return f"UserPublicMetrics(user={self.original_payload.get('username')} follower_count={self.follower_count} following_count={self.following_count} tweet_count={self.tweet_count})"
 
     @property
-    def followers_count(self) -> int:
+    def follower_count(self) -> int:
         """int: Returns total of followers that a user has.
         Version Added:: 1.1.0
         """
