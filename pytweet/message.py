@@ -1,7 +1,5 @@
-#{'event': {'type': 'message_create', 'id': '1455747748536324105', 'created_timestamp': '1635912284393', 'message_create': {'target': {'recipient_id': '1382006704171196419'}, 'sender_id': '1445987330582405122', 'message_data': {'text': 'Hello Le World @TheGenocides #lmao #amongus uwu', 'entities': {'hashtags': [{'text': 'lmao', 'indices': [29, 34]}, {'text': 'amongus', 'indices': [35, 43]}], 'symbols': [], 'user_mentions': [{'screen_name': 'TheGenocides', 'name': 'TheGenocide', 'id': 1382006704171196419, 'id_str': '1382006704171196419', 'indices': [15, 28]}], 'urls': []}}}}}
-
 import datetime
-from typing import Dict, Any, Union, Optional, List, TYPE_CHECKING
+from typing import Dict, Any, Union, Optional, TYPE_CHECKING
 from .enums import MessageEventsTypeEnum, MessageTypeEnum
 from .user import User
 
