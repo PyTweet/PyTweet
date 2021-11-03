@@ -1,7 +1,10 @@
 from typing import Any, Optional, Union
+
 from .http import HTTPClient
 from .tweet import Tweet
 from .user import User
+
+__all__ = ("Client",)
 
 
 class Client:
@@ -41,7 +44,7 @@ class Client:
         access_token: Optional[str] = None,
         access_token_secret: Optional[str] = None,
     ) -> None:
-        self.http = HTTPClient(
+        self.http: HTTPClient = HTTPClient(
             bearer_token,
             consumer_key=consumer_key,
             consumer_key_secret=consumer_key_secret,

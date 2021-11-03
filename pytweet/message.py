@@ -1,13 +1,21 @@
 import datetime
-from typing import Dict, Any, Union, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union
+
 from .enums import MessageEventTypeEnum, MessageTypeEnum
 from .user import User
 
 if TYPE_CHECKING:
     from .http import HTTPClient
 
+
+__all__ = (
+    "Message",
+    "DirectMessage",
+)
+
+
 class Message:
-    """Represents the base Message of all Message types in Twitter, this include DirrectMessage & Tweet 
+    """Represents the base Message of all Message types in Twitter, this include DirrectMessage & Tweet
     Version Added: 1.2.0
 
     Parameters:
@@ -18,9 +26,11 @@ class Message:
     id: Union[str, int]
         The messages's ID.
     """
+
     def __init__(self, text: Optional[str], id: Union[str, int]):
         self.text = text
         self.id = id
+
 
 class DirectMessage(Message):
     """Represents a Direct Message in Twitter.
@@ -37,16 +47,17 @@ class DirectMessage(Message):
     timestamp: int
         The message timestamp when the Direct Message event was created..
     """
+
     def __init__(self, data: Dict[str, Any], **kwargs):
-        self.original_payload=data
-        self._payload = data.get('event', None)
-        self.message_create = self._payload.get('message_create', None)
-        self.message_data = self.message_create.get('message_data', None)
+        self.original_payload = data
+        self._payload = data.get("event", None)
+        self.message_create = self._payload.get("message_create", None)
+        self.message_data = self.message_create.get("message_data", None)
         self.entities = self.message_data.get("entities", None)
 
-        super().__init__(self.message_data.get('text'), self._payload.get('id'))
-        self.http_client: HTTPClient = kwargs.get('http_client', None)
-        self.timestamp=round(datetime.datetime.utcnow().timestamp())
+        super().__init__(self.message_data.get("text"), self._payload.get("id"))
+        self.http_client: HTTPClient = kwargs.get("http_client", None)
+        self.timestamp = round(datetime.datetime.utcnow().timestamp())
 
     def __repr__(self) -> str:
         return "Message(text:{0.text} id:{0.id} author: {0.author})"
@@ -70,8 +81,8 @@ class DirectMessage(Message):
         if not self.http_client:
             return None
 
-        user_id=self.message_create.get("target").get("recipient_id")
-        user=self.http_client.fetch_user(user_id, self.http_client)
+        user_id = self.message_create.get("target").get("recipient_id")
+        user = self.http_client.fetch_user(user_id, self.http_client)
         return user
 
     @property

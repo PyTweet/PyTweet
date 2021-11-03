@@ -1,24 +1,24 @@
+import logging
+import sys
 from typing import Any, Dict, NoReturn, Optional, Union
 
 import requests
 
+from . import __version__
 from .auth import OauthSession
-from .errors import (
-    Forbidden,
-    NotFoundError,
-    PytweetException,
-    TooManyRequests,
-    Unauthorized,
-)
+from .errors import Forbidden, NotFoundError, PytweetException, TooManyRequests, Unauthorized
+from .message import DirectMessage
 from .relations import RelationFollow
 from .tweet import Tweet
 from .user import User
-from .message import DirectMessage
+
+_log = logging.getLogger(__name__)
+
 
 def check_error(respond: requests.models.Response) -> NoReturn:
     code = respond.status_code
     if code == 200:
-        res= respond.json()
+        res = respond.json()
         if "errors" in res.keys():
             try:
                 if res["errors"][0]["detail"].startswith("Could not find"):
@@ -105,6 +105,17 @@ class HTTPClient:
             "access_token": access_token,
             "access_token_secret": access_token_secret,
         }
+        if not bearer_token:
+            _log.error("bearer token is missing!")
+        if not consumer_key:
+            _log.warning("Consumer key is missing this is recommended to have!")
+        if not access_token:
+            _log.warning("Access token is missing this is recommended to have")
+        if not access_token_secret:
+            _log.warning(
+                "Access token scrcret is missing this is required if you have passed in the access_toke param."
+            )
+
         for k, v in self.credentials.items():
             if not isinstance(v, str) and not isinstance(v, type(None)):
                 raise Unauthorized(f"Wrong authorization passed for credential: {k}.")
@@ -167,12 +178,14 @@ class HTTPClient:
 
         This function make an HTTP Request with the given paramaters then return a dictionary in a json format.
         """
+        user_agent = "Py-Tweet (https://github.com/TheFarGG/PyTweet/ {2}) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
+        headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__, __version__)
         if headers == {}:
             headers = {"Authorization": f"Bearer {self.bearer_token}"}
 
         res = getattr(requests, route.method.lower(), None)
         if not res:
-            raise TypeError("Method isnt recognizable")
+            raise TypeError("Method isn't recognizable")
 
         if auth:
             auth = OauthSession(self.consumer_key, self.consumer_key_secret)
@@ -192,9 +205,7 @@ class HTTPClient:
 
         return respond
 
-    
-
-    def fetch_user(self, user_id: Union[str, int], *,http_client=None) -> User:
+    def fetch_user(self, user_id: Union[str, int], *, http_client=None) -> User:
         """Make a Request to optain the user from the given user id.
         version Added:1.0.0
 
@@ -248,18 +259,14 @@ class HTTPClient:
 
         data["data"].update(
             {
-                "followers": [
-                    User(follower, http_client=http_client) for follower in followers["data"]
-                ]
+                "followers": [User(follower, http_client=http_client) for follower in followers["data"]]
                 if followers != []
                 else []
             }
         )
         data["data"].update(
             {
-                "following": [
-                    User(following, http_client=http_client) for following in following["data"]
-                ]
+                "following": [User(following, http_client=http_client) for following in following["data"]]
                 if following != []
                 else []
             }
@@ -267,7 +274,7 @@ class HTTPClient:
 
         return User(data, http_client=http_client)
 
-    def fetch_user_byusername(self, username: str, *,http_client=None) -> User:
+    def fetch_user_byusername(self, username: str, *, http_client=None) -> User:
         """Make a Request to optain the user from their username.
         Version Added: 1.0.0
 
@@ -305,7 +312,7 @@ class HTTPClient:
 
         return User(data, http_client=http_client)
 
-    def fetch_tweet(self, tweet_id: Union[str, int], *,http_client=None) -> Tweet:
+    def fetch_tweet(self, tweet_id: Union[str, int], *, http_client=None) -> Tweet:
         """Fetch a tweet info from the specified id. Return if consumer_key or consumer_key_secret or access_token or access_token_secret is not specified.
         version Added:1.0.0
 
@@ -368,20 +375,8 @@ class HTTPClient:
             res2["data"]
             res3["data"]
 
-            res["data"].update(
-                {
-                    "retweeted_by": [
-                        User(user, http_client=http_client) for user in res2["data"]
-                    ]
-                }
-            )
-            res["data"].update(
-                {
-                    "liking_users": [
-                        User(user, http_client=http_client) for user in res3["data"]
-                    ]
-                }
-            )
+            res["data"].update({"retweeted_by": [User(user, http_client=http_client) for user in res2["data"]]})
+            res["data"].update({"liking_users": [User(user, http_client=http_client) for user in res3["data"]]})
 
         except (KeyError, TypeError):
             res["data"].update({"retweeted_by": 0})
@@ -407,7 +402,7 @@ class HTTPClient:
 
         This function return a :class: `DirrectMessage` object.
         """
-        http_client=kwargs.get('http_client', None)
+        http_client = kwargs.get("http_client", None)
         data = {
             "event": {
                 "type": "message_create",
@@ -419,7 +414,7 @@ class HTTPClient:
                 },
             }
         }
-        res=self.request(
+        res = self.request(
             Route("POST", "1.1", "/direct_messages/events/new.json"),
             json=data,
             auth=True,
@@ -456,7 +451,7 @@ class HTTPClient:
         This function return a :class: `RelationFollow` object.
         """
         my_id = self.access_token.partition("-")[0]
-        res=self.request(
+        res = self.request(
             Route("POST", "2", f"/users/{my_id}/following"),
             json={"target_user_id": str(user_id)},
             auth=True,
@@ -477,7 +472,7 @@ class HTTPClient:
         This function return a :class: `RelationFollow` object.
         """
         my_id = self.access_token.partition("-")[0]
-        res=self.request(
+        res = self.request(
             Route("DELETE", "2", f"/users/{my_id}/following/{user_id}"),
             auth=True,
             mode="unfollow",
@@ -520,4 +515,3 @@ class HTTPClient:
             auth=True,
             mode="unblock",
         )
-        
