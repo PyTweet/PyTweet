@@ -25,17 +25,23 @@ classifiers = [
     "Operating System :: OS Independent",
     "Topic :: Internet",
     "Topic :: Utilities",
+    "Development Status :: 5 - Production/Stable",
 ]
 
 
 setup(
     name="PyTweet",
-    author="TheGenocide & TheFarGG",
+    author="TheFarGG",
+    maintainer=", ".join(['TheGenocide', 'Sengolda']),
     url="https://github.com/TheFarGG/PyTweet/",
     version=version,
     packages=["pytweet"],
     include_package_data=True,
     license="MIT",
+    project_urls={
+        "Documentation": "https://py-tweet.readthedocs.io/",
+        "HomePage/Github": "https://github.com/TheFarGG/PyTweet/",
+    },
     description="A Synchronous python API wrapper for twitter's api",
     long_description=readme,
     long_description_content_type="text/markdown",
