@@ -303,7 +303,8 @@ class Tweet:
             if self._includes.get("mentions"):
                 return [
                     self.http_client.fetch_user_byusername(
-                        user.get("username"), http_client=self.http_client
+                        user.get("username"), 
+                        http_client=self.http_client
                     )
                     for user in self._includes.get("mentions")
                 ]

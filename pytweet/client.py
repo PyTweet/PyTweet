@@ -68,25 +68,40 @@ class Client:
         """A function for HTTPClient.fetch_user().
         Version Added: 1.0.0
 
+        Parameters:
+        -----------
+        user_id: Union[str, int]
+            Represent the user id that you wish to get info to, if you dont have the id you may use `get_user_by_username`, it only need the user's username.
+
         This function returns a :class:`User` object.
         """
-        return self.http.fetch_user(user_id, self.http)
+        return self.http.fetch_user(user_id, http_client=self.http)
 
     def get_user_by_username(self, username: str) -> User:
         """A function for HTTPClient.fetch_user_byusername().
         Version Added: 1.0.0
 
+        Parameters:
+        -----------
+        username: Union[str, int]
+            Represent the user's username that you wish to get info. A Username usually start with '@' before any letters. If a username named @Jack,then the username argument must be 'Jack'.
+
         This function returns a :class:`User` object.
         """
-        return self.http.fetch_user_byusername(username, self.http)
+        return self.http.fetch_user_byusername(username, http_client=self.http)
 
     def get_tweet(self, tweet_id: Union[str, int]) -> Tweet:
         """A function for HTTPClient.fetch_tweet().
         Version Added: 1.0.0
 
+        Parameters:
+        -----------
+        tweet_id: Union[str, int]
+            Represent the tweet id that you wish to get info to.
+
         This function returns a :class:`Tweet`.
         """
-        return self.http.fetch_tweet(tweet_id, self.http)
+        return self.http.fetch_tweet(tweet_id, http_client=self.http)
 
     def tweet(self, text: str, **kwargs: Any) -> None:
         """Post a tweet directly to twitter from the given paramaters.
