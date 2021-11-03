@@ -9,7 +9,9 @@ class RelationsTypeEnum(Enum):
 class MessageTypeEnum(Enum):
     DIRECT_MESSAGE = 0
     MESSAGE_TWEET = 1
+    NULL = None
 
-class MessageEventsEnum(Enum):
-    MESSAGE_CREATE = 0
-    MESSAGE_DELETE = 1
+class MessageEventsTypeEnum(Enum):
+    MESSAGE_CREATE = "message_create"
+    MESSAGE_DELETE = "message_delete"
+    NULL = None
