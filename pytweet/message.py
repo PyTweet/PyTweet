@@ -1,13 +1,13 @@
 import datetime
 from typing import Dict, Any, Union, Optional, TYPE_CHECKING
-from .enums import MessageEventsTypeEnum, MessageTypeEnum
+from .enums import MessageEventTypeEnum, MessageTypeEnum
 from .user import User
 
 if TYPE_CHECKING:
     from .http import HTTPClient
 
 class Message:
-    """Represent the base Message of all Message types in twitter, this include DirrectMessage & Tweet 
+    """Represents the base Message of all Message types in Twitter, this include DirrectMessage & Tweet 
     Version Added: 1.2.0
 
     Parameters:
@@ -23,17 +23,19 @@ class Message:
         self.id = id
 
 class DirectMessage(Message):
-    """Represent a Direct Message in twitter.
+    """Represents a Direct Message in Twitter.
     Version Added: 1.2.0
 
     Paramaters:
     -----------
-
     data: Dict[str, Any]
         The message data keep inside a dictionary.
 
     http_client: Optional[HTTPClient]
-        The http client that made the request.
+        Represents the HTTP Client that make the request, this will be use for interaction between the client and the user.
+
+    timestamp: int
+        The message timestamp when the Direct Message event was created..
     """
     def __init__(self, data: Dict[str, Any], **kwargs):
         self.original_payload=data
@@ -44,6 +46,7 @@ class DirectMessage(Message):
 
         super().__init__(self.message_data.get('text'), self._payload.get('id'))
         self.http_client: HTTPClient = kwargs.get('http_client', None)
+        self.timestamp=round(datetime.datetime.utcnow().timestamp())
 
     def __repr__(self) -> str:
         return "Message(text:{0.text} id:{0.id} author: {0.author})"
@@ -52,15 +55,18 @@ class DirectMessage(Message):
         return self.text
 
     @property
-    def event_type(self):
-        return MessageEventsTypeEnum(self._payload.get("type", None))
+    def event_type(self) -> MessageEventTypeEnum:
+        """:class:`MessageEventTypeEnum`: Returns the message event type."""
+        return MessageEventTypeEnum(self._payload.get("type", None))
 
     @property
-    def type(self):
+    def type(self) -> MessageTypeEnum:
+        """:class:`MessageTypesEnum`: Returns the message type."""
         return MessageTypeEnum(1)
 
     @property
     def author(self) -> User:
+        """:class:`User`: Returns the author of the message in User object."""
         if not self.http_client:
             return None
 
@@ -70,4 +76,5 @@ class DirectMessage(Message):
 
     @property
     def created_at(self) -> datetime.datetime:
-        return datetime.datetime.fromtimestamp(float(self._payload.get("created_timestamp")))    
+        """:class:`datetime.datetime`: Returns the time when the Direct Message event was created."""
+        return datetime.datetime.fromtimestamp(self.timestamp)
