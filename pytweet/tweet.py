@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, List, Optional, Union, NoReturn, TypeVar
+from typing import Any, Dict, List, NoReturn, Optional, TypeVar, Union
 
 from .attachments import Media, Poll
 from .enums import MessageTypeEnum
@@ -7,7 +7,13 @@ from .metrics import TweetPublicMetrics
 from .user import User
 from .utils import time_parse_todt
 
-T = TypeVar("T", bound="Tweet")
+TT = TypeVar("TT", bound="Tweet")
+
+__all__ = (
+    "EmbedsImages",
+    "Embed",
+    "Tweet",
+)
 
 
 class EmbedsImages:
@@ -29,9 +35,7 @@ class EmbedsImages:
         self._payload = data
 
     def __repr__(self) -> str:
-        return "EmbedsImages(url={0.url} width={0.width} height={0.height})".format(
-            self
-        )
+        return "EmbedsImages(url={0.url} width={0.width} height={0.height})".format(self)
 
     def __str__(self) -> str:
         return self.url
@@ -77,9 +81,7 @@ class Embed:
         self._payload = data
 
     def __repr__(self) -> str:
-        return "Embed(title={0.title} description={0.description} url={0.url})".format(
-            self
-        )
+        return "Embed(title={0.title} description={0.description} url={0.url})".format(self)
 
     def __str__(self) -> str:
         return self.url
@@ -205,18 +207,14 @@ class Tweet:
     def __str__(self) -> str:
         return self.text
 
-    def __eq__(self, other: T) -> Union[bool, NoReturn]:
+    def __eq__(self, other: TT) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "== operation cannot be done with one of the element not a valid Tweet object"
-            )
+            raise ValueError("== operation cannot be done with one of the element not a valid Tweet object")
         return self.id == other.id
 
-    def __ne__(self, other: T) -> Union[bool, NoReturn]:
+    def __ne__(self, other: TT) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "!= operation cannot be done with one of the element not a valid User object"
-            )
+            raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
     @property
@@ -302,10 +300,7 @@ class Tweet:
         if self._includes:
             if self._includes.get("mentions"):
                 return [
-                    self.http_client.fetch_user_byusername(
-                        user.get("username"), 
-                        http_client=self.http_client
-                    )
+                    self.http_client.fetch_user_byusername(user.get("username"), http_client=self.http_client)
                     for user in self._includes.get("mentions")
                 ]
         return None

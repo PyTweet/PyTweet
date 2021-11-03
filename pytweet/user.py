@@ -1,14 +1,5 @@
 import datetime
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    List,
-    NoReturn,
-    Optional,
-    Union,
-    TypeVar,
-)
+from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, TypeVar, Union
 
 from .metrics import UserPublicMetrics
 from .utils import time_parse_todt
@@ -18,6 +9,7 @@ if TYPE_CHECKING:
 
 
 U = TypeVar("U", bound="User")
+
 
 class Messageable:
     """Represent an object that can send and receive a message through DM.
@@ -42,7 +34,7 @@ class Messageable:
         """Send a message to a specific Messageable object.
         Version Added: 1.1.0
         """
-        res=self.http_client.send_message(self._payload.get("id"), text, **kwargs)
+        res = self.http_client.send_message(self._payload.get("id"), text, **kwargs)
         return res
 
     def delete_message(self, message_id: int, **kwargs: Any) -> None:
@@ -55,14 +47,14 @@ class Messageable:
         """Follow a Messageable object.
         Version Added: 1.1.0
         """
-        follow=self.http_client.follow_user(self._payload.get("id"))
+        follow = self.http_client.follow_user(self._payload.get("id"))
         return follow
 
     def unfollow(self) -> None:
         """Unfollow a Messageable object.
         Version Added: 1.1.0
         """
-        unfollow=self.http_client.unfollow_user(self._payload.get("id"))
+        unfollow = self.http_client.unfollow_user(self._payload.get("id"))
         return unfollow
 
     def block(self) -> None:
@@ -116,16 +108,10 @@ class User(Messageable):
         super().__init__(data, **kwargs)
         self.original_payload = data
         self._payload = (
-            self.original_payload.get("data")
-            if self.original_payload.get("data") != None
-            else self.original_payload
+            self.original_payload.get("data") if self.original_payload.get("data") != None else self.original_payload
         )
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
-        self._metrics = (
-            UserPublicMetrics(self._payload)
-            if self._payload != None
-            else self.original_payload
-        )
+        self._metrics = UserPublicMetrics(self._payload) if self._payload != None else self.original_payload
 
     def __str__(self) -> str:
         return self.username
@@ -135,16 +121,12 @@ class User(Messageable):
 
     def __eq__(self, other: U) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "== operation cannot be done with one of the element not a valid User object"
-            )
+            raise ValueError("== operation cannot be done with one of the element not a valid User object")
         return self.id == other.id
 
     def __ne__(self, other: U) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "!= operation cannot be done with one of the element not a valid User object"
-            )
+            raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
     @property
@@ -213,11 +195,7 @@ class User(Messageable):
         Version Added: 1.1.3"""
 
         id = self._payload.get("pinned_tweet_id")
-        return (
-            None
-            if not id
-            else self.http_client.fetch_tweet(int(id), http_client=self.http_client)
-        )
+        return None if not id else self.http_client.fetch_tweet(int(id), http_client=self.http_client)
 
     @property
     def followers(self) -> Union[List[U], List]:

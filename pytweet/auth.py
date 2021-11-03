@@ -1,12 +1,13 @@
 from typing import Any
+
 from requests_oauthlib import OAuth1, OAuth1Session
+
+__all__ = ("OauthSession",)
 
 
 class OauthSession(OAuth1Session):
     def __init__(self, consumer_key: str, consumer_secret: str, callback=None) -> None:
-        super().__init__(
-            consumer_key, client_secret=consumer_secret, callback_uri=callback
-        )
+        super().__init__(consumer_key, client_secret=consumer_secret, callback_uri=callback)
         self.consumer_key: str = consumer_key
         self.consumer_key_secret: str = consumer_secret
         self.access_token: str = None
