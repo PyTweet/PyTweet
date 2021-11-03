@@ -10,7 +10,7 @@ from .utils import time_parse_todt
 TT = TypeVar("TT", bound="Tweet")
 
 __all__ = (
-    "EmbedImages",
+    "EmbedsImages",
     "Embed",
     "Tweet",
 )

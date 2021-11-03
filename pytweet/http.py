@@ -4,7 +4,6 @@ from typing import Any, Dict, NoReturn, Optional, Union
 
 import requests
 
-from . import __version__
 from .auth import OauthSession
 from .errors import Forbidden, NotFoundError, PytweetException, TooManyRequests, Unauthorized
 from .message import DirectMessage
@@ -178,8 +177,8 @@ class HTTPClient:
 
         This function make an HTTP Request with the given paramaters then return a dictionary in a json format.
         """
-        user_agent = "Py-Tweet (https://github.com/TheFarGG/PyTweet/ {2}) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
-        headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__, __version__)
+        user_agent = "Py-Tweet (https://github.com/TheFarGG/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
+        headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
         if headers == {}:
             headers = {"Authorization": f"Bearer {self.bearer_token}"}
 
