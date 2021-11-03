@@ -19,7 +19,6 @@ if TYPE_CHECKING:
 
 U = TypeVar("U", bound="User")
 
-
 class Messageable:
     """Represent an object that can send and receive a message through DM.
     Version Added: 1.0.0

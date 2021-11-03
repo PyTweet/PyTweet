@@ -13,7 +13,7 @@ from .errors import (
 from .relations import RelationFollow
 from .tweet import Tweet
 from .user import User
-
+from .message import DirectMessage
 
 def check_error(respond: requests.models.Response) -> NoReturn:
     code = respond.status_code
@@ -269,7 +269,7 @@ class HTTPClient:
 
     def fetch_user_byusername(self, username: str, http_client) -> User:
         """Make a Request to optain the user from their username.
-        version Added:1.0.0
+        Version Added: 1.0.0
 
         Parameters:
         -----------
@@ -417,7 +417,7 @@ class HTTPClient:
             json=data,
             auth=True,
         )
-        return res
+        return DirectMessage(res, http_client=self)
 
     def delete_message(self, id: int, **kwargs):
         """WARNING: this function isnt finish yet!
