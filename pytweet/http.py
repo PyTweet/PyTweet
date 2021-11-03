@@ -1,6 +1,8 @@
 import logging
 import sys
 from typing import Any, Dict, NoReturn, Optional, Union
+import asyncio
+import time
 
 import requests
 
@@ -35,7 +37,11 @@ def check_error(respond: requests.models.Response) -> NoReturn:
         raise Forbidden("Forbidden to interact with that User!")
 
     elif code == 429:
-        raise TooManyRequests(respond.text)
+        response = f"{respond.text}"
+        #__check = respond.headers["x-rate-limit-reset"]
+        #_time = time.time()
+        #asyncio.run(asyncio.sleep(_time - __check))
+        raise TooManyRequests(response)
 
 
 RequestModel: Union[Dict[str, Any], Any] = Any

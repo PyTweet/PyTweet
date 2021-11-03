@@ -1,14 +1,6 @@
 pytweet package
 ===============
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   pytweet.types
-
 Submodules
 ----------
 
