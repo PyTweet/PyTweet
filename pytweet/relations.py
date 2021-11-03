@@ -8,20 +8,10 @@ class RelationFollow:
     .. describe:: str(x)
         Returns the type.
 
-
-    Parameters
+    Parameters:
     -----------
     data: Payload
         The data of the relations
-
-    Attributes
-    -----------
-
-    original_payload
-        The data paramater.
-
-    _payload
-        The data paramater in data key.
     """
 
     def __init__(self, data: Dict[str, Any]):
