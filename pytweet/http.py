@@ -51,7 +51,7 @@ class Route:
 
 
 class HTTPClient:
-    """Represent the http/base client for :class: Client!
+    """Represent the http/base client for :class:`Client` !
     This http/base client have methods for making requests to twitter's api!
     version Added: 1.0.0
 
@@ -214,7 +214,7 @@ class HTTPClient:
         ValueError:
             Raise when user_id is not an int and is not a string of digits.
 
-        This function return a :class: User object.
+        This function return a :class:`User` object.
         """
         try:
             int(user_id)
@@ -284,7 +284,7 @@ class HTTPClient:
         pytweet.errors.NotFoundError:
             Raise when the api cant find a user with that username.
 
-        This function return a :class: User object.
+        This function return a :class:`User` object.
         """
         if "@" in username:
             username = username.replace("@", "", 1)
@@ -322,7 +322,7 @@ class HTTPClient:
         pytweet.errors.NotFoundError:
             Raise when the api cant find a tweet with that id.
 
-        This function return a :class: Tweet.
+        This function return a :class:`Tweet`.
         """
         if not any([v for v in self.credentials.values()]):
             return None

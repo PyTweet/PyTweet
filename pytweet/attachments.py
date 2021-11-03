@@ -60,21 +60,21 @@ class Media:
 
     @property
     def type(self) -> Optional[str]:
-        """str: Return the media's type.
+        """:class:`Optional[str]`: Return the media's type.
         Version Added: 1.1.0
         """
         return self._payload.get("type")
 
     @property
     def url(self) -> Optional[str]:
-        """str: Return the media's url.
+        """:class:`Optional[str]`: Return the media's url.
         Version Added: 1.1.0
         """
         return self._payload.get("url")
 
     @property
     def width(self) -> Optional[int]:
-        """int: Return the media's width.
+        """:class:`Optional[int]`: the media's width.
         Version Added: 1.1.0
         """
         return self._payload.get("width")
@@ -88,7 +88,7 @@ class Media:
 
     @property
     def media_key(self) -> Optional[Union[int, str]]:
-        """Return the media's unique key.
+        """:class:`Optional[Union[int, str]]`: Returns the media's unique key.
         Version Added: 1.1.0
         """
         return self._payload.get("media_key")
@@ -177,21 +177,21 @@ class PollOptions:
 
     @property
     def position(self) -> Optional[int]:
-        """int: The option's position.
+        """:class:`Optional[int]`: The option's position.
         Version Added: 1.1.0
         """
         return self.options.get("position")
 
     @property
     def label(self) -> Optional[str]:
-        """str: The option's label.
+        """:class:`Optional[int]`: The option's label.
         Version Added: 1.1.0
         """
         return self.options.get("label")
 
     @property
     def votes(self) -> Optional[int]:
-        """int: The option's votes.
+        """:class:`Optional[int]`: The option's votes.
         Version Added: 1.1.0
         """
         return self.options.get("votes")
@@ -264,7 +264,7 @@ class Poll:
 
     @property
     def options(self) -> List[PollOptions]:
-        """List[PollOptions]: Return a list of :class: PollOptions.
+        """:class:`List[PollOptions]`: Return a list of :class:`PollOptions`.
         Version Added: 1.1.0.
         """
         return [PollOptions(option) for option in self._payload.get("options")]
@@ -285,7 +285,7 @@ class Poll:
 
     @property
     def end_date(self) -> datetime.datetime:
-        """datetime.datetime: Return the end date in datetime.datetime object.
+        """`datetime.datetime`: Return the end date in datetime.datetime object.
         Version Added: 1.1.0
         """
         return time_parse_todt(self._payload.get("end_datetime"))
