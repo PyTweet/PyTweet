@@ -21,7 +21,7 @@ client = pytweet.Client(
 
 def giveaway():
     user = client.get_user_by_username("TheGenocides")
-    followers = user.followers
+    followers = user.followers #Note that, maximum users for followers is 100 users.  
     if followers == 0:  # Check if the user doesnt have a followers.
         return print("This user doesnt have a followers!")
 
