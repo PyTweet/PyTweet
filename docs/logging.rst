@@ -10,7 +10,7 @@ Logging
 PyTweet now provides **logging** support!
 However, you will not see these logs since they are muted.
 
-To make the logs shows you can do:
+To make the logs show you can do:
 
 .. code-block:: py
 
