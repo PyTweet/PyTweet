@@ -14,6 +14,8 @@
 
 <img src="https://img.shields.io/discord/858312394236624957?color=blue&label=PyTweet&logo=discord">
 
+<img src='https://readthedocs.org/projects/py-tweet/badge/?version=latest' alt='Documentation Status' />
+
 </div>
 <br>
 <br>
