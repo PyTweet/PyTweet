@@ -38,9 +38,9 @@ def check_error(respond: requests.models.Response) -> NoReturn:
 
     elif code == 429:
         response = f"{respond.text}"
-        #__check = respond.headers["x-rate-limit-reset"]
-        #_time = time.time()
-        #asyncio.run(asyncio.sleep(_time - __check))
+        __check = respond.headers["x-rate-limit-reset"]
+        _time = time.time()
+        time.sleep(_time - __check)
         raise TooManyRequests(response)
 
 
@@ -56,7 +56,7 @@ class Route:
 
 
 class HTTPClient:
-    """Represent the http/base client for :class:`Client` !
+    """Represents the http/base client for :class:`Client` !
     This http/base client have methods for making requests to twitter's api!
     version Added: 1.0.0
 
