@@ -61,6 +61,8 @@ class UserPublicMetrics:
 class TweetPublicMetrics:
     """Represent a PublicMetrics for a tweet.
     This PublicMetrics contain public info about the tweet.
+    
+    .. versionadded:: 1.1.0
 
     Parameters:
     -----------
@@ -89,7 +91,7 @@ class TweetPublicMetrics:
     @property
     def like_count(self) -> int:
         """int: Return total of likes that the tweet has.
-
+       
         .. versionadded:: 1.1.0
         """
         return int(self._public.get("like_count"))

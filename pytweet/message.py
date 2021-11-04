@@ -16,7 +16,7 @@ __all__ = (
 
 class Message:
     """Represents the base Message of all Message types in Twitter, this include DirrectMessage & Tweet
-    Version Added: 1.2.0
+    .. versionadded:: 1.2.0
 
     Parameters:
     -----------
@@ -42,7 +42,7 @@ class Message:
 
 class DirectMessage(Message):
     """Represents a Direct Message in Twitter.
-    Version Added: 1.2.0
+    .. versionadded:: 1.2.0
 
     Parameters:
     -----------
@@ -72,17 +72,23 @@ class DirectMessage(Message):
 
     @property
     def event_type(self) -> MessageEventTypeEnum:
-        """:class:`MessageEventTypeEnum`: Returns the message event type."""
+        """:class:`MessageEventTypeEnum`: Returns the message event type.
+        .. versionadded:: 1.2.0
+        """
         return MessageEventTypeEnum(self._payload.get("type", None))
 
     @property
     def type(self) -> MessageTypeEnum:
-        """:class:`MessageTypesEnum`: Returns the message type."""
+        """:class:`MessageTypesEnum`: Returns the message type.
+        .. versionadded:: 1.2.0
+        """
         return MessageTypeEnum(1)
 
     @property
     def author(self) -> User:
-        """:class:`User`: Returns the author of the message in User object."""
+        """:class:`User`: Returns the author of the message in User object.
+        .. versionadded:: 1.2.0
+        """
         if not self.http_client:
             return None
 
@@ -92,5 +98,7 @@ class DirectMessage(Message):
 
     @property
     def created_at(self) -> datetime.datetime:
-        """:class:`datetime.datetime`: Returns the time when the Direct Message event was created."""
+        """:class:`datetime.datetime`: Returns the time when the Direct Message event was created.
+        .. versionadded:: 1.2.0
+        """
         return datetime.datetime.fromtimestamp(self.timestamp)

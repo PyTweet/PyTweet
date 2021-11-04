@@ -11,6 +11,8 @@ class Client:
     """Represent a client that connected to Twitter!
     This client will interact with other through twitter's api version 2!
 
+    .. versionadded:: 1.1.0
+
     Parameters:
     -----------
     bearer_token: str
@@ -60,7 +62,6 @@ class Client:
     @property
     def user(self) -> Optional[User]:
         """:class:`User`: Returns the client in user object, return None if access token isn't specified.
-        
 
         .. versionadded:: 1.2.0
         """
@@ -73,9 +74,8 @@ class Client:
 
     def get_user(self, user_id: Union[str, int]) -> User:
         """A function for HTTPClient.fetch_user().
-        
+        .. versionadded:: 1.1.0
 
-        .. versionadded:: 1.0.0
 
         Parameters:
         -----------
@@ -88,9 +88,6 @@ class Client:
 
     def get_user_by_username(self, username: str) -> User:
         """A function for HTTPClient.fetch_user_byusername().
-
-        .. versionadded:: 1.0.0
-
         Parameters:
         -----------
         username: Union[str, int]
@@ -116,7 +113,7 @@ class Client:
 
     def tweet(self, text: str, **kwargs: Any) -> None:
         """Post a tweet directly to twitter from the given parameters.
-
+       
         .. versionadded:: 1.1.0
 
         text: str

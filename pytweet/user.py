@@ -18,13 +18,11 @@ from .utils import time_parse_todt
 if TYPE_CHECKING:
     from .http import HTTPClient
 
-
 U = TypeVar("U", bound="User")
-
 
 class Messageable:
     """Represent an object that can send and receive a message through DM.
-    Version Added: 1.0.0
+    .. versionadded: 1.0.0
 
     Parameters:
     -----------
@@ -44,6 +42,8 @@ class Messageable:
     def send(self, text: str = None, **kwargs: Any):
         """:class:`DirectMessage`: Send a message to a specific Messageable object.
 
+        .. versionadded: 1.1.0
+
         Parameters:
         -----------
         text: str
@@ -58,13 +58,14 @@ class Messageable:
 
     def delete_message(self, message_id: int, **kwargs: Any) -> None:
         """Delete a message from a Messageable object.
-
         .. versionadded:: 1.1.0
         """
         self.http_client.delete_message(self._payload.get("id"), message_id, **kwargs)
 
     def follow(self) -> RelationFollow:
         """:class:`RelationFollow`: Follow a Messageable object.
+       
+         .. versionadded: 1.1.0
 
         This function return a :class:`RelationFollow` object.
 
@@ -75,6 +76,8 @@ class Messageable:
 
     def unfollow(self) -> RelationFollow:
         """:class:`RelationFollow`: Unfollow a Messageable object.
+
+        .. versionadded: 1.1.0
 
         This function return a :class:`RelationFollow` object.
 
@@ -101,6 +104,7 @@ class Messageable:
 class User(Messageable):
     """Represent a user in Twitter.
     User is an identity in twitter, its very interactive. Can send message, post a tweet, and even send messages to other user through Dms.
+    .. versionadded: 1.0.0
 
     .. describe:: x == y
         Check if one user id is equal to another.
@@ -155,98 +159,134 @@ class User(Messageable):
 
     @property
     def name(self) -> str:
-        """str: Return the user's name."""
+        """str: Return the user's name.
+        .. versionadded: 1.0.0
+        """
         return self._payload.get("name")
 
     @property
     def username(self) -> str:
-        """str: Return the user's username, this usually start with '@' follow by their username."""
+        """str: Return the user's username, this usually start with '@' follow by their username.
+        .. versionadded: 1.0.0
+        """
         return "@" + self._payload.get("username")
 
     @property
     def id(self) -> int:
-        """int: Return the user's id."""
+        """int: Return the user's id.
+        .. versionadded: 1.0.0
+        """
         return int(self._payload.get("id"))
 
     @property
     def bio(self) -> str:
-        """str: Return the user's bio."""
+        """str: Return the user's bio.
+        .. versionadded: 1.0.0
+        """
         return self._payload.get("description")
 
     @property
     def description(self) -> str:
-        """str: an alias to User.bio"""
+        """str: an alias to User.bio
+        .. versionadded: 1.0.0
+        """
         return self._payload.get("description")
 
     @property
     def profile_link(self) -> str:
-        """str: Return the user's profile link"""
+        """str: Return the user's profile link
+        .. versionadded: 1.0.0
+        """
         return f"https://twitter.com/{self.username.replace('@', '', 1)}"
 
     @property
     def link(self) -> str:
-        """str: Return url where the user put links, return an empty string if there isn't a url"""
+        """str: Return url where the user put links, return an empty string if there isn't a url
+        .. versionadded: 1.0.0
+        """
         return self._payload.get("url")
 
     @property
     def verified(self) -> bool:
-        """bool: Return True if the user is verified account, else False."""
+        """bool: Return True if the user is verified account, else False.
+        .. versionadded: 1.0.0
+        """
         return self._payload.get("verified")
 
     @property
     def protected(self) -> bool:
-        """bool: Return True if the user is protected, else False."""
+        """bool: Return True if the user is protected, else False.
+        .. versionadded: 1.0.0
+        """
         return self._payload.get("protected")
 
     @property
     def avatar_url(self) -> Optional[str]:
-        """Optional[str]: Return the user profile image."""
+        """Optional[str]: Return the user profile image.
+        .. versionadded: 1.0.0
+        """
         return self._payload.get("profile_image_url")
 
     @property
     def location(self) -> Optional[str]:
-        """str: Return the user's location"""
+        """str: Return the user's location
+        .. versionadded: 1.0.0
+        """
         return self._payload.get("location")
 
     @property
     def created_at(self) -> datetime.datetime:
-        """:class:datetime.datetime: Return datetime.datetime object with the user's account date."""
+        """:class:datetime.datetime: Return datetime.datetime object with the user's account date.
+        .. versionadded: 1.0.0
+        """
         return time_parse_todt(self._payload.get("created_at"))
 
     @property
     def pinned_tweet(self) -> Optional[object]:
         """Optional[object]: Returns the user's pinned tweet.
-        Version Added: 1.1.3
+        .. versionadded: 1.1.3
         """
         id = self._payload.get("pinned_tweet_id")
         return None if not id else self.http_client.fetch_tweet(int(id), http_client=self.http_client)
 
     @property
     def followers(self) -> Union[List[U], List]:
-        """:class:`List[User]`: Returns a list of users who are followers of the specified user ID. Maximum users is 100 users."""
+        """:class:`List[User]`: Returns a list of users who are followers of the specified user ID. Maximum users is 100 users.
+        .. versionadded: 1.1.0
+        """
         return self._payload.get("followers")
 
     @property
     def following(self) -> Union[List[U], List]:
-        """:class:`List[User]`: Returns a list of users that's followed by the specified user ID. Maximum users is 100 users."""
+        """:class:`List[User]`: Returns a list of users that's followed by the specified user ID. Maximum users is 100 users.
+        .. versionadded: 1.1.0
+        """
         return self._payload.get("following")
 
     @property
     def follower_count(self) -> int:
-        """int: Return total of followers that a user has."""
+        """int: Return total of followers that a user has.
+        .. versionadded: 1.1.0
+        """
         return self._metrics.follower_count
 
     @property
     def following_count(self) -> int:
-        """int: Return total of following that a user has."""
+        """int: Return total of following that a user has.
+        .. versionadded: 1.1.0
+        """
         return self._metrics.following_count
 
     @property
     def tweet_count(self) -> int:
-        """int: Return total of tweet that a user has."""
+        """int: Return total of tweet that a user has.
+        .. versionadded: 1.1.0
+        """
         return self._metrics.tweet_count
 
     @property
     def listed_count(self) -> int:
-        """int: Return total of listed that a user has."""
+        """int: Return total of listed that a user has.
+        .. versionadded: 1.1.0
+        """
         return self._metrics.listed_count

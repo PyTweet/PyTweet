@@ -1,5 +1,4 @@
 from typing import Any, Dict
-
 from .enums import RelationsTypeEnum
 
 __all__ = ("RelationFollow",)
@@ -7,7 +6,7 @@ __all__ = ("RelationFollow",)
 
 class RelationFollow:
     """Represent the follow relation from a follow request.
-    Version Added: 1.2.0
+    .. versionadded:: 1.2.0
 
     .. describe:: str(x)
         Returns the type.
@@ -27,15 +26,21 @@ class RelationFollow:
 
     @property
     def pending(self) -> bool:
-        """bool: Check if the relation is pending."""
+        """bool: Check if the relation is pending.
+        .. versionadded:: 1.2.0
+        """
         return self._payload.get("pending", False)
 
     @property
     def following(self) -> bool:
-        """bool: Check if the relation is following."""
+        """bool: Check if the relation is following.
+        .. versionadded:: 1.2.0
+        """
         return self._payload.get("following", False)
 
     @property
     def type(self) -> RelationsTypeEnum:
-        """RelationTypeEnum: Check what relation type it is."""
+        """RelationTypeEnum: Check what relation type it is.
+        .. versionadded:: 1.2.0
+        """
         return RelationsTypeEnum(1 if self._payload["following"] else 0)
