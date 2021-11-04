@@ -28,7 +28,7 @@ class EmbedsImages:
     Attributes:
     -----------
     _payload
-        The data paramaters.
+        The data parameters.
     """
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -63,7 +63,7 @@ class EmbedsImages:
 
 
 class Embed:
-    """Represent the embeded urls in a tweet.
+    """Represent the embedded urls in a tweet.
     .. versionadded: 1.1.3
 
     Parameters:
@@ -74,7 +74,7 @@ class Embed:
     Attributes:
     ------------
     _payload
-        The data paramaters.
+        The data parameters.
     """
 
     def __init__(self, data: Dict[str, Any]):
@@ -328,7 +328,7 @@ class Tweet:
 
     @property
     def embeds(self) -> Optional[List[Embed]]:
-        """:class:`List[Embed]`: Return a list of Embeded url from that tweet
+        """:class:`List[Embed]`: Return a list of Embedded url from that tweet
         .. versionadded: 1.1.3
         """
         if self._payload.get("entities"):

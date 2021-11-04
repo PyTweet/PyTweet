@@ -45,7 +45,7 @@ class DirectMessage(Message):
     """Represents a Direct Message in Twitter.
     Version Added: 1.2.0
 
-    Paramaters:
+    Parameters:
     -----------
     data: Dict[str, Any]
         The message data keep inside a dictionary.
