@@ -3,9 +3,9 @@ In this example i'm going to make a very simple code
 to send messages to other user through DM
 Code Explanations:
 1. Wrap that the code in try-except block to make it easier to catch errors.
-2. Fetc the user with get_user_by_username method.
+2. Fetch the user with get_user_by_username method.
 3. Send a message to that user using the send method.
-4. If it cause error and if the error is from pytweet.errors.Forbidden it'll print the error. Other then pytweet.errors.Forbidden, it'll raise the errors. 
+4. If it cause error and if the error is pytweet.errors.Forbidden it'll print the error. Other then pytweet.errors.Forbidden, it'll raise the errors. 
 5. If it didnt cause any errors, it'll print success message.
 """
 import pytweet

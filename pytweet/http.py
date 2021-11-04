@@ -59,7 +59,7 @@ class Route:
 class HTTPClient:
     """Represents the http/base client for :class:`Client` !
     This http/base client have methods for making requests to twitter's api!
-    version Added: 1.0.0
+    .. versionadded:: 1.0.0
 
     Parameters:
     -----------
@@ -136,7 +136,7 @@ class HTTPClient:
         mode: str = None,
     ) -> Union[str, Dict[Any, Any], NoReturn]:
         """Make an HTTP Requests to the api.
-        version Added: 1.0.0
+        .. versionadded:: 1.0.0
 
         Parameters:
         -----------
@@ -205,7 +205,7 @@ class HTTPClient:
     def fetch_user(self, user_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> User:
         """Make a Request to optain the user from the given user id.
         
-        version Added: 1.0.0
+        .. versionadded:: 1.0.0
 
         Parameters:
         -----------
@@ -274,7 +274,7 @@ class HTTPClient:
 
     def fetch_user_byusername(self, username: str, *, http_client: Optional[HTTPClient] = None) -> User:
         """Make a Request to optain the user from their username.
-        Version Added: 1.0.0
+        .. versionadded:: 1.0.0
 
         Parameters:
         -----------
@@ -312,7 +312,7 @@ class HTTPClient:
 
     def fetch_tweet(self, tweet_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> Tweet:
         """Fetch a tweet info from the specified id. Return if consumer_key or consumer_key_secret or access_token or access_token_secret is not specified.
-        version Added:1.0.0
+        .. versionadded:: 1.0.0
 
         Parameters:
         -----------
@@ -384,8 +384,8 @@ class HTTPClient:
 
     def send_message(self, user_id: Union[str, int], text: str, **kwargs):
         """Make a post Request for sending a message to a Messageable object.
-        version Added: 1.1.0
-        Updated: 1.2.0
+        .. versionadded:: 1.1.0
+        .. versionchanged:: 1.2.0 
 
         Parameters:
         -----------
@@ -421,7 +421,7 @@ class HTTPClient:
 
     def delete_message(self, id: int, **kwargs: Any) -> NoReturn:
         """WARNING: this function isnt finish yet!
-        version Added:1.1.0
+        .. versionadded:: 1.1.0
 
         Make a DELETE Request for deleting a certain message in a Messageable object.
         """
@@ -430,7 +430,7 @@ class HTTPClient:
 
     def post_tweet(self, text: str, **kwargs: Any) -> NoReturn:
         """WARNING: this function isnt finish yet!
-        version Added:1.1.0
+        .. versionadded:: 1.1.0
 
         Make a POST Request to post a tweet to twitter from the client itself.
         """
@@ -438,8 +438,8 @@ class HTTPClient:
 
     def follow_user(self, user_id: Union[str, int]) -> None:
         """Make a POST Request to follow a Messageable object.
-        version Added:1.1.0
-        Updated: 1.2.0
+        .. versionadded:: 1.1.0
+        .. versionchanged:: 1.2.0 
 
         Parameters:
         -----------
@@ -460,8 +460,8 @@ class HTTPClient:
 
     def unfollow_user(self, user_id: Union[str, int]) -> None:
         """Make a DELETE Request to unfollow a Messageable object.
-        version Added:1.1.0
-        Updated: 1.2.0
+        .. versionadded:: 1.1.0
+        .. versionchanged:: 1.2.0 
 
         Parameters:
         -----------
@@ -480,7 +480,7 @@ class HTTPClient:
 
     def block_user(self, user_id: Union[str, int]) -> None:
         """Make a POST Request to Block a Messageable object.
-        version Added: 1.2.0
+        .. versionadded:: 1.2.0
 
         Parameters:
         -----------
@@ -497,7 +497,7 @@ class HTTPClient:
 
     def unblock_user(self, user_id: Union[str, int]) -> None:
         """Make a DELETE Request to unblock a Messageable object.
-        version Added:1.2.0
+        .. versionadded:: 1.2.0
 
         Parameters:
         -----------
