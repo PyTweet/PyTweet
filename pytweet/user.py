@@ -1,12 +1,12 @@
 import datetime
 from typing import (
-    TYPE_CHECKING, 
+    TYPE_CHECKING,
     Any,
-    Dict, 
-    List, 
-    NoReturn, 
+    Dict,
+    List,
+    NoReturn,
     Optional,
-    TypeVar, 
+    TypeVar,
     Union,
 )
 

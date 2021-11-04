@@ -8,8 +8,7 @@ from typing import Any, Dict, NoReturn, Optional, Union
 import requests
 
 from .auth import OauthSession
-from .errors import (Forbidden, NotFound, PytweetException, TooManyRequests,
-                     Unauthorized)
+from .errors import Forbidden, NotFound, PytweetException, TooManyRequests, Unauthorized
 from .message import DirectMessage
 from .relations import RelationFollow
 from .tweet import Tweet

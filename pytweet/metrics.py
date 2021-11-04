@@ -19,7 +19,7 @@ class UserPublicMetrics:
 
     def __init__(self, data: Dict[str, Any] = {}, **kwargs: Any):
         self.original_payload: Dict[str, Any] = data
-        self._public: Dict[Any, Any]  = self.original_payload.get("public_metrics")
+        self._public: Dict[Any, Any] = self.original_payload.get("public_metrics")
 
     def __repr__(self) -> str:
         return f"UserPublicMetrics(user={self.original_payload.get('username')} follower_count={self.follower_count} following_count={self.following_count} tweet_count={self.tweet_count})"
