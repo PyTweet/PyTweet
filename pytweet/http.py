@@ -82,10 +82,10 @@ class HTTPClient:
     credentials
         The credentials in a dictionary.
 
-    Exceptions Raises:
-    ----------------
-    pytweet.errors.Unauthorized:
-        Raise when the api return code: 401. This usually because you passed invalid credentials.
+    Raises:
+    -------
+        pytweet.errors.Unauthorized:
+            Raise when the api return code: 401. This usually because you passed invalid credentials.
 
     .. versionadded:: 1.0.0
     """
@@ -161,16 +161,16 @@ class HTTPClient:
         mode: str
             This mode argument usually use in a POST request, its going to specified what's the request action, then it log into a cache. For example, if a mode is 'follow' then it log the request to a follow cache.
 
-        Exceptions Raises:
-        ----------------
-        pytweet.errors.Unauthorized:
-            Raise when the api return code: 401. This usually because you passed invalid credentials
+        Raises:
+        -------
+            pytweet.errors.Unauthorized:
+                Raise when the api return code: 401. This usually because you passed invalid credentials
 
-        pytweet.errors.Forbidden:
-            Raise when the api return code: 403. There's a lot of reason why, This usually happen when the client cannot do the request due to twitter's limitation e.g trying to follow someone that you blocked etc.
+            pytweet.errors.Forbidden:
+                Raise when the api return code: 403. There's a lot of reason why, This usually happen when the client cannot do the request due to twitter's limitation e.g trying to follow someone that you blocked etc.
 
-        pytweet.errors.TooManyRequests:
-            Raise when the api return code: 429. This usually happen when you made too much request thus the api ratelimit you. The ratelimit will ware off in a couple of minutes.
+            pytweet.errors.TooManyRequests:
+                Raise when the api return code: 429. This usually happen when you made too much request thus the api ratelimit you. The ratelimit will ware off in a couple of minutes.
 
         This function make an HTTP Request with the given parameters then return a dictionary in a json format.
 
@@ -215,13 +215,13 @@ class HTTPClient:
         http_client:
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
-        Exceptions Raises:
-        ----------------
-        pytweet.errors.NotFoundError:
-            Raise when the api can't find a user with that id.
+        Raises:
+        -------
+            pytweet.errors.NotFoundError:
+                Raise when the api can't find a user with that id.
 
-        ValueError:
-            Raise when user_id is not an int and is not a string of digits.
+            ValueError:
+                Raise when user_id is not an int and is not a string of digits.
 
         This function return a :class:`User` object.
 
@@ -285,10 +285,10 @@ class HTTPClient:
         http_client:
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
-        Exceptions Raises:
-        ----------------
-        pytweet.errors.NotFoundError:
-            Raise when the api can't find a user with that username.
+        Raises:
+        -------
+            pytweet.errors.NotFoundError:
+                Raise when the api can't find a user with that username.
 
         This function return a :class:`User` object.
 
@@ -324,10 +324,10 @@ class HTTPClient:
         http_client
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
-        Exceptions Raises:
-        ----------------
-        pytweet.errors.NotFoundError:
-            Raise when the api can't find a tweet with that id.
+        Raises:
+        -------
+            pytweet.errors.NotFoundError:
+                Raise when the api can't find a tweet with that id.
 
         This function return a :class:`Tweet`.
 
