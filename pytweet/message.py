@@ -28,8 +28,16 @@ class Message:
     """
 
     def __init__(self, text: Optional[str], id: Union[str, int]):
-        self.text = text
-        self.id = id
+        self._text = text
+        self._id = id
+
+    @property
+    def text(self) -> str:
+        return self._text
+
+    @property
+    def id(self) -> int:
+        return int(self._id)
 
 
 class DirectMessage(Message):
@@ -43,9 +51,6 @@ class DirectMessage(Message):
 
     http_client: Optional[HTTPClient]
         Represents the HTTP Client that make the request, this will be use for interaction between the client and the user.
-
-    timestamp: int
-        The message timestamp when the Direct Message event was created..
     """
 
     def __init__(self, data: Dict[str, Any], **kwargs):

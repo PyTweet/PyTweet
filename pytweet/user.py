@@ -3,6 +3,8 @@ from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, TypeVar, 
 
 from .metrics import UserPublicMetrics
 from .utils import time_parse_todt
+from .relations import RelationFollow
+from .message import DirectMessage
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -30,9 +32,16 @@ class Messageable:
         self._payload = data
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
 
-    def send(self, text: str = None, **kwargs: Any) -> None:
-        """Send a message to a specific Messageable object.
+    def send(self, text: str = None, **kwargs: Any) -> DirectMessage:
+        """:class:`DirectMessage`: Send a message to a specific Messageable object.
         Version Added: 1.1.0
+        
+        Parameters:
+        -----------
+        text: str
+            The text that will be send to that user.
+
+        This function return a :class:`DirectMessage` object
         """
         res = self.http_client.send_message(self._payload.get("id"), text, **kwargs)
         return res
@@ -43,16 +52,20 @@ class Messageable:
         """
         self.http_client.delete_message(self._payload.get("id"), message_id, **kwargs)
 
-    def follow(self) -> None:
-        """Follow a Messageable object.
+    def follow(self) -> RelationFollow:
+        """:class:`RelationFollow`: Follow a Messageable object.
         Version Added: 1.1.0
+
+        This function return a :class:`RelationFollow` object.
         """
         follow = self.http_client.follow_user(self._payload.get("id"))
         return follow
 
-    def unfollow(self) -> None:
-        """Unfollow a Messageable object.
+    def unfollow(self) -> RelationFollow:
+        """:class:`RelationFollow`: Unfollow a Messageable object.
         Version Added: 1.1.0
+
+        This function return a :class:`RelationFollow` object.
         """
         unfollow = self.http_client.unfollow_user(self._payload.get("id"))
         return unfollow
@@ -93,15 +106,11 @@ class User(Messageable):
 
     Attributes:
     -----------
-    original_payload
-        Represent the main data of a user.
-
     http_client
-        Represent a :class:HTTPClient that make the request.
+        Represent the HTTP Client that make the request, this will be use for interaction between the client and the user.
 
     user_metrics
         Represent the public metrics of the user.
-
     """
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
@@ -142,7 +151,7 @@ class User(Messageable):
     @property
     def id(self) -> int:
         """int: Return the user's id."""
-        return self._payload.get("id")
+        return int(self._payload.get("id"))
 
     @property
     def bio(self) -> str:
@@ -192,8 +201,8 @@ class User(Messageable):
     @property
     def pinned_tweet(self) -> Optional[object]:
         """Optional[object]: Returns the user's pinned tweet.
-        Version Added: 1.1.3"""
-
+        Version Added: 1.1.3
+        """
         id = self._payload.get("pinned_tweet_id")
         return None if not id else self.http_client.fetch_tweet(int(id), http_client=self.http_client)
 

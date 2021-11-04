@@ -74,7 +74,7 @@ class Client:
         Parameters:
         -----------
         user_id: Union[str, int]
-            Represent the user id that you wish to get info to, if you dont have the id you may use `get_user_by_username`, it only need the user's username.
+            Represent the user id that you wish to get info to, If you dont have it you may use `fetch_user_byusername` because it only required the user's username.
 
         This function returns a :class:`User` object.
         """

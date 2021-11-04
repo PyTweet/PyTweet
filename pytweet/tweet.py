@@ -229,17 +229,17 @@ class Tweet:
 
     @property
     def author(self) -> User:
-        """Optional[User]: Return a user (object) who posted the tweet."""
+        """Optional[:class:`User`]: Return a user (object) who posted the tweet."""
         return User(self._includes.get("users")[0], http_client=self.http_client)
 
     @property
     def retweeted_by(self) -> Union[List[User], int]:
-        """Optional[List[User]]: Return a list of users thats retweeted the specified tweet's id. Maximum users is 100. Return 0 if no one retweeted."""
+        """Optional[List[:class:`User`]]: Return a list of users thats retweeted the specified tweet's id. Maximum users is 100. Return 0 if no one retweeted."""
         return self._payload.get("retweeted_by")
 
     @property
     def liking_users(self) -> Union[List[User], int]:
-        """Optional[List[User]]: Return a list of users that liked the specified tweet's id. Maximum users is 100. Return 0 if no one liked."""
+        """Optional[List[:class:`User`]]: Return a list of users that liked the specified tweet's id. Maximum users is 100. Return 0 if no one liked."""
         return self._payload.get("liking_users")
 
     @property

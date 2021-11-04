@@ -1,10 +1,8 @@
 import logging
 import sys
-from typing import Any, Dict, NoReturn, Optional, Union
-import asyncio
 import time
-
 import requests
+from typing import Any, Dict, NoReturn, Optional, Union
 
 from .auth import OauthSession
 from .errors import Forbidden, NotFoundError, PytweetException, TooManyRequests, Unauthorized
@@ -183,10 +181,11 @@ class HTTPClient:
 
         This function make an HTTP Request with the given paramaters then return a dictionary in a json format.
         """
-        user_agent = "Py-Tweet (https://github.com/TheFarGG/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
-        headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
         if headers == {}:
             headers = {"Authorization": f"Bearer {self.bearer_token}"}
+
+        user_agent = "Py-Tweet (https://github.com/TheFarGG/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
+        headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
 
         res = getattr(requests, route.method.lower(), None)
         if not res:
@@ -212,7 +211,7 @@ class HTTPClient:
 
     def fetch_user(self, user_id: Union[str, int], *, http_client=None) -> User:
         """Make a Request to optain the user from the given user id.
-        version Added:1.0.0
+        version Added: 1.0.0
 
         Parameters:
         -----------
@@ -451,7 +450,7 @@ class HTTPClient:
         -----------
 
         user_id: Union[str, int]
-            The user's id that you wish to follow, better to make it a string.
+            The user's id that you wish to follow.
 
         This function return a :class: `RelationFollow` object.
         """
@@ -472,9 +471,9 @@ class HTTPClient:
         Parameters:
         -----------
         user_id: Union[str, int]
-            The user's id that you wish to unfollow, better to make it a string.
+            The user's id that you wish to unfollow.
 
-        This function return a :class: `RelationFollow` object.
+        This function return a :class:`RelationFollow` object.
         """
         my_id = self.access_token.partition("-")[0]
         res = self.request(
@@ -491,9 +490,7 @@ class HTTPClient:
         Parameters:
         -----------
         user_id: Union[str, int]
-            The user's id that you wish to block, better to make it a string.
-
-        This function return a :class: `RelationBlock` object.
+            The user's id that you wish to block.
         """
         my_id = self.access_token.partition("-")[0]
         self.request(
@@ -510,9 +507,7 @@ class HTTPClient:
         Parameters:
         -----------
         user_id: Union[str, int]
-            The user's id that you wish to unblock, better to make it a string.
-
-        This function return a :class: `RelationBlock` object.
+            The user's id that you wish to unblock.
         """
         my_id = self.access_token.partition("-")[0]
         self.request(
