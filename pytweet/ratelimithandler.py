@@ -5,7 +5,7 @@ class RatelimitHandler:
         self,
         limit: float,
     ):
-        self._limit: float = limit
+        self._limit = limit
     
 
     def is_ratelimited(self):
