@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, TypeVar, 
 from .metrics import UserPublicMetrics
 from .utils import time_parse_todt
 from .relations import RelationFollow
-from .message import DirectMessage
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -32,7 +31,7 @@ class Messageable:
         self._payload = data
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
 
-    def send(self, text: str = None, **kwargs: Any) -> DirectMessage:
+    def send(self, text: str = None, **kwargs: Any):
         """:class:`DirectMessage`: Send a message to a specific Messageable object.
         Version Added: 1.1.0
         

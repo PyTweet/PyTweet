@@ -2,10 +2,10 @@ import datetime
 from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 from .enums import MessageEventTypeEnum, MessageTypeEnum
-from .user import User
 
 if TYPE_CHECKING:
     from .http import HTTPClient
+    from .user import User
 
 
 __all__ = (
