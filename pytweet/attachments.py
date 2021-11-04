@@ -16,7 +16,7 @@ __all__ = (
 
 class Media:
     """Represent a Media attachment in a tweet.
-    .. versionadded:: 1.1.0
+    .. versionadded:: 1.1
 
     .. describe:: x == y
         Check if one Media key is equal to another.
@@ -62,42 +62,42 @@ class Media:
     @property
     def type(self) -> Optional[str]:
         """:class:`Optional[str]`: Return the media's type.
-        .. versionadded:: 1.1.0
+        .. versionadded:: 1.1
         """
         return self._payload.get("type")
 
     @property
     def url(self) -> Optional[str]:
         """:class:`Optional[str]`: Return the media's url.
-        .. versionadded:: 1.1.0
+        .. versionadded:: 1.1
         """
         return self._payload.get("url")
 
     @property
     def width(self) -> Optional[int]:
         """:class:`Optional[int]`: the media's width.
-        .. versionadded:: 1.1.0
+        .. versionadded:: 1.1
         """
         return self._payload.get("width")
 
     @property
     def height(self) -> Optional[int]:
         """int: Return the media's height.
-        .. versionadded:: 1.1.0
+        .. versionadded:: 1.1
         """
         return self._payload.get("height")
 
     @property
     def media_key(self) -> Optional[Union[int, str]]:
         """:class:`Optional[Union[int, str]]`: Returns the media's unique key.
-        .. versionadded:: 1.1.0
+        .. versionadded:: 1.1
         """
         return self._payload.get("media_key")
 
 
 class PollOptions:
     """Represent the Poll Options, The minimum option of a poll is 2 and maximum is 4.
-    .. versionadded:: 1.1.0
+    .. versionadded:: 1.1
 
     .. describe:: x == y
         Check if one PollOption position is equal to another.
@@ -167,28 +167,28 @@ class PollOptions:
     @property
     def position(self) -> Optional[int]:
         """:class:`Optional[int]`: The option's position.
-        .. versionadded:: 1.1.0
+        .. versionadded:: 1.1
         """
         return self.options.get("position")
 
     @property
     def label(self) -> Optional[str]:
         """:class:`Optional[int]`: The option's label.
-        .. versionadded:: 1.1.0
+        .. versionadded:: 1.1
         """
         return self.options.get("label")
 
     @property
     def votes(self) -> Optional[int]:
         """:class:`Optional[int]`: The option's votes.
-        .. versionadded:: 1.1.0
+        .. versionadded:: 1.1
         """
         return self.options.get("votes")
 
 
 class Poll:
     """Represent a Poll attachment in a tweet.
-    .. versionadded:: 1.1.0
+    .. versionadded:: 1.1
 
     .. describe:: x == y
         Check if one Poll's id is equal to another.
@@ -243,34 +243,34 @@ class Poll:
     @property
     def id(self) -> Optional[int]:
         """int: Return the poll's unique ID.
-        .. versionadded:: 1.1.0.
+        .. versionadded:: 1.1.
         """
         return self._payload.get("id")
 
     @property
     def options(self) -> List[PollOptions]:
         """:class:`List[PollOptions]`: Return a list of :class:`PollOptions`.
-        .. versionadded:: 1.1.0.
+        .. versionadded:: 1.1.
         """
         return [PollOptions(option) for option in self._payload.get("options")]
 
     @property
     def voting_status(self) -> bool:
         """bool: Return True if the poll is still open for voting, if its closed it return False.
-        .. versionadded:: 1.1.0
+        .. versionadded:: 1.1
         """
         return True if self._payload.get("voting_status") == "open" else False
 
     @property
     def duration(self) -> int:
         """int: Return the poll duration in seconds.
-        .. versionadded:: 1.1.0
+        .. versionadded:: 1.1
         """
         return int(self._payload.get("duration_minutes")) * 60
 
     @property
     def end_date(self) -> datetime.datetime:
         """`datetime.datetime`: Return the end date in datetime.datetime object.
-        .. versionadded:: 1.1.0
+        .. versionadded:: 1.1
         """
         return time_parse_todt(self._payload.get("end_datetime"))
