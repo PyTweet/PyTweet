@@ -34,7 +34,7 @@ jobs:
       - name: Run linter
         uses: psf/black@stable
         with:
-          options: "-l 120"
+          options: "-l 120 --check"
           src: "./pytweet"
   
   codespell:
