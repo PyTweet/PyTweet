@@ -19,8 +19,8 @@ class RelationFollow:
     """
 
     def __init__(self, data: Dict[str, Any]):
-        self.original_payload = data
-        self._payload = data["data"]
+        self.original_payload: Dict[str, Any] = data
+        self._payload: Dict[Any, Any] = data["data"]
 
     def __repr__(self) -> str:
         return "Followed(type: {0.type} following: {0.following} pending: {0.pending})".format(self)

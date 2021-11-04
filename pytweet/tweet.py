@@ -1,11 +1,14 @@
 import datetime
-from typing import Any, Dict, List, NoReturn, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, TypeVar, Union
 
 from .attachments import Media, Poll
 from .enums import MessageTypeEnum
 from .metrics import TweetPublicMetrics
 from .user import User
 from .utils import time_parse_todt
+
+if TYPE_CHECKING:
+    from .http import HTTPClient
 
 TT = TypeVar("TT", bound="Tweet")
 
@@ -199,7 +202,7 @@ class Tweet:
         self._payload = data.get("data") or None
         self._includes = self.original_payload.get("includes")
         self.tweet_metrics: TweetPublicMetrics = TweetPublicMetrics(self._payload)
-        self.http_client = kwargs.get("http_client") or None
+        self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
 
     def __repr__(self) -> str:
         return "Tweet(text={0.text} id={0.id} author={0.author})".format(self)

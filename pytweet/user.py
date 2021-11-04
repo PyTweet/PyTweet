@@ -1,9 +1,19 @@
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    List,
+    NoReturn,
+    Optional,
+    TypeVar,
+    Union,
+)
+
 
 from .metrics import UserPublicMetrics
-from .utils import time_parse_todt
 from .relations import RelationFollow
+from .utils import time_parse_todt
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -28,8 +38,8 @@ class Messageable:
     """
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any):
-        self._payload = data
-        self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
+        self._payload: Dict[str, Any] = data
+        self.http_client: Optional[HTTPClient] = kwargs.get("http_client", None)
 
     def send(self, text: str = None, **kwargs: Any):
         """:class:`DirectMessage`: Send a message to a specific Messageable object.
@@ -114,8 +124,8 @@ class User(Messageable):
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
         super().__init__(data, **kwargs)
-        self.original_payload = data
-        self._payload = (
+        self.original_payload: Dict[str, Any] = data
+        self._payload: Dict[Any, Any] = (
             self.original_payload.get("data") if self.original_payload.get("data") != None else self.original_payload
         )
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
