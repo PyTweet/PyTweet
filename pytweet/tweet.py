@@ -173,6 +173,7 @@ class Embed:
     @property
     def status_code(self) -> int:
         """int: Return the embed's url HTTP status code
+
         .. versionadded: 1.1.3
         """
         return int(self._payload.get("status"))
@@ -242,6 +243,7 @@ class Tweet:
     @property
     def text(self) -> str:
         """str: Return the tweet's text.
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("text")
@@ -249,6 +251,7 @@ class Tweet:
     @property
     def id(self) -> int:
         """int: Return the tweet's id.
+
         .. versionadded: 1.0.0
         """
         return int(self._payload.get("id"))
@@ -256,20 +259,23 @@ class Tweet:
     @property
     def author(self) -> User:
         """Optional[:class:`User`]: Return a user (object) who posted the tweet.
+
         .. versionadded: 1.0.0
         """
         return User(self._includes.get("users")[0], http_client=self.http_client)
 
     @property
     def retweeted_by(self) -> Union[List[User], int]:
-        """Optional[List[:class:`User`]]: Return a list of users that's retweeted the specified tweet's id. Maximum users is 100. Return 0 if no one retweeted.
+        """:class`Optional[List[User], int]`: Return a list of users that's retweeted the specified tweet's id. Maximum users is 100. Return 0 if no one retweeted.
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("retweeted_by")
 
     @property
     def liking_users(self) -> Union[List[User], int]:
-        """Optional[List[:class:`User`]]: Return a list of users that liked the specified tweet's id. Maximum users is 100. Return 0 if no one liked.
+        """:class`Optional[List[User], int]`: Return a list of users that liked the specified tweet's id. Maximum users is 100. Return 0 if no one liked.
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("liking_users")
@@ -277,6 +283,7 @@ class Tweet:
     @property
     def sensitive(self) -> bool:
         """bool: Return True if the tweet is possible sensitive to some users, else False
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("possibly_sensitive")
@@ -284,6 +291,7 @@ class Tweet:
     @property
     def created_at(self) -> datetime.datetime:
         """:class:`datetime.datetime`: Return a datetime object with the tweet posted age.
+
         .. versionadded: 1.0.0
         """
         return time_parse_todt(self._payload.get("created_at"))
@@ -291,13 +299,15 @@ class Tweet:
     @property
     def source(self) -> str:
         """str: Return the source of the tweet. e.g if you post a tweet from a website, the source is gonna be 'Twitter Web App'
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("source")
 
     @property
     def reply_setting(self) -> str:
-        """str: Return the reply setting. If everyone can replied, reply_setting return 'Everyone'
+        """str: Return the reply setting. If everyone can replied, reply_setting return 'Everyone'.
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("reply_settings")
@@ -305,20 +315,23 @@ class Tweet:
     @property
     def lang(self) -> str:
         """str: Return the tweet's lang, if its english it return en.
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("lang")
 
     @property
-    def convertion_id(self) -> int:
-        """int: Return the tweet's convertion id.
+    def conversation_id(self) -> int:
+        """int: Return the tweet's conversation's id.
+
         .. versionadded: 1.0.0
         """
-        return int(self._payload.get("convertion_id"))
+        return int(self._payload.get("conversation_id"))
 
     @property
     def link(self) -> str:
         """str: Return the tweet's link.
+
         .. versionadded: 1.1.0
         """
         return f"https://twitter.com/{self.author.username.split('@', 1)[1]}/status/{self.id}"
@@ -398,6 +411,7 @@ class Tweet:
     @property
     def like_count(self) -> int:
         """int: Return the total of likes in a tweet.
+        
         .. versionadded: 1.1.0
         """
         return self.tweet_metrics.like_count
@@ -405,6 +419,7 @@ class Tweet:
     @property
     def retweet_count(self) -> int:
         """int: Return the total of retweetes in a tweet.
+
         .. versionadded: 1.1.0
         """
         return self.tweet_metrics.retweet_count
@@ -412,6 +427,7 @@ class Tweet:
     @property
     def reply_count(self) -> int:
         """int: Return the total of replies in a tweet.
+
         .. versionadded: 1.1.0
         """
         return self.tweet_metrics.reply_count
@@ -419,6 +435,7 @@ class Tweet:
     @property
     def quote_count(self) -> int:
         """int: Return the total of quotes in a tweet.
+
         .. versionadded: 1.1.0
         """
         return self.tweet_metrics.quote_count

@@ -5,17 +5,16 @@ __all__ = (
     "TweetPublicMetrics",
 )
 
-
 class UserPublicMetrics:
     """Represent a PublicMetrics for a User.
     This PublicMetrics contain public info about the user.
-
-    .. versionadded:: 1.1.0
 
     Parameters:
     -----------
     data: Dict[str, Any]
         The complete data of the user's public metrics through a dictionary!
+
+    .. versionadded:: 1.1.0
     """
 
     def __init__(self, data: Dict[str, Any] = {}, **kwargs: Any):
@@ -61,8 +60,6 @@ class UserPublicMetrics:
 class TweetPublicMetrics:
     """Represent a PublicMetrics for a tweet.
     This PublicMetrics contain public info about the tweet.
-    
-    .. versionadded:: 1.1.0
 
     Parameters:
     -----------
@@ -77,7 +74,6 @@ class TweetPublicMetrics:
     _public
         Returns the user public metrics.
     
-
     .. versionadded:: 1.1.0
     """
 

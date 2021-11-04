@@ -59,7 +59,6 @@ class Route:
 class HTTPClient:
     """Represents the http/base client for :class:`Client` !
     This http/base client have methods for making requests to twitter's api!
-    .. versionadded:: 1.0.0
 
     Parameters:
     -----------
@@ -83,10 +82,12 @@ class HTTPClient:
     credentials
         The credentials in a dictionary.
 
-    Exceptions Raise:
+    Exceptions Raises:
     ----------------
     pytweet.errors.Unauthorized:
         Raise when the api return code: 401. This usually because you passed invalid credentials.
+
+    .. versionadded:: 1.0.0
     """
 
     def __init__(
@@ -136,7 +137,6 @@ class HTTPClient:
         mode: str = None,
     ) -> Union[str, Dict[Any, Any], NoReturn]:
         """Make an HTTP Requests to the api.
-        .. versionadded:: 1.0.0
 
         Parameters:
         -----------
@@ -161,7 +161,7 @@ class HTTPClient:
         mode: str
             This mode argument usually use in a POST request, its going to specified what's the request action, then it log into a cache. For example, if a mode is 'follow' then it log the request to a follow cache.
 
-        Exceptions Raise:
+        Exceptions Raises:
         ----------------
         pytweet.errors.Unauthorized:
             Raise when the api return code: 401. This usually because you passed invalid credentials
@@ -173,6 +173,8 @@ class HTTPClient:
             Raise when the api return code: 429. This usually happen when you made too much request thus the api ratelimit you. The ratelimit will ware off in a couple of minutes.
 
         This function make an HTTP Request with the given parameters then return a dictionary in a json format.
+
+        .. versionadded:: 1.0.0
         """
         if headers == {}:
             headers = {"Authorization": f"Bearer {self.bearer_token}"}
@@ -204,8 +206,6 @@ class HTTPClient:
 
     def fetch_user(self, user_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> User:
         """Make a Request to obtain the user from the given user id.
-        
-        .. versionadded:: 1.0.0
 
         Parameters:
         -----------
@@ -215,7 +215,7 @@ class HTTPClient:
         http_client:
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
-        Exceptions Raise:
+        Exceptions Raises:
         ----------------
         pytweet.errors.NotFoundError:
             Raise when the api can't find a user with that id.
@@ -224,6 +224,8 @@ class HTTPClient:
             Raise when user_id is not an int and is not a string of digits.
 
         This function return a :class:`User` object.
+
+        .. versionadded:: 1.0.0
         """
         try:
             int(user_id)
@@ -274,7 +276,6 @@ class HTTPClient:
 
     def fetch_user_byusername(self, username: str, *, http_client: Optional[HTTPClient] = None) -> User:
         """Make a Request to obtain the user from their username.
-        .. versionadded:: 1.0.0
 
         Parameters:
         -----------
@@ -284,12 +285,14 @@ class HTTPClient:
         http_client:
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
-        Exceptions Raise:
+        Exceptions Raises:
         ----------------
         pytweet.errors.NotFoundError:
             Raise when the api can't find a user with that username.
 
         This function return a :class:`User` object.
+
+        .. versionadded:: 1.0.0
         """
         if "@" in username:
             username = username.replace("@", "", 1)
@@ -312,7 +315,6 @@ class HTTPClient:
 
     def fetch_tweet(self, tweet_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> Tweet:
         """Fetch a tweet info from the specified id. Return if consumer_key or consumer_key_secret or access_token or access_token_secret is not specified.
-        .. versionadded:: 1.0.0
 
         Parameters:
         -----------
@@ -322,12 +324,14 @@ class HTTPClient:
         http_client
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
-        Exceptions Raise:
+        Exceptions Raises:
         ----------------
         pytweet.errors.NotFoundError:
             Raise when the api can't find a tweet with that id.
 
         This function return a :class:`Tweet`.
+
+        .. versionadded:: 1.0.0
         """
         if not any([v for v in self.credentials.values()]):
             return None
@@ -384,8 +388,6 @@ class HTTPClient:
 
     def send_message(self, user_id: Union[str, int], text: str, **kwargs):
         """Make a post Request for sending a message to a Messageable object.
-        .. versionadded:: 1.1.0
-        .. versionchanged:: 1.2.0 
 
         Parameters:
         -----------
@@ -399,6 +401,10 @@ class HTTPClient:
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
         This function return a :class: `DirrectMessage` object.
+
+        .. versionadded:: 1.1.0
+
+        .. versionchanged:: 1.2.0 
         """
         http_client = kwargs.get("http_client", None)
         data = {
@@ -420,10 +426,18 @@ class HTTPClient:
         return DirectMessage(res, http_client=http_client if http_client else self)
 
     def delete_message(self, id: int, **kwargs: Any) -> NoReturn:
-        """WARNING: this function isn't finish yet!
-        .. versionadded:: 1.1.0
+        """
+        .. warning:: 
+            This function is still under development and will raise an error when used!
 
         Make a DELETE Request for deleting a certain message in a Messageable object.
+
+        Parameters:
+        -----------
+        id:
+            The message id that you want to delete.
+
+        .. versionadded:: 1.1.0
         """
         raise NotImplementedError("This function is not finish yet")
 
@@ -431,7 +445,7 @@ class HTTPClient:
     def post_tweet(self, text: str, **kwargs: Any) -> NoReturn:
         """
         .. warning:: 
-            this function isnt finish yet!
+            This function is still under development and will raise an error when used!
 
         Make a POST Request to post a tweet to twitter from the client itself.
 
@@ -441,7 +455,6 @@ class HTTPClient:
 
     def follow_user(self, user_id: Union[str, int]) -> RelationFollow:
         """Make a POST Request to follow a Messageable object.
-
 
         Parameters:
         -----------
@@ -454,6 +467,8 @@ class HTTPClient:
         .. versionadded:: 1.1.0
 
         .. versionchanged:: 1.2.0
+
+        Make the method functional and return :class:`RelationFollow`
         """
         my_id = self.access_token.partition("-")[0]
         res = self.request(
@@ -466,8 +481,6 @@ class HTTPClient:
 
     def unfollow_user(self, user_id: Union[str, int]) -> RelationFollow:
         """Make a DELETE Request to unfollow a Messageable object.
-    
-        .. versionadded:: 1.1.0
 
         Parameters:
         -----------
@@ -479,6 +492,8 @@ class HTTPClient:
         .. versionadded:: 1.1.0
 
         .. versionchanged:: 1.2.0
+
+        Make the method functional and return :class:`RelationFollow
         """
         my_id = self.access_token.partition("-")[0]
         res = self.request(
@@ -490,9 +505,6 @@ class HTTPClient:
 
     def block_user(self, user_id: Union[str, int]) -> None:
         """Make a POST Request to Block a Messageable object.
-
-        .. versionadded:: 1.2.0
-
 
         Parameters:
         -----------
@@ -511,9 +523,6 @@ class HTTPClient:
 
     def unblock_user(self, user_id: Union[str, int]) -> None:
         """Make a DELETE Request to unblock a Messageable object.
-
-        .. versionadded:: 1.2.0
-
 
         Parameters:
         -----------

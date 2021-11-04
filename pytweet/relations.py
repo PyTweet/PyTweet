@@ -6,7 +6,6 @@ __all__ = ("RelationFollow",)
 
 class RelationFollow:
     """Represent the follow relation from a follow request.
-    .. versionadded:: 1.2.0
 
     .. describe:: str(x)
         Returns the type.
@@ -14,7 +13,9 @@ class RelationFollow:
     Parameters:
     -----------
     data: Payload
-        The data of the relations
+        The data of the relations.
+
+    .. versionadded:: 1.2.0
     """
 
     def __init__(self, data: Dict[str, Any]):
@@ -27,6 +28,7 @@ class RelationFollow:
     @property
     def pending(self) -> bool:
         """bool: Check if the relation is pending.
+
         .. versionadded:: 1.2.0
         """
         return self._payload.get("pending", False)
@@ -34,6 +36,7 @@ class RelationFollow:
     @property
     def following(self) -> bool:
         """bool: Check if the relation is following.
+
         .. versionadded:: 1.2.0
         """
         return self._payload.get("following", False)
@@ -41,6 +44,7 @@ class RelationFollow:
     @property
     def type(self) -> RelationsTypeEnum:
         """RelationTypeEnum: Check what relation type it is.
+        
         .. versionadded:: 1.2.0
         """
         return RelationsTypeEnum(1 if self._payload["following"] else 0)

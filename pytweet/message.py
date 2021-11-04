@@ -16,7 +16,6 @@ __all__ = (
 
 class Message:
     """Represents the base Message of all Message types in Twitter, this include DirrectMessage & Tweet
-    .. versionadded:: 1.2.0
 
     Parameters:
     -----------
@@ -25,6 +24,8 @@ class Message:
 
     id: Union[str, int]
         The messages's ID.
+
+    .. versionadded:: 1.2.0
     """
 
     def __init__(self, text: Optional[str], id: Union[str, int]):
@@ -42,7 +43,6 @@ class Message:
 
 class DirectMessage(Message):
     """Represents a Direct Message in Twitter.
-    .. versionadded:: 1.2.0
 
     Parameters:
     -----------
@@ -51,6 +51,8 @@ class DirectMessage(Message):
 
     http_client: Optional[HTTPClient]
         Represents the HTTP Client that make the request, this will be use for interaction between the client and the user.
+
+    .. versionadded:: 1.2.0
     """
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any):
@@ -73,6 +75,7 @@ class DirectMessage(Message):
     @property
     def event_type(self) -> MessageEventTypeEnum:
         """:class:`MessageEventTypeEnum`: Returns the message event type.
+
         .. versionadded:: 1.2.0
         """
         return MessageEventTypeEnum(self._payload.get("type", None))
@@ -80,6 +83,7 @@ class DirectMessage(Message):
     @property
     def type(self) -> MessageTypeEnum:
         """:class:`MessageTypesEnum`: Returns the message type.
+
         .. versionadded:: 1.2.0
         """
         return MessageTypeEnum(1)
@@ -87,6 +91,7 @@ class DirectMessage(Message):
     @property
     def author(self) -> User:
         """:class:`User`: Returns the author of the message in User object.
+
         .. versionadded:: 1.2.0
         """
         if not self.http_client:
@@ -99,6 +104,7 @@ class DirectMessage(Message):
     @property
     def created_at(self) -> datetime.datetime:
         """:class:`datetime.datetime`: Returns the time when the Direct Message event was created.
+        
         .. versionadded:: 1.2.0
         """
         return datetime.datetime.fromtimestamp(self.timestamp)

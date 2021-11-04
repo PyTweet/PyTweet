@@ -22,7 +22,6 @@ U = TypeVar("U", bound="User")
 
 class Messageable:
     """Represent an object that can send and receive a message through DM.
-    .. versionadded: 1.0.0
 
     Parameters:
     -----------
@@ -33,6 +32,8 @@ class Messageable:
     -----------
     http_client: Optional[HTTPClient]
         The HTTPClient that make the request.
+
+    .. versionadded: 1.0.0
     """
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any):
@@ -41,8 +42,6 @@ class Messageable:
 
     def send(self, text: str = None, **kwargs: Any):
         """:class:`DirectMessage`: Send a message to a specific Messageable object.
-
-        .. versionadded: 1.1.0
 
         Parameters:
         -----------
@@ -58,14 +57,18 @@ class Messageable:
 
     def delete_message(self, message_id: int, **kwargs: Any) -> None:
         """Delete a message from a Messageable object.
+
+        Parameters:
+        -----------
+        message_id: int
+            The message id you wish want to deleted.
+
         .. versionadded:: 1.1.0
         """
         self.http_client.delete_message(self._payload.get("id"), message_id, **kwargs)
 
     def follow(self) -> RelationFollow:
         """:class:`RelationFollow`: Follow a Messageable object.
-       
-         .. versionadded: 1.1.0
 
         This function return a :class:`RelationFollow` object.
 
@@ -104,7 +107,6 @@ class Messageable:
 class User(Messageable):
     """Represent a user in Twitter.
     User is an identity in twitter, its very interactive. Can send message, post a tweet, and even send messages to other user through Dms.
-    .. versionadded: 1.0.0
 
     .. describe:: x == y
         Check if one user id is equal to another.
@@ -130,6 +132,8 @@ class User(Messageable):
 
     user_metrics
         Represent the public metrics of the user.
+
+    .. versionadded: 1.0.0
     """
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
@@ -160,6 +164,7 @@ class User(Messageable):
     @property
     def name(self) -> str:
         """str: Return the user's name.
+        
         .. versionadded: 1.0.0
         """
         return self._payload.get("name")
@@ -167,6 +172,7 @@ class User(Messageable):
     @property
     def username(self) -> str:
         """str: Return the user's username, this usually start with '@' follow by their username.
+
         .. versionadded: 1.0.0
         """
         return "@" + self._payload.get("username")
@@ -174,6 +180,7 @@ class User(Messageable):
     @property
     def id(self) -> int:
         """int: Return the user's id.
+
         .. versionadded: 1.0.0
         """
         return int(self._payload.get("id"))
@@ -181,13 +188,15 @@ class User(Messageable):
     @property
     def bio(self) -> str:
         """str: Return the user's bio.
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("description")
 
     @property
     def description(self) -> str:
-        """str: an alias to User.bio
+        """str: an alias to User.bio.
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("description")
@@ -195,6 +204,7 @@ class User(Messageable):
     @property
     def profile_link(self) -> str:
         """str: Return the user's profile link
+
         .. versionadded: 1.0.0
         """
         return f"https://twitter.com/{self.username.replace('@', '', 1)}"
@@ -202,6 +212,7 @@ class User(Messageable):
     @property
     def link(self) -> str:
         """str: Return url where the user put links, return an empty string if there isn't a url
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("url")
@@ -209,6 +220,7 @@ class User(Messageable):
     @property
     def verified(self) -> bool:
         """bool: Return True if the user is verified account, else False.
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("verified")
@@ -216,6 +228,7 @@ class User(Messageable):
     @property
     def protected(self) -> bool:
         """bool: Return True if the user is protected, else False.
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("protected")
@@ -223,6 +236,7 @@ class User(Messageable):
     @property
     def avatar_url(self) -> Optional[str]:
         """Optional[str]: Return the user profile image.
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("profile_image_url")
@@ -230,6 +244,7 @@ class User(Messageable):
     @property
     def location(self) -> Optional[str]:
         """str: Return the user's location
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("location")
@@ -237,6 +252,7 @@ class User(Messageable):
     @property
     def created_at(self) -> datetime.datetime:
         """:class:datetime.datetime: Return datetime.datetime object with the user's account date.
+        
         .. versionadded: 1.0.0
         """
         return time_parse_todt(self._payload.get("created_at"))
@@ -244,6 +260,7 @@ class User(Messageable):
     @property
     def pinned_tweet(self) -> Optional[object]:
         """Optional[object]: Returns the user's pinned tweet.
+
         .. versionadded: 1.1.3
         """
         id = self._payload.get("pinned_tweet_id")
@@ -252,6 +269,7 @@ class User(Messageable):
     @property
     def followers(self) -> Union[List[U], List]:
         """:class:`List[User]`: Returns a list of users who are followers of the specified user ID. Maximum users is 100 users.
+
         .. versionadded: 1.1.0
         """
         return self._payload.get("followers")
@@ -259,6 +277,7 @@ class User(Messageable):
     @property
     def following(self) -> Union[List[U], List]:
         """:class:`List[User]`: Returns a list of users that's followed by the specified user ID. Maximum users is 100 users.
+        
         .. versionadded: 1.1.0
         """
         return self._payload.get("following")
@@ -266,6 +285,7 @@ class User(Messageable):
     @property
     def follower_count(self) -> int:
         """int: Return total of followers that a user has.
+
         .. versionadded: 1.1.0
         """
         return self._metrics.follower_count
@@ -273,6 +293,7 @@ class User(Messageable):
     @property
     def following_count(self) -> int:
         """int: Return total of following that a user has.
+
         .. versionadded: 1.1.0
         """
         return self._metrics.following_count
@@ -280,6 +301,7 @@ class User(Messageable):
     @property
     def tweet_count(self) -> int:
         """int: Return total of tweet that a user has.
+
         .. versionadded: 1.1.0
         """
         return self._metrics.tweet_count
@@ -287,6 +309,7 @@ class User(Messageable):
     @property
     def listed_count(self) -> int:
         """int: Return total of listed that a user has.
+
         .. versionadded: 1.1.0
         """
         return self._metrics.listed_count
