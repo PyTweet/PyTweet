@@ -373,16 +373,18 @@ class HTTPClient:
         res["includes"]["users"][0].update({"following": user.following})
 
         try:
-
             res2["data"]
+
+            res["data"].update({"retweetes": [User(user, http_client=http_client) for user in res2["data"]]})
+        except (KeyError, TypeError):
+            res["data"].update({"retweetes": []})
+
+        try:
             res3["data"]
 
-            res["data"].update({"retweeted_by": [User(user, http_client=http_client) for user in res2["data"]]})
-            res["data"].update({"liking_users": [User(user, http_client=http_client) for user in res3["data"]]})
-
+            res["data"].update({"likes": [User(user, http_client=http_client) for user in res3["data"]]})
         except (KeyError, TypeError):
-            res["data"].update({"retweeted_by": 0})
-            res["data"].update({"liking_users": 0})
+            res["data"].update({"likes": []})
 
         return Tweet(res, http_client=http_client)
 

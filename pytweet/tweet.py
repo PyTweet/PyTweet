@@ -225,20 +225,20 @@ class Tweet:
         return User(self._includes.get("users")[0], http_client=self.http_client)
 
     @property
-    def retweeted_by(self) -> Union[List[User], int]:
-        """:class`Optional[List[User], int]`: Return a list of users that's retweeted the specified tweet's id. Maximum users is 100. Return 0 if no one retweeted.
+    def retweetes(self) -> Union[List[User], list]:
+        """:class`Optional[List[User], int]`: Return a list of users that's retweeted the specified tweet's id. Maximum users is 100. Return empty list if no one retweeted.
 
         .. versionadded: 1.0.0
         """
-        return self._payload.get("retweeted_by")
+        return self._payload.get("retweetes")
 
     @property
-    def liking_users(self) -> Union[List[User], int]:
-        """:class`Optional[List[User], int]`: Return a list of users that liked the specified tweet's id. Maximum users is 100. Return 0 if no one liked.
+    def likes(self) -> Union[List[User], list]:
+        """:class`Optional[List[User], int]`: Return a list of users that liked the specified tweet's id. Maximum users is 100. Return empty list if no one liked.
 
         .. versionadded: 1.0.0
         """
-        return self._payload.get("liking_users")
+        return self._payload.get("likes")
 
     @property
     def sensitive(self) -> bool:
