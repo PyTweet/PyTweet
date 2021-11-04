@@ -28,16 +28,6 @@ class Media:
     .. describe:: str(x)
         Get the media url.
 
-    Parameters:
-    -----------
-    data: Dict[str, Any]
-        The full data of the media in a dictionary.
-
-    Attributes:
-    -----------
-    _payload
-        Represent the main data of a Media.
-
     .. versionadded:: 1.1.0
     """
 
@@ -127,11 +117,6 @@ class PollOptions:
     .. describe:: x <= y
         Check if one PollOption position is less then equal to another.
 
-    Parameters:
-    -----------
-    options: Dict[str, Any]
-        An dictionary filled with the option's: position, label, and votes.
-
     .. versionadded:: 1.1.0
     """
 
@@ -213,16 +198,6 @@ class Poll:
 
     .. describe:: bool(x)
         return True if the poll is open else it return False.
-
-    Parameters:
-    -----------
-    data: Dict[str, Any]
-        The full data of the poll in a dictionary.
-
-    Attributes:
-    -----------
-    _payload
-        The complete data of a Poll keep inside a dictionary.
 
     .. versionadded:: 1.1.0
     """

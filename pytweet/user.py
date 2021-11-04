@@ -22,17 +22,7 @@ U = TypeVar("U", bound="User")
 
 class Messageable:
     """Represent an object that can send and receive a message through DM.
-
-    Parameters:
-    -----------
-    data: Dict[str, Any]
-        The complete data of a Messageable object.
-
-    Attributes:
-    -----------
-    http_client: Optional[HTTPClient]
-        The HTTPClient that make the request.
-
+    
     .. versionadded: 1.0.0
     """
 
@@ -118,20 +108,6 @@ class User(Messageable):
 
     .. describe:: str(x)
         Get the user's name.
-
-
-    Parameters:
-    -----------
-    data: Dict[str, Any]
-        The complete data of the user through a dictionary in a dictionary.
-
-    Attributes:
-    -----------
-    http_client
-        Represent the HTTP Client that make the request, this will be use for interaction between the client and the user.
-
-    user_metrics
-        Represent the public metrics of the user.
 
     .. versionadded: 1.0.0
     """

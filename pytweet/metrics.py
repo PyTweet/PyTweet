@@ -9,11 +9,6 @@ class UserPublicMetrics:
     """Represent a PublicMetrics for a User.
     This PublicMetrics contain public info about the user.
 
-    Parameters:
-    -----------
-    data: Dict[str, Any]
-        The complete data of the user's public metrics through a dictionary!
-
     .. versionadded:: 1.1.0
     """
 
@@ -60,19 +55,6 @@ class UserPublicMetrics:
 class TweetPublicMetrics:
     """Represent a PublicMetrics for a tweet.
     This PublicMetrics contain public info about the tweet.
-
-    Parameters:
-    -----------
-    data: Dict[str, Any]:
-        The complete data of the tweet's public metrics keep in a dictionary.
-
-    Attributes:
-    -----------
-    original_payload
-        Return the original payload of the tweet.
-
-    _public
-        Returns the user public metrics.
     
     .. versionadded:: 1.1.0
     """

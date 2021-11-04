@@ -10,11 +10,6 @@ class RelationFollow:
     .. describe:: str(x)
         Returns the type.
 
-    Parameters:
-    -----------
-    data: Payload
-        The data of the relations.
-
     .. versionadded:: 1.2.0
     """
 

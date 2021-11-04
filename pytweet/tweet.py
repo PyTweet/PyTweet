@@ -20,17 +20,7 @@ __all__ = (
 
 
 class EmbedsImages:
-    """Represent the tweets embed images
-
-    Parameters:
-    -----------
-    data: Dict[str, Any]
-        The full data of the images keep inside a dictionary.
-
-    Attributes:
-    -----------
-    _payload
-        The data parameters.
+    """Represent the tweets embed images.
 
     .. versionadded: 1.1.3
     """
@@ -71,17 +61,6 @@ class EmbedsImages:
 
 class Embed:
     """Represent the embedded urls in a tweet.
-
-    Parameters:
-    ------------
-    data: Dict[str, Any]
-        The full data of the embed keep inside a dictionary.
-
-    Attributes:
-    ------------
-    _payload
-        The data parameters.
-    
 
     .. versionadded: 1.1.3
     """
@@ -194,25 +173,6 @@ class Tweet:
     .. describe:: str(x)
         Get the Tweet's text.
 
-    Parameters:
-    -----------
-    data: Dict[str, Any]
-        The complete data of a tweet keep inside a dictionary.
-
-    Attributes:
-    -----------
-    original_payload
-        Represent the main data of a tweet.
-
-    _payload
-        Same as original_payload but its inside the 'data' key.
-
-    _includes
-        Same as original_payload but its inside the '_includes' key..
-
-    tweet_metrics
-        Represent the public metrics of the tweet.
-    
 
     .. versionadded:: 1.0.0
     """

@@ -89,7 +89,7 @@ class Client:
         
         Parameters:
         -----------
-        username: Union[str, int]
+        username: str
             Represent the user's username that you wish to get info. A Username usually start with '@' before any letters. If a username named @Jack,then the username argument must be 'Jack'.
 
         This function returns a :class:`User` object.

@@ -44,14 +44,6 @@ class Message:
 class DirectMessage(Message):
     """Represents a Direct Message in Twitter.
 
-    Parameters:
-    -----------
-    data: Dict[str, Any]
-        The message data keep inside a dictionary.
-
-    http_client: Optional[HTTPClient]
-        Represents the HTTP Client that make the request, this will be use for interaction between the client and the user.
-
     .. versionadded:: 1.2.0
     """
 
