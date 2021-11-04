@@ -144,10 +144,10 @@ class HTTPClient:
             Represent the Route class, this will be use to configure the endpoint, method, and version of the api.
 
         headers: RequestModel
-            Represent the http request headers, it usually filled with your bearer token. If this isnt specified then the default argument will be an empty dictionary. Later in the code it will update and gets your bearer token.
+            Represent the http request headers, it usually filled with your bearer token. If this isn't specified then the default argument will be an empty dictionary. Later in the code it will update and gets your bearer token.
 
         params: RequestModel
-            Represent the http request paramaters, If this isnt specified then the default argument will be an empty dictionary.
+            Represent the http request parameters, If this isn't specified then the default argument will be an empty dictionary.
 
         json: RequestModel
             Represent the Json data. This usually use for request with POST method.
@@ -159,7 +159,7 @@ class HTTPClient:
             Represent a toggle, if its True then the return will be in a json format else its going to be a requests.models.Response object. Default to True.
 
         mode: str
-            This mode argument usually use in a POST request, its going to specified whats the request action, then it log into a cache. For example, if a mode is 'follow' then it log the request to a follow cache.
+            This mode argument usually use in a POST request, its going to specified what's the request action, then it log into a cache. For example, if a mode is 'follow' then it log the request to a follow cache.
 
         Exceptions Raise:
         ----------------
@@ -167,12 +167,12 @@ class HTTPClient:
             Raise when the api return code: 401. This usually because you passed invalid credentials
 
         pytweet.errors.Forbidden:
-            Raise when the api return code: 403. Theres alot of reason why, This usually happen when the client cannot do the request due to twitter's limitation e.g trying to follow someone that you blocked etc.
+            Raise when the api return code: 403. There's a lot of reason why, This usually happen when the client cannot do the request due to twitter's limitation e.g trying to follow someone that you blocked etc.
 
         pytweet.errors.TooManyRequests:
             Raise when the api return code: 429. This usually happen when you made too much request thus the api ratelimit you. The ratelimit will ware off in a couple of minutes.
 
-        This function make an HTTP Request with the given paramaters then return a dictionary in a json format.
+        This function make an HTTP Request with the given parameters then return a dictionary in a json format.
         """
         if headers == {}:
             headers = {"Authorization": f"Bearer {self.bearer_token}"}
@@ -204,6 +204,7 @@ class HTTPClient:
 
     def fetch_user(self, user_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> User:
         """Make a Request to optain the user from the given user id.
+        
         version Added: 1.0.0
 
         Parameters:
@@ -212,12 +213,12 @@ class HTTPClient:
             Represent the user id that you wish to get info to, If you dont have it you may use `fetch_user_byusername` because it only required the user's username.
 
         http_client:
-            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isnt a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
+            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
         Exceptions Raise:
         ----------------
         pytweet.errors.NotFoundError:
-            Raise when the api cant find a user with that id.
+            Raise when the api can't find a user with that id.
 
         ValueError:
             Raise when user_id is not an int and is not a string of digits.
@@ -281,12 +282,12 @@ class HTTPClient:
             Represent the user's username. A Username usually start with '@' before any letters. If a username named @Jack, then the username argument must be 'Jack'.
 
         http_client:
-            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isnt a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
+            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
         Exceptions Raise:
         ----------------
         pytweet.errors.NotFoundError:
-            Raise when the api cant find a user with that username.
+            Raise when the api can't find a user with that username.
 
         This function return a :class:`User` object.
         """
@@ -319,12 +320,12 @@ class HTTPClient:
             Represent the tweet's id that you wish .
 
         http_client
-            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isnt a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
+            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
         Exceptions Raise:
         ----------------
         pytweet.errors.NotFoundError:
-            Raise when the api cant find a tweet with that id.
+            Raise when the api can't find a tweet with that id.
 
         This function return a :class:`Tweet`.
         """
@@ -395,7 +396,7 @@ class HTTPClient:
             The text that will be send to that user.
 
         http_client
-            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isnt a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
+            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
         This function return a :class: `DirrectMessage` object.
         """
@@ -426,6 +427,7 @@ class HTTPClient:
         """
         raise NotImplementedError("This function is not finish yet")
 
+
     def post_tweet(self, text: str, **kwargs: Any) -> NoReturn:
         """WARNING: this function isnt finish yet!
         version Added:1.1.0
@@ -439,7 +441,7 @@ class HTTPClient:
         version Added:1.1.0
         Updated: 1.2.0
 
-        Paramaters:
+        Parameters:
         -----------
 
         user_id: Union[str, int]

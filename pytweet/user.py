@@ -179,7 +179,7 @@ class User(Messageable):
 
     @property
     def link(self) -> str:
-        """str: Return url where the user put links, return an empty string if there isnt a url"""
+        """str: Return url where the user put links, return an empty string if there isn't a url"""
         return self._payload.get("url")
 
     @property
@@ -222,7 +222,7 @@ class User(Messageable):
 
     @property
     def following(self) -> Union[List[U], List]:
-        """:class:`List[User]`: Returns a list of users thats followed by the specified user ID. Maximum users is 100 users."""
+        """:class:`List[User]`: Returns a list of users that's followed by the specified user ID. Maximum users is 100 users."""
         return self._payload.get("following")
 
     @property
