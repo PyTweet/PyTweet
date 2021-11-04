@@ -5,7 +5,7 @@ import requests
 from typing import Any, Dict, NoReturn, Optional, Union
 
 from .auth import OauthSession
-from .errors import Forbidden, NotFoundError, PytweetException, TooManyRequests, Unauthorized
+from .errors import Forbidden, NotFound, PytweetException, TooManyRequests, Unauthorized
 from .message import DirectMessage
 from .relations import RelationFollow
 from .tweet import Tweet
@@ -13,33 +13,32 @@ from .user import User
 
 _log = logging.getLogger(__name__)
 
-
-def check_error(respond: requests.models.Response) -> NoReturn:
-    code = respond.status_code
+def check_error(response: requests.models.Response) -> NoReturn:
+    code = response.status_code
     if code == 200:
-        res = respond.json()
-        if "errors" in res.keys():
+        json = response.json()
+        if "errors" in json.keys():
             try:
-                if res["errors"][0]["detail"].startswith("Could not find"):
-                    raise NotFoundError(res["errors"][0]["detail"])
+                if json["errors"][0]["detail"].startswith("Could not find"):
+                    raise NotFound(response, json["errors"][0]["detail"])
 
                 else:
-                    raise PytweetException(res["errors"][0]["detail"])
+                    raise PytweetException(response, json["errors"][0]["detail"])
             except KeyError:
-                raise PytweetException(res)
+                raise PytweetException(json)
 
     elif code == 401:
-        raise Unauthorized("Invalid credentials passed!")
+        raise Unauthorized(response, "Invalid credentials passed!")
 
     elif code == 403:
-        raise Forbidden("Forbidden to interact with that User!")
+        raise Forbidden(response, "Forbidden to interact with that User!")
 
     elif code == 429:
-        response = f"{respond.text}"
-        __check = respond.headers["x-rate-limit-reset"]
+        text = response.text
+        __check = response.headers["x-rate-limit-reset"]
         _time = time.time()
         time.sleep(_time - __check)
-        raise TooManyRequests(response)
+        raise TooManyRequests(response, text)
 
 
 RequestModel: Union[Dict[str, Any], Any] = Any
@@ -80,12 +79,6 @@ class HTTPClient:
     credentials
         The credentials in a dictionary.
 
-    followed_cache
-        The followed cache, will be update when the client follow someone.
-
-    blocked_cache
-        The blocked cache, will be update when the client block someone.
-
     Exceptions Raise:
     ----------------
     pytweet.errors.Unauthorized:
@@ -121,15 +114,13 @@ class HTTPClient:
 
         for k, v in self.credentials.items():
             if not isinstance(v, str) and not isinstance(v, type(None)):
-                raise Unauthorized(f"Wrong authorization passed for credential: {k}.")
+                raise Unauthorized(None, f"Wrong authorization passed for credential: {k}.") from Exception
 
         self.bearer_token: Optional[str] = bearer_token
         self.consumer_key: Optional[str] = consumer_key
         self.consumer_key_secret: Optional[str] = consumer_key_secret
         self.access_token: Optional[str] = access_token
         self.access_token_secret: Optional[str] = access_token_secret
-        self.followed_cache: Dict[Any, Any] = {}
-        self.blocked_cache: Dict[Any, Any] = {}
 
     def request(
         self,
