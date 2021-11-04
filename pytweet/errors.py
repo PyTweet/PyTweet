@@ -17,7 +17,7 @@ class PytweetException(Exception):
         return self.res.status_code
 
 class APIException(PytweetException):
-    """:class:`PytweetException`: When an error is incurred during a request, detailed information about the error is returned in the response body to aid in diagnosing the problem. A type field, which is a URI, indicates the nature of the problem, while additional fields provide details about the problem.
+    """:class:`PytweetException`: Raise When an error is incurred during a request with HTTP Status code 200.
     .. versionadded:: 1.2.0
     """
     pass
