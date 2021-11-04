@@ -13,6 +13,7 @@ from .user import User
 
 _log = logging.getLogger(__name__)
 
+
 def check_error(response: requests.models.Response) -> NoReturn:
     code = response.status_code
     if code == 200:
@@ -108,9 +109,7 @@ class HTTPClient:
         if not access_token:
             _log.warning("Access token is missing this is recommended to have")
         if not access_token_secret:
-            _log.warning(
-                "Access token secret is missing this is required if you have passed in the access_toke param."
-            )
+            _log.warning("Access token secret is missing this is required if you have passed in the access_toke param.")
 
         for k, v in self.credentials.items():
             if not isinstance(v, str) and not isinstance(v, type(None)):
