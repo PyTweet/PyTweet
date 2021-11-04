@@ -77,15 +77,6 @@ html_show_sphinx = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-<<<<<<< HEAD
-# If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
-html_show_sphinx = False
-
-# If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
-
-# html_show_copyright = True
-=======
->>>>>>> db9a7232a0af92b38dd43158bd7457f1e119ab9f
 
 html_theme = 'sphinx_rtd_theme'
 

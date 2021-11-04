@@ -1,5 +1,7 @@
 """
-Here's another example of what you can make using pytweet, In Twitter i've seen a lot of giveaways from crypto to an item like iphone, computer etc. This is a very simple giveaway function using the user's followers! 
+Here's another example of what you can make using pytweet.
+In Twitter i've seen a lot of giveaways from crypto to an item like iphone, computer etc. 
+This is a very simple giveaway function using the user's followers! 
 Code Explanation:
 1. The client will get a user. 
 2. from user we use the followers `property`.
@@ -22,7 +24,7 @@ client = pytweet.Client(
 def giveaway():
     user = client.get_user_by_username("TheGenocides")
     followers = user.followers #Note that, maximum users for followers is 100 users.  
-    if followers == 0:  # Check if the user doesnt have a followers.
+    if len(followers) == 0:  # Check if the user doesnt have a followers.
         return print("This user doesnt have a followers!")
 
     seconds = 60 * 3  # mark for 60 seconds and 3 minutes. You can change to whatever minutes you like.
