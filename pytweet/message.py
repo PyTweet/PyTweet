@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 from .enums import MessageEventTypeEnum, MessageTypeEnum
 from .user import User
 
-
 if TYPE_CHECKING:
     from .http import HTTPClient
 
@@ -54,7 +53,7 @@ class DirectMessage(Message):
         Represents the HTTP Client that make the request, this will be use for interaction between the client and the user.
     """
 
-    def __init__(self, data: Dict[str, Any], **kwargs):
+    def __init__(self, data: Dict[str, Any], **kwargs: Any):
         self.original_payload = data
         self._payload = data.get("event", None)
         self.message_create = self._payload.get("message_create", None)
@@ -62,7 +61,7 @@ class DirectMessage(Message):
         self.entities = self.message_data.get("entities", None)
 
         super().__init__(self.message_data.get("text"), self._payload.get("id"))
-        self.http_client: HTTPClient = kwargs.get("http_client", None)
+        self.http_client: Optional[HTTPClient] = kwargs.get("http_client", None)
         self.timestamp = round(datetime.datetime.utcnow().timestamp())
 
     def __repr__(self) -> str:

@@ -1,11 +1,15 @@
+from __future__ import annotations
+
 import logging
 import sys
 import time
-import requests
 from typing import Any, Dict, NoReturn, Optional, Union
 
+import requests
+
 from .auth import OauthSession
-from .errors import Forbidden, NotFound, PytweetException, TooManyRequests, Unauthorized
+from .errors import (Forbidden, NotFound, PytweetException, TooManyRequests,
+                     Unauthorized)
 from .message import DirectMessage
 from .relations import RelationFollow
 from .tweet import Tweet
@@ -49,7 +53,7 @@ class Route:
     def __init__(self, method: str, version: str, path: str):
         self.method: str = method
         self.path: str = path
-        self.base_url = f"https://api.twitter.com/{version}"
+        self.base_url: str = f"https://api.twitter.com/{version}"
         self.url: str = self.base_url + self.path
 
 
@@ -199,7 +203,7 @@ class HTTPClient:
 
         return respond
 
-    def fetch_user(self, user_id: Union[str, int], *, http_client=None) -> User:
+    def fetch_user(self, user_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> User:
         """Make a Request to optain the user from the given user id.
         version Added: 1.0.0
 
@@ -268,7 +272,7 @@ class HTTPClient:
 
         return User(data, http_client=http_client)
 
-    def fetch_user_byusername(self, username: str, *, http_client=None) -> User:
+    def fetch_user_byusername(self, username: str, *, http_client: Optional[HTTPClient] = None) -> User:
         """Make a Request to optain the user from their username.
         Version Added: 1.0.0
 
@@ -306,7 +310,7 @@ class HTTPClient:
 
         return User(data, http_client=http_client)
 
-    def fetch_tweet(self, tweet_id: Union[str, int], *, http_client=None) -> Tweet:
+    def fetch_tweet(self, tweet_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> Tweet:
         """Fetch a tweet info from the specified id. Return if consumer_key or consumer_key_secret or access_token or access_token_secret is not specified.
         version Added:1.0.0
 
@@ -415,7 +419,7 @@ class HTTPClient:
         )
         return DirectMessage(res, http_client=http_client if http_client else self)
 
-    def delete_message(self, id: int, **kwargs):
+    def delete_message(self, id: int, **kwargs: Any) -> NoReturn:
         """WARNING: this function isnt finish yet!
         version Added:1.1.0
 
@@ -423,7 +427,7 @@ class HTTPClient:
         """
         raise NotImplementedError("This function is not finish yet")
 
-    def post_tweet(self, text: str, **kwargs):
+    def post_tweet(self, text: str, **kwargs: Any) -> NoReturn:
         """WARNING: this function isnt finish yet!
         version Added:1.1.0
 
