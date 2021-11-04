@@ -44,7 +44,7 @@ class Client:
         access_token: Optional[str] = None,
         access_token_secret: Optional[str] = None,
     ) -> None:
-        self.http: HTTPClient = HTTPClient(
+        self.http = HTTPClient(
             bearer_token,
             consumer_key=consumer_key,
             consumer_key_secret=consumer_key_secret,
