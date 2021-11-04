@@ -429,17 +429,19 @@ class HTTPClient:
 
 
     def post_tweet(self, text: str, **kwargs: Any) -> NoReturn:
-        """WARNING: this function isn't finish yet!
-        .. versionadded:: 1.1.0
+        """
+        .. warning:: 
+            this function isnt finish yet!
 
         Make a POST Request to post a tweet to twitter from the client itself.
+
+        .. versionadded:: 1.1.0
         """
         raise NotImplementedError("This function is not finished yet")
 
-    def follow_user(self, user_id: Union[str, int]) -> None:
+    def follow_user(self, user_id: Union[str, int]) -> RelationFollow:
         """Make a POST Request to follow a Messageable object.
-        .. versionadded:: 1.1.0
-        .. versionchanged:: 1.2.0 
+
 
         Parameters:
         -----------
@@ -448,6 +450,10 @@ class HTTPClient:
             The user's id that you wish to follow.
 
         This function return a :class: `RelationFollow` object.
+
+        .. versionadded:: 1.1.0
+
+        .. versionchanged:: 1.2.0
         """
         my_id = self.access_token.partition("-")[0]
         res = self.request(
@@ -458,10 +464,10 @@ class HTTPClient:
         )
         return RelationFollow(res)
 
-    def unfollow_user(self, user_id: Union[str, int]) -> None:
+    def unfollow_user(self, user_id: Union[str, int]) -> RelationFollow:
         """Make a DELETE Request to unfollow a Messageable object.
+    
         .. versionadded:: 1.1.0
-        .. versionchanged:: 1.2.0 
 
         Parameters:
         -----------
@@ -469,6 +475,10 @@ class HTTPClient:
             The user's id that you wish to unfollow.
 
         This function return a :class:`RelationFollow` object.
+
+        .. versionadded:: 1.1.0
+
+        .. versionchanged:: 1.2.0
         """
         my_id = self.access_token.partition("-")[0]
         res = self.request(
@@ -480,12 +490,16 @@ class HTTPClient:
 
     def block_user(self, user_id: Union[str, int]) -> None:
         """Make a POST Request to Block a Messageable object.
+
         .. versionadded:: 1.2.0
+
 
         Parameters:
         -----------
         user_id: Union[str, int]
             The user's id that you wish to block.
+
+        .. versionadded:: 1.2.0
         """
         my_id = self.access_token.partition("-")[0]
         self.request(
@@ -497,12 +511,17 @@ class HTTPClient:
 
     def unblock_user(self, user_id: Union[str, int]) -> None:
         """Make a DELETE Request to unblock a Messageable object.
+
         .. versionadded:: 1.2.0
+
 
         Parameters:
         -----------
         user_id: Union[str, int]
             The user's id that you wish to unblock.
+        
+
+        .. versionadded:: 1.2.0
         """
         my_id = self.access_token.partition("-")[0]
         self.request(

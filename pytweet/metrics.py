@@ -9,6 +9,7 @@ __all__ = (
 class UserPublicMetrics:
     """Represent a PublicMetrics for a User.
     This PublicMetrics contain public info about the user.
+
     .. versionadded:: 1.1.0
 
     Parameters:
@@ -27,6 +28,7 @@ class UserPublicMetrics:
     @property
     def follower_count(self) -> int:
         """int: Returns total of followers that a user has.
+
         .. versionadded:: 1.1.0
         """
         return int(self._public.get("followers_count"))
@@ -34,6 +36,7 @@ class UserPublicMetrics:
     @property
     def following_count(self) -> int:
         """int: Returns total of following that a user has.
+
         .. versionadded:: 1.1.0
         """
         return int(self._public.get("following_count"))
@@ -41,6 +44,7 @@ class UserPublicMetrics:
     @property
     def tweet_count(self) -> int:
         """int: Returns total of tweet that a user has.
+
         .. versionadded:: 1.1.0
         """
         return int(self._public.get("tweet_count"))
@@ -48,6 +52,7 @@ class UserPublicMetrics:
     @property
     def listed_count(self) -> int:
         """int: Returns total of listed that a user has.
+
         .. versionadded:: 1.1.0
         """
         return int(self._public.get("listed_count"))
@@ -56,6 +61,7 @@ class UserPublicMetrics:
 class TweetPublicMetrics:
     """Represent a PublicMetrics for a tweet.
     This PublicMetrics contain public info about the tweet.
+    
     .. versionadded:: 1.1.0
 
     Parameters:
@@ -70,6 +76,9 @@ class TweetPublicMetrics:
 
     _public
         Returns the user public metrics.
+    
+
+    .. versionadded:: 1.1.0
     """
 
     def __init__(self, data: Dict[str, Any] = {}, **kwargs: Any) -> None:
@@ -82,6 +91,7 @@ class TweetPublicMetrics:
     @property
     def like_count(self) -> int:
         """int: Return total of likes that the tweet has.
+       
         .. versionadded:: 1.1.0
         """
         return int(self._public.get("like_count"))
@@ -89,6 +99,7 @@ class TweetPublicMetrics:
     @property
     def retweet_count(self) -> int:
         """int: Return total of retweetes that the tweet has.
+
         .. versionadded:: 1.1.0
         """
         return int(self._public.get("retweet_count"))
@@ -96,6 +107,7 @@ class TweetPublicMetrics:
     @property
     def reply_count(self) -> int:
         """int: Return total of replies that the tweet has.
+
         .. versionadded:: 1.1.0
         """
         return int(self._public.get("reply_count"))
@@ -103,6 +115,7 @@ class TweetPublicMetrics:
     @property
     def quote_count(self) -> int:
         """int: Return total of quotes that the tweet has.
+
         .. versionadded:: 1.1.0
         """
         return int(self._public.get("quote_count"))

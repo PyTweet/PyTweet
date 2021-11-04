@@ -41,6 +41,7 @@ class Messageable:
 
     def send(self, text: str = None, **kwargs: Any):
         """:class:`DirectMessage`: Send a message to a specific Messageable object.
+
         .. versionadded: 1.1.0
 
         Parameters:
@@ -49,43 +50,53 @@ class Messageable:
             The text that will be send to that user.
 
         This function return a :class:`DirectMessage` object
+
+        .. versionadded:: 1.1.0
         """
         res = self.http_client.send_message(self._payload.get("id"), text, **kwargs)
         return res
 
     def delete_message(self, message_id: int, **kwargs: Any) -> None:
         """Delete a message from a Messageable object.
-        .. versionadded: 1.1.0
+        .. versionadded:: 1.1.0
         """
         self.http_client.delete_message(self._payload.get("id"), message_id, **kwargs)
 
     def follow(self) -> RelationFollow:
         """:class:`RelationFollow`: Follow a Messageable object.
-        .. versionadded: 1.1.0
+       
+         .. versionadded: 1.1.0
 
         This function return a :class:`RelationFollow` object.
+
+        .. versionadded:: 1.1.0
         """
         follow = self.http_client.follow_user(self._payload.get("id"))
         return follow
 
     def unfollow(self) -> RelationFollow:
         """:class:`RelationFollow`: Unfollow a Messageable object.
+
         .. versionadded: 1.1.0
 
         This function return a :class:`RelationFollow` object.
+
+        .. versionadded:: 1.1.0
         """
         unfollow = self.http_client.unfollow_user(self._payload.get("id"))
         return unfollow
 
     def block(self) -> None:
         """Block a Messageable object.
-        .. versionadded: 1.2.0
+
+        .. versionadded:: 1.1.0
         """
         self.http_client.block_user(self._payload.get("id"))
 
     def unblock(self) -> None:
         """Unblock a Messageable object.
-        .. versionadded: 1.2.0
+
+        .. versionadded:: 1.1.0
         """
         self.http_client.unblock_user(self._payload.get("id"))
 
