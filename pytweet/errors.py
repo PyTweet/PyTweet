@@ -3,6 +3,7 @@ from typing import Optional
 
 class PytweetException(Exception):
     """Exception: This is the base class of all exceptions.
+
     .. versionadded:: 1.2.0
     """
 
@@ -21,6 +22,7 @@ class PytweetException(Exception):
 
 class APIException(PytweetException):
     """:class:`PytweetException`: Raise When an error is incurred during a request with HTTP Status code 200.
+
     .. versionadded:: 1.2.0
     """
 
@@ -29,6 +31,7 @@ class APIException(PytweetException):
 
 class HTTPException(PytweetException):
     """:class:`PytweetException`: A custom error that will be raised when ever a request return HTTP status code above 200.
+
     .. versionadded:: 1.2.0
     """
 
@@ -37,6 +40,7 @@ class HTTPException(PytweetException):
 
 class Unauthorized(HTTPException):
     """:class:`HTTPException`: Raised when the Credentials you passed is invalid and a request return status code: 401
+
     .. versionadded:: 1.0.0
     """
 
@@ -45,6 +49,7 @@ class Unauthorized(HTTPException):
 
 class TooManyRequests(HTTPException):
     """:class:`HTTPException`: Raised when ratelimit exceeded and a request return status code: 429
+
     .. versionadded:: 1.1.0
     """
 
@@ -53,6 +58,7 @@ class TooManyRequests(HTTPException):
 
 class Forbidden(HTTPException):
     """:class:`HTTPException`: Raised when a request return status code: 403
+
     .. versionadded:: 1.2.0
     """
 
@@ -61,6 +67,7 @@ class Forbidden(HTTPException):
 
 class NotFound(APIException):
     """This error is returned when a given Tweet, User, etc. does not exist.
+
     .. versionadded:: 1.0.0
     """
 

@@ -68,6 +68,10 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # -- Options for HTML output -------------------------------------------------
 
+# Output file base name for HTML help builder.
+htmlhelp_basename = 'pytweet.pydoc'
+
+
 # Output is processed with HTML5 writer. Default is False.
 html_experimental_html5_writer = True
 

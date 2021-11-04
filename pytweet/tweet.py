@@ -21,7 +21,6 @@ __all__ = (
 
 class EmbedsImages:
     """Represent the tweets embed images
-    .. versionadded: 1.1.3
 
     Parameters:
     -----------
@@ -32,6 +31,8 @@ class EmbedsImages:
     -----------
     _payload
         The data parameters.
+
+    .. versionadded: 1.1.3
     """
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -46,6 +47,7 @@ class EmbedsImages:
     @property
     def width(self) -> int:
         """int: Return the image's width
+
         .. versionadded: 1.1.3
         """
         return int(self._payload.get("width"))
@@ -53,6 +55,7 @@ class EmbedsImages:
     @property
     def height(self) -> int:
         """int: Return the image's height
+
         .. versionadded: 1.1.3
         """
         return int(self._payload.get("height"))
@@ -60,6 +63,7 @@ class EmbedsImages:
     @property
     def url(self) -> str:
         """int: Return the image's url
+
         .. versionadded: 1.1.3
         """
         return self._payload.get("url")
@@ -67,7 +71,6 @@ class EmbedsImages:
 
 class Embed:
     """Represent the embedded urls in a tweet.
-    .. versionadded: 1.1.3
 
     Parameters:
     ------------
@@ -78,6 +81,9 @@ class Embed:
     ------------
     _payload
         The data parameters.
+    
+
+    .. versionadded: 1.1.3
     """
 
     def __init__(self, data: Dict[str, Any]):
@@ -92,6 +98,7 @@ class Embed:
     @property
     def title(self) -> str:
         """str: Return the embed's title
+
         .. versionadded: 1.1.3
         """
         return self._payload.get("title")
@@ -99,6 +106,7 @@ class Embed:
     @property
     def description(self) -> str:
         """str: Return the embed's description
+
         .. versionadded: 1.1.3
         """
         return self._payload.get("description")
@@ -106,6 +114,7 @@ class Embed:
     @property
     def start(self) -> int:
         """int: Return the embed's url startpoint start
+
         .. versionadded: 1.1.3
         """
         return int(self._payload.get("start"))
@@ -113,6 +122,7 @@ class Embed:
     @property
     def end(self) -> int:
         """int: Return the embed's url endpoint.
+
         .. versionadded: 1.1.3
         """
         return int(self._payload.get("end"))
@@ -120,6 +130,7 @@ class Embed:
     @property
     def url(self) -> str:
         """str: Return the embed's url
+
         .. versionadded: 1.1.3
         """
         return self._payload.get("url")
@@ -127,6 +138,7 @@ class Embed:
     @property
     def expanded_url(self) -> str:
         """str: Return the expanded url
+
         .. versionadded: 1.1.3
         """
         return self._payload.get("expanded_url")
@@ -134,6 +146,7 @@ class Embed:
     @property
     def display_url(self) -> str:
         """str: Return the display url
+
         .. versionadded: 1.1.3
         """
         return self._payload.get("display_url")
@@ -141,6 +154,7 @@ class Embed:
     @property
     def unwound_url(self) -> str:
         """str: Return the unwound url
+
         .. versionadded: 1.1.3
         """
         return self._payload.get("unwound_url")
@@ -148,7 +162,8 @@ class Embed:
     @property
     def images(self) -> Optional[List[EmbedsImages]]:
         """List[EmbedsImages]: Return a list of Embed's Images
-        .. versionadded: 1.1.3
+
+        .. versionadded:: 1.1.3
         """
         if self._payload.get("images"):
             return [EmbedsImages(data) for data in self._payload.get("images")]
@@ -164,7 +179,6 @@ class Embed:
 class Tweet:
     """Represent a tweet message from Twitter.
     A Tweet is any message posted to Twitter which may contain photos, videos, links, and text.
-    .. versionadded: 1.0.0
 
     .. describe:: x == y
         Check if one tweet id is equal to another.
@@ -195,6 +209,9 @@ class Tweet:
 
     tweet_metrics
         Represent the public metrics of the tweet.
+    
+
+    .. versionadded:: 1.0.0
     """
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
@@ -283,7 +300,8 @@ class Tweet:
     @property
     def reply_to(self) -> Optional[User]:
         """:class:`Optional[User]`: Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
-        .. versionadded: 1.1.3
+
+        .. versionadded:: 1.1.3
         """
         user = (
             self.http_client.fetch_user(
@@ -298,7 +316,8 @@ class Tweet:
     @property
     def mentions(self) -> Optional[List[User]]:
         """:class:`Optional[List[User]]`: Return the mentioned users, if there isnt it return None.
-        .. versionadded: 1.1.3
+
+        .. versionadded:: 1.1.3
         """
         if self._includes:
             if self._includes.get("mentions"):
@@ -311,7 +330,8 @@ class Tweet:
     @property
     def poll(self) -> Optional[Poll]:
         """:class:`Poll`: Return a Poll object with the tweet's poll.
-        .. versionadded: 1.1.0
+
+        .. versionadded:: 1.1.0
         """
         if self._includes:
             if self._includes.get("polls"):
@@ -322,7 +342,8 @@ class Tweet:
     @property
     def media(self) -> Optional[Media]:
         """:class:`List[Media]` -> Return a list of media(s) in a tweet.
-        .. versionadded: 1.1.0
+
+        .. versionadded:: 1.1.0
         """
         if self._includes:
             if self._includes.get("media"):
@@ -332,7 +353,8 @@ class Tweet:
     @property
     def embeds(self) -> Optional[List[Embed]]:
         """:class:`List[Embed]`: Return a list of Embedded url from that tweet
-        .. versionadded: 1.1.3
+
+        .. versionadded:: 1.1.3
         """
         if self._payload.get("entities"):
             if self._payload.get("entities").get("urls"):
@@ -342,7 +364,8 @@ class Tweet:
     @property
     def type(self) -> MessageTypeEnum:
         """MessageTypeEnum: Return the Message type.
-        .. versionadded: 1.2.0
+
+        .. versionadded:: 1.2.0
         """
         return MessageTypeEnum(1)
 
