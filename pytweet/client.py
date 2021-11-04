@@ -107,7 +107,7 @@ class Client:
         return self.http.fetch_tweet(tweet_id, http_client=self.http)
 
     def tweet(self, text: str, **kwargs: Any) -> None:
-        """Post a tweet directly to twitter from the given paramaters.
+        """Post a tweet directly to twitter from the given parameters.
         Version Added: 1.1.0
 
         text: str
