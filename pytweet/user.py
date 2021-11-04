@@ -34,7 +34,7 @@ class Messageable:
     def send(self, text: str = None, **kwargs: Any):
         """:class:`DirectMessage`: Send a message to a specific Messageable object.
         Version Added: 1.1.0
-        
+
         Parameters:
         -----------
         text: str
