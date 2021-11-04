@@ -245,7 +245,7 @@ class Tweet:
 
     @property
     def retweeted_by(self) -> Union[List[User], int]:
-        """Optional[List[:class:`User`]]: Return a list of users thats retweeted the specified tweet's id. Maximum users is 100. Return 0 if no one retweeted.
+        """Optional[List[:class:`User`]]: Return a list of users that's retweeted the specified tweet's id. Maximum users is 100. Return 0 if no one retweeted.
         .. versionadded: 1.0.0
         """
         return self._payload.get("retweeted_by")
@@ -323,7 +323,7 @@ class Tweet:
 
     @property
     def mentions(self) -> Optional[List[User]]:
-        """:class:`Optional[List[User]]`: Return the mentioned users, if there isnt it return None.
+        """:class:`Optional[List[User]]`: Return the mentioned users, if there isn't it return None.
         .. versionadded: 1.1.3
         """
         if self._includes:

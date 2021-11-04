@@ -203,7 +203,7 @@ class HTTPClient:
         return respond
 
     def fetch_user(self, user_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> User:
-        """Make a Request to optain the user from the given user id.
+        """Make a Request to obtain the user from the given user id.
         
         .. versionadded:: 1.0.0
 
@@ -273,7 +273,7 @@ class HTTPClient:
         return User(data, http_client=http_client)
 
     def fetch_user_byusername(self, username: str, *, http_client: Optional[HTTPClient] = None) -> User:
-        """Make a Request to optain the user from their username.
+        """Make a Request to obtain the user from their username.
         .. versionadded:: 1.0.0
 
         Parameters:
@@ -420,7 +420,7 @@ class HTTPClient:
         return DirectMessage(res, http_client=http_client if http_client else self)
 
     def delete_message(self, id: int, **kwargs: Any) -> NoReturn:
-        """WARNING: this function isnt finish yet!
+        """WARNING: this function isn't finish yet!
         .. versionadded:: 1.1.0
 
         Make a DELETE Request for deleting a certain message in a Messageable object.
@@ -429,7 +429,7 @@ class HTTPClient:
 
 
     def post_tweet(self, text: str, **kwargs: Any) -> NoReturn:
-        """WARNING: this function isnt finish yet!
+        """WARNING: this function isn't finish yet!
         .. versionadded:: 1.1.0
 
         Make a POST Request to post a tweet to twitter from the client itself.
