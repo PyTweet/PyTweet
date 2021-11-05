@@ -289,7 +289,7 @@ class Poll:
         return time_parse_todt(self._payload.get("end_datetime"))
 
 
-class QuickReply():
+class QuickReply:
     """Represent a quick_reply options in Direct Message!
 
     Attributes:
