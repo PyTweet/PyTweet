@@ -15,7 +15,9 @@ class RelationFollow:
         self._payload: Dict[Any, Any] = data["data"]
 
     def __repr__(self) -> str:
-        return "RelationFollow(type: {0.type} following: {0.following} pending: {0.pending})".format(self)
+        return "RelationFollow(type: {0.type} following: {0.following} pending: {0.pending})".format(
+            self
+        )
 
     @property
     def pending(self) -> bool:
@@ -36,10 +38,11 @@ class RelationFollow:
     @property
     def type(self) -> RelationsTypeEnum:
         """:class:`RelationTypeEnum`: Check what relation type it is.
-        
+
         .. versionadded:: 1.2.0
         """
         return RelationsTypeEnum(1 if self._payload["following"] else 0)
+
 
 class RelationLike:
     """Represent the like relation from a like & unlike request.
@@ -65,10 +68,11 @@ class RelationLike:
     @property
     def type(self) -> RelationsTypeEnum:
         """:class:`RelationTypeEnum`: Check what relation type it is.
-        
+
         .. versionadded:: 1.2.0
         """
         return RelationsTypeEnum(2 if self.liked else None)
+
 
 class RelationRetweet:
     """Represent the retweet relations from a retweet & unretweet request.
@@ -94,7 +98,7 @@ class RelationRetweet:
     @property
     def type(self) -> RelationsTypeEnum:
         """:class:`RelationTypeEnum`: Check what relation type it is.
-        
+
         .. versionadded:: 1.2.0
         """
         return RelationsTypeEnum(3 if self.retweeted else None)

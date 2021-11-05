@@ -31,7 +31,9 @@ class EmbedsImages:
         self._payload = data
 
     def __repr__(self) -> str:
-        return "EmbedsImages(url={0.url} width={0.width} height={0.height})".format(self)
+        return "EmbedsImages(url={0.url} width={0.width} height={0.height})".format(
+            self
+        )
 
     def __str__(self) -> str:
         return self.url
@@ -71,7 +73,9 @@ class Embed:
         self._payload = data
 
     def __repr__(self) -> str:
-        return "Embed(title={0.title} description={0.description} url={0.url})".format(self)
+        return "Embed(title={0.title} description={0.description} url={0.url})".format(
+            self
+        )
 
     def __str__(self) -> str:
         return self.url
@@ -200,79 +204,69 @@ class Tweet(Message):
 
     def __eq__(self, other: TT) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError("== operation cannot be done with one of the element not a valid Tweet object")
+            raise ValueError(
+                "== operation cannot be done with one of the element not a valid Tweet object"
+            )
         return self.id == other.id
 
     def __ne__(self, other: TT) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError("!= operation cannot be done with one of the element not a valid User object")
+            raise ValueError(
+                "!= operation cannot be done with one of the element not a valid User object"
+            )
         return self.id != other.id
 
     def like(self) -> Optional[RelationLike]:
         """RelationLike: Method for liking a tweet.
-        
+
         .. versionadded:: 1.2.0
         """
         my_id = self.http_client.access_token.partition("-")[0]
         route = self.http_client.make_route("POST", "2", f"/users/{my_id}/likes")
 
-        payload={
-            "tweet_id": str(self.id)
-        }
-        res = self.http_client.request(
-            route,
-            json = payload,
-            auth = True
-        )
+        payload = {"tweet_id": str(self.id)}
+        res = self.http_client.request(route, json=payload, auth=True)
 
         return RelationLike(res)
 
     def unlike(self) -> Optional[RelationLike]:
         """RelationLike: Method for unliking a tweet.
-        
+
         .. versionadded:: 1.2.0
         """
         my_id = self.http_client.access_token.partition("-")[0]
-        route = self.http_client.make_route("DELETE", "2", f"/users/{my_id}/likes/{self.id}")
-        
-        res = self.http_client.request(
-            route,
-            auth = True
+        route = self.http_client.make_route(
+            "DELETE", "2", f"/users/{my_id}/likes/{self.id}"
         )
+
+        res = self.http_client.request(route, auth=True)
 
         return RelationLike(res)
 
     def retweet(self) -> RelationRetweet:
         """RelationRetweet: Method for retweet a tweet.
-        
+
         .. versionadded:: 1.2.0
         """
         my_id = self.http_client.access_token.partition("-")[0]
         route = self.http_client.make_route("POST", "2", f"/users/{my_id}/retweets")
 
-        payload={
-            "tweet_id": str(self.id)
-        }
-        res = self.http_client.request(
-            route,
-            json = payload,
-            auth = True
-        )
+        payload = {"tweet_id": str(self.id)}
+        res = self.http_client.request(route, json=payload, auth=True)
 
         return RelationRetweet(res)
 
     def unretweet(self) -> RelationRetweet:
         """RelationRetweet: Method for unretweet a tweet.
-        
+
         .. versionadded:: 1.2.0
         """
         my_id = self.http_client.access_token.partition("-")[0]
-        route = self.http_client.make_route("DELETE", "2", f"/users/{my_id}/retweets/{self.id}")
-
-        res = self.http_client.request(
-            route,
-            auth = True
+        route = self.http_client.make_route(
+            "DELETE", "2", f"/users/{my_id}/retweets/{self.id}"
         )
+
+        res = self.http_client.request(route, auth=True)
 
         return RelationRetweet(res)
 
@@ -381,7 +375,9 @@ class Tweet(Message):
         if self._includes:
             if self._includes.get("mentions"):
                 return [
-                    self.http_client.fetch_user_byusername(user.get("username"), http_client=self.http_client)
+                    self.http_client.fetch_user_byusername(
+                        user.get("username"), http_client=self.http_client
+                    )
                     for user in self._includes.get("mentions")
                 ]
         return None
@@ -431,7 +427,7 @@ class Tweet(Message):
     @property
     def like_count(self) -> int:
         """int: Return the total of likes in a tweet.
-        
+
         .. versionadded: 1.1.0
         """
         return self.tweet_metrics.like_count

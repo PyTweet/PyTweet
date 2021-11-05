@@ -96,7 +96,7 @@ class DirectMessage(Message):
     @property
     def created_at(self) -> datetime.datetime:
         """:class:`datetime.datetime`: Returns the time when the Direct Message event was created.
-        
+
         .. versionadded:: 1.2.0
         """
         return datetime.datetime.fromtimestamp(self.timestamp)

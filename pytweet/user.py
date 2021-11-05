@@ -20,9 +20,10 @@ if TYPE_CHECKING:
 
 U = TypeVar("U", bound="User")
 
+
 class Messageable:
     """Represent an object that can send and receive a message through DM.
-    
+
     .. versionadded: 1.0.0
     """
 
@@ -116,10 +117,16 @@ class User(Messageable):
         super().__init__(data, **kwargs)
         self.original_payload: Dict[str, Any] = data
         self._payload: Dict[Any, Any] = (
-            self.original_payload.get("data") if self.original_payload.get("data") != None else self.original_payload
+            self.original_payload.get("data")
+            if self.original_payload.get("data") != None
+            else self.original_payload
         )
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
-        self._metrics = UserPublicMetrics(self._payload) if self._payload != None else self.original_payload
+        self._metrics = (
+            UserPublicMetrics(self._payload)
+            if self._payload != None
+            else self.original_payload
+        )
 
     def __str__(self) -> str:
         return self.username
@@ -129,18 +136,22 @@ class User(Messageable):
 
     def __eq__(self, other: U) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError("== operation cannot be done with one of the element not a valid User object")
+            raise ValueError(
+                "== operation cannot be done with one of the element not a valid User object"
+            )
         return self.id == other.id
 
     def __ne__(self, other: U) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError("!= operation cannot be done with one of the element not a valid User object")
+            raise ValueError(
+                "!= operation cannot be done with one of the element not a valid User object"
+            )
         return self.id != other.id
 
     @property
     def name(self) -> str:
         """str: Return the user's name.
-        
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("name")
@@ -228,7 +239,7 @@ class User(Messageable):
     @property
     def created_at(self) -> datetime.datetime:
         """:class:datetime.datetime: Return datetime.datetime object with the user's account date.
-        
+
         .. versionadded: 1.0.0
         """
         return time_parse_todt(self._payload.get("created_at"))
@@ -240,7 +251,11 @@ class User(Messageable):
         .. versionadded: 1.1.3
         """
         id = self._payload.get("pinned_tweet_id")
-        return None if not id else self.http_client.fetch_tweet(int(id), http_client=self.http_client)
+        return (
+            None
+            if not id
+            else self.http_client.fetch_tweet(int(id), http_client=self.http_client)
+        )
 
     @property
     def followers(self) -> Union[List[U], List]:
@@ -253,7 +268,7 @@ class User(Messageable):
     @property
     def following(self) -> Union[List[U], List]:
         """:class:`List[User]`: Returns a list of users that's followed by the specified user ID. Maximum users is 100 users.
-        
+
         .. versionadded: 1.1.0
         """
         return self._payload.get("following")

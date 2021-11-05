@@ -86,7 +86,7 @@ class Client:
 
     def get_user_by_username(self, username: str) -> User:
         """A function for HTTPClient.fetch_user_byusername().
-        
+
         Parameters:
         -----------
         username: str
@@ -120,5 +120,5 @@ class Client:
 
         .. versionadded:: 1.1.0
         """
-        res=self.http.post_tweet(text, **kwargs)
+        res = self.http.post_tweet(text, **kwargs)
         return res
