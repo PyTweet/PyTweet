@@ -125,6 +125,10 @@ class HTTPClient:
         self.access_token: Optional[str] = access_token
         self.access_token_secret: Optional[str] = access_token_secret
 
+    def make_route(self, method: str, version: str, path: str) -> Route:
+        """:class:`Route`: Function to make a Route, this intent to avoid circular import error."""
+        return Route(method, version, path)
+
     def request(
         self,
         route: Route,
