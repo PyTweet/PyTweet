@@ -52,17 +52,30 @@ class Messageable:
         )
         return res
 
-    def delete_message(self, event_id: int, **kwargs: Any) -> object:
+    def delete_message(self, event_id: Union[str, int]) -> None:
         """Delete a message from a Messageable object.
 
         Parameters:
         -----------
         message_id: int
-            The message id you wish want to deleted.
+            The event id. Everytime a Direct Message is created, its going to return a unique ID called event id.
 
         .. versionadded:: 1.1.0
         """
-        res = self.http_client.delete_message(self._payload.get("id"), **kwargs)
+        self.http_client.delete_message(event_id)
+        return None
+
+    def get_message(self, event_id: Union[str, int]) -> object:
+        """Get a message from a Messageable object.
+
+        Parameters:
+        -----------
+        event_id: int
+            The event id. Everytime a Direct Message is created, its going to return a unique ID called event id.
+
+        .. versionadded:: 1.2.0
+        """
+        res = self.http_client.get_message(event_id)
         return res
 
     def follow(self) -> RelationFollow:
