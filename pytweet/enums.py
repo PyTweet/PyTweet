@@ -4,6 +4,8 @@ from enum import Enum
 class RelationsTypeEnum(Enum):
     PENDING = 0
     ACCEPT = 1
+    LIKED = 2
+    RETWEETED = 3
     NULL = None
 
 
