@@ -1,11 +1,10 @@
 import argparse
+import platform
 import sys
-from pathlib import Path
+
+import requests
 
 import pytweet
-import pkg_resources
-import requests
-import platform
 
 
 def show_version():
