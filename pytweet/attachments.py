@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 from typing import Any, Dict, List, NoReturn, Optional, TypeVar, Union
 from .errors import BadArguments
@@ -307,7 +309,7 @@ class QuickReply:
         self.options: List[Any, Any] = []
         self.items = len(self.options)
 
-    def add_option(self, *,label: str, description: str = None, metadata: str = None) -> NoReturn:
+    def add_option(self, *,label: str, description: str = None, metadata: str = None) -> QuickReply:
         """NoReturn: Method for adding an option in your quick reply instance.
 
         Parameters:
@@ -316,7 +318,7 @@ class QuickReply:
                 The option's label. Label text is returned as the user's message response, Must be less then 36 characters.
 
             description: str
-                The option's description. Description text displayed under label text. All options must have this property defined if property is present in any option. Text is auto-wrapped and will display on a max of two lines and supports n for controling line breaks, Must be less then 72 characters.
+                The option's description. Description text displayed under label text. All options must have this property defined if property is present in any option. Text is auto-wrapped and will display on a max of two lines and supports n for controlling line breaks, Must be less then 72 characters.
 
             metadata: str
                 The option's metadata. Metadata that will be sent back in the webhook request, must be less then 1000 characters. 
@@ -335,3 +337,5 @@ class QuickReply:
         self.options.append(
             {"label": label, "description": description, "metadata": metadata}
         )
+
+        return self
