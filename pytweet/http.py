@@ -397,7 +397,7 @@ class HTTPClient:
             res["data"].update(
                 {
                     "retweetes": [
-                        User(user, http_client=http_client) for user in res2["data"]
+                        User(user, http_client=http_client if http_client else self) for user in res2["data"]
                     ]
                 }
             )
@@ -410,14 +410,14 @@ class HTTPClient:
             res["data"].update(
                 {
                     "likes": [
-                        User(user, http_client=http_client) for user in res3["data"]
+                        User(user, http_client=http_client if http_client else self) for user in res3["data"]
                     ]
                 }
             )
         except (KeyError, TypeError):
             res["data"].update({"likes": []})
 
-        return Tweet(res, http_client=http_client)
+        return Tweet(res, http_client=http_client if http_client else None)
 
     def send_message(self, user_id: Union[str, int], text: str, *,quick_reply: QuickReply = None, http_client = None) -> Optional[NoReturn]:
         """Make a post Request for sending a message to a Messageable object.
@@ -481,7 +481,7 @@ class HTTPClient:
         )
         return DirectMessage(res, http_client=http_client if http_client else self)
 
-    def delete_message(self, event_id: Union[str, int]) -> DirectMessage:
+    def delete_message(self, event_id: Union[str, int]) -> None:
         """
         .. warning::
             This function is still under development and will raise an error when used!
@@ -494,18 +494,35 @@ class HTTPClient:
             The id of the Direct Message event that you want to delete.
 
         .. versionadded:: 1.1.0
-
-        .. versionchanged:: 1.2.0
-
-        Make the method functional and return :class:`DirectMessage`.
         """
         res = self.request(
-            route=Route("DELETE", "1.1", "/direct_messages/events/destroy.json"),
-            params={"id": str(event_id)},
+            route=Route("DELETE", "1.1", f"/direct_messages/events/destroy.json?id={event_id}"),
             auth=True
         )
 
-        return DirectMessage(res)
+        return res
+
+    def get_message(self, event_id: Union[str, int]) -> None:
+        """
+        .. warning::
+            This function is still under development and will raise an error when used!
+        
+        Make a DELETE Request for deleting a certain message in a Messageable object.
+
+        Parameters:
+        -----------
+        id:
+            The id of the Direct Message event that you want to delete.
+
+        .. versionadded:: 1.1.0
+        """
+        res = self.request(
+            route=Route("GET", "1.1", f"/direct_messages/events/show.json"),
+            params={"id": event_id},
+            auth=True
+        )
+
+        return DirectMessage(res, http_client=self)
         
 
     def post_tweet(self, text: str, **kwargs: Any) -> Union[NoReturn, Any]:
@@ -522,7 +539,11 @@ class HTTPClient:
         if text:
             payload["text"] = text
 
-        res = self.request(Route("POST", "2", "/tweets"), json=payload, auth=True)
+        res = self.request(
+            Route("POST", "2", "/tweets"), 
+            json=payload, 
+            auth=True
+        )
 
         return res
 
