@@ -19,6 +19,11 @@ Getting started
 - **Quickstart** :doc:`quickstart`
 - **First steps:** :doc:`pytweet`
 
+
+Manuals
+-----------------
+- :doc:`api`
+
 Indices and tables
 ==================
 
