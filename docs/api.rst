@@ -71,12 +71,12 @@ Errors
 
 Error raised by pytweet.
 
-.. autoexception::PytweetException
+.. autoexception:: PytweetException
 
 .. autoexception:: APIException
 
-
 .. autoexception:: HTTPException
+
 
 .. autoexception:: Unauthorized
 
