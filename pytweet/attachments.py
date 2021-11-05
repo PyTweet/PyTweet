@@ -35,25 +35,19 @@ class Media:
         self._payload = data
 
     def __repr__(self) -> str:
-        return "Media(type={0.type} url={0.url} width={0.width} height={0.height} media_key={0.media_key})".format(
-            self
-        )
+        return "Media(type={0.type} url={0.url} width={0.width} height={0.height} media_key={0.media_key})".format(self)
 
     def __str__(self) -> str:
         return self.url
 
     def __eq__(self, other: M) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "== operation cannot be done with one of the element not a valid Media object"
-            )
+            raise ValueError("== operation cannot be done with one of the element not a valid Media object")
         return self.media_key == other.media_key
 
     def __ne__(self, other: M) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "!= operation cannot be done with one of the element not a valid Media object"
-            )
+            raise ValueError("!= operation cannot be done with one of the element not a valid Media object")
         return self.media_key != other.media_key
 
     @property
@@ -134,44 +128,32 @@ class PollOptions:
 
     def __eq__(self, other: PO) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "== operation cannot be done with one of the element not a valid PollOptions object"
-            )
+            raise ValueError("== operation cannot be done with one of the element not a valid PollOptions object")
         return self.position == other.position
 
     def __ne__(self, other: PO) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "!= operation cannot be done with one of the element not a valid PollOptions object"
-            )
+            raise ValueError("!= operation cannot be done with one of the element not a valid PollOptions object")
         return self.position != other.position
 
     def __lt__(self, other: PO) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "< operation cannot be done with one of the element not a valid PollOptions object"
-            )
+            raise ValueError("< operation cannot be done with one of the element not a valid PollOptions object")
         return self.position < other.position
 
     def __gt__(self, other: PO) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "> operation cannot be done with one of the element not a valid PollOptions object"
-            )
+            raise ValueError("> operation cannot be done with one of the element not a valid PollOptions object")
         return self.position > other.position
 
     def __le__(self, other: PO) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "<= operation cannot be done with one of the element not a valid PollOptions object"
-            )
+            raise ValueError("<= operation cannot be done with one of the element not a valid PollOptions object")
         return self.position <= other.position
 
     def __ge__(self, other: PO) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                ">= operation cannot be done with one of the element not a valid PollOptions object"
-            )
+            raise ValueError(">= operation cannot be done with one of the element not a valid PollOptions object")
         return self.position >= other.position
 
     @property
@@ -230,16 +212,12 @@ class Poll:
 
     def __eq__(self, other: P) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "== operation cannot be done with one of the element not a valid Poll object"
-            )
+            raise ValueError("== operation cannot be done with one of the element not a valid Poll object")
         return self.id == other.id
 
     def __ne__(self, other: P) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "!= operation cannot be done with one of the element not a valid Poll object"
-            )
+            raise ValueError("!= operation cannot be done with one of the element not a valid Poll object")
         return self.id != other.id
 
     def __len__(self) -> int:
