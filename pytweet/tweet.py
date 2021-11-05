@@ -6,6 +6,8 @@ from .enums import MessageTypeEnum
 from .metrics import TweetPublicMetrics
 from .user import User
 from .utils import time_parse_todt
+from .message import Message
+from .relations import RelationLike
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -158,7 +160,7 @@ class Embed:
         return int(self._payload.get("status"))
 
 
-class Tweet:
+class Tweet(Message):
     """Represent a tweet message from Twitter.
     A Tweet is any message posted to Twitter which may contain photos, videos, links, and text.
 
@@ -182,6 +184,8 @@ class Tweet:
         self._payload = data.get("data") or None
         self._includes = self.original_payload.get("includes")
         self.tweet_metrics: TweetPublicMetrics = TweetPublicMetrics(self._payload)
+
+        super().__init__(self._payload.get("text"), self._payload.get("id"))
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
 
     def __repr__(self) -> str:
@@ -200,21 +204,38 @@ class Tweet:
             raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
-    @property
-    def text(self) -> str:
-        """str: Return the tweet's text.
-
-        .. versionadded: 1.0.0
+    def like(self) -> Optional[RelationLike]:
+        """RelationLike: Function for liking a tweet.
+        
+        .. versionadded:: 1.2.0
         """
-        return self._payload.get("text")
+        my_id = self.http_client.access_token.partition("-")[0]
+        route = self.http_client.make_route("POST", "2", f"/users/{my_id}/likes")
+        payload={
+            "tweet_id": str(self.id)
+        }
+        res = self.http_client.request(
+            route,
+            json = payload,
+            auth = True
+        )
 
-    @property
-    def id(self) -> int:
-        """int: Return the tweet's id.
+        return RelationLike(res)
 
-        .. versionadded: 1.0.0
+    def unlike(self) -> Optional[RelationLike]:
+        """RelationLike: Function for unliking a tweet.
+        
+        .. versionadded:: 1.2.0
         """
-        return int(self._payload.get("id"))
+        my_id = self.http_client.access_token.partition("-")[0]
+        route = self.http_client.make_route("DELETE", "2", f"/users/{my_id}/likes/{self.id}")
+        
+        res = self.http_client.request(
+            route,
+            auth = True
+        )
+
+        return RelationLike(res)
 
     @property
     def author(self) -> User:
