@@ -32,7 +32,7 @@ class Messageable:
         self._payload: Dict[str, Any] = data
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client", None)
 
-    def send(self, text: str = None, *,quick_reply: QuickReply = None):
+    def send(self, text: str = None, *, quick_reply: QuickReply = None):
         """:class:`DirectMessage`: Send a message to a specific Messageable object.
 
         Parameters:
@@ -45,10 +45,10 @@ class Messageable:
         .. versionadded:: 1.1.0
         """
         res = self.http_client.send_message(
-            self._payload.get("id"), 
-            text, 
-            quick_reply=quick_reply, 
-            http_client=self.http_client
+            self._payload.get("id"),
+            text,
+            quick_reply=quick_reply,
+            http_client=self.http_client,
         )
         return res
 
@@ -58,7 +58,7 @@ class Messageable:
         Parameters:
         -----------
         message_id: int
-            The event id. Everytime a Direct Message is created, its going to return a unique ID called event id.
+            The event id. Every time a Direct Message is created, its going to return a unique ID called event id.
 
         .. versionadded:: 1.1.0
         """
@@ -71,7 +71,7 @@ class Messageable:
         Parameters:
         -----------
         event_id: int
-            The event id. Everytime a Direct Message is created, its going to return a unique ID called event id.
+            The event id. Every time a Direct Message is created, its going to return a unique ID called event id.
 
         .. versionadded:: 1.2.0
         """
@@ -137,16 +137,10 @@ class User(Messageable):
         super().__init__(data, **kwargs)
         self.original_payload: Dict[str, Any] = data
         self._payload: Dict[Any, Any] = (
-            self.original_payload.get("data")
-            if self.original_payload.get("data") != None
-            else self.original_payload
+            self.original_payload.get("data") if self.original_payload.get("data") != None else self.original_payload
         )
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
-        self._metrics = (
-            UserPublicMetrics(self._payload)
-            if self._payload != None
-            else self.original_payload
-        )
+        self._metrics = UserPublicMetrics(self._payload) if self._payload != None else self.original_payload
 
     def __str__(self) -> str:
         return self.username
@@ -156,16 +150,12 @@ class User(Messageable):
 
     def __eq__(self, other: U) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "== operation cannot be done with one of the element not a valid User object"
-            )
+            raise ValueError("== operation cannot be done with one of the element not a valid User object")
         return self.id == other.id
 
     def __ne__(self, other: U) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "!= operation cannot be done with one of the element not a valid User object"
-            )
+            raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
     @property
@@ -271,11 +261,7 @@ class User(Messageable):
         .. versionadded: 1.1.3
         """
         id = self._payload.get("pinned_tweet_id")
-        return (
-            None
-            if not id
-            else self.http_client.fetch_tweet(int(id), http_client=self.http_client)
-        )
+        return None if not id else self.http_client.fetch_tweet(int(id), http_client=self.http_client)
 
     @property
     def followers(self) -> Union[List[U], List]:

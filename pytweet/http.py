@@ -7,7 +7,14 @@ import requests
 from typing import Any, Dict, NoReturn, Optional, Union
 
 from .auth import OauthSession
-from .errors import Forbidden, NotFound, PytweetException, TooManyRequests, Unauthorized, BadArguments
+from .errors import (
+    Forbidden,
+    NotFound,
+    PytweetException,
+    TooManyRequests,
+    Unauthorized,
+    BadArguments,
+)
 from .message import DirectMessage
 from .relations import RelationFollow
 from .tweet import Tweet
@@ -54,6 +61,7 @@ class Route:
         self.path: str = path
         self.base_url: str = f"https://api.twitter.com/{version}"
         self.url: str = self.base_url + self.path
+
 
 class HTTPClient:
     """Represents the http/base client for :class:`Client` !
@@ -112,15 +120,11 @@ class HTTPClient:
         if not access_token:
             _log.warning("Access token is missing this is recommended to have")
         if not access_token_secret:
-            _log.warning(
-                "Access token secret is missing this is required if you have passed in the access_toke param."
-            )
+            _log.warning("Access token secret is missing this is required if you have passed in the access_toke param.")
 
         for k, v in self.credentials.items():
             if not isinstance(v, str) and not isinstance(v, type(None)):
-                raise Unauthorized(
-                    None, f"Wrong authorization passed for credential: {k}."
-                ) from Exception
+                raise Unauthorized(None, f"Wrong authorization passed for credential: {k}.") from Exception
 
         self.bearer_token: Optional[str] = bearer_token
         self.consumer_key: Optional[str] = consumer_key
@@ -183,9 +187,7 @@ class HTTPClient:
         if headers == {}:
             headers = {"Authorization": f"Bearer {self.bearer_token}"}
 
-        headers["User-Agent"] = user_agent.format(
-            sys.version_info, requests.__version__
-        )
+        headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
 
         res = getattr(requests, route.method.lower(), None)
         if not res:
@@ -209,9 +211,7 @@ class HTTPClient:
             return res
         return respond
 
-    def fetch_user(
-        self, user_id: Union[str, int], *, http_client: Optional[HTTPClient] = None
-    ) -> User:
+    def fetch_user(self, user_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> User:
         """Make a Request to obtain the user from the given user id.
 
         Parameters:
@@ -266,20 +266,14 @@ class HTTPClient:
 
         data["data"].update(
             {
-                "followers": [
-                    User(follower, http_client=http_client)
-                    for follower in followers["data"]
-                ]
+                "followers": [User(follower, http_client=http_client) for follower in followers["data"]]
                 if followers != []
                 else []
             }
         )
         data["data"].update(
             {
-                "following": [
-                    User(following, http_client=http_client)
-                    for following in following["data"]
-                ]
+                "following": [User(following, http_client=http_client) for following in following["data"]]
                 if following != []
                 else []
             }
@@ -287,9 +281,7 @@ class HTTPClient:
 
         return User(data, http_client=http_client)
 
-    def fetch_user_byusername(
-        self, username: str, *, http_client: Optional[HTTPClient] = None
-    ) -> User:
+    def fetch_user_byusername(self, username: str, *, http_client: Optional[HTTPClient] = None) -> User:
         """Make a Request to obtain the user from their username.
 
         Parameters:
@@ -322,17 +314,13 @@ class HTTPClient:
             is_json=True,
         )
 
-        user_payload = self.fetch_user(
-            int(data["data"].get("id")), http_client=http_client
-        )
+        user_payload = self.fetch_user(int(data["data"].get("id")), http_client=http_client)
         data["data"].update({"followers": user_payload.followers})
         data["data"].update({"following": user_payload.following})
 
         return User(data, http_client=http_client)
 
-    def fetch_tweet(
-        self, tweet_id: Union[str, int], *, http_client: Optional[HTTPClient] = None
-    ) -> Tweet:
+    def fetch_tweet(self, tweet_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> Tweet:
         """Fetch a tweet info from the specified id. Return if consumer_key or consumer_key_secret or access_token or access_token_secret is not specified.
 
         Parameters:
@@ -395,11 +383,7 @@ class HTTPClient:
             res2["data"]
 
             res["data"].update(
-                {
-                    "retweetes": [
-                        User(user, http_client=http_client if http_client else self) for user in res2["data"]
-                    ]
-                }
+                {"retweetes": [User(user, http_client=http_client if http_client else self) for user in res2["data"]]}
             )
         except (KeyError, TypeError):
             res["data"].update({"retweetes": []})
@@ -408,18 +392,21 @@ class HTTPClient:
             res3["data"]
 
             res["data"].update(
-                {
-                    "likes": [
-                        User(user, http_client=http_client if http_client else self) for user in res3["data"]
-                    ]
-                }
+                {"likes": [User(user, http_client=http_client if http_client else self) for user in res3["data"]]}
             )
         except (KeyError, TypeError):
             res["data"].update({"likes": []})
 
         return Tweet(res, http_client=http_client if http_client else None)
 
-    def send_message(self, user_id: Union[str, int], text: str, *,quick_reply: QuickReply = None, http_client = None) -> Optional[NoReturn]:
+    def send_message(
+        self,
+        user_id: Union[str, int],
+        text: str,
+        *,
+        quick_reply: QuickReply = None,
+        http_client=None,
+    ) -> Optional[NoReturn]:
         """Make a post Request for sending a message to a Messageable object.
 
         Parameters:
@@ -447,9 +434,7 @@ class HTTPClient:
                 "type": "message_create",
                 "message_create": {
                     "target": {"recipient_id": str(user_id)},
-                    "message_data": {
-                        
-                    },
+                    "message_data": {},
                 },
             }
         }
@@ -458,9 +443,12 @@ class HTTPClient:
             if not quick_reply:
                 pass
             else:
-                raise BadArguments(None, "'quick_reply' kwargs must be an instance of pytweet.QuickReply")
+                raise BadArguments(
+                    None,
+                    "'quick_reply' kwargs must be an instance of pytweet.QuickReply",
+                )
 
-        message_data=data["event"]["message_create"]["message_data"]
+        message_data = data["event"]["message_create"]["message_data"]
 
         if text or not text:
             try:
@@ -472,7 +460,10 @@ class HTTPClient:
             if quick_reply.items >= 20:
                 raise BadArguments(None, "Maximum quick reply's options must be less then equal 20.")
 
-            message_data['quick_reply'] = {"type" : quick_reply.type, "options": quick_reply.options}
+            message_data["quick_reply"] = {
+                "type": quick_reply.type,
+                "options": quick_reply.options,
+            }
 
         res = self.request(
             Route("POST", "1.1", "/direct_messages/events/new.json"),
@@ -485,7 +476,7 @@ class HTTPClient:
         """
         .. warning::
             This function is still under development and will raise an error when used!
-        
+
         Make a DELETE Request for deleting a certain message in a Messageable object.
 
         Parameters:
@@ -497,7 +488,7 @@ class HTTPClient:
         """
         res = self.request(
             route=Route("DELETE", "1.1", f"/direct_messages/events/destroy.json?id={event_id}"),
-            auth=True
+            auth=True,
         )
 
         return res
@@ -506,7 +497,7 @@ class HTTPClient:
         """
         .. warning::
             This function is still under development and will raise an error when used!
-        
+
         Make a DELETE Request for deleting a certain message in a Messageable object.
 
         Parameters:
@@ -519,11 +510,10 @@ class HTTPClient:
         res = self.request(
             route=Route("GET", "1.1", f"/direct_messages/events/show.json"),
             params={"id": event_id},
-            auth=True
+            auth=True,
         )
 
         return DirectMessage(res, http_client=self)
-        
 
     def post_tweet(self, text: str, **kwargs: Any) -> Union[NoReturn, Any]:
         """
@@ -539,11 +529,7 @@ class HTTPClient:
         if text:
             payload["text"] = text
 
-        res = self.request(
-            Route("POST", "2", "/tweets"), 
-            json=payload, 
-            auth=True
-        )
+        res = self.request(Route("POST", "2", "/tweets"), json=payload, auth=True)
 
         return res
 
@@ -589,9 +575,7 @@ class HTTPClient:
         Make the method functional and return :class:`RelationFollow
         """
         my_id = self.access_token.partition("-")[0]
-        res = self.request(
-            Route("DELETE", "2", f"/users/{my_id}/following/{user_id}"), auth=True
-        )
+        res = self.request(Route("DELETE", "2", f"/users/{my_id}/following/{user_id}"), auth=True)
         return RelationFollow(res)
 
     def block_user(self, user_id: Union[str, int]) -> None:
@@ -623,6 +607,4 @@ class HTTPClient:
         .. versionadded:: 1.2.0
         """
         my_id = self.access_token.partition("-")[0]
-        self.request(
-            Route("DELETE", "2", f"/users/{my_id}/blocking/{user_id}"), auth=True
-        )
+        self.request(Route("DELETE", "2", f"/users/{my_id}/blocking/{user_id}"), auth=True)

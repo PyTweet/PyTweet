@@ -37,25 +37,19 @@ class Media:
         self._payload = data
 
     def __repr__(self) -> str:
-        return "Media(type={0.type} url={0.url} width={0.width} height={0.height} media_key={0.media_key})".format(
-            self
-        )
+        return "Media(type={0.type} url={0.url} width={0.width} height={0.height} media_key={0.media_key})".format(self)
 
     def __str__(self) -> str:
         return self.url
 
     def __eq__(self, other: M) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "== operation cannot be done with one of the element not a valid Media object"
-            )
+            raise ValueError("== operation cannot be done with one of the element not a valid Media object")
         return self.media_key == other.media_key
 
     def __ne__(self, other: M) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "!= operation cannot be done with one of the element not a valid Media object"
-            )
+            raise ValueError("!= operation cannot be done with one of the element not a valid Media object")
         return self.media_key != other.media_key
 
     @property
@@ -136,44 +130,32 @@ class PollOptions:
 
     def __eq__(self, other: PO) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "== operation cannot be done with one of the element not a valid PollOptions object"
-            )
+            raise ValueError("== operation cannot be done with one of the element not a valid PollOptions object")
         return self.position == other.position
 
     def __ne__(self, other: PO) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "!= operation cannot be done with one of the element not a valid PollOptions object"
-            )
+            raise ValueError("!= operation cannot be done with one of the element not a valid PollOptions object")
         return self.position != other.position
 
     def __lt__(self, other: PO) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "< operation cannot be done with one of the element not a valid PollOptions object"
-            )
+            raise ValueError("< operation cannot be done with one of the element not a valid PollOptions object")
         return self.position < other.position
 
     def __gt__(self, other: PO) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "> operation cannot be done with one of the element not a valid PollOptions object"
-            )
+            raise ValueError("> operation cannot be done with one of the element not a valid PollOptions object")
         return self.position > other.position
 
     def __le__(self, other: PO) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "<= operation cannot be done with one of the element not a valid PollOptions object"
-            )
+            raise ValueError("<= operation cannot be done with one of the element not a valid PollOptions object")
         return self.position <= other.position
 
     def __ge__(self, other: PO) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                ">= operation cannot be done with one of the element not a valid PollOptions object"
-            )
+            raise ValueError(">= operation cannot be done with one of the element not a valid PollOptions object")
         return self.position >= other.position
 
     @property
@@ -232,16 +214,12 @@ class Poll:
 
     def __eq__(self, other: P) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "== operation cannot be done with one of the element not a valid Poll object"
-            )
+            raise ValueError("== operation cannot be done with one of the element not a valid Poll object")
         return self.id == other.id
 
     def __ne__(self, other: P) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "!= operation cannot be done with one of the element not a valid Poll object"
-            )
+            raise ValueError("!= operation cannot be done with one of the element not a valid Poll object")
         return self.id != other.id
 
     def __len__(self) -> int:
@@ -304,12 +282,13 @@ class QuickReply:
 
     .. versionadded:: 1.2.0
     """
-    def __init__(self, type: str = 'options'):
-        self.type = type if type == 'options' else 'options'
+
+    def __init__(self, type: str = "options"):
+        self.type = type if type == "options" else "options"
         self.options: List[Any, Any] = []
         self.items = len(self.options)
 
-    def add_option(self, *,label: str, description: str = None, metadata: str = None) -> QuickReply:
+    def add_option(self, *, label: str, description: str = None, metadata: str = None) -> QuickReply:
         """:class:`QuickReply`: Method for adding an option in your quick reply instance.
 
         Parameters:
@@ -321,8 +300,8 @@ class QuickReply:
                 The option's description. Description text displayed under label text. All options must have this property defined if property is present in any option. Text is auto-wrapped and will display on a max of two lines and supports n for controlling line breaks, Must be less then 72 characters.
 
             metadata: str
-                The option's metadata. Metadata that will be sent back in the webhook request, must be less then 1000 characters. 
-        
+                The option's metadata. Metadata that will be sent back in the webhook request, must be less then 1000 characters.
+
         .. versionadded:: 1.2.0
         """
         if len(label) >= 36:
@@ -334,8 +313,6 @@ class QuickReply:
         if len(metadata) >= 1000:
             raise BadArguments(None, "metadata must be less then 1000 characters.")
 
-        self.options.append(
-            {"label": label, "description": description, "metadata": metadata}
-        )
+        self.options.append({"label": label, "description": description, "metadata": metadata})
 
         return self

@@ -66,22 +66,25 @@ class Forbidden(HTTPException):
 
     .. versionadded:: 1.2.0
     """
+
     def __init__(
         self,
         response: Optional[requests.models.Response] = None,
         message: str = None,
     ):
-        json=response.json()
-        detail=json.get("detail") if not message else message
+        json = response.json()
+        detail = json.get("detail") if not message else message
         super().__init__(response, detail)
+
 
 class BadArguments(HTTPException):
     """:class:`HTTPException`: Raised when a request return status code: 400.
 
     .. versionadded:: 1.2.0
     """
-   
+
     pass
+
 
 class NotFound(APIException):
     """This error is returned when a given Tweet, User, etc. does not exist.

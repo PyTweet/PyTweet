@@ -102,7 +102,6 @@ class DirectMessage(Message):
         """
         return datetime.datetime.fromtimestamp(self.timestamp)
 
-
     @property
     def hashtags(self) -> Optional[List[Hashtags]]:
         """List[str]: Returns the messages's hashtags.
@@ -118,7 +117,6 @@ class DirectMessage(Message):
         .. versionadded:: 1.2.0
         """
         return [Symbols(data) for data in self.entities.get("symbol")]
-
 
     @property
     def mentions(self) -> Optional[List[UserMentions]]:

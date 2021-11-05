@@ -30,6 +30,7 @@ __authors__ = ["TheFarGG", "TheGenocides"]
 __license__ = "MIT"
 __copyright__ = "Copyright 2021 TheFarGG & TheGenocides"
 
+
 class VersionInfo(NamedTuple):
     major: int
     minor: int
