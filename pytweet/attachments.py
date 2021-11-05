@@ -198,7 +198,7 @@ class PollOptions:
 
         .. versionadded:: 1.1.0
         """
-        return self.options.get("votes")
+        return self.options.get("votes", 0)
 
 
 class Poll:
