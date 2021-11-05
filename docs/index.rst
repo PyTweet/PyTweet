@@ -22,8 +22,8 @@ Getting started
 
 Manuals
 -----------------
-- API Reference :doc:`api`
-`
+- :doc:`api`
+
 
 Indices and tables
 ==================
