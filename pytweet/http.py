@@ -137,15 +137,14 @@ class HTTPClient:
         params: RequestModel = {},
         json: RequestModel = {},
         auth: bool = False,
-        is_json: bool = True,
-        mode: str = None,
+        is_json: bool = True
     ) -> Union[str, Dict[Any, Any], NoReturn]:
         """Make an HTTP Requests to the api.
 
         Parameters:
         -----------
         route: Route
-            Represent the Route class, this will be use to configure the endpoint, method, and version of the api.
+            Represent the Route class, this will be use to configure the endpoint's path, method, and version of the api.
 
         headers: RequestModel
             Represent the http request headers, it usually filled with your bearer token. If this isn't specified then the default argument will be an empty dictionary. Later in the code it will update and gets your bearer token.
@@ -157,13 +156,10 @@ class HTTPClient:
             Represent the Json data. This usually use for request with POST method.
 
         auth: bool
-           Represent a toggle, if auth is True then the request will be handler with Oauth1 particularly OauthSession.
+           Represent a toggle, if auth is True then the request will be handle with Oauth1 particularly OauthSession.
 
         is_json: bool
             Represent a toggle, if its True then the return will be in a json format else its going to be a requests.models.Response object. Default to True.
-
-        mode: str
-            This mode argument usually use in a POST request, its going to specified what's the request action, then it log into a cache. For example, if a mode is 'follow' then it log the request to a follow cache.
 
         Raises:
         -------
@@ -174,16 +170,16 @@ class HTTPClient:
                 Raise when the api return code: 403. There's a lot of reason why, This usually happen when the client cannot do the request due to twitter's limitation e.g trying to follow someone that you blocked etc.
 
             pytweet.errors.TooManyRequests:
-                Raise when the api return code: 429. This usually happen when you made too much request thus the api ratelimit you. The ratelimit will ware off in a couple of minutes.
+                Raise when the api return code: 429. This happen when you made too much request thus the api ratelimit you. The ratelimit will ware off in a couple of minutes.
 
         This function make an HTTP Request with the given parameters then return a dictionary in a json format.
 
         .. versionadded:: 1.0.0
         """
+        user_agent = "Py-Tweet (https://github.com/TheFarGG/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
         if headers == {}:
             headers = {"Authorization": f"Bearer {self.bearer_token}"}
 
-        user_agent = "Py-Tweet (https://github.com/TheFarGG/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
         headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
 
         res = getattr(requests, route.method.lower(), None)
@@ -195,7 +191,14 @@ class HTTPClient:
             auth.set_access_token(self.access_token, self.access_token_secret)
             auth = auth.oauth1
 
-        respond = res(route.url, headers=headers, params=params, json=json, auth=auth)
+        respond = res(
+            route.url, 
+            headers=headers, 
+            params=params, 
+            json=json, 
+            auth=auth
+        )
+
         check_error(respond)
         res = respond.json()
 
@@ -205,7 +208,6 @@ class HTTPClient:
 
         if is_json:
             return res
-
         return respond
 
     def fetch_user(self, user_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> User:
@@ -480,8 +482,7 @@ class HTTPClient:
         res = self.request(
             Route("POST", "2", f"/users/{my_id}/following"),
             json={"target_user_id": str(user_id)},
-            auth=True,
-            mode="follow",
+            auth=True
         )
         return RelationFollow(res)
 
@@ -504,8 +505,7 @@ class HTTPClient:
         my_id = self.access_token.partition("-")[0]
         res = self.request(
             Route("DELETE", "2", f"/users/{my_id}/following/{user_id}"),
-            auth=True,
-            mode="unfollow",
+            auth=True
         )
         return RelationFollow(res)
 
@@ -523,8 +523,7 @@ class HTTPClient:
         self.request(
             Route("POST", "2", f"/users/{my_id}/blocking"),
             json={"target_user_id": str(user_id)},
-            auth=True,
-            mode="block",
+            auth=True
         )
 
     def unblock_user(self, user_id: Union[str, int]) -> None:
@@ -541,6 +540,5 @@ class HTTPClient:
         my_id = self.access_token.partition("-")[0]
         self.request(
             Route("DELETE", "2", f"/users/{my_id}/blocking/{user_id}"),
-            auth=True,
-            mode="unblock",
+            auth=True
         )

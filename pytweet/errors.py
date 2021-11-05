@@ -1,5 +1,5 @@
+import requests
 from typing import Optional
-
 
 class PytweetException(Exception):
     """Exception: This is the base class of all exceptions.
@@ -7,7 +7,7 @@ class PytweetException(Exception):
     .. versionadded:: 1.2.0
     """
 
-    def __init__(self, response, message):
+    def __init__(self, response: Optional[requests.models.Response] = None, message: str = "No Error Message Provided"):
         self.res = response
         self.message = message
         super().__init__(self.message)

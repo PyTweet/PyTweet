@@ -335,7 +335,7 @@ class Tweet(Message):
 
     @property
     def mentions(self) -> Optional[List[User]]:
-        """:class:`Optional[List[User]]`: Return the mentioned users, if there isnt it return None.
+        """:class:`Optional[List[User]]`: Return the mentioned users, if there isn't it return None.
 
         .. versionadded:: 1.1.3
         """
