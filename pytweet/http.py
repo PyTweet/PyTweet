@@ -115,11 +115,15 @@ class HTTPClient:
         if not access_token:
             _log.warning("Access token is missing this is recommended to have")
         if not access_token_secret:
-            _log.warning("Access token secret is missing this is required if you have passed in the access_toke param.")
+            _log.warning(
+                "Access token secret is missing this is required if you have passed in the access_toke param."
+            )
 
         for k, v in self.credentials.items():
             if not isinstance(v, str) and not isinstance(v, type(None)):
-                raise Unauthorized(None, f"Wrong authorization passed for credential: {k}.") from Exception
+                raise Unauthorized(
+                    None, f"Wrong authorization passed for credential: {k}."
+                ) from Exception
 
         self.bearer_token: Optional[str] = bearer_token
         self.consumer_key: Optional[str] = consumer_key
@@ -182,7 +186,9 @@ class HTTPClient:
         if headers == {}:
             headers = {"Authorization": f"Bearer {self.bearer_token}"}
 
-        headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
+        headers["User-Agent"] = user_agent.format(
+            sys.version_info, requests.__version__
+        )
 
         res = getattr(requests, route.method.lower(), None)
         if not res:
@@ -206,7 +212,9 @@ class HTTPClient:
             return res
         return respond
 
-    def fetch_user(self, user_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> User:
+    def fetch_user(
+        self, user_id: Union[str, int], *, http_client: Optional[HTTPClient] = None
+    ) -> User:
         """Make a Request to obtain the user from the given user id.
 
         Parameters:
@@ -261,14 +269,20 @@ class HTTPClient:
 
         data["data"].update(
             {
-                "followers": [User(follower, http_client=http_client) for follower in followers["data"]]
+                "followers": [
+                    User(follower, http_client=http_client)
+                    for follower in followers["data"]
+                ]
                 if followers != []
                 else []
             }
         )
         data["data"].update(
             {
-                "following": [User(following, http_client=http_client) for following in following["data"]]
+                "following": [
+                    User(following, http_client=http_client)
+                    for following in following["data"]
+                ]
                 if following != []
                 else []
             }
@@ -276,7 +290,9 @@ class HTTPClient:
 
         return User(data, http_client=http_client)
 
-    def fetch_user_byusername(self, username: str, *, http_client: Optional[HTTPClient] = None) -> User:
+    def fetch_user_byusername(
+        self, username: str, *, http_client: Optional[HTTPClient] = None
+    ) -> User:
         """Make a Request to obtain the user from their username.
 
         Parameters:
@@ -309,13 +325,17 @@ class HTTPClient:
             is_json=True,
         )
 
-        user_payload = self.fetch_user(int(data["data"].get("id")), http_client=http_client)
+        user_payload = self.fetch_user(
+            int(data["data"].get("id")), http_client=http_client
+        )
         data["data"].update({"followers": user_payload.followers})
         data["data"].update({"following": user_payload.following})
 
         return User(data, http_client=http_client)
 
-    def fetch_tweet(self, tweet_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> Tweet:
+    def fetch_tweet(
+        self, tweet_id: Union[str, int], *, http_client: Optional[HTTPClient] = None
+    ) -> Tweet:
         """Fetch a tweet info from the specified id. Return if consumer_key or consumer_key_secret or access_token or access_token_secret is not specified.
 
         Parameters:
@@ -377,14 +397,26 @@ class HTTPClient:
         try:
             res2["data"]
 
-            res["data"].update({"retweetes": [User(user, http_client=http_client) for user in res2["data"]]})
+            res["data"].update(
+                {
+                    "retweetes": [
+                        User(user, http_client=http_client) for user in res2["data"]
+                    ]
+                }
+            )
         except (KeyError, TypeError):
             res["data"].update({"retweetes": []})
 
         try:
             res3["data"]
 
-            res["data"].update({"likes": [User(user, http_client=http_client) for user in res3["data"]]})
+            res["data"].update(
+                {
+                    "likes": [
+                        User(user, http_client=http_client) for user in res3["data"]
+                    ]
+                }
+            )
         except (KeyError, TypeError):
             res["data"].update({"likes": []})
 
@@ -505,7 +537,9 @@ class HTTPClient:
         Make the method functional and return :class:`RelationFollow
         """
         my_id = self.access_token.partition("-")[0]
-        res = self.request(Route("DELETE", "2", f"/users/{my_id}/following/{user_id}"), auth=True)
+        res = self.request(
+            Route("DELETE", "2", f"/users/{my_id}/following/{user_id}"), auth=True
+        )
         return RelationFollow(res)
 
     def block_user(self, user_id: Union[str, int]) -> None:
@@ -537,4 +571,6 @@ class HTTPClient:
         .. versionadded:: 1.2.0
         """
         my_id = self.access_token.partition("-")[0]
-        self.request(Route("DELETE", "2", f"/users/{my_id}/blocking/{user_id}"), auth=True)
+        self.request(
+            Route("DELETE", "2", f"/users/{my_id}/blocking/{user_id}"), auth=True
+        )

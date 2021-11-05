@@ -15,7 +15,9 @@ class RelationFollow:
         self._payload: Dict[Any, Any] = data["data"]
 
     def __repr__(self) -> str:
-        return "RelationFollow(type: {0.type} following: {0.following} pending: {0.pending})".format(self)
+        return "RelationFollow(type: {0.type} following: {0.following} pending: {0.pending})".format(
+            self
+        )
 
     @property
     def pending(self) -> bool:
