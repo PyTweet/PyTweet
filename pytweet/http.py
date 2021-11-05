@@ -35,6 +35,8 @@ def check_error(response: requests.models.Response) -> NoReturn:
         raise Unauthorized(response, "Invalid credentials passed!")
 
     elif code == 403:
+        print(dir(response))
+        print(response.text)
         raise Forbidden(response, "Forbidden to interact with that User!")
 
     elif code == 429:
@@ -450,7 +452,7 @@ class HTTPClient:
         raise NotImplementedError("This function is not finish yet")
 
 
-    def post_tweet(self, text: str, **kwargs: Any) -> NoReturn:
+    def post_tweet(self, text: str, **kwargs: Any) -> Union[NoReturn, Any]:
         """
         .. warning:: 
             This function is still under development and will raise an error when used!
@@ -459,7 +461,18 @@ class HTTPClient:
 
         .. versionadded:: 1.1.0
         """
-        raise NotImplementedError("This function is not finished yet")
+
+        payload = {}
+        if text:
+            payload['text'] = text
+        
+        res = self.request(
+            Route("POST", "2", "/tweets"),
+            json=payload,
+            auth=True
+        )
+
+        return res
 
     def follow_user(self, user_id: Union[str, int]) -> RelationFollow:
         """Make a POST Request to follow a Messageable object.

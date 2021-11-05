@@ -7,7 +7,7 @@ from .metrics import TweetPublicMetrics
 from .user import User
 from .utils import time_parse_todt
 from .message import Message
-from .relations import RelationLike
+from .relations import RelationLike, RelationRetweet
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -177,6 +177,10 @@ class Tweet(Message):
 
 
     .. versionadded:: 1.0.0
+
+    .. versionchanged:: 1.2.0
+
+    Inherite :class:`Message`. The text and ID property is now provided by :class:`Message`,
     """
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
@@ -205,12 +209,13 @@ class Tweet(Message):
         return self.id != other.id
 
     def like(self) -> Optional[RelationLike]:
-        """RelationLike: Function for liking a tweet.
+        """RelationLike: Method for liking a tweet.
         
         .. versionadded:: 1.2.0
         """
         my_id = self.http_client.access_token.partition("-")[0]
         route = self.http_client.make_route("POST", "2", f"/users/{my_id}/likes")
+
         payload={
             "tweet_id": str(self.id)
         }
@@ -223,7 +228,7 @@ class Tweet(Message):
         return RelationLike(res)
 
     def unlike(self) -> Optional[RelationLike]:
-        """RelationLike: Function for unliking a tweet.
+        """RelationLike: Method for unliking a tweet.
         
         .. versionadded:: 1.2.0
         """
@@ -236,6 +241,40 @@ class Tweet(Message):
         )
 
         return RelationLike(res)
+
+    def retweet(self) -> RelationRetweet:
+        """RelationRetweet: Method for retweet a tweet.
+        
+        .. versionadded:: 1.2.0
+        """
+        my_id = self.http_client.access_token.partition("-")[0]
+        route = self.http_client.make_route("POST", "2", f"/users/{my_id}/retweets")
+
+        payload={
+            "tweet_id": str(self.id)
+        }
+        res = self.http_client.request(
+            route,
+            json = payload,
+            auth = True
+        )
+
+        return RelationRetweet(res)
+
+    def unretweet(self) -> RelationRetweet:
+        """RelationRetweet: Method for unretweet a tweet.
+        
+        .. versionadded:: 1.2.0
+        """
+        my_id = self.http_client.access_token.partition("-")[0]
+        route = self.http_client.make_route("DELETE", "2", f"/users/{my_id}/retweets/{self.id}")
+
+        res = self.http_client.request(
+            route,
+            auth = True
+        )
+
+        return RelationRetweet(res)
 
     @property
     def author(self) -> User:

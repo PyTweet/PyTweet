@@ -1,11 +1,11 @@
 from typing import Any, Dict
 from .enums import RelationsTypeEnum
 
-__all__ = ("RelationFollow", "RelationLike")
+__all__ = ("RelationFollow", "RelationLike", "RelationRetweet")
 
 
 class RelationFollow:
-    """Represent the follow relation from a follow request.
+    """Represent the follow relation from a follow & unfollow request.
 
     .. versionadded:: 1.2.0
     """
@@ -69,3 +69,32 @@ class RelationLike:
         .. versionadded:: 1.2.0
         """
         return RelationsTypeEnum(2 if self.liked else None)
+
+class RelationRetweet:
+    """Represent the retweet relations from a retweet & unretweet request.
+
+    .. versionadded:: 1.2.0
+    """
+
+    def __init__(self, data: Dict[str, Any]):
+        self.original_payload: Dict[str, Any] = data
+        self._payload: Dict[Any, Any] = data["data"]
+
+    def __repr__(self) -> str:
+        return "RelationRetweet(liked: {0.retweet})".format(self)
+
+    @property
+    def retweeted(self) -> bool:
+        """bool: Return True if user retweeted the tweet else False.
+
+        .. versionadded:: 1.2.0
+        """
+        return self._payload.get("retweeted")
+
+    @property
+    def type(self) -> RelationsTypeEnum:
+        """:class:`RelationTypeEnum`: Check what relation type it is.
+        
+        .. versionadded:: 1.2.0
+        """
+        return RelationsTypeEnum(3 if self.retweeted else None)

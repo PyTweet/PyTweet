@@ -120,4 +120,5 @@ class Client:
 
         .. versionadded:: 1.1.0
         """
-        self.http.post_tweet(text, **kwargs)
+        res=self.http.post_tweet(text, **kwargs)
+        return res
