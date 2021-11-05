@@ -32,7 +32,7 @@ class Messageable:
         self._payload: Dict[str, Any] = data
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client", None)
 
-    def send(self, text: str = None, *,quick_reply: QuickReply):
+    def send(self, text: str = None, *,quick_reply: QuickReply = None):
         """:class:`DirectMessage`: Send a message to a specific Messageable object.
 
         Parameters:
@@ -52,7 +52,7 @@ class Messageable:
         )
         return res
 
-    def delete_message(self, message_id: int, **kwargs: Any) -> None:
+    def delete_message(self, event_id: int, **kwargs: Any) -> object:
         """Delete a message from a Messageable object.
 
         Parameters:
@@ -62,7 +62,8 @@ class Messageable:
 
         .. versionadded:: 1.1.0
         """
-        self.http_client.delete_message(self._payload.get("id"), message_id, **kwargs)
+        res = self.http_client.delete_message(self._payload.get("id"), **kwargs)
+        return res
 
     def follow(self) -> RelationFollow:
         """:class:`RelationFollow`: Follow a Messageable object.

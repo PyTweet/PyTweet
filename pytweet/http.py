@@ -431,7 +431,7 @@ class HTTPClient:
             The text that will be send to that user.
 
         quick_reply: QuickReply
-            The message's quick reply.
+            The message's quick reply attachment.
 
         http_client
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
@@ -448,16 +448,25 @@ class HTTPClient:
                 "message_create": {
                     "target": {"recipient_id": str(user_id)},
                     "message_data": {
-                        "text": text,
+                        
                     },
                 },
             }
         }
 
         if not isinstance(quick_reply, QuickReply):
-            raise BadArguments(None, "'quick_reply' kwargs must be an instance of pytweet.QuickReply")
+            if not quick_reply:
+                pass
+            else:
+                raise BadArguments(None, "'quick_reply' kwargs must be an instance of pytweet.QuickReply")
 
         message_data=data["event"]["message_create"]["message_data"]
+
+        if text or not text:
+            try:
+                message_data["text"] = str(text)
+            except ValueError:
+                raise BadArguments(None, "Invalid argument type for 'text'.")
 
         if quick_reply:
             if quick_reply.items >= 20:
@@ -472,21 +481,32 @@ class HTTPClient:
         )
         return DirectMessage(res, http_client=http_client if http_client else self)
 
-    def delete_message(self, id: int, **kwargs: Any) -> NoReturn:
+    def delete_message(self, event_id: Union[str, int]) -> DirectMessage:
         """
         .. warning::
             This function is still under development and will raise an error when used!
-
+        
         Make a DELETE Request for deleting a certain message in a Messageable object.
 
         Parameters:
         -----------
         id:
-            The message id that you want to delete.
+            The id of the Direct Message event that you want to delete.
 
         .. versionadded:: 1.1.0
+
+        .. versionchanged:: 1.2.0
+
+        Make the method functional and return :class:`DirectMessage`.
         """
-        raise NotImplementedError("This function is not finish yet")
+        res = self.request(
+            route=Route("DELETE", "1.1", "/direct_messages/events/destroy.json"),
+            params={"id": str(event_id)},
+            auth=True
+        )
+
+        return DirectMessage(res)
+        
 
     def post_tweet(self, text: str, **kwargs: Any) -> Union[NoReturn, Any]:
         """

@@ -292,7 +292,7 @@ class Poll:
 
 
 class QuickReply:
-    """Represent a quick_reply options in Direct Message!
+    """Represent a quick_reply attachment in Direct Message.
 
     Attributes:
     -----------
@@ -304,13 +304,13 @@ class QuickReply:
 
     .. versionadded:: 1.2.0
     """
-    def __init__(self):
-        self.type = 'options'
+    def __init__(self, type: str = 'options'):
+        self.type = type if type == 'options' else 'options'
         self.options: List[Any, Any] = []
         self.items = len(self.options)
 
     def add_option(self, *,label: str, description: str = None, metadata: str = None) -> QuickReply:
-        """NoReturn: Method for adding an option in your quick reply instance.
+        """:class:`QuickReply`: Method for adding an option in your quick reply instance.
 
         Parameters:
         -----------

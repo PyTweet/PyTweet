@@ -23,7 +23,7 @@ class Message:
         The messages's text.
 
     id: Union[str, int]
-        The messages's ID.
+        The messages's ID or event id for DirectMessage.
 
     .. versionadded:: 1.2.0
     """
