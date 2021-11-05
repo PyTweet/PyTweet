@@ -22,7 +22,7 @@ Getting started
 
 Manuals
 -----------------
-- API Reference :doc:`api
+- API Reference :doc:`api`
 `
 
 Indices and tables
