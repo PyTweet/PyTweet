@@ -7,9 +7,6 @@ __all__ = ("RelationFollow", "RelationLike")
 class RelationFollow:
     """Represent the follow relation from a follow request.
 
-    .. describe:: str(x)
-        Returns the type.
-
     .. versionadded:: 1.2.0
     """
 
@@ -46,9 +43,6 @@ class RelationFollow:
 
 class RelationLike:
     """Represent the like relation from a like & unlike request.
-
-    .. describe:: str(x)
-        Returns the type.
 
     .. versionadded:: 1.2.0
     """
