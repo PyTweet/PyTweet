@@ -1,8 +1,9 @@
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union, List
 
 from .enums import MessageEventTypeEnum, MessageTypeEnum
 from .user import User
+from .entities import Hashtags, Symbols, UserMentions, Urls
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -100,3 +101,37 @@ class DirectMessage(Message):
         .. versionadded:: 1.2.0
         """
         return datetime.datetime.fromtimestamp(self.timestamp)
+
+
+    @property
+    def hashtags(self) -> Optional[List[Hashtags]]:
+        """List[str]: Returns the messages's hashtags.
+
+        .. versionadded:: 1.2.0
+        """
+        return [Hashtags(data) for data in self.entities.get("hashtags")]
+
+    @property
+    def symbol(self) -> Optional[List[Hashtags]]:
+        """List[str]: Returns the messages's hashtags.
+
+        .. versionadded:: 1.2.0
+        """
+        return [Symbols(data) for data in self.entities.get("symbol")]
+
+
+    @property
+    def mentions(self) -> Optional[List[UserMentions]]:
+        """List[UserMentions]: Returns the messages usermetions.
+
+        .. versionadded:: 1.2.0
+        """
+        return [UserMentions(data) for data in self.entities.get("user_mentions")]
+
+    @property
+    def urls(self) -> Optional[List[Urls]]:
+        """List[UserMentions]: Returns the message's urls.
+
+        .. versionadded:: 1.2.0
+        """
+        return [Urls(data) for data in self.entities.get("urls")]
