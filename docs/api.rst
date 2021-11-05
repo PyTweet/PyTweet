@@ -19,7 +19,7 @@ Client
 Commonly used Classes 
 -------
 
-There a lot of comonly used classes that is used frequently when using PyTweet, and here they are.
+There a lot of commonly used classes that is used frequently when using PyTweet, and here they are.
 
 
 .. autoclass:: User
