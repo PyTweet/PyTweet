@@ -1,6 +1,6 @@
 import datetime
 from typing import Any, Dict, List, NoReturn, Optional, TypeVar, Union
-
+from .errors import BadArguments
 from .utils import time_parse_todt
 
 M = TypeVar("M", bound="Media")
@@ -287,3 +287,51 @@ class Poll:
         .. versionadded:: 1.1.0
         """
         return time_parse_todt(self._payload.get("end_datetime"))
+
+
+class QuickReply():
+    """Represent a quick_reply options in Direct Message!
+
+    Attributes:
+    -----------
+        options: List[Any, Any]
+            The QuickReply's options. An option must have a label, description and metadata, Maximum options is 20.
+
+        items:
+            Return how many options in your quick_reply object.
+
+    .. versionadded:: 1.2.0
+    """
+    def __init__(self):
+        self.type = 'options'
+        self.options: List[Any, Any] = []
+        self.items = len(self.options)
+
+    def add_option(self, *,label: str, description: str = None, metadata: str = None) -> NoReturn:
+        """NoReturn: Method for adding an option in your quick reply instance.
+
+        Parameters:
+        -----------
+            label: str
+                The option's label. Label text is returned as the user's message response, Must be less then 36 characters.
+
+            description: str
+                The option's description. Description text displayed under label text. All options must have this property defined if property is present in any option. Text is auto-wrapped and will display on a max of two lines and supports n for controling line breaks, Must be less then 72 characters.
+
+            metadata: str
+                The option's metadata. Metadata that will be sent back in the webhook request, must be less then 1000 characters. 
+        
+        .. versionadded:: 1.2.0
+        """
+        if len(label) >= 36:
+            raise BadArguments(None, "Label must be less then 36 characters.")
+
+        if len(description) >= 72:
+            raise BadArguments(None, "Description must be less then 72 characters.")
+
+        if len(metadata) >= 1000:
+            raise BadArguments(None, "metadata must be less then 1000 characters.")
+
+        self.options.append(
+            {"label": label, "description": description, "metadata": metadata}
+        )
