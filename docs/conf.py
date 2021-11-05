@@ -39,9 +39,6 @@ extensions = [
 autodoc_member_order = 'bysource'
 autodoc_typehints = 'none'
 
-# User starts in light mode
-default_dark_mode = False
-
 # The suffix of source filenames.
 source_suffix = '.rst'
 

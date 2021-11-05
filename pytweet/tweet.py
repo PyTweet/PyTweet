@@ -56,7 +56,7 @@ class EmbedsImages:
 
     @property
     def url(self) -> str:
-        """int: Return the image's url
+        """str: Return the image's url
 
         .. versionadded: 1.1.3
         """
