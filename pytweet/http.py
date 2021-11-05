@@ -3,16 +3,16 @@ from __future__ import annotations
 import logging
 import sys
 import time
+import requests
 from typing import Any, Dict, NoReturn, Optional, Union
 
-import requests
-
 from .auth import OauthSession
-from .errors import Forbidden, NotFound, PytweetException, TooManyRequests, Unauthorized
+from .errors import Forbidden, NotFound, PytweetException, TooManyRequests, Unauthorized, BadArguments
 from .message import DirectMessage
 from .relations import RelationFollow
 from .tweet import Tweet
 from .user import User
+from .attachments import QuickReply
 
 _log = logging.getLogger(__name__)
 
@@ -35,9 +35,7 @@ def check_error(response: requests.models.Response) -> NoReturn:
         raise Unauthorized(response, "Invalid credentials passed!")
 
     elif code == 403:
-        print(dir(response))
-        print(response.text)
-        raise Forbidden(response, "Forbidden to interact with that User!")
+        raise Forbidden(response)
 
     elif code == 429:
         text = response.text
@@ -56,7 +54,6 @@ class Route:
         self.path: str = path
         self.base_url: str = f"https://api.twitter.com/{version}"
         self.url: str = self.base_url + self.path
-
 
 class HTTPClient:
     """Represents the http/base client for :class:`Client` !
@@ -422,7 +419,7 @@ class HTTPClient:
 
         return Tweet(res, http_client=http_client)
 
-    def send_message(self, user_id: Union[str, int], text: str, **kwargs):
+    def send_message(self, user_id: Union[str, int], text: str, *,quick_reply: QuickReply = None, http_client = None) -> Optional[NoReturn]:
         """Make a post Request for sending a message to a Messageable object.
 
         Parameters:
@@ -433,6 +430,9 @@ class HTTPClient:
         text: str
             The text that will be send to that user.
 
+        quick_reply: QuickReply
+            The message's quick reply.
+
         http_client
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
@@ -442,7 +442,6 @@ class HTTPClient:
 
         .. versionchanged:: 1.2.0
         """
-        http_client = kwargs.get("http_client", None)
         data = {
             "event": {
                 "type": "message_create",
@@ -454,6 +453,18 @@ class HTTPClient:
                 },
             }
         }
+
+        if not isinstance(quick_reply, QuickReply):
+            raise BadArguments(None, "'quick_reply' kwargs must be an instance of pytweet.QuickReply")
+
+        message_data=data["event"]["message_create"]["message_data"]
+
+        if quick_reply:
+            if quick_reply.items >= 20:
+                raise BadArguments(None, "Maximum quick reply's options must be less then equal 20.")
+
+            message_data['quick_reply'] = {"type" : quick_reply.type, "options": quick_reply.options}
+
         res = self.request(
             Route("POST", "1.1", "/direct_messages/events/new.json"),
             json=data,
