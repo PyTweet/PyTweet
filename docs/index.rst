@@ -24,7 +24,6 @@ Manuals
 -----------------
 - :doc:`api`
 
-
 Indices and tables
 ==================
 
