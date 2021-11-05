@@ -14,6 +14,7 @@ from typing import (
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import time_parse_todt
+from .attachments import QuickReply
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -31,7 +32,7 @@ class Messageable:
         self._payload: Dict[str, Any] = data
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client", None)
 
-    def send(self, text: str = None, **kwargs: Any):
+    def send(self, text: str = None, *,quick_reply: QuickReply):
         """:class:`DirectMessage`: Send a message to a specific Messageable object.
 
         Parameters:
@@ -43,7 +44,12 @@ class Messageable:
 
         .. versionadded:: 1.1.0
         """
-        res = self.http_client.send_message(self._payload.get("id"), text, **kwargs)
+        res = self.http_client.send_message(
+            self._payload.get("id"), 
+            text, 
+            quick_reply=quick_reply, 
+            http_client=self.http_client
+        )
         return res
 
     def delete_message(self, message_id: int, **kwargs: Any) -> None:
