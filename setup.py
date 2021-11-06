@@ -41,13 +41,14 @@ setup(
     project_urls={
         "Documentation": "https://py-tweet.readthedocs.io/",
         "HomePage/Github": "https://github.com/TheFarGG/PyTweet/",
+        "Support": "https://discord.com/invite/XHBhg6A4jJ",
     },
     description="A Synchronous python API wrapper for twitter's api",
     long_description=readme,
     long_description_content_type="text/markdown",
     install_requires=requirements,
-    extras_require={"docs": ["sphinx_rtd_dark_mode==1.2.4", "furo"]},
     keywords="PyTweet, pytweet, twitter, tweet.py twitter.py",
+    platforms="any",
     python_requires=">=3.7.0",
     classifiers=classifiers
 )
