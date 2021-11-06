@@ -2,7 +2,6 @@ import requests
 from typing import Optional
 
 
-
 class PytweetException(Exception):
     """Exception: This is the base class of all exceptions.
 
@@ -17,12 +16,12 @@ class PytweetException(Exception):
         super().__init__(self.message)
 
 
-
 class APIException(PytweetException):
     """:class:`PytweetException`: Raise When an error is incurred during a request with HTTP Status code 200.
 
     .. versionadded:: 1.2.0
     """
+
     def __init__(
         self,
         response: Optional[requests.models.Response] = None,
@@ -32,11 +31,13 @@ class APIException(PytweetException):
         self.message = message
         super().__init__(f"API Return an Exception: {self.message}")
 
+
 class HTTPException(PytweetException):
     """:class:`PytweetException`: A custom error that will be raised when ever a request return HTTP status code above 200.
 
     .. versionadded:: 1.2.0
     """
+
     def __init__(
         self,
         response: Optional[requests.models.Response] = None,
@@ -49,15 +50,11 @@ class HTTPException(PytweetException):
 
     @property
     def status_code(self) -> Optional[int]:
+        """Optional[:class:`int`]: Return the request status code"""
         if not self.res:
             return None
 
         return self.res.status_code
-
-
-
-
-
 
 
 class BadRequests(HTTPException):
@@ -65,15 +62,16 @@ class BadRequests(HTTPException):
 
     .. versionadded:: 1.2.0
     """
-    
+
     def __init__(
         self,
         response: Optional[requests.models.Response] = None,
         message: Optional[str] = None,
     ):
-        msg=response.json().get('errors')[0].get('message') if not message else message
-        detail=response.json().get('errors')[0].get('detail')
+        msg = response.json().get("errors")[0].get("message") if not message else message
+        detail = response.json().get("errors")[0].get("detail")
         super().__init__(response, msg if msg else detail if detail else "Not Found!")
+
 
 class Unauthorized(HTTPException):
     """:class:`HTTPException`: Raised when the Credentials you passed is invalid and a request return status code: 401
@@ -95,24 +93,26 @@ class Forbidden(HTTPException):
         response: Optional[requests.models.Response] = None,
         message: Optional[str] = None,
     ):
-        msg=response.json().get('errors')[0].get('message') if not message else message
-        detail=response.json().get('errors')[0].get('detail')
+        msg = response.json().get("errors")[0].get("message") if not message else message
+        detail = response.json().get("errors")[0].get("detail")
         super().__init__(response, msg if msg else detail if detail else "Forbidden to do that action.")
+
 
 class NotFound(HTTPException):
     """:class:`HTTPException`: Raised when a request return status code: 404.
 
     .. versionadded:: 1.2.0
     """
-    
+
     def __init__(
         self,
         response: Optional[requests.models.Response] = None,
         message: Optional[str] = None,
     ):
-        msg=response.json().get('errors')[0].get('message') if not message else message
-        detail=response.json().get('errors')[0].get('detail')
+        msg = response.json().get("errors")[0].get("message") if not message else message
+        detail = response.json().get("errors")[0].get("detail")
         super().__init__(response, msg if msg else detail if detail else "Not Found!")
+
 
 class TooManyRequests(HTTPException):
     """:class:`HTTPException`: Raised when ratelimit exceeded and a request return status code: 429
@@ -123,23 +123,17 @@ class TooManyRequests(HTTPException):
     pass
 
 
+class NotFoundError(APIException):
+    """This error is usually returns when trying to find specific Tweet, User that does not exist. This differ then :class:`NotFound` This one return status code 200 while still returning error from API while :class:`NotFound` return code 404.
 
-
-
-
-
-
-
-class NotFound(APIException):
-    """This error is usually returns when trying to find specific Tweet, User that does not exist.
-
-    .. versionadded:: 1.0.0
+    .. versionadded:: 1.2.0
     """
+
     def __init__(
         self,
         response: Optional[requests.models.Response] = None,
         message: Optional[str] = None,
     ):
-        msg=response.json().get('errors')[0].get('message') if not message else message
-        detail=response.json().get('errors')[0].get('detail')
+        msg = response.json().get("errors")[0].get("message") if not message else message
+        detail = response.json().get("errors")[0].get("detail")
         super().__init__(response, msg if msg else detail if detail else "Not Found!")

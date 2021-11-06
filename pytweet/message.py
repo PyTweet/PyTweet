@@ -18,12 +18,11 @@ __all__ = (
 class Message:
     """Represents the base Message of all Message types in Twitter, this include DirrectMessage & Tweet
 
-    Parameters:
-    -----------
-    text: Optional[str]
+    Parameters
+    ------------
+    text: Optional[:class:`str`]
         The messages's text.
-
-    id: Union[str, int]
+    id: Union[:class:`str`, :class:`int`]
         The messages's unique ID.
 
     .. versionadded:: 1.2.0
@@ -68,8 +67,8 @@ class DirectMessage(Message):
     def delete(self) -> None:
         """Delete a DirectMessage object.
 
-        Parameters:
-        -----------
+        Parameters
+        ------------
         event_id: int
             The event id. Every time a Direct Message is created, its going to return a unique ID called event id.
 

@@ -53,7 +53,7 @@ class Media:
 
     @property
     def type(self) -> Optional[str]:
-        """:class:`Optional[str]`: Return the media's type.
+        """Optional[:class:`str`]: Return the media's type.
 
         .. versionadded:: 1.1.0
         """
@@ -61,7 +61,7 @@ class Media:
 
     @property
     def url(self) -> Optional[str]:
-        """:class:`Optional[str]`: Return the media's url.
+        """Optional[:class:`str`]: Return the media's url.
 
         .. versionadded:: 1.1.0
         """
@@ -69,7 +69,7 @@ class Media:
 
     @property
     def width(self) -> Optional[int]:
-        """:class:`Optional[int]`: the media's width.
+        """Optional[:class:`int`]: the media's width.
 
         .. versionadded:: 1.1.0
         """
@@ -77,7 +77,7 @@ class Media:
 
     @property
     def height(self) -> Optional[int]:
-        """int: Return the media's height.
+        """Optional[:class:`int`]: Return the media's height.
 
         .. versionadded:: 1.1.0
         """
@@ -85,7 +85,7 @@ class Media:
 
     @property
     def media_key(self) -> Optional[Union[int, str]]:
-        """:class:`Optional[Union[int, str]]`: Returns the media's unique key.
+        """Optional[Union[:class:`int`, :class:`str`]]: Returns the media's unique key.
 
         .. versionadded:: 1.1.0
         """
@@ -159,7 +159,7 @@ class PollOptions:
 
     @property
     def position(self) -> Optional[int]:
-        """:class:`Optional[int]`: The option's position.
+        """Optional[:class:`int`]: The option's position.
 
         .. versionadded:: 1.1.0
         """
@@ -167,7 +167,7 @@ class PollOptions:
 
     @property
     def label(self) -> Optional[str]:
-        """:class:`Optional[int]`: The option's label.
+        """Optional[:class:`int`]: The option's label.
 
         .. versionadded:: 1.1.0
         """
@@ -175,7 +175,7 @@ class PollOptions:
 
     @property
     def votes(self) -> Optional[int]:
-        """:class:`Optional[int]`: The option's votes.
+        """Optional[:class:`int`]: The option's votes.
 
         .. versionadded:: 1.1.0
         """
@@ -229,7 +229,7 @@ class Poll:
 
     @property
     def id(self) -> Optional[int]:
-        """int: Return the poll's unique ID.
+        """:class:`int`: Return the poll's unique ID.
 
         .. versionadded:: 1.1.0
         """
@@ -237,7 +237,7 @@ class Poll:
 
     @property
     def options(self) -> List[PollOptions]:
-        """:class:`List[PollOptions]`: Return a list of :class:`PollOptions`.
+        """List[:class:`PollOptions`]: Return a list of :class:`PollOptions`.
 
         .. versionadded:: 1.1.0
         """
@@ -245,7 +245,7 @@ class Poll:
 
     @property
     def voting_status(self) -> bool:
-        """bool: Return True if the poll is still open for voting, if its closed it return False.
+        """:class:`bool`: Return True if the poll is still open for voting, if its closed it return False.
 
         .. versionadded:: 1.1.0
         """
@@ -253,7 +253,7 @@ class Poll:
 
     @property
     def duration(self) -> int:
-        """int: Return the poll duration in seconds.
+        """:class:`int`: Return the poll duration in seconds.
 
         .. versionadded:: 1.1.0
         """
@@ -261,7 +261,7 @@ class Poll:
 
     @property
     def end_date(self) -> datetime.datetime:
-        """`datetime.datetime`: Return the end date in datetime.datetime object.
+        """:class:`datetime.datetime`: Return the end date in datetime.datetime object.
 
         .. versionadded:: 1.1.0
         """
@@ -271,13 +271,17 @@ class Poll:
 class QuickReply:
     """Represent a quick_reply attachment in Direct Message.
 
-    Attributes:
+    Parameters
     -----------
-        options: List[Any, Any]
-            The QuickReply's options. An option must have a label, description and metadata, Maximum options is 20.
+    type: :class:`str`
+        The quick reply string. Must be set to 'options'. Default to options''
 
-        items:
-            Return how many options in your quick_reply object.
+    Attributes
+    -----------
+    options: List[Any, Any]
+        The QuickReply's options. An option must have a label, description and metadata, Maximum options is 20.
+    items:
+        Return how many options in your quick_reply object.
 
     .. versionadded:: 1.2.0
     """
@@ -292,14 +296,18 @@ class QuickReply:
 
         Parameters:
         -----------
-            label: str
-                The option's label. Label text is returned as the user's message response, Must be less then 36 characters.
+        label: str
+            The option's label. Label text is returned as the user's message response, Must be less then 36 characters.
+        description: str
+            The option's description. Description text displayed under label text. All options must have this property defined if property is present in any option. Text is auto-wrapped and will display on a max of two lines and supports n for controlling line breaks, Must be less then 72 characters.
+        metadata: str
+            The option's metadata. Metadata that will be sent back in the webhook request, must be less then 1000 characters.
 
-            description: str
-                The option's description. Description text displayed under label text. All options must have this property defined if property is present in any option. Text is auto-wrapped and will display on a max of two lines and supports n for controlling line breaks, Must be less then 72 characters.
+        Returns
+        ------------
+            :class:`QuickReply`
+                This function return a :class:`QuickReply` object.
 
-            metadata: str
-                The option's metadata. Metadata that will be sent back in the webhook request, must be less then 1000 characters.
 
         .. versionadded:: 1.2.0
         """

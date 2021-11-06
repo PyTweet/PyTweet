@@ -33,7 +33,7 @@ class Messageable:
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client", None)
 
     def send(self, text: str = None, *, quick_reply: QuickReply = None):
-        """:class:`DirectMessage`: Send a message to a specific Messageable object.
+        """Send a message to a specific Messageable object.
 
         Parameters:
         -----------
@@ -41,6 +41,12 @@ class Messageable:
             The text that will be send to that user.
 
         This function return a :class:`DirectMessage` object
+
+
+        Returns
+        ------------
+        :class:`DirectMessage`
+          The message you sent.
 
         .. versionadded:: 1.1.0
         """
@@ -54,7 +60,7 @@ class Messageable:
 
     def fetch_message(self, event_id: Union[str, int]) -> object:
         """Get a message from a Messageable object.
-        
+
         .. warning::
             This method use api call and might cause ratelimit if use often! You can instead use :class:`Client().get_message()` which get the message through the client message cache. As of right now, only the client's message thats going to be store in the cache!
 

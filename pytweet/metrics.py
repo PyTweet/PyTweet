@@ -13,7 +13,7 @@ class UserPublicMetrics:
     .. versionadded:: 1.1.0
     """
 
-    def __init__(self, data: Dict[str, Any] = {}, **kwargs: Any):
+    def __init__(self, data: Dict[str, Any] = {}, **kwargs: Any) -> None:
         self.original_payload: Dict[str, Any] = data
         self._public: Dict[Any, Any] = self.original_payload.get("public_metrics")
 
