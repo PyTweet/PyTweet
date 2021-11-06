@@ -47,7 +47,7 @@ You can use black easily by doing:
 .. code:: bash
 
     pip install black
-    black setup.py pytweet -l 120
+    black setup.py pytweet --line-length 120
 
 
 If you want to see what changes black will make, you can do:
@@ -55,7 +55,7 @@ If you want to see what changes black will make, you can do:
 .. code:: bash
 
     pip install black
-    black --diff setup.py pytweet -l 120
+    black --diff setup.py pytweet --line-length 120
 
 
 Testing
