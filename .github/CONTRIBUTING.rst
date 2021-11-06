@@ -38,6 +38,33 @@ compile them using the following commands:
 
 
 
+Code formatting
+==================
+
+This project (``PyTweet``) follows the black code-style with line-length as ``120``
+You can use black easily by doing:
+
+.. code:: bash
+
+    pip install black
+    black setup.py pytweet
+
+
+If you want to see what changes black will make, you can do:
+
+.. code:: bash
+
+    pip install black
+    black --diff setup.py pytweet
+
+
+Testing
+==================
+
+Currently we are setting up tests with pytest, however it is not done yet, don't put any tests folders, if you do please put the them in the ``.gitignore``
+
+
+
 Code Contributions
 ==================
 
@@ -97,9 +124,3 @@ Submit your contribution
    to send your changes for review.
 
       Find more detailed information `creating a PR`.
-
-
-Testing
-------------------------
-
-Currently we are setting up tests with pytest, however it is not done yet, don't put any tests folders, if you do please put the them in the ``.gitignore``
