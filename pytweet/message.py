@@ -18,11 +18,12 @@ __all__ = (
 class Message:
     """Represents the base Message of all Message types in Twitter, this include DirrectMessage & Tweet
 
-    Parameters
-    ------------
-    text: Optional[:class:`str`]
+    Parameters:
+    -----------
+    text: Optional[str]
         The messages's text.
-    id: Union[:class:`str`, :class:`int`]
+
+    id: Union[str, int]
         The messages's unique ID.
 
     .. versionadded:: 1.2.0
@@ -67,12 +68,12 @@ class DirectMessage(Message):
     def delete(self) -> None:
         """Delete a DirectMessage object.
 
-        Parameters
-        ------------
+        Parameters:
+        -----------
         event_id: int
             The event id. Every time a Direct Message is created, its going to return a unique ID called event id.
 
-        .. versionadded:: 1.2.0
+        .. versionadded:: 1.1.0
         """
         self.http_client.delete_message(self.id)
         return None
@@ -91,7 +92,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.2.0
         """
-        return MessageTypeEnum(1)
+        return MessageTypeEnum(0)
 
     @property
     def author(self) -> User:
@@ -123,12 +124,12 @@ class DirectMessage(Message):
         return [Hashtags(data) for data in self.entities.get("hashtags")]
 
     @property
-    def symbol(self) -> Optional[List[Hashtags]]:
+    def symbols(self) -> Optional[List[Hashtags]]:
         """List[str]: Returns the messages's hashtags.
 
         .. versionadded:: 1.2.0
         """
-        return [Symbols(data) for data in self.entities.get("symbol")]
+        return [Symbols(data) for data in self.entities.get("symbols")]
 
     @property
     def mentions(self) -> Optional[List[UserMentions]]:

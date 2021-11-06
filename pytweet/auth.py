@@ -6,7 +6,8 @@ __all__ = ("OauthSession",)
 
 
 class OauthSession(OAuth1Session):
-    """The OauthSession, this usually is uses for POST requests and requests that need Oauth1 Authorization.
+    """
+    The OauthSession, this usually is uses for POST requests and requests that need Oauth1 Authorization.
 
     .. versionadded:: 1.2.0
     """
@@ -23,6 +24,11 @@ class OauthSession(OAuth1Session):
     def oauth1(self) -> OAuth1:
         """:class:`Oauth1`: Wrap the credentials in a function that return Oauth1. Usually Uses for Authorization.
 
+        Returns
+        ------------
+        :class:`OAuth1`
+            This function returns an OAuth1 object.
+
         .. versionadded:: 1.2.0
         """
         return OAuth1(
@@ -34,6 +40,6 @@ class OauthSession(OAuth1Session):
         )
 
     def set_access_token(self, key: str, secret: str) -> None:
-        """:class:`None`: Set the access token's key and secret."""
+        """Set the access token's key and secret."""
         self.access_token = key
         self.access_token_secret = secret

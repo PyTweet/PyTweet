@@ -33,7 +33,7 @@ class Messageable:
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client", None)
 
     def send(self, text: str = None, *, quick_reply: QuickReply = None):
-        """Send a message to a specific Messageable object.
+        """:class:`DirectMessage`: Send a message to a specific Messageable object.
 
         Parameters:
         -----------
@@ -41,12 +41,6 @@ class Messageable:
             The text that will be send to that user.
 
         This function return a :class:`DirectMessage` object
-
-
-        Returns
-        ------------
-        :class:`DirectMessage`
-          The message you sent.
 
         .. versionadded:: 1.1.0
         """
@@ -72,7 +66,7 @@ class Messageable:
 
         .. versionadded:: 1.2.0
         """
-        res = self.http_client.get_message(event_id)
+        res = self.http_client.fetch_message(event_id)
         return res
 
     def follow(self) -> RelationFollow:

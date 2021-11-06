@@ -29,7 +29,6 @@ class Client:
     http: Optional[:class:`HTTPClient`]
         Return the HTTPClient, HTTPClient is responsible for making most of the Requests.
 
-
     .. versionadded:: 1.0.0
     """
 
@@ -67,7 +66,8 @@ class Client:
         return me
 
     def fetch_user(self, user_id: Union[str, int]) -> User:
-        """
+        """:class:`User`: A function for HTTPClient.fetch_user().
+
         .. warning::
             This method uses api call and might cause ratelimit if used often!
 
@@ -76,17 +76,15 @@ class Client:
         user_id: Union[:class:`str`, :class:`int`]
             Represent the user id that you wish to get info to, If you dont have it you may use `fetch_user_byusername` because it only required the user's username.
 
-        Returns
-        ------------
-        :class:`User`
-            This function returns a User object.
+        This function returns a :class:`User` object.
 
         .. versionadded:: 1.0.0
         """
         return self.http.fetch_user(user_id, http_client=self.http)
 
     def fetch_user_by_username(self, username: str) -> User:
-        """
+        """:class:`User`: A function for HTTPClient.fetch_user_byusername().
+
         .. warning::
             This method uses api call and might cause ratelimit if used often!
 
@@ -95,47 +93,53 @@ class Client:
         username: :class:`str`
             Represent the user's username that you wish to get info. A Username usually start with '@' before any letters. If a username named @Jack,then the username argument must be 'Jack'.
 
-        Returns
-        ------------
-            :class:`User`:
-                This function returns a User object.
+        This function returns a :class:`User` object.
 
         .. versionadded:: 1.0.0
         """
         return self.http.fetch_user_byusername(username, http_client=self.http)
 
     def fetch_tweet(self, tweet_id: Union[str, int]) -> Tweet:
-        """Make an api call to fetch the tweet with the tweet id.
+        """:class:`Tweet`: A function for HTTPClient.fetch_tweet().
 
         .. warning::
-            This method uses api call and might cause ratelimit if used often!
+        This method uses api call and might cause ratelimit if used often!
 
         Parameters
         ------------
         tweet_id: Union[:class:`str`, :class:`int`]
-            Represent the tweet id that you wish to get info to.
+        Represent the tweet id that you wish to get info to.
 
-        Returns
-        ------------
-            :class:`Tweet`
-                This function returns a Tweet object.
+        This function returns a :class:`Tweet`.
 
         .. versionadded:: 1.0.0
         """
         return self.http.fetch_tweet(tweet_id, http_client=self.http)
 
+    def fetch_message(self, event_id: Union[str, int]) -> DirectMessage:
+        """:class:`DirectMessage`: A function for HTTPClient.fetch_message().
+
+        .. warning::
+        This method uses api call and might cause ratelimit if used often! Recommended to use `get_message()` method, it only retrieves the client's message only.
+
+        Parameters
+        ------------
+        event_id: Union[:class:`str`, :class:`int`]
+            Represent the tweet id that you wish to get info to fetch.
+
+        This function returns a :class:`DirectMessage`.
+
+        .. versionadded:: 1.2.0
+        """
+        return self.http.fetch_message(event_id, http_client=self.http)
+
     def tweet(self, text: str, **kwargs: Any) -> Tweet:
-        """Post a tweet directly to twitter from the given parameters.
+        """:class:`Tweet`: Post a tweet directly to twitter from the given parameters.
 
         Parameters
         ------------
         text: :class:`str`
-            The tweet's text, it will showup as the main text in a tweet.
-
-        Returns
-        ------------
-            :class:`Tweet`
-                This function returns a Tweet object.
+            The tweets text, it will showup as the main text in a tweet.
 
         .. versionadded:: 1.1.0
         """
@@ -144,20 +148,15 @@ class Client:
         return res
 
     def get_message(self, event_id: Union[str, int]) -> Optional[DirectMessage]:
-        """Get a direct message through the client message cache. Return None if the message is not in the cache.
+        """Optional[:class:`DirectMessage`]: Get a direct message through the client message cache. Return None if the message is not in the cache.
 
         .. note::
-            Note that, you can only get the client's message for now.
+            Note that, only the client's message stored in the cache!
 
         Parameters
         ------------
         event_id: Union[:class:`str`, :class:`int`]
             The event id of the Direct Message event that you want to get.
-
-        Returns
-        ------------
-            :class:`DirectMessage `
-                This function returns a DirectMessage.
 
         .. versionadded:: 1.2.0
         """
@@ -169,9 +168,10 @@ class Client:
         return self.http.message_cache.get(event_id)
 
     def get_tweet(self, tweet_id: Union[str, int]) -> Optional[Tweet]:
-        """
+        """Optional[:class:`Tweet`]: Get a tweet through the client tweet cache. Return None if the tweet is not in the cache.
+
         .. note::
-        Note that, only the client's tweet is going to be stored.
+            Note that, only the client's tweet is going to be stored.
 
         Parameters
         ------------
@@ -180,13 +180,8 @@ class Client:
 
         Raises
         ---------
-        ValueError:
-            Raise when the tweet_id argument is not an integer or a string of digits.
-
-        Returns
-        -------------
-            :class:`Optional[Tweet]`
-                Get a tweet through the client tweet cache. Return None if the tweet is not in the cache.
+            ValueError:
+                Raise when the tweet_id argument is not an integer or a string of digits.
 
         .. versionadded:: 1.2.0
         """

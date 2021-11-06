@@ -167,7 +167,7 @@ class PollOptions:
 
     @property
     def label(self) -> Optional[str]:
-        """Optional[:class:`int`]: The option's label.
+        """Optional[:class:`str`]: The option's label.
 
         .. versionadded:: 1.1.0
         """
@@ -271,15 +271,16 @@ class Poll:
 class QuickReply:
     """Represent a quick_reply attachment in Direct Message.
 
-    Parameters
+    Parameters:
     -----------
     type: :class:`str`
-        The quick reply string. Must be set to 'options'. Default to options''
+        The quick_reply's types, it must be and only 'options'
 
-    Attributes
+    Attributes:
     -----------
     options: List[Any, Any]
         The QuickReply's options. An option must have a label, description and metadata, Maximum options is 20.
+
     items:
         Return how many options in your quick_reply object.
 
@@ -298,16 +299,12 @@ class QuickReply:
         -----------
         label: str
             The option's label. Label text is returned as the user's message response, Must be less then 36 characters.
+
         description: str
             The option's description. Description text displayed under label text. All options must have this property defined if property is present in any option. Text is auto-wrapped and will display on a max of two lines and supports n for controlling line breaks, Must be less then 72 characters.
+
         metadata: str
             The option's metadata. Metadata that will be sent back in the webhook request, must be less then 1000 characters.
-
-        Returns
-        ------------
-            :class:`QuickReply`
-                This function return a :class:`QuickReply` object.
-
 
         .. versionadded:: 1.2.0
         """

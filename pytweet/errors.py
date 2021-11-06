@@ -50,7 +50,6 @@ class HTTPException(PytweetException):
 
     @property
     def status_code(self) -> Optional[int]:
-        """Optional[:class:`int`]: Return the request status code"""
         if not self.res:
             return None
 
@@ -123,10 +122,10 @@ class TooManyRequests(HTTPException):
     pass
 
 
-class NotFoundError(APIException):
-    """This error is usually returns when trying to find specific Tweet, User that does not exist. This differ then :class:`NotFound` This one return status code 200 while still returning error from API while :class:`NotFound` return code 404.
+class NotFound(APIException):
+    """This error is usually returns when trying to find specific Tweet, User that does not exist.
 
-    .. versionadded:: 1.2.0
+    .. versionadded:: 1.0.0
     """
 
     def __init__(
