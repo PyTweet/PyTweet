@@ -5,7 +5,7 @@ from dateutil import parser
 
 
 def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
-    """Optional[Any]: Parse time return from twitter api to datetime object!
+    """Optional[Any]: Parse time return from twitter to datetime object!
 
     .. versionadded: 1.1.3
     """
