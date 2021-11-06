@@ -52,26 +52,17 @@ class Messageable:
         )
         return res
 
-    def delete_message(self, event_id: Union[str, int]) -> None:
-        """Delete a message from a Messageable object.
-
-        Parameters:
-        -----------
-        message_id: int
-            The event id. Every time a Direct Message is created, its going to return a unique ID called event id.
-
-        .. versionadded:: 1.1.0
-        """
-        self.http_client.delete_message(event_id)
-        return None
-
-    def get_message(self, event_id: Union[str, int]) -> object:
+    def fetch_message(self, event_id: Union[str, int]) -> object:
         """Get a message from a Messageable object.
+        
+        .. warning::
+            This method use api call and might cause ratelimit if use often! You can instead use :class:`Client().get_message()` which get the message through the client message cache. As of right now, only the client's message thats going to be store in the cache!
 
         Parameters:
         -----------
         event_id: int
             The event id. Every time a Direct Message is created, its going to return a unique ID called event id.
+
 
         .. versionadded:: 1.2.0
         """
