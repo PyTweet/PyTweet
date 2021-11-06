@@ -38,7 +38,7 @@ class EmbedsImages:
 
     @property
     def width(self) -> int:
-        """int: Return the image's width
+        """:class:`int`: Return the image's width
 
         .. versionadded: 1.1.3
         """
@@ -46,7 +46,7 @@ class EmbedsImages:
 
     @property
     def height(self) -> int:
-        """int: Return the image's height
+        """:class:`int`: Return the image's height
 
         .. versionadded: 1.1.3
         """
@@ -54,7 +54,7 @@ class EmbedsImages:
 
     @property
     def url(self) -> str:
-        """str: Return the image's url
+        """:class:`str`: Return the image's url
 
         .. versionadded: 1.1.3
         """
@@ -78,7 +78,7 @@ class Embed:
 
     @property
     def title(self) -> str:
-        """str: Return the embed's title
+        """:class:`str`: Return the embed's title
 
         .. versionadded: 1.1.3
         """
@@ -86,7 +86,7 @@ class Embed:
 
     @property
     def description(self) -> str:
-        """str: Return the embed's description
+        """:class:`str`: Return the embed's description
 
         .. versionadded: 1.1.3
         """
@@ -94,7 +94,7 @@ class Embed:
 
     @property
     def start(self) -> int:
-        """int: Return the embed's url startpoint start
+        """:class:`int`: Return the embed's url startpoint start
 
         .. versionadded: 1.1.3
         """
@@ -102,7 +102,7 @@ class Embed:
 
     @property
     def end(self) -> int:
-        """int: Return the embed's url endpoint.
+        """:class:`int`: Return the embed's url endpoint.
 
         .. versionadded: 1.1.3
         """
@@ -110,7 +110,7 @@ class Embed:
 
     @property
     def url(self) -> str:
-        """str: Return the embed's url
+        """:class:`str`: Return the embed's url
 
         .. versionadded: 1.1.3
         """
@@ -118,7 +118,7 @@ class Embed:
 
     @property
     def expanded_url(self) -> str:
-        """str: Return the expanded url
+        """:class:`str`: Return the expanded url
 
         .. versionadded: 1.1.3
         """
@@ -126,7 +126,7 @@ class Embed:
 
     @property
     def display_url(self) -> str:
-        """str: Return the display url
+        """:class:`str`: Return the display url
 
         .. versionadded: 1.1.3
         """
@@ -134,7 +134,7 @@ class Embed:
 
     @property
     def unwound_url(self) -> str:
-        """str: Return the unwound url
+        """:class:`str`: Return the unwound url
 
         .. versionadded: 1.1.3
         """
@@ -142,7 +142,7 @@ class Embed:
 
     @property
     def images(self) -> Optional[List[EmbedsImages]]:
-        """List[EmbedsImages]: Return a list of Embed's Images
+        """List[:class:`EmbedsImages`]: Return a list of Embed's Images
 
         .. versionadded:: 1.1.3
         """
@@ -153,7 +153,7 @@ class Embed:
 
     @property
     def status_code(self) -> int:
-        """int: Return the embed's url HTTP status code
+        """:class:`int`: Return the embed's url HTTP status code
 
         .. versionadded: 1.1.3
         """
@@ -209,7 +209,11 @@ class Tweet(Message):
         return self.id != other.id
 
     def like(self) -> Optional[RelationLike]:
-        """RelationLike: Method for liking a tweet.
+        """:class:`RelationLike`: Method for liking a tweet.
+
+        Returns
+        ---------
+        Returns a :class:`RelationLike` object.
 
         .. versionadded:: 1.2.0
         """
@@ -222,7 +226,11 @@ class Tweet(Message):
         return RelationLike(res)
 
     def unlike(self) -> Optional[RelationLike]:
-        """RelationLike: Method for unliking a tweet.
+        """:class:`RelationLike`: Method for unliking a tweet.
+
+        Returns
+        ---------
+        Returns a :class:`RelationLike` object.
 
         .. versionadded:: 1.2.0
         """
@@ -234,7 +242,11 @@ class Tweet(Message):
         return RelationLike(res)
 
     def retweet(self) -> RelationRetweet:
-        """RelationRetweet: Method for retweet a tweet.
+        """:class:`RelationRetweet`: Method for retweet a tweet.
+
+        Returns
+        ---------
+        Returns a :class:`RelationRetweet` object.
 
         .. versionadded:: 1.2.0
         """
@@ -247,9 +259,11 @@ class Tweet(Message):
         return RelationRetweet(res)
 
     def unretweet(self) -> RelationRetweet:
-        """RelationRetweet: Method for unretweet a tweet.
+        """:class:`RelationRetweet`: Method for unretweet a tweet.
 
-        .. versionadded:: 1.2.0
+        Returns
+        ---------
+        Returns a :class:`RelationRetweet` object.
         """
         my_id = self.http_client.access_token.partition("-")[0]
         route = self.http_client.make_route("DELETE", "2", f"/users/{my_id}/retweets/{self.id}")
@@ -257,6 +271,15 @@ class Tweet(Message):
         res = self.http_client.request(route, auth=True)
 
         return RelationRetweet(res)
+
+    def delete(self) -> None:
+        """:class:`None`: A method for HTTPClient.delete_message()
+
+        .. versionadded:: 1.2.0
+        """
+
+        self.http_client.delete_tweet(int(self.id))
+        return None
 
     @property
     def author(self) -> User:
@@ -268,7 +291,7 @@ class Tweet(Message):
 
     @property
     def retweetes(self) -> Union[List[User], list]:
-        """:class:`Optional[List[User], int]`: Return a list of users that's retweeted the specified tweet's id. Maximum users is 100. Return empty list if no one retweeted.
+        """Optional[List[:class:`User`, :class:`list`], :class:`int`]: Return a list of users that's retweeted the tweet's id. Maximum users is 100. Return empty list if no one retweeted.
 
         .. versionadded: 1.0.0
         """
@@ -276,7 +299,7 @@ class Tweet(Message):
 
     @property
     def likes(self) -> Union[List[User], list]:
-        """:class:`Optional[List[User], list]`: Return a list of users that liked the specified tweet's id. Maximum users is 100. Return empty list if no one liked.
+        """Optional[List[:class:`User`], :class:`list`]: Return a list of users that liked the tweet's id. Maximum users is 100. Return empty list if no one liked.
 
         .. versionadded: 1.0.0
         """
@@ -284,7 +307,7 @@ class Tweet(Message):
 
     @property
     def sensitive(self) -> bool:
-        """bool: Return True if the tweet is possible sensitive to some users, else False
+        """:class`bool`: Return True if the tweet is possible sensitive to some users, else False
 
         .. versionadded: 1.0.0
         """
@@ -300,7 +323,7 @@ class Tweet(Message):
 
     @property
     def source(self) -> str:
-        """str: Return the source of the tweet. e.g if you post a tweet from a website, the source is gonna be 'Twitter Web App'
+        """:class:`str`: Return the source of the tweet. e.g if you post a tweet from a website, the source is gonna be 'Twitter Web App'
 
         .. versionadded: 1.0.0
         """
@@ -308,7 +331,7 @@ class Tweet(Message):
 
     @property
     def reply_setting(self) -> str:
-        """str: Return the reply setting. If everyone can replied, reply_setting return 'Everyone'.
+        """:class:`str`: Return the reply setting. If everyone can replied, reply_setting return 'Everyone'.
 
         .. versionadded: 1.0.0
         """
@@ -316,7 +339,7 @@ class Tweet(Message):
 
     @property
     def lang(self) -> str:
-        """str: Return the tweet's lang, if its english it return en.
+        """:class:`str`: Return the tweet's lang, if its english it return en.
 
         .. versionadded: 1.0.0
         """
@@ -324,7 +347,7 @@ class Tweet(Message):
 
     @property
     def conversation_id(self) -> int:
-        """int: Return the tweet's conversation's id.
+        """:class:`int`: Return the tweet's conversation's id.
 
         .. versionadded: 1.0.0
         """
@@ -332,7 +355,7 @@ class Tweet(Message):
 
     @property
     def link(self) -> str:
-        """str: Return the tweet's link.
+        """:class:`str`: Return the tweet's link.
 
         .. versionadded: 1.1.0
         """
@@ -340,7 +363,7 @@ class Tweet(Message):
 
     @property
     def reply_to(self) -> Optional[User]:
-        """:class:`Optional[User]`: Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
+        """Optional[:class:`User`]: Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
 
         .. versionadded:: 1.1.3
         """
@@ -356,7 +379,7 @@ class Tweet(Message):
 
     @property
     def mentions(self) -> Optional[List[User]]:
-        """:class:`Optional[List[User]]`: Return the mentioned users, if there isn't it return None.
+        """Optional[List[:class:`User`]]: Return the mentioned users, if there isn't it return None.
 
         .. versionadded:: 1.1.3
         """
@@ -382,7 +405,7 @@ class Tweet(Message):
 
     @property
     def media(self) -> Optional[Media]:
-        """:class:`List[Media]` -> Return a list of media(s) in a tweet.
+        """List[:class:`Media`]: Return a list of media(s) in a tweet.
 
         .. versionadded:: 1.1.0
         """
@@ -393,7 +416,7 @@ class Tweet(Message):
 
     @property
     def embeds(self) -> Optional[List[Embed]]:
-        """:class:`List[Embed]`: Return a list of Embedded url from that tweet
+        """List[:class:`Embed`]: Return a list of Embedded url from that tweet
 
         .. versionadded:: 1.1.3
         """
@@ -404,7 +427,7 @@ class Tweet(Message):
 
     @property
     def type(self) -> MessageTypeEnum:
-        """MessageTypeEnum: Return the Message type.
+        """:class:`MessageTypeEnum`: Return the Message type.
 
         .. versionadded:: 1.2.0
         """
@@ -412,7 +435,7 @@ class Tweet(Message):
 
     @property
     def like_count(self) -> int:
-        """int: Return the total of likes in a tweet.
+        """:class:`int`: Return the total of likes in a tweet.
 
         .. versionadded: 1.1.0
         """
@@ -420,7 +443,7 @@ class Tweet(Message):
 
     @property
     def retweet_count(self) -> int:
-        """int: Return the total of retweetes in a tweet.
+        """:class:`int`: Return the total of retweetes in a tweet.
 
         .. versionadded: 1.1.0
         """
@@ -428,7 +451,7 @@ class Tweet(Message):
 
     @property
     def reply_count(self) -> int:
-        """int: Return the total of replies in a tweet.
+        """:class:`int`: Return the total of replies in a tweet.
 
         .. versionadded: 1.1.0
         """
@@ -436,7 +459,7 @@ class Tweet(Message):
 
     @property
     def quote_count(self) -> int:
-        """int: Return the total of quotes in a tweet.
+        """:class:`int`: Return the total of quotes in a tweet.
 
         .. versionadded: 1.1.0
         """

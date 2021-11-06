@@ -25,9 +25,11 @@ class Client:
         The Access Token Secret of the app.
 
     Attributes
-    -----------
+    ------------
     http: Optional[:class:`HTTPClient`]
         Return the HTTPClient, HTTPClient is responsible for making most of the Requests.
+
+
 
     .. versionadded:: 1.0.0
     """
@@ -76,7 +78,12 @@ class Client:
         user_id: Union[:class:`str`, :class:`int`]
             Represent the user id that you wish to get info to, If you dont have it you may use `fetch_user_byusername` because it only required the user's username.
 
-        This function returns a :class:`User` object.
+        Returns
+        ---------
+        :class:`User`
+            This method returns a :class:`User` object.
+
+
 
         .. versionadded:: 1.0.0
         """
@@ -93,7 +100,11 @@ class Client:
         username: :class:`str`
             Represent the user's username that you wish to get info. A Username usually start with '@' before any letters. If a username named @Jack,then the username argument must be 'Jack'.
 
-        This function returns a :class:`User` object.
+        Returns
+        ---------
+        :class:`User`
+            This method returns a :class:`User` object.
+
 
         .. versionadded:: 1.0.0
         """
@@ -103,14 +114,18 @@ class Client:
         """:class:`Tweet`: A function for HTTPClient.fetch_tweet().
 
         .. warning::
-        This method uses api call and might cause ratelimit if used often!
+        This method uses api call and might cause ratelimit if used often! More recommended to use get_tweet to get the **client's tweet**.
 
         Parameters
         ------------
         tweet_id: Union[:class:`str`, :class:`int`]
         Represent the tweet id that you wish to get info to.
 
-        This function returns a :class:`Tweet`.
+        Returns
+        ---------
+        :class:`Tweet`
+            This method returns a :class:`Tweet` object.
+
 
         .. versionadded:: 1.0.0
         """
@@ -127,7 +142,10 @@ class Client:
         event_id: Union[:class:`str`, :class:`int`]
             Represent the tweet id that you wish to get info to fetch.
 
-        This function returns a :class:`DirectMessage`.
+        Returns
+        ---------
+        :class:`DirectMessage`
+            This method returns a :class:`DirectMessage` object.
 
         .. versionadded:: 1.2.0
         """
@@ -140,6 +158,11 @@ class Client:
         ------------
         text: :class:`str`
             The tweets text, it will showup as the main text in a tweet.
+
+        Returns
+        ---------
+        :class:`Tweet`
+            This method returns a :class:`Tweet` object.
 
         .. versionadded:: 1.1.0
         """
@@ -157,6 +180,11 @@ class Client:
         ------------
         event_id: Union[:class:`str`, :class:`int`]
             The event id of the Direct Message event that you want to get.
+
+        Returns
+        ---------
+        :class:`DirectMessage`
+            This method returns a :class:`DirectMessage` object.
 
         .. versionadded:: 1.2.0
         """
@@ -179,9 +207,14 @@ class Client:
             The id of a tweet that you want to get.
 
         Raises
+        --------
+        ValueError:
+            Raise when the tweet_id argument is not an integer or a string of digits.
+
+        Returns
         ---------
-            ValueError:
-                Raise when the tweet_id argument is not an integer or a string of digits.
+        :class:`Tweet`
+            This method returns a :class:`Tweet` object or None if the tweet was not found.
 
         .. versionadded:: 1.2.0
         """

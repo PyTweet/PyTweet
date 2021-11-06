@@ -93,7 +93,7 @@ class Media:
 
 
 class PollOptions:
-    """Represent the Poll Options, The minimum option of a poll is 2 and maximum is 4.
+    """Represent the Poll Options, The minimum options in a poll is 2 and maximum is 4.
 
     .. describe:: x == y
         Check if one PollOption position is equal to another.
@@ -233,7 +233,7 @@ class Poll:
 
         .. versionadded:: 1.1.0
         """
-        return self._payload.get("id")
+        return int(self._payload.get("id"))
 
     @property
     def options(self) -> List[PollOptions]:
@@ -271,17 +271,16 @@ class Poll:
 class QuickReply:
     """Represent a quick_reply attachment in Direct Message.
 
-    Parameters:
-    -----------
+    Parameters
+    ------------
     type: :class:`str`
         The quick_reply's types, it must be and only 'options'
 
-    Attributes:
-    -----------
+    Attributes
+    ------------
     options: List[Any, Any]
         The QuickReply's options. An option must have a label, description and metadata, Maximum options is 20.
-
-    items:
+    items: :class:`int`
         Return how many options in your quick_reply object.
 
     .. versionadded:: 1.2.0
@@ -290,21 +289,24 @@ class QuickReply:
     def __init__(self, type: str = "options"):
         self.type = type if type == "options" else "options"
         self.options: List[Any, Any] = []
-        self.items = len(self.options)
+        self.items: int = len(self.options)
 
     def add_option(self, *, label: str, description: str = None, metadata: str = None) -> QuickReply:
         """:class:`QuickReply`: Method for adding an option in your quick reply instance.
 
-        Parameters:
-        -----------
+        Parameters
+        ------------
         label: str
             The option's label. Label text is returned as the user's message response, Must be less then 36 characters.
-
         description: str
             The option's description. Description text displayed under label text. All options must have this property defined if property is present in any option. Text is auto-wrapped and will display on a max of two lines and supports n for controlling line breaks, Must be less then 72 characters.
-
         metadata: str
             The option's metadata. Metadata that will be sent back in the webhook request, must be less then 1000 characters.
+
+        Returns
+        ---------
+        :class:`QuickReply`
+            Returns the :class:`QuickReply` object.
 
         .. versionadded:: 1.2.0
         """

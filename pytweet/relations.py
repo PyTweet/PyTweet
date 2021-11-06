@@ -19,7 +19,7 @@ class RelationFollow:
 
     @property
     def pending(self) -> bool:
-        """bool: Check if the relation is pending.
+        """:class:`bool`: Check if the relation is pending.
 
         .. versionadded:: 1.2.0
         """
@@ -27,7 +27,7 @@ class RelationFollow:
 
     @property
     def following(self) -> bool:
-        """bool: Check if the relation is following.
+        """:class:`bool`: Check if the relation is following.
 
         .. versionadded:: 1.2.0
         """
@@ -57,7 +57,7 @@ class RelationLike:
 
     @property
     def liked(self) -> bool:
-        """bool: Return True if user liked the tweet else False.
+        """:class:`bool`: Return True if user liked the tweet else False.
 
         .. versionadded:: 1.2.0
         """
@@ -87,7 +87,7 @@ class RelationRetweet:
 
     @property
     def retweeted(self) -> bool:
-        """bool: Return True if user retweeted the tweet else False.
+        """:class:`bool`: Return True if user retweeted the tweet else False.
 
         .. versionadded:: 1.2.0
         """

@@ -18,12 +18,12 @@ __all__ = (
 class Message:
     """Represents the base Message of all Message types in Twitter, this include DirrectMessage & Tweet
 
-    Parameters:
-    -----------
-    text: Optional[str]
+    Parameters
+    ------------
+    text: Optional[:class:`str`]
         The messages's text.
 
-    id: Union[str, int]
+    id: Union[:class:`str`, :class:`int`]
         The messages's unique ID.
 
     .. versionadded:: 1.2.0
@@ -68,9 +68,9 @@ class DirectMessage(Message):
     def delete(self) -> None:
         """Delete a DirectMessage object.
 
-        Parameters:
-        -----------
-        event_id: int
+        Parameters
+        ------------
+        event_id: :class:`int`
             The event id. Every time a Direct Message is created, its going to return a unique ID called event id.
 
         .. versionadded:: 1.1.0
@@ -117,15 +117,15 @@ class DirectMessage(Message):
 
     @property
     def hashtags(self) -> Optional[List[Hashtags]]:
-        """List[str]: Returns the messages's hashtags.
+        """List[:class:`Hashtags`]: Returns the messages's hashtags.
 
         .. versionadded:: 1.2.0
         """
         return [Hashtags(data) for data in self.entities.get("hashtags")]
 
     @property
-    def symbols(self) -> Optional[List[Hashtags]]:
-        """List[str]: Returns the messages's hashtags.
+    def symbols(self) -> Optional[List[Symbols]]:
+        """List[:class:`Symbols`]: Returns the messages's hashtags.
 
         .. versionadded:: 1.2.0
         """
@@ -133,7 +133,7 @@ class DirectMessage(Message):
 
     @property
     def mentions(self) -> Optional[List[UserMentions]]:
-        """List[UserMentions]: Returns the messages usermetions.
+        """List[:class:`UserMentions`]: Returns the messages usermetions.
 
         .. versionadded:: 1.2.0
         """
@@ -141,7 +141,7 @@ class DirectMessage(Message):
 
     @property
     def urls(self) -> Optional[List[Urls]]:
-        """List[UserMentions]: Returns the message's urls.
+        """List[:class:`Urls`]: Returns the message's urls.
 
         .. versionadded:: 1.2.0
         """

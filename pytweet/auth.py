@@ -25,7 +25,7 @@ class OauthSession(OAuth1Session):
         """:class:`Oauth1`: Wrap the credentials in a function that return Oauth1. Usually Uses for Authorization.
 
         Returns
-        ------------
+        ---------
         :class:`OAuth1`
             This function returns an OAuth1 object.
 

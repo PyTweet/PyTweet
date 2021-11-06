@@ -31,6 +31,9 @@ def check_error(response: requests.models.Response) -> NoReturn:
             except KeyError:
                 raise PytweetException(json)
 
+    elif code == 204:
+        pass
+
     elif code == 400:
         raise BadRequests(response)
 
@@ -49,6 +52,11 @@ def check_error(response: requests.models.Response) -> NoReturn:
         _time = time.time()
         time.sleep(_time - __check)
         raise TooManyRequests(response, text)
+
+    else:
+        raise PytweetException(
+            f"Unknown exception raised (status code: {response.status_code}): Open an issue in github or go to the support server to report this error unknown exception!"
+        )
 
 
 RequestModel: Union[Dict[str, Any], Any] = Any
@@ -523,9 +531,9 @@ class HTTPClient:
     def post_tweet(self, text: str, *, http_client=None, **kwargs: Any) -> Union[NoReturn, Any]:
         """
         .. note::
-            This function is still under development, though you can still use it and open an issue if it still cause an error.
+            This function is almost complete! though you can still use and open an issue in github if it cause an error.
 
-        Make a POST Request to post a tweet to twitter from the client itself.
+        Make a POST Request to post a tweet through with the given arguments.
 
         .. versionadded:: 1.1.0
 
@@ -543,6 +551,25 @@ class HTTPClient:
         self.tweet_cache[tweet.id] = tweet
 
         return tweet
+
+    def delete_tweet(self, tweet_id: Union[str, int]) -> None:
+        """
+        .. note::
+            This function is almost complete! though you can still use and open an issue in github if it cause an error.
+
+        Make a DELETE Request to delete a tweet through the tweet_id.
+
+        .. versionadded:: 1.2.0
+        """
+
+        self.request(Route("DELETE", "2", f"/tweets/{tweet_id}"), auth=True)
+
+        try:
+            self.tweet_cache.pop(tweet_id)
+        except KeyError:
+            pass
+
+        return None
 
     def follow_user(self, user_id: Union[str, int]) -> RelationFollow:
         """Make a POST Request to follow a Messageable object.

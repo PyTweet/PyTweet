@@ -1,11 +1,10 @@
 import datetime
 from typing import Any, Optional
-
 from dateutil import parser
 
 
 def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
-    """Optional[Any]: Parse time return from twitter to datetime object!
+    """:class:`datetime.datetime`: Parse time return from twitter to datetime object!
 
     .. versionadded: 1.1.3
     """

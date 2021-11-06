@@ -35,12 +35,14 @@ class Messageable:
     def send(self, text: str = None, *, quick_reply: QuickReply = None):
         """:class:`DirectMessage`: Send a message to a specific Messageable object.
 
-        Parameters:
-        -----------
-        text: str
+        Parameters
+        ------------
+        text: :class:`str`
             The text that will be send to that user.
 
-        This function return a :class:`DirectMessage` object
+        Returns
+        ---------
+        This method return a :class:`DirectMessage` object.
 
         .. versionadded:: 1.1.0
         """
@@ -56,12 +58,16 @@ class Messageable:
         """Get a message from a Messageable object.
 
         .. warning::
-            This method use api call and might cause ratelimit if use often! You can instead use :class:`Client().get_message()` which get the message through the client message cache. As of right now, only the client's message thats going to be store in the cache!
+            This method use api call and might cause ratelimit if use often! You can instead use `get_message()` which get the message through the client message cache. As of right now, only the client's message that's going to be store in the cache!
 
-        Parameters:
-        -----------
-        event_id: int
+        Parameters
+        ------------
+        event_id: Union[:class:`str`, :class:`int`]
             The event id. Every time a Direct Message is created, its going to return a unique ID called event id.
+
+        Returns
+        ---------
+        This method return :class:`DirectMessage` object.
 
 
         .. versionadded:: 1.2.0
@@ -72,7 +78,9 @@ class Messageable:
     def follow(self) -> RelationFollow:
         """:class:`RelationFollow`: Follow a Messageable object.
 
-        This function return a :class:`RelationFollow` object.
+        Returns
+        ---------
+        This method return :class:`RelationFollow` object.
 
         .. versionadded:: 1.1.0
         """
@@ -82,9 +90,9 @@ class Messageable:
     def unfollow(self) -> RelationFollow:
         """:class:`RelationFollow`: Unfollow a Messageable object.
 
-        .. versionadded: 1.1.0
-
-        This function return a :class:`RelationFollow` object.
+        Returns
+        ---------
+        This method return a :class:`RelationFollow` object
 
         .. versionadded:: 1.1.0
         """
@@ -94,12 +102,20 @@ class Messageable:
     def block(self) -> None:
         """Block a Messageable object.
 
+        Returns
+        ---------
+        This method return a None object.
+
         .. versionadded:: 1.1.0
         """
         self.http_client.block_user(self._payload.get("id"))
 
     def unblock(self) -> None:
         """Unblock a Messageable object.
+
+        Returns
+        ---------
+        This method return a None object.
 
         .. versionadded:: 1.1.0
         """
@@ -151,7 +167,7 @@ class User(Messageable):
 
     @property
     def name(self) -> str:
-        """str: Return the user's name.
+        """:class:`str`: Return the user's name.
 
         .. versionadded: 1.0.0
         """
@@ -159,7 +175,7 @@ class User(Messageable):
 
     @property
     def username(self) -> str:
-        """str: Return the user's username, this usually start with '@' follow by their username.
+        """:class:`str`: Return the user's username, this usually start with '@' follow by their username.
 
         .. versionadded: 1.0.0
         """
@@ -167,7 +183,7 @@ class User(Messageable):
 
     @property
     def id(self) -> int:
-        """int: Return the user's id.
+        """:class:`int`: Return the user's id.
 
         .. versionadded: 1.0.0
         """
@@ -175,7 +191,7 @@ class User(Messageable):
 
     @property
     def bio(self) -> str:
-        """str: Return the user's bio.
+        """:class:`str`: Return the user's bio.
 
         .. versionadded: 1.0.0
         """
@@ -183,7 +199,7 @@ class User(Messageable):
 
     @property
     def description(self) -> str:
-        """str: an alias to User.bio.
+        """:class:`str`: an alias to User.bio.
 
         .. versionadded: 1.0.0
         """
@@ -191,7 +207,7 @@ class User(Messageable):
 
     @property
     def profile_link(self) -> str:
-        """str: Return the user's profile link
+        """:class:`str`: Return the user's profile link
 
         .. versionadded: 1.0.0
         """
@@ -199,7 +215,7 @@ class User(Messageable):
 
     @property
     def link(self) -> str:
-        """str: Return url where the user put links, return an empty string if there isn't a url
+        """:class:`str`: Return url where the user put links, return an empty string if there isn't a url
 
         .. versionadded: 1.0.0
         """
@@ -207,7 +223,7 @@ class User(Messageable):
 
     @property
     def verified(self) -> bool:
-        """bool: Return True if the user is verified account, else False.
+        """:class:`bool`: Return True if the user is verified account, else False.
 
         .. versionadded: 1.0.0
         """
@@ -215,7 +231,7 @@ class User(Messageable):
 
     @property
     def protected(self) -> bool:
-        """bool: Return True if the user is protected, else False.
+        """:class:`bool`: Return True if the user is protected, else False.
 
         .. versionadded: 1.0.0
         """
@@ -223,7 +239,7 @@ class User(Messageable):
 
     @property
     def avatar_url(self) -> Optional[str]:
-        """Optional[str]: Return the user profile image.
+        """Optional[:class:`str`]: Return the user profile image.
 
         .. versionadded: 1.0.0
         """
@@ -231,7 +247,7 @@ class User(Messageable):
 
     @property
     def location(self) -> Optional[str]:
-        """str: Return the user's location
+        """:class:`str`: Return the user's location
 
         .. versionadded: 1.0.0
         """
@@ -239,7 +255,7 @@ class User(Messageable):
 
     @property
     def created_at(self) -> datetime.datetime:
-        """:class:datetime.datetime: Return datetime.datetime object with the user's account date.
+        """:class:`datetime.datetime`: Return datetime.datetime object with the user's account date.
 
         .. versionadded: 1.0.0
         """
@@ -247,7 +263,7 @@ class User(Messageable):
 
     @property
     def pinned_tweet(self) -> Optional[object]:
-        """Optional[object]: Returns the user's pinned tweet.
+        """Optional[:class:`object`]: Returns the user's pinned tweet.
 
         .. versionadded: 1.1.3
         """
@@ -256,7 +272,7 @@ class User(Messageable):
 
     @property
     def followers(self) -> Union[List[U], List]:
-        """:class:`List[User]`: Returns a list of users who are followers of the specified user ID. Maximum users is 100 users.
+        """List[:class:`User`]: Returns a list of users who are followers of the specified user ID. Maximum users is 100 users.
 
         .. versionadded: 1.1.0
         """
@@ -264,7 +280,7 @@ class User(Messageable):
 
     @property
     def following(self) -> Union[List[U], List]:
-        """:class:`List[User]`: Returns a list of users that's followed by the specified user ID. Maximum users is 100 users.
+        """List[:class:`User`]`: Returns a list of users that's followed by the specified user ID. Maximum users is 100 users.
 
         .. versionadded: 1.1.0
         """
@@ -272,7 +288,7 @@ class User(Messageable):
 
     @property
     def follower_count(self) -> int:
-        """int: Return total of followers that a user has.
+        """:class:`int`: Return total of followers that a user has.
 
         .. versionadded: 1.1.0
         """
@@ -280,7 +296,7 @@ class User(Messageable):
 
     @property
     def following_count(self) -> int:
-        """int: Return total of following that a user has.
+        """:class:`int`: Return total of following that a user has.
 
         .. versionadded: 1.1.0
         """
@@ -288,7 +304,7 @@ class User(Messageable):
 
     @property
     def tweet_count(self) -> int:
-        """int: Return total of tweet that a user has.
+        """:class:`int`: Return total of tweet that a user has.
 
         .. versionadded: 1.1.0
         """
@@ -296,7 +312,7 @@ class User(Messageable):
 
     @property
     def listed_count(self) -> int:
-        """int: Return total of listed that a user has.
+        """:class:`int`: Return total of listed that a user has.
 
         .. versionadded: 1.1.0
         """

@@ -22,7 +22,7 @@ class UserPublicMetrics:
 
     @property
     def follower_count(self) -> int:
-        """int: Returns total of followers that a user has.
+        """:class:`int`: Returns total of followers that a user has.
 
         .. versionadded:: 1.1.0
         """
@@ -30,7 +30,7 @@ class UserPublicMetrics:
 
     @property
     def following_count(self) -> int:
-        """int: Returns total of following that a user has.
+        """:class:`int`: Returns total of following that a user has.
 
         .. versionadded:: 1.1.0
         """
@@ -38,7 +38,7 @@ class UserPublicMetrics:
 
     @property
     def tweet_count(self) -> int:
-        """int: Returns total of tweet that a user has.
+        """:class:`int`: Returns total of tweet that a user has.
 
         .. versionadded:: 1.1.0
         """
@@ -46,7 +46,7 @@ class UserPublicMetrics:
 
     @property
     def listed_count(self) -> int:
-        """int: Returns total of listed that a user has.
+        """:class:`int`: Returns total of listed that a user has.
 
         .. versionadded:: 1.1.0
         """
@@ -69,7 +69,7 @@ class TweetPublicMetrics:
 
     @property
     def like_count(self) -> int:
-        """int: Return total of likes that the tweet has.
+        """:class:`int`: Return total of likes that the tweet has.
 
         .. versionadded:: 1.1.0
         """
@@ -77,7 +77,7 @@ class TweetPublicMetrics:
 
     @property
     def retweet_count(self) -> int:
-        """int: Return total of retweetes that the tweet has.
+        """:class:`int`: Return total of retweetes that the tweet has.
 
         .. versionadded:: 1.1.0
         """
@@ -85,7 +85,7 @@ class TweetPublicMetrics:
 
     @property
     def reply_count(self) -> int:
-        """int: Return total of replies that the tweet has.
+        """:class:`int`: Return total of replies that the tweet has.
 
         .. versionadded:: 1.1.0
         """
@@ -93,7 +93,7 @@ class TweetPublicMetrics:
 
     @property
     def quote_count(self) -> int:
-        """int: Return total of quotes that the tweet has.
+        """:class:`int`: Return total of quotes that the tweet has.
 
         .. versionadded:: 1.1.0
         """
