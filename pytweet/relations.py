@@ -83,7 +83,7 @@ class RelationRetweet:
         self._payload: Dict[Any, Any] = data["data"]
 
     def __repr__(self) -> str:
-        return "RelationRetweet(liked: {0.retweet})".format(self)
+        return "RelationRetweet(liked: {0.retweeted})".format(self)
 
     @property
     def retweeted(self) -> bool:

@@ -114,7 +114,7 @@ class Client:
         """:class:`Tweet`: A function for HTTPClient.fetch_tweet().
 
         .. warning::
-        This method uses api call and might cause ratelimit if used often! More recommended to use get_tweet to get the **client's tweet**.
+        This method uses api call and might cause ratelimit if used often! More recommended to use get_tweet to get the client's tweet.
 
         Parameters
         ------------
