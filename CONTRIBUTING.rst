@@ -30,9 +30,12 @@ that any documentation update is done in the same way was a code contribution.
 When working on documentation changes in your local machine, you can
 compile them using the following commands:
 
-``cd docs/``
-``make clean html``
-``python3 -m http.server -d _build/html``
+.. code:: bash
+
+    cd docs/
+    make clean html
+    python3 -m http.server -d _build/html
+
 
 
 Code Contributions
