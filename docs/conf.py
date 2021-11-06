@@ -11,7 +11,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 
-"""NOTE: that configuration file is taken directly fromdiscord.py."""
+"""NOTE: that configuration file is taken directly from discord.py."""
 
 import re
 
@@ -20,6 +20,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(".."))
+sys.path.append(os.path.abspath("extensions"))
 
 
 # -- Project information -----------------------------------------------------
@@ -36,6 +37,7 @@ author = "TheGenocide & TheFarGG"
 # ones.
 
 extensions = [
+    "attributetable",
     "sphinx.ext.autodoc",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
@@ -76,9 +78,6 @@ if version:
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
 language = None
-
-locale_dirs = ["locale/"]
-gettext_compact = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

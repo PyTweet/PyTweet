@@ -76,7 +76,3 @@ document.addEventListener('DOMContentLoaded', () => {
         pattern = new RegExp(pattern, 'i');
     }
 });
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
