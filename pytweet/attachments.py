@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime
 from typing import Any, Dict, List, NoReturn, Optional, TypeVar, Union
-from .errors import BadArguments
 from .utils import time_parse_todt
 
 M = TypeVar("M", bound="Media")
@@ -304,14 +303,6 @@ class QuickReply:
 
         .. versionadded:: 1.2.0
         """
-        if len(label) >= 36:
-            raise BadArguments(None, "Label must be less then 36 characters.")
-
-        if len(description) >= 72:
-            raise BadArguments(None, "Description must be less then 72 characters.")
-
-        if len(metadata) >= 1000:
-            raise BadArguments(None, "metadata must be less then 1000 characters.")
 
         self.options.append({"label": label, "description": description, "metadata": metadata})
 
