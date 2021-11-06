@@ -31,7 +31,7 @@ def check_error(response: requests.models.Response) -> NoReturn:
             except KeyError:
                 raise PytweetException(json)
 
-    elif code == 204:
+    elif code in (201, 204):
         pass
 
     elif code == 400:
@@ -71,7 +71,7 @@ class Route:
 
 
 class HTTPClient:
-    """Represents the http/base client for :class:`Client` !
+    """Represents the http/base client for :class:`Client`
     This http/base client have methods for making requests to twitter's api!
 
     Parameters:
@@ -96,10 +96,10 @@ class HTTPClient:
     credentials
         The credentials in a dictionary.
 
-    Raises:
-    -------
-        pytweet.errors.Unauthorized:
-            Raise when the api return code: 401. This usually because you passed invalid credentials.
+    Raises
+    --------
+    pytweet.errors.Unauthorized:
+        Raise when the api return code: 401. This usually because you passed invalid credentials.
 
     .. versionadded:: 1.0.0
     """
