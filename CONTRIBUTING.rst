@@ -15,12 +15,6 @@ If you experience bugs or general issues with ``pytweet``, please have a look
 on the `issue tracker`. If you don't see anything useful there, please feel
 free to fire an issue report.
 
-New issue reports should include information about your programming environment
-(e.g., operating system, Python version) and steps to reproduce the problem.
-Please try also to simplify the reproduction steps to a very minimal example
-that still illustrates the problem you are facing. By removing other factors,
-you help us to identify the root cause of the issue.
-
 
 Documentation Improvements
 ==========================
@@ -36,11 +30,9 @@ that any documentation update is done in the same way was a code contribution.
 When working on documentation changes in your local machine, you can
 compile them using the following commands:
 
-.. code:: sh
-
-cd docs/
-make clean html
-python3 -m http.server -d _build/html
+``cd docs/``
+``make clean html``
+``python3 -m http.server -d _build/html``
 
 
 Code Contributions
