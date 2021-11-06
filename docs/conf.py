@@ -37,12 +37,11 @@ author = "TheGenocide & TheFarGG"
 # ones.
 
 extensions = [
-    "builder",
+    "attributetable",
     "sphinx.ext.autodoc",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
-    "attributetable",
 ]
 autodoc_member_order = "bysource"
 autodoc_typehints = "none"
