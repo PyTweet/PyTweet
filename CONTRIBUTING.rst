@@ -57,9 +57,9 @@ This can easily be done via either virtualenv
 Clone the repository
 --------------------
 
-#. Create an user account on |the repository service| if you do not already have one.
+#. Create an user account on the github if you do not already have one.
 #. Fork the project repository: click on the *Fork* button near the top of the
-   page. This creates a copy of the code under your account on |the repository service|.
+   page. This creates a copy of the code under your account on github.
 #. Clone this copy to your local disk::
 
     git clone https://github.com/YOUR_NAME/PyTweet
