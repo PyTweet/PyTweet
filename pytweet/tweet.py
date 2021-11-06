@@ -234,7 +234,9 @@ class Tweet(Message):
 
         Returns
         ---------
-        Returns a :class:`RelationLike` object.
+        :class:`RelationLike`
+            Returns a :class:`RelationLike` object.
+
 
         .. versionadded:: 1.2.0
         """
@@ -250,7 +252,9 @@ class Tweet(Message):
 
         Returns
         ---------
-        Returns a :class:`RelationRetweet` object.
+        :class:`RelationRetweet`
+            Returns a :class:`RelationRetweet` object.
+
 
         .. versionadded:: 1.2.0
         """
