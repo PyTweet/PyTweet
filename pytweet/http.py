@@ -13,7 +13,7 @@ from .errors import (
     PytweetException,
     TooManyRequests,
     Unauthorized,
-    BadArguments,
+    BadRequests
 )
 from .message import DirectMessage
 from .relations import RelationFollow
@@ -26,23 +26,30 @@ _log = logging.getLogger(__name__)
 
 def check_error(response: requests.models.Response) -> NoReturn:
     code = response.status_code
+    print(code)
     if code == 200:
         json = response.json()
         if "errors" in json.keys():
             try:
                 if json["errors"][0]["detail"].startswith("Could not find"):
-                    raise NotFound(response, json["errors"][0]["detail"])
+                    raise NotFound(response)
 
                 else:
                     raise PytweetException(response, json["errors"][0]["detail"])
             except KeyError:
                 raise PytweetException(json)
 
+    elif code == 400:
+        raise BadRequests(response)
+
     elif code == 401:
         raise Unauthorized(response, "Invalid credentials passed!")
 
     elif code == 403:
         raise Forbidden(response)
+
+    elif code == 404:
+        raise NotFound(response)
 
     elif code == 429:
         text = response.text
@@ -113,6 +120,9 @@ class HTTPClient:
             "access_token": access_token,
             "access_token_secret": access_token_secret,
         }
+        self.message_cache = {}
+        self.tweet_cache = {}
+
         if not bearer_token:
             _log.error("bearer token is missing!")
         if not consumer_key:
@@ -198,18 +208,20 @@ class HTTPClient:
             auth.set_access_token(self.access_token, self.access_token_secret)
             auth = auth.oauth1
 
-        respond = res(route.url, headers=headers, params=params, json=json, auth=auth)
+        response = res(route.url, headers=headers, params=params, json=json, auth=auth)
 
-        check_error(respond)
-        res = respond.json()
+        check_error(response)
+        if response.status_code in (204,):
+            return
 
+        res = response.json()
         if "meta" in res.keys():
             if res["meta"]["result_count"] == 0:
                 return []
 
         if is_json:
             return res
-        return respond
+        return response
 
     def fetch_user(self, user_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> User:
         """Make a Request to obtain the user from the given user id.
@@ -428,6 +440,8 @@ class HTTPClient:
         .. versionadded:: 1.1.0
 
         .. versionchanged:: 1.2.0
+
+        Make the method functional and return :class:`DirectMessage`
         """
         data = {
             "event": {
@@ -443,23 +457,14 @@ class HTTPClient:
             if not quick_reply:
                 pass
             else:
-                raise BadArguments(
-                    None,
-                    "'quick_reply' kwargs must be an instance of pytweet.QuickReply",
-                )
+                raise PytweetException("'quick_reply' is not an instance of pytweet.QuickReply")
 
         message_data = data["event"]["message_create"]["message_data"]
 
         if text or not text:
-            try:
-                message_data["text"] = str(text)
-            except ValueError:
-                raise BadArguments(None, "Invalid argument type for 'text'.")
+            message_data["text"] = str(text)
 
         if quick_reply:
-            if quick_reply.items >= 20:
-                raise BadArguments(None, "Maximum quick reply's options must be less then equal 20.")
-
             message_data["quick_reply"] = {
                 "type": quick_reply.type,
                 "options": quick_reply.options,
@@ -470,7 +475,10 @@ class HTTPClient:
             json=data,
             auth=True,
         )
-        return DirectMessage(res, http_client=http_client if http_client else self)
+        msg=DirectMessage(res, http_client=http_client if http_client else self)
+        self.message_cache[msg.id] = msg
+        
+        return msg
 
     def delete_message(self, event_id: Union[str, int]) -> None:
         """
@@ -486,43 +494,25 @@ class HTTPClient:
 
         .. versionadded:: 1.1.0
         """
-        res = self.request(
+        self.request(
             route=Route("DELETE", "1.1", f"/direct_messages/events/destroy.json?id={event_id}"),
             auth=True,
         )
 
-        return res
+        return None
 
-    def get_message(self, event_id: Union[str, int]) -> None:
+    def post_tweet(self, text: str, *, http_client = None, **kwargs: Any) -> Union[NoReturn, Any]:
         """
-        .. warning::
-            This function is still under development and will raise an error when used!
-
-        Make a DELETE Request for deleting a certain message in a Messageable object.
-
-        Parameters:
-        -----------
-        id:
-            The id of the Direct Message event that you want to delete.
-
-        .. versionadded:: 1.1.0
-        """
-        res = self.request(
-            route=Route("GET", "1.1", f"/direct_messages/events/show.json"),
-            params={"id": event_id},
-            auth=True,
-        )
-
-        return DirectMessage(res, http_client=self)
-
-    def post_tweet(self, text: str, **kwargs: Any) -> Union[NoReturn, Any]:
-        """
-        .. warning::
-            This function is still under development and will raise an error when used!
+        .. note::
+            This function is still under development, though you can still use it and open an issue if it still cause an error.
 
         Make a POST Request to post a tweet to twitter from the client itself.
 
         .. versionadded:: 1.1.0
+
+        .. versionchanged:: 1.2.0
+
+        Make the method functional and return :class:`Tweet`
         """
 
         payload = {}
@@ -530,8 +520,10 @@ class HTTPClient:
             payload["text"] = text
 
         res = self.request(Route("POST", "2", "/tweets"), json=payload, auth=True)
+        tweet=Tweet(res, http_client=http_client if http_client else self)
+        self.tweet_cache[tweet.id] = tweet 
 
-        return res
+        return tweet
 
     def follow_user(self, user_id: Union[str, int]) -> RelationFollow:
         """Make a POST Request to follow a Messageable object.
@@ -572,7 +564,7 @@ class HTTPClient:
 
         .. versionchanged:: 1.2.0
 
-        Make the method functional and return :class:`RelationFollow
+        Make the method functional and return :class:`RelationFollow`
         """
         my_id = self.access_token.partition("-")[0]
         res = self.request(Route("DELETE", "2", f"/users/{my_id}/following/{user_id}"), auth=True)
