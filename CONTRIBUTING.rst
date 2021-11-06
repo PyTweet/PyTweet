@@ -45,6 +45,7 @@ Before you start coding, we recommend creating an isolated `virtual
 environment` to avoid any problems with your installed Python packages.
 This can easily be done via either virtualenv
 
+.. code:: bash
     pip install virtualenv
     virtualenv venv
     source venv/bin/activate
