@@ -46,7 +46,12 @@ extensions = [
 autodoc_member_order = "bysource"
 autodoc_typehints = "none"
 
-extlinks = {"issue": ("https://github.com/TheFarGG/PyTweet/issues/%s", "GH-")}
+extlinks = {
+    "issue": ("https://github.com/TheFarGG/PyTweet/issues/%s", ""),
+    "gh": ("https://github.com/TheFarGG/PyTweet/%s", ""),
+    "discord": ("https://discord.com/invite/XHBhg6A4jJ/%s", ""),
+}
+
 
 # Links used for cross-referencing stuff in other documentation
 intersphinx_mapping = {
@@ -64,7 +69,9 @@ master_doc = "index"
 version = ""
 try:
     with open("../pytweet/__init__.py") as f:
-        version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
+        version = re.search(
+            r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE
+        ).group(1)
 except Exception:
     pass
 
@@ -89,7 +96,6 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # The style name to use for Pygments highlighting of source code.
 pygments_style = "friendly"
-pygments_dark_style = "monokai"
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -117,4 +123,4 @@ html_theme = "basic"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
