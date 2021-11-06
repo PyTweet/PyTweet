@@ -72,7 +72,7 @@ class DirectMessage(Message):
         event_id: int
             The event id. Every time a Direct Message is created, its going to return a unique ID called event id.
 
-        .. versionadded:: 1.1.0
+        .. versionadded:: 1.2.0
         """
         self.http_client.delete_message(self.id)
         return None
