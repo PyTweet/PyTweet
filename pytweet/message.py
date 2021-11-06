@@ -24,7 +24,7 @@ class Message:
         The messages's text.
 
     id: Union[str, int]
-        The messages's ID or event id for DirectMessage.
+        The messages's unique ID.
 
     .. versionadded:: 1.2.0
     """
@@ -65,6 +65,19 @@ class DirectMessage(Message):
     def __str__(self) -> str:
         return self.text
 
+    def delete(self) -> None:
+        """Delete a DirectMessage object.
+
+        Parameters:
+        -----------
+        event_id: int
+            The event id. Every time a Direct Message is created, its going to return a unique ID called event id.
+
+        .. versionadded:: 1.1.0
+        """
+        self.http_client.delete_message(self.id)
+        return None
+
     @property
     def event_type(self) -> MessageEventTypeEnum:
         """:class:`MessageEventTypeEnum`: Returns the message event type.
@@ -91,7 +104,7 @@ class DirectMessage(Message):
             return None
 
         user_id = self.message_create.get("target").get("recipient_id")
-        user = self.http_client.fetch_user(user_id, self.http_client)
+        user = self.http_client.fetch_user(user_id, http_client=self.http_client)
         return user
 
     @property
