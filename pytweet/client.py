@@ -28,7 +28,7 @@ class Client:
     ------------
     http: Optional[:class:`HTTPClient`]
         Return the HTTPClient, HTTPClient is responsible for making most of the Requests.
-        
+
 
     .. versionadded:: 1.0.0
     """

@@ -221,11 +221,7 @@ class Tweet(Message):
         route = self.http_client.make_route("POST", "2", f"/users/{my_id}/likes")
 
         payload = {"tweet_id": str(self.id)}
-        res = self.http_client.request(
-            route, 
-            json=payload, 
-            auth=True
-        )
+        res = self.http_client.request(route, json=payload, auth=True)
 
         return RelationLike(res)
 
