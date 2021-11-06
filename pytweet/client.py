@@ -3,6 +3,7 @@ from typing import Any, Optional, Union
 from .http import HTTPClient
 from .tweet import Tweet
 from .user import User
+from .message import DirectMessage
 
 __all__ = ("Client",)
 
@@ -70,8 +71,11 @@ class Client:
         me = self.get_user(my_id)
         return me
 
-    def get_user(self, user_id: Union[str, int]) -> User:
+    def fetch_user(self, user_id: Union[str, int]) -> User:
         """A function for HTTPClient.fetch_user().
+
+        .. warning::
+            This method use api call and might cause ratelimit if use often!
 
         Parameters:
         -----------
@@ -84,8 +88,11 @@ class Client:
         """
         return self.http.fetch_user(user_id, http_client=self.http)
 
-    def get_user_by_username(self, username: str) -> User:
+    def fetch_user_by_username(self, username: str) -> User:
         """A function for HTTPClient.fetch_user_byusername().
+
+        .. warning::
+            This method use api call and might cause ratelimit if use often!
 
         Parameters:
         -----------
@@ -98,8 +105,11 @@ class Client:
         """
         return self.http.fetch_user_byusername(username, http_client=self.http)
 
-    def get_tweet(self, tweet_id: Union[str, int]) -> Tweet:
+    def fetch_tweet(self, tweet_id: Union[str, int]) -> Tweet:
         """A function for HTTPClient.fetch_tweet().
+        
+        .. warning::
+            This method use api call and might cause ratelimit if use often!
 
         Parameters:
         -----------
@@ -120,5 +130,56 @@ class Client:
 
         .. versionadded:: 1.1.0
         """
-        res = self.http.post_tweet(text, **kwargs)
+        http_client=kwargs.get('http_client', None)
+        res = self.http.post_tweet(text, http_client=http_client if http_client else self.http, **kwargs)
         return res
+
+    def get_message(self, event_id: Union[str, int]) -> Optional[DirectMessage]:
+        """Get a direct message through the client message cache. Return None if the message is not in the cache.
+
+        .. note::
+            Note that, only the client's message is going to be stored.
+
+        Parameters:
+        -----------
+        event_id: Union[str, int]
+            The event id of the Direct Message event that you want to get.
+
+        Raises:
+        -------
+            ValueError:
+                Raise when the event_id argument is not an integer or a string of digits.
+
+        .. versionadded:: 1.2.0
+        """
+        try:
+            event_id=int(event_id)
+        except ValueError:
+            raise ValueError("Event id must be an integer or a string of digits.")
+            
+        return self.http.message_cache.get(event_id)
+
+    def get_tweet(self, tweet_id: Union[str, int]) -> Optional[Tweet]:
+        """Get a tweet through the client tweet cache. Return None if the tweet is not in the cache.
+
+        .. note::
+            Note that, only the client's tweet is going to be stored.
+
+        Parameters:
+        -----------
+        event_id: Union[str, int]
+            The id of a tweet that you want to get.
+
+        Raises:
+        -------
+            ValueError:
+                Raise when the tweet_id argument is not an integer or a string of digits.
+
+        .. versionadded:: 1.2.0
+        """
+        try:
+            tweet_id=int(tweet_id)
+        except ValueError:
+            raise ValueError("tweet_id must be an integer or a string of digits.")
+            
+        return self.http.message_cache.get(tweet_id)
