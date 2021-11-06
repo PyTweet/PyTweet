@@ -61,7 +61,7 @@ If you want to see what changes black will make, you can do:
 Testing
 ==================
 
-Currently we are setting up tests with pytest, however it is not done yet, don't put any tests folders, if you do please put the them in the ``.gitignore``
+Currently, we are setting up tests with pytest, however it is not done yet, don't put any tests folders, if you do please put the them in the ``.gitignore``
 
 
 
