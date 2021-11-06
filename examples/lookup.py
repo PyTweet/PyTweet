@@ -1,5 +1,5 @@
 """
-This is a simple code for getting user & Tweet's info.
+This is a simple code for user and tweet lookup!
 """
 import pytweet
 
@@ -12,10 +12,10 @@ client = pytweet.Client(
 )  # if you dont have one make an application in https://apps.twitter.com
 
 
-user = client.get_user_by_username("TheGenocides")
+user = client.fetch_user_by_username("TheGenocides")
 print(user.name, user.username, user.id)
-# Return The user's name, username, and id
+# Returns The user's name, username, and id
 
-tweet = client.get_tweet("Tweet ID Here")
+tweet = client.fetch_tweet("The tweet id in INTEGER form!")
 print(tweet.text, tweet.id, tweet.author.username)
-# Return the tweet's text, id, and the author's username.
+# Returns the tweet's text, id, and the author's username.
