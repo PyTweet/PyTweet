@@ -116,7 +116,7 @@ Implement your changes
 Submit your contribution
 ------------------------
 
-#. If everything works fine, push your local branch to |the repository service| with::
+#. If everything works fine, push your local branch to github with::
 
     git push -u origin <my-feature>
 
