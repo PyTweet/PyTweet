@@ -24,6 +24,13 @@ Manuals
 -----------------
 - :doc:`api`
 
+
+Links
+-----------------
+- :gh:`Github`
+- :issue:`Report a bug`
+- :discord:`Discord Server`
+
 Indices and tables
 ==================
 
