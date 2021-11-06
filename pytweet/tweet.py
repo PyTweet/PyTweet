@@ -268,7 +268,7 @@ class Tweet(Message):
 
     @property
     def retweetes(self) -> Union[List[User], list]:
-        """:class`Optional[List[User], int]`: Return a list of users that's retweeted the specified tweet's id. Maximum users is 100. Return empty list if no one retweeted.
+        """:class:`Optional[List[User], int]`: Return a list of users that's retweeted the specified tweet's id. Maximum users is 100. Return empty list if no one retweeted.
 
         .. versionadded: 1.0.0
         """
@@ -276,7 +276,7 @@ class Tweet(Message):
 
     @property
     def likes(self) -> Union[List[User], list]:
-        """:class`Optional[List[User], int]`: Return a list of users that liked the specified tweet's id. Maximum users is 100. Return empty list if no one liked.
+        """:class:`Optional[List[User], list]`: Return a list of users that liked the specified tweet's id. Maximum users is 100. Return empty list if no one liked.
 
         .. versionadded: 1.0.0
         """
