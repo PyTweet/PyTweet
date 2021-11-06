@@ -5,8 +5,6 @@ __pycache__/
 *pyproject.toml
 *.breakpoints
 docs/_build
-docs/_static
-docs/_templates
 *.inv
 *.buildinfo
 *.doctree
@@ -15,3 +13,4 @@ build/
 dist/
 *.egg-info
 tests/
+*DS_Store
