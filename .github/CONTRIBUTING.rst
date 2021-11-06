@@ -13,7 +13,7 @@ Issue Reports
 
 If you experience bugs or general issues with ``pytweet``, please have a look
 on the `issue tracker`. If you don't see anything useful there, please feel
-free to fire an issue report.
+free to open an issue report.
 
 
 Documentation Improvements
