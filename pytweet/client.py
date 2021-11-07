@@ -63,7 +63,7 @@ class Client:
             return None
 
         my_id = self.http.access_token.partition("-")[0]
-        me = self.get_user(my_id)
+        me = self.fetch_user(my_id)
         return me
 
     def fetch_user(self, user_id: Union[str, int]) -> User:
@@ -81,7 +81,6 @@ class Client:
         ---------
         :class:`User`
             This method returns a :class:`User` object.
-
 
 
         .. versionadded:: 1.0.0
