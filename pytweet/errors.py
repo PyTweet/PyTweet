@@ -129,7 +129,7 @@ class TooManyRequests(HTTPException):
     pass
 
 
-class NotFound(APIException):
+class NotFoundError(APIException):
     """This error is usually returns when trying to find specific Tweet, User that does not exist.
 
     .. versionadded:: 1.0.0

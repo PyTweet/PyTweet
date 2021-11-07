@@ -20,6 +20,7 @@ from .attachments import QuickReply
 if TYPE_CHECKING:
     from .http import HTTPClient
 
+
 class User:
     """Represent a user in Twitter.
     User is an identity in twitter, its very interactive. Can send message, post a tweet, and even send messages to other user through Dms.
@@ -90,7 +91,7 @@ class User:
 
         Returns
         ---------
-        :class:`RelationFollow` 
+        :class:`RelationFollow`
             This method return :class:`RelationFollow` object.
 
         .. versionadded:: 1.1.0
@@ -103,7 +104,7 @@ class User:
 
         Returns
         ---------
-        :class:`RelationFollow`    
+        :class:`RelationFollow`
             This method return a :class:`RelationFollow` object
 
         .. versionadded:: 1.1.0
@@ -120,10 +121,6 @@ class User:
 
     def unblock(self) -> None:
         """unblock the user.
-
-        Returns
-        ---------
-        This method return a None object.
 
         .. versionadded:: 1.1.0
         """

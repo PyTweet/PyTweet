@@ -7,7 +7,8 @@ import requests
 from typing import Any, Dict, NoReturn, Optional, Union
 
 from .auth import OauthSession
-from .errors import Forbidden, NotFound, PytweetException, TooManyRequests, Unauthorized, BadRequests
+from .errors import Forbidden, NotFoundError, PytweetException, TooManyRequests, Unauthorized, BadRequests, NotFound
+
 from .message import DirectMessage
 from .relations import RelationFollow
 from .tweet import Tweet
@@ -24,7 +25,7 @@ def check_error(response: requests.models.Response) -> NoReturn:
         if "errors" in json.keys():
             try:
                 if json["errors"][0]["detail"].startswith("Could not find"):
-                    raise NotFound(response)
+                    raise NotFoundError(response)
 
                 else:
                     raise PytweetException(response, json["errors"][0]["detail"])
@@ -60,6 +61,7 @@ def check_error(response: requests.models.Response) -> NoReturn:
 
 
 RequestModel: Union[Dict[str, Any], Any] = Any
+
 
 class HTTPClient:
     """Represents the http/base client for :class:`Client`
@@ -193,7 +195,7 @@ class HTTPClient:
         check_error(response)
         if response.status_code in (201, 204):
             return
-        
+
         res = response.json()
         if "meta" in res.keys():
             if res["meta"]["result_count"] == 0:
@@ -232,8 +234,8 @@ class HTTPClient:
             raise ValueError("user_id must be an int, or a string of digits!")
 
         data = self.request(
-            "GET", 
-            "2", 
+            "GET",
+            "2",
             f"/users/{user_id}",
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
@@ -243,10 +245,10 @@ class HTTPClient:
         )
 
         followers = self.request(
-            "GET", 
+            "GET",
             "2",
             f"/users/{user_id}/followers",
-            headers = {"Authorization": f"Bearer {self.bearer_token}"},
+            headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
             },
@@ -344,8 +346,8 @@ class HTTPClient:
             return None
 
         res = self.request(
-            "GET", 
-            "2", 
+            "GET",
+            "2",
             f"/tweets/{tweet_id}",
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
@@ -360,8 +362,8 @@ class HTTPClient:
         )
 
         res2 = self.request(
-            "GET", 
-            "2", 
+            "GET",
+            "2",
             f"/tweets/{tweet_id}/retweeted_by",
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
@@ -370,7 +372,7 @@ class HTTPClient:
         )
 
         res3 = self.request(
-            "GET", 
+            "GET",
             "2",
             f"/tweets/{tweet_id}/liking_users",
             headers={"Authorization": f"Bearer {self.bearer_token}"},
@@ -465,8 +467,8 @@ class HTTPClient:
             }
 
         res = self.request(
-            "POST", 
-            "1.1", 
+            "POST",
+            "1.1",
             "/direct_messages/events/new.json",
             json=data,
             auth=True,
@@ -491,8 +493,8 @@ class HTTPClient:
         Make the method functional and return :class:`Tweet`
         """
         self.request(
-            "DELETE", 
-            "1.1", 
+            "DELETE",
+            "1.1",
             f"/direct_messages/events/destroy.json?id={event_id}",
             auth=True,
         )
@@ -523,12 +525,7 @@ class HTTPClient:
         except ValueError:
             raise ValueError("event_id must be an integer or a :class:`str`ing of digits.")
 
-        res = self.request(
-            "GET", 
-            "1.1", 
-            f"/direct_messages/events/show.json?id={event_id}", 
-            auth=True
-        )
+        res = self.request("GET", "1.1", f"/direct_messages/events/show.json?id={event_id}", auth=True)
 
         return DirectMessage(res, http_client=http_client if http_client else self)
 
@@ -550,14 +547,8 @@ class HTTPClient:
         if text:
             payload["text"] = text
 
-        res = self.request(
-            "POST", 
-            "2", 
-            "/tweets", 
-            json=payload, 
-            auth=True
-        )
-        
+        res = self.request("POST", "2", "/tweets", json=payload, auth=True)
+
         tweet = Tweet(res, http_client=http_client if http_client else self)
         self.tweet_cache[tweet.id] = tweet
 
@@ -573,12 +564,7 @@ class HTTPClient:
         .. versionadded:: 1.2.0
         """
 
-        self.request(
-            "DELETE", 
-            "2", 
-            f"/tweets/{tweet_id}", 
-            auth=True
-        )
+        self.request("DELETE", "2", f"/tweets/{tweet_id}", auth=True)
 
         try:
             self.tweet_cache.pop(tweet_id)
@@ -606,8 +592,8 @@ class HTTPClient:
         """
         my_id = self.access_token.partition("-")[0]
         res = self.request(
-            "POST", 
-            "2", 
+            "POST",
+            "2",
             f"/users/{my_id}/following",
             json={"target_user_id": str(user_id)},
             auth=True,
@@ -631,12 +617,7 @@ class HTTPClient:
         Make the method functional and return :class:`RelationFollow`
         """
         my_id = self.access_token.partition("-")[0]
-        res = self.request(
-            "DELETE",
-            "2",
-            f"/users/{my_id}/following/{user_id}",
-            auth=True
-        )
+        res = self.request("DELETE", "2", f"/users/{my_id}/following/{user_id}", auth=True)
         return RelationFollow(res)
 
     def block_user(self, user_id: Union[str, int]) -> None:
@@ -651,8 +632,8 @@ class HTTPClient:
         """
         my_id = self.access_token.partition("-")[0]
         self.request(
-            "POST", 
-            "2", 
+            "POST",
+            "2",
             f"/users/{my_id}/blocking",
             json={"target_user_id": str(user_id)},
             auth=True,
@@ -670,9 +651,4 @@ class HTTPClient:
         .. versionadded:: 1.2.0
         """
         my_id = self.access_token.partition("-")[0]
-        self.request(
-            "DELETE",
-            "2",
-            f"/users/{my_id}/blocking/{user_id}",
-            auth=True
-        )
+        self.request("DELETE", "2", f"/users/{my_id}/blocking/{user_id}", auth=True)
