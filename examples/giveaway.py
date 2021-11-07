@@ -3,7 +3,7 @@ Here's another example of what you can make using pytweet.
 In Twitter i've seen a lot of giveaways from crypto to an item like iphone, computer etc. 
 This is a very simple giveaway function using the user's followers! 
 Code Explanation:
-1. The client will get a user. 
+1. The client will fetch a user. 
 2. from user we use the followers `property`.
 3. then using time.sleep it make a delay.
 4. then using random.choice it will pick one user from a list of users. 
@@ -22,8 +22,8 @@ client = pytweet.Client(
 
 
 def giveaway():
-    user = client.get_user_by_username("TheGenocides")
-    followers = user.followers #Note that, maximum users for followers is 100 users.  
+    user = client.fetch_user_by_username("TheGenocides")
+    followers = user.followers #Note that, maximum users for followers is 100 users.
     if len(followers) == 0:  # Check if the user doesnt have a followers.
         return print("This user doesnt have a followers!")
 

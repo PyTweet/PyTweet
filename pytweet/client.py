@@ -7,7 +7,6 @@ from .message import DirectMessage
 
 __all__ = ("Client",)
 
-
 class Client:
     """Represent a client that connected to Twitter!
 
@@ -63,7 +62,7 @@ class Client:
             return None
 
         my_id = self.http.access_token.partition("-")[0]
-        me = self.get_user(my_id)
+        me = self.fetch_user(my_id)
         return me
 
     def fetch_user(self, user_id: Union[str, int]) -> User:
@@ -82,10 +81,8 @@ class Client:
         :class:`User`
             This method returns a :class:`User` object.
 
-
-
     .. versionadded:: 1.0.0
-        """
+    """
         return self.http.fetch_user(user_id, http_client=self.http)
 
     def fetch_user_by_username(self, username: str) -> User:
@@ -134,12 +131,12 @@ class Client:
         """:class:`DirectMessage`: A function for HTTPClient.fetch_message().
 
         .. warning::
-        This method uses api call and might cause ratelimit if used often! Recommended to use `get_message()` method, it only retrieves the client's message only.
+            This method uses api call and might cause ratelimit if used often! Recommended to use `get_message()` method, it only retrieves the client's message only.
 
         Parameters
         ------------
         event_id: Union[:class:`str`, :class:`int`]
-            Represent the tweet id that you wish to get info to fetch.
+            Represent the tweet id that you wish to fetch.
 
         Returns
         ---------

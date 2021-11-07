@@ -61,15 +61,6 @@ def check_error(response: requests.models.Response) -> NoReturn:
 
 RequestModel: Union[Dict[str, Any], Any] = Any
 
-
-class Route:
-    def __init__(self, method: str, version: str, path: str):
-        self.method: str = method
-        self.path: str = path
-        self.base_url: str = f"https://api.twitter.com/{version}"
-        self.url: str = self.base_url + self.path
-
-
 class HTTPClient:
     """Represents the http/base client for :class:`Client`
     This http/base client have methods for making requests to twitter's api!
@@ -138,16 +129,15 @@ class HTTPClient:
         self.consumer_key_secret: Optional[str] = consumer_key_secret
         self.access_token: Optional[str] = access_token
         self.access_token_secret: Optional[str] = access_token_secret
+        self.base_url = "https://api.twitter.com/"
         self.message_cache = {}
         self.tweet_cache = {}
 
-    def make_route(self, method: str, version: str, path: str) -> Route:
-        """:class:`Route`: Function to make a Route, this intent to avoid circular import error."""
-        return Route(method, version, path)
-
     def request(
         self,
-        route: Route,
+        method: str,
+        version: str,
+        path: str,
         *,
         headers: RequestModel = {},
         params: RequestModel = {},
@@ -155,50 +145,42 @@ class HTTPClient:
         auth: bool = False,
         is_json: bool = True,
     ) -> Union[str, Dict[Any, Any], NoReturn]:
-        """Make an HTTP Requests to the api.
+        """This function make an HTTP Request with the given parameters then return a dictionary in a json format.
 
-        Parameters:
-        -----------
+        Parameters
+        ------------
         route: Route
             Represent the Route class, this will be use to configure the endpoint's path, method, and version of the api.
-
         headers: RequestModel
             Represent the http request headers, it usually filled with your bearer token. If this isn't specified then the default argument will be an empty dictionary. Later in the code it will update and gets your bearer token.
-
         params: RequestModel
             Represent the http request parameters, If this isn't specified then the default argument will be an empty dictionary.
-
         json: RequestModel
             Represent the Json data. This usually use for request with POST method.
-
         auth: bool
            Represent a toggle, if auth is True then the request will be handle with Oauth1 particularly OauthSession.
-
         is_json: bool
             Represent a toggle, if its True then the return will be in a json format else its going to be a requests.models.Response object. Default to True.
 
-        Raises:
-        -------
-            pytweet.errors.Unauthorized:
-                Raise when the api return code: 401. This usually because you passed invalid credentials
-
-            pytweet.errors.Forbidden:
-                Raise when the api return code: 403. There's a lot of reason why, This usually happen when the client cannot do the request due to twitter's limitation e.g trying to follow someone that you blocked etc.
-
-            pytweet.errors.TooManyRequests:
-                Raise when the api return code: 429. This happen when you made too much request thus the api ratelimit you. The ratelimit will ware off in a couple of minutes.
-
-        This function make an HTTP Request with the given parameters then return a dictionary in a json format.
+        Raises
+        --------
+        pytweet.errors.Unauthorized:
+            Raise when the api return code: 401. This usually because you passed invalid credentials
+        pytweet.errors.Forbidden:
+            Raise when the api return code: 403. There's a lot of reason why, This usually happen when the client cannot do the request due to twitter's limitation e.g trying to follow someone that you blocked etc.
+        pytweet.errors.TooManyRequests:
+            Raise when the api return code: 429. This happen when you made too much request thus the api ratelimit you. The ratelimit will ware off in a couple of minutes.
 
         .. versionadded:: 1.0.0
         """
+        url = self.base_url + version + path
         user_agent = "Py-Tweet (https://github.com/TheFarGG/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
         if headers == {}:
             headers = {"Authorization": f"Bearer {self.bearer_token}"}
 
         headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
 
-        res = getattr(requests, route.method.lower(), None)
+        res = getattr(requests, method.lower(), None)
         if not res:
             raise TypeError("Method isn't recognizable")
 
@@ -207,12 +189,11 @@ class HTTPClient:
             auth.set_access_token(self.access_token, self.access_token_secret)
             auth = auth.oauth1
 
-        response = res(route.url, headers=headers, params=params, json=json, auth=auth)
-
+        response = res(url, headers=headers, params=params, json=json, auth=auth)
         check_error(response)
-        if response.status_code in (204,):
+        if response.status_code in (201, 204):
             return
-
+        
         res = response.json()
         if "meta" in res.keys():
             if res["meta"]["result_count"] == 0:
@@ -235,11 +216,11 @@ class HTTPClient:
 
         Raises:
         -------
-            pytweet.errors.NotFoundError:
-                Raise when the api can't find a user with that id.
+        pytweet.errors.NotFoundError:
+            Raise when the api can't find a user with that id.
 
-            ValueError:
-                Raise when user_id is not an int and is not a string of digits.
+        ValueError:
+            Raise when user_id is not an int and is not a string of digits.
 
         This function return a :class:`User` object.
 
@@ -248,10 +229,12 @@ class HTTPClient:
         try:
             int(user_id)
         except ValueError:
-            raise ValueError("user_id have to be an int, or a string of digits!")
+            raise ValueError("user_id must be an int, or a string of digits!")
 
         data = self.request(
-            Route("GET", "2", f"/users/{user_id}"),
+            "GET", 
+            "2", 
+            f"/users/{user_id}",
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,entities,id,location,name,profile_image_url,protected,public_metrics,url,username,verified,withheld,pinned_tweet_id"
@@ -260,15 +243,19 @@ class HTTPClient:
         )
 
         followers = self.request(
-            Route("GET", "2", f"/users/{user_id}/followers"),
-            headers={"Authorization": f"Bearer {self.bearer_token}"},
+            "GET", 
+            "2",
+            f"/users/{user_id}/followers",
+            headers = {"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
             },
         )
 
         following = self.request(
-            Route("GET", "2", f"/users/{user_id}/following"),
+            "GET",
+            "2",
+            f"/users/{user_id}/following",
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
@@ -312,12 +299,14 @@ class HTTPClient:
 
         .. versionadded:: 1.0.0
         """
+
         if "@" in username:
             username = username.replace("@", "", 1)
 
-        route: Route = Route("GET", "2", f"/users/by/username/{username}")
         data = self.request(
-            route,
+            "GET",
+            "2",
+            f"/users/by/username/{username}",
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
@@ -355,7 +344,9 @@ class HTTPClient:
             return None
 
         res = self.request(
-            Route("GET", "2", f"/tweets/{tweet_id}"),
+            "GET", 
+            "2", 
+            f"/tweets/{tweet_id}",
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "tweet.fields": "attachments,author_id,context_annotations,conversation_id,created_at,geo,entities,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,reply_settings,source,text,withheld",
@@ -369,7 +360,9 @@ class HTTPClient:
         )
 
         res2 = self.request(
-            Route("GET", "2", f"/tweets/{tweet_id}/retweeted_by"),
+            "GET", 
+            "2", 
+            f"/tweets/{tweet_id}/retweeted_by",
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
@@ -377,7 +370,9 @@ class HTTPClient:
         )
 
         res3 = self.request(
-            Route("GET", "2", f"/tweets/{tweet_id}/liking_users"),
+            "GET", 
+            "2",
+            f"/tweets/{tweet_id}/liking_users",
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
@@ -418,7 +413,7 @@ class HTTPClient:
         quick_reply: QuickReply = None,
         http_client=None,
     ) -> Optional[NoReturn]:
-        """Make a post Request for sending a message to a Messageable object.
+        """Make a post Request for sending a message to a User.
 
         Parameters:
         -----------
@@ -470,7 +465,9 @@ class HTTPClient:
             }
 
         res = self.request(
-            Route("POST", "1.1", "/direct_messages/events/new.json"),
+            "POST", 
+            "1.1", 
+            "/direct_messages/events/new.json",
             json=data,
             auth=True,
         )
@@ -494,7 +491,9 @@ class HTTPClient:
         Make the method functional and return :class:`Tweet`
         """
         self.request(
-            route=Route("DELETE", "1.1", f"/direct_messages/events/destroy.json?id={event_id}"),
+            "DELETE", 
+            "1.1", 
+            f"/direct_messages/events/destroy.json?id={event_id}",
             auth=True,
         )
 
@@ -524,7 +523,12 @@ class HTTPClient:
         except ValueError:
             raise ValueError("event_id must be an integer or a :class:`str`ing of digits.")
 
-        res = self.request(Route("GET", "1.1", f"/direct_messages/events/show.json?id={event_id}"), auth=True)
+        res = self.request(
+            "GET", 
+            "1.1", 
+            f"/direct_messages/events/show.json?id={event_id}", 
+            auth=True
+        )
 
         return DirectMessage(res, http_client=http_client if http_client else self)
 
@@ -546,7 +550,14 @@ class HTTPClient:
         if text:
             payload["text"] = text
 
-        res = self.request(Route("POST", "2", "/tweets"), json=payload, auth=True)
+        res = self.request(
+            "POST", 
+            "2", 
+            "/tweets", 
+            json=payload, 
+            auth=True
+        )
+        
         tweet = Tweet(res, http_client=http_client if http_client else self)
         self.tweet_cache[tweet.id] = tweet
 
@@ -562,7 +573,12 @@ class HTTPClient:
         .. versionadded:: 1.2.0
         """
 
-        self.request(Route("DELETE", "2", f"/tweets/{tweet_id}"), auth=True)
+        self.request(
+            "DELETE", 
+            "2", 
+            f"/tweets/{tweet_id}", 
+            auth=True
+        )
 
         try:
             self.tweet_cache.pop(tweet_id)
@@ -572,7 +588,7 @@ class HTTPClient:
         return None
 
     def follow_user(self, user_id: Union[str, int]) -> RelationFollow:
-        """Make a POST Request to follow a Messageable object.
+        """Make a POST Request to follow a User.
 
         Parameters:
         -----------
@@ -590,14 +606,16 @@ class HTTPClient:
         """
         my_id = self.access_token.partition("-")[0]
         res = self.request(
-            Route("POST", "2", f"/users/{my_id}/following"),
+            "POST", 
+            "2", 
+            f"/users/{my_id}/following",
             json={"target_user_id": str(user_id)},
             auth=True,
         )
         return RelationFollow(res)
 
     def unfollow_user(self, user_id: Union[str, int]) -> RelationFollow:
-        """Make a DELETE Request to unfollow a Messageable object.
+        """Make a DELETE Request to unfollow a User.
 
         Parameters:
         -----------
@@ -613,11 +631,16 @@ class HTTPClient:
         Make the method functional and return :class:`RelationFollow`
         """
         my_id = self.access_token.partition("-")[0]
-        res = self.request(Route("DELETE", "2", f"/users/{my_id}/following/{user_id}"), auth=True)
+        res = self.request(
+            "DELETE",
+            "2",
+            f"/users/{my_id}/following/{user_id}",
+            auth=True
+        )
         return RelationFollow(res)
 
     def block_user(self, user_id: Union[str, int]) -> None:
-        """Make a POST Request to Block a Messageable object.
+        """Make a POST Request to Block a User.
 
         Parameters:
         -----------
@@ -628,13 +651,15 @@ class HTTPClient:
         """
         my_id = self.access_token.partition("-")[0]
         self.request(
-            Route("POST", "2", f"/users/{my_id}/blocking"),
+            "POST", 
+            "2", 
+            f"/users/{my_id}/blocking",
             json={"target_user_id": str(user_id)},
             auth=True,
         )
 
     def unblock_user(self, user_id: Union[str, int]) -> None:
-        """Make a DELETE Request to unblock a Messageable object.
+        """Make a DELETE Request to unblock a User.
 
         Parameters:
         -----------
@@ -645,4 +670,9 @@ class HTTPClient:
         .. versionadded:: 1.2.0
         """
         my_id = self.access_token.partition("-")[0]
-        self.request(Route("DELETE", "2", f"/users/{my_id}/blocking/{user_id}"), auth=True)
+        self.request(
+            "DELETE",
+            "2",
+            f"/users/{my_id}/blocking/{user_id}",
+            auth=True
+        )
