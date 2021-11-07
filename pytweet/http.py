@@ -411,7 +411,7 @@ class HTTPClient:
         quick_reply: QuickReply = None,
         http_client=None,
     ) -> Optional[NoReturn]:
-        """Make a post Request for sending a message to a Messageable object.
+        """Make a post Request for sending a message to a User.
 
         Parameters:
         -----------
@@ -586,7 +586,7 @@ class HTTPClient:
         return None
 
     def follow_user(self, user_id: Union[str, int]) -> RelationFollow:
-        """Make a POST Request to follow a Messageable object.
+        """Make a POST Request to follow a User.
 
         Parameters:
         -----------
@@ -613,7 +613,7 @@ class HTTPClient:
         return RelationFollow(res)
 
     def unfollow_user(self, user_id: Union[str, int]) -> RelationFollow:
-        """Make a DELETE Request to unfollow a Messageable object.
+        """Make a DELETE Request to unfollow a User.
 
         Parameters:
         -----------
@@ -638,7 +638,7 @@ class HTTPClient:
         return RelationFollow(res)
 
     def block_user(self, user_id: Union[str, int]) -> None:
-        """Make a POST Request to Block a Messageable object.
+        """Make a POST Request to Block a User.
 
         Parameters:
         -----------
@@ -657,7 +657,7 @@ class HTTPClient:
         )
 
     def unblock_user(self, user_id: Union[str, int]) -> None:
-        """Make a DELETE Request to unblock a Messageable object.
+        """Make a DELETE Request to unblock a User.
 
         Parameters:
         -----------
