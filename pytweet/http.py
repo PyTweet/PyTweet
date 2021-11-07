@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json as j
 import logging
 import sys
 import time
@@ -8,7 +9,6 @@ from typing import Any, Dict, NoReturn, Optional, Union
 
 from .auth import OauthSession
 from .errors import Forbidden, NotFoundError, PytweetException, TooManyRequests, Unauthorized, BadRequests, NotFound
-
 from .message import DirectMessage
 from .relations import RelationFollow
 from .tweet import Tweet
@@ -21,16 +21,16 @@ _log = logging.getLogger(__name__)
 def check_error(response: requests.models.Response) -> NoReturn:
     code = response.status_code
     if code == 200:
-        json = response.json()
-        if "errors" in json.keys():
+        res = response.json()
+        if "errors" in res.keys():
             try:
-                if json["errors"][0]["detail"].startswith("Could not find"):
+                if res["errors"][0]["detail"].startswith("Could not find"):
                     raise NotFoundError(response)
 
                 else:
-                    raise PytweetException(response, json["errors"][0]["detail"])
+                    raise PytweetException(response, res["errors"][0]["detail"])
             except KeyError:
-                raise PytweetException(json)
+                raise PytweetException(res)
 
     elif code in (201, 204):
         pass
@@ -193,10 +193,13 @@ class HTTPClient:
 
         response = res(url, headers=headers, params=params, json=json, auth=auth)
         check_error(response)
-        if response.status_code in (201, 204):
+        res=None
+
+        try:
+            res = response.json()
+        except j.JSONDecoderError:
             return
 
-        res = response.json()
         if "meta" in res.keys():
             if res["meta"]["result_count"] == 0:
                 return []
