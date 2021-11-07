@@ -31,7 +31,7 @@ Scorer = {
         // only inflate the score of things that are actual API reference things
         const [, title, , , score] = result;
 
-        if (pattern !== null && title.startsWith('donphan.')) {
+        if (pattern !== null && title.startsWith('pytweet.')) {
             let _score = __score(title, pattern);
             if (_score === Number.MAX_VALUE) {
                 return score;

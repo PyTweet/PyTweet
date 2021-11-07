@@ -81,9 +81,8 @@ class Client:
         :class:`User`
             This method returns a :class:`User` object.
 
-
-        .. versionadded:: 1.0.0
-        """
+    .. versionadded:: 1.0.0
+    """
         return self.http.fetch_user(user_id, http_client=self.http)
 
     def fetch_user_by_username(self, username: str) -> User:
@@ -103,7 +102,7 @@ class Client:
             This method returns a :class:`User` object.
 
 
-        .. versionadded:: 1.0.0
+    .. versionadded:: 1.0.0
         """
         return self.http.fetch_user_byusername(username, http_client=self.http)
 
@@ -124,7 +123,7 @@ class Client:
             This method returns a :class:`Tweet` object.
 
 
-        .. versionadded:: 1.0.0
+    .. versionadded:: 1.0.0
         """
         return self.http.fetch_tweet(tweet_id, http_client=self.http)
 
@@ -144,7 +143,7 @@ class Client:
         :class:`DirectMessage`
             This method returns a :class:`DirectMessage` object.
 
-        .. versionadded:: 1.2.0
+    .. versionadded:: 1.2.0
         """
         return self.http.fetch_message(event_id, http_client=self.http)
 
@@ -161,7 +160,7 @@ class Client:
         :class:`Tweet`
             This method returns a :class:`Tweet` object.
 
-        .. versionadded:: 1.1.0
+    .. versionadded:: 1.1.0
         """
         http_client = kwargs.get("http_client", None)
         res = self.http.post_tweet(text, http_client=http_client if http_client else self.http, **kwargs)
@@ -183,7 +182,7 @@ class Client:
         :class:`DirectMessage`
             This method returns a :class:`DirectMessage` object.
 
-        .. versionadded:: 1.2.0
+    .. versionadded:: 1.2.0
         """
         try:
             event_id = int(event_id)
@@ -213,7 +212,7 @@ class Client:
         :class:`Tweet`
             This method returns a :class:`Tweet` object or None if the tweet was not found.
 
-        .. versionadded:: 1.2.0
+    .. versionadded:: 1.2.0
         """
         try:
             tweet_id = int(tweet_id)
