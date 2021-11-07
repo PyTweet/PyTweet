@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 from typing import (
     TYPE_CHECKING,
@@ -6,7 +8,6 @@ from typing import (
     List,
     NoReturn,
     Optional,
-    TypeVar,
     Union,
 )
 
@@ -19,110 +20,7 @@ from .attachments import QuickReply
 if TYPE_CHECKING:
     from .http import HTTPClient
 
-U = TypeVar("U", bound="User")
-
-
-class Messageable:
-    """Represent an object that can send and receive a message through DM.
-
-    .. versionadded: 1.0.0
-    """
-
-    def __init__(self, data: Dict[str, Any], **kwargs: Any):
-        self._payload: Dict[str, Any] = data
-        self.http_client: Optional[HTTPClient] = kwargs.get("http_client", None)
-
-    def send(self, text: str = None, *, quick_reply: QuickReply = None):
-        """:class:`DirectMessage`: Send a message to a specific Messageable object.
-
-        Parameters
-        ------------
-        text: :class:`str`
-            The text that will be send to that user.
-
-        Returns
-        ---------
-        This method return a :class:`DirectMessage` object.
-
-        .. versionadded:: 1.1.0
-        """
-        res = self.http_client.send_message(
-            self._payload.get("id"),
-            text,
-            quick_reply=quick_reply,
-            http_client=self.http_client,
-        )
-        return res
-
-    def fetch_message(self, event_id: Union[str, int]) -> object:
-        """Get a message from a Messageable object.
-
-        .. warning::
-            This method use api call and might cause ratelimit if use often! You can instead use `get_message()` which get the message through the client message cache. As of right now, only the client's message that's going to be store in the cache!
-
-        Parameters
-        ------------
-        event_id: Union[:class:`str`, :class:`int`]
-            The event id. Every time a Direct Message is created, its going to return a unique ID called event id.
-
-        Returns
-        ---------
-        This method return :class:`DirectMessage` object.
-
-
-        .. versionadded:: 1.2.0
-        """
-        res = self.http_client.fetch_message(event_id)
-        return res
-
-    def follow(self) -> RelationFollow:
-        """:class:`RelationFollow`: Follow a Messageable object.
-
-        Returns
-        ---------
-        This method return :class:`RelationFollow` object.
-
-        .. versionadded:: 1.1.0
-        """
-        follow = self.http_client.follow_user(self._payload.get("id"))
-        return follow
-
-    def unfollow(self) -> RelationFollow:
-        """:class:`RelationFollow`: Unfollow a Messageable object.
-
-        Returns
-        ---------
-        This method return a :class:`RelationFollow` object
-
-        .. versionadded:: 1.1.0
-        """
-        unfollow = self.http_client.unfollow_user(self._payload.get("id"))
-        return unfollow
-
-    def block(self) -> None:
-        """Block a Messageable object.
-
-        Returns
-        ---------
-        This method return a None object.
-
-        .. versionadded:: 1.1.0
-        """
-        self.http_client.block_user(self._payload.get("id"))
-
-    def unblock(self) -> None:
-        """Unblock a Messageable object.
-
-        Returns
-        ---------
-        This method return a None object.
-
-        .. versionadded:: 1.1.0
-        """
-        self.http_client.unblock_user(self._payload.get("id"))
-
-
-class User(Messageable):
+class User:
     """Represent a user in Twitter.
     User is an identity in twitter, its very interactive. Can send message, post a tweet, and even send messages to other user through Dms.
 
@@ -141,7 +39,6 @@ class User(Messageable):
     """
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
-        super().__init__(data, **kwargs)
         self.original_payload: Dict[str, Any] = data
         self._payload: Dict[Any, Any] = (
             self.original_payload.get("data") if self.original_payload.get("data") != None else self.original_payload
@@ -155,15 +52,82 @@ class User(Messageable):
     def __repr__(self) -> str:
         return "User(name={0.name} username={0.username} id={0.id})".format(self)
 
-    def __eq__(self, other: U) -> Union[bool, NoReturn]:
+    def __eq__(self, other: User) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError("== operation cannot be done with one of the element not a valid User object")
         return self.id == other.id
 
-    def __ne__(self, other: U) -> Union[bool, NoReturn]:
+    def __ne__(self, other: User) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
+
+    def send(self, text: str = None, *, quick_reply: QuickReply = None):
+        """:class:`DirectMessage`: Send a message to the user.
+
+        Parameters
+        ------------
+        text: :class:`str`
+            The text that will be send to that user.
+
+        Returns
+        ---------
+        :class:`DirectMessage`
+            This method return a :class:`DirectMessage` object.
+
+        .. versionadded:: 1.1.0
+        """
+        res = self.http_client.send_message(
+            self.id,
+            text,
+            quick_reply=quick_reply,
+            http_client=self.http_client,
+        )
+        return res
+
+    def follow(self) -> RelationFollow:
+        """:class:`RelationFollow`: follow the user.
+
+        Returns
+        ---------
+        :class:`RelationFollow` 
+            This method return :class:`RelationFollow` object.
+
+        .. versionadded:: 1.1.0
+        """
+        follow = self.http_client.follow_user(self.id)
+        return follow
+
+    def unfollow(self) -> RelationFollow:
+        """:class:`RelationFollow`: unfollow the user.
+
+        Returns
+        ---------
+        :class:`RelationFollow`    
+            This method return a :class:`RelationFollow` object
+
+        .. versionadded:: 1.1.0
+        """
+        unfollow = self.http_client.unfollow_user(self.id)
+        return unfollow
+
+    def block(self) -> None:
+        """block the user.
+
+        .. versionadded:: 1.1.0
+        """
+        self.http_client.block_user(self.id)
+
+    def unblock(self) -> None:
+        """unblock the user.
+
+        Returns
+        ---------
+        This method return a None object.
+
+        .. versionadded:: 1.1.0
+        """
+        self.http_client.unblock_user(self.id)
 
     @property
     def name(self) -> str:
@@ -271,7 +235,7 @@ class User(Messageable):
         return None if not id else self.http_client.fetch_tweet(int(id), http_client=self.http_client)
 
     @property
-    def followers(self) -> Union[List[U], List]:
+    def followers(self) -> Union[List[User], List]:
         """List[:class:`User`]: Returns a list of users who are followers of the specified user ID. Maximum users is 100 users.
 
         .. versionadded: 1.1.0
@@ -279,7 +243,7 @@ class User(Messageable):
         return self._payload.get("followers")
 
     @property
-    def following(self) -> Union[List[U], List]:
+    def following(self) -> Union[List[User], List]:
         """List[:class:`User`]`: Returns a list of users that's followed by the specified user ID. Maximum users is 100 users.
 
         .. versionadded: 1.1.0
