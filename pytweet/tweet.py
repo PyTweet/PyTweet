@@ -218,10 +218,15 @@ class Tweet(Message):
         .. versionadded:: 1.2.0
         """
         my_id = self.http_client.access_token.partition("-")[0]
-        route = self.http_client.make_route("POST", "2", f"/users/{my_id}/likes")
 
         payload = {"tweet_id": str(self.id)}
-        res = self.http_client.request(route, json=payload, auth=True)
+        res = self.http_client.request(
+            "POST", 
+            "2", 
+            f"/users/{my_id}/likes", 
+            json=payload, 
+            auth=True
+        )
 
         return RelationLike(res)
 
@@ -237,9 +242,13 @@ class Tweet(Message):
         .. versionadded:: 1.2.0
         """
         my_id = self.http_client.access_token.partition("-")[0]
-        route = self.http_client.make_route("DELETE", "2", f"/users/{my_id}/likes/{self.id}")
 
-        res = self.http_client.request(route, auth=True)
+        res = self.http_client.request(
+            "DELETE", 
+            "2", 
+            f"/users/{my_id}/likes/{self.id}", 
+            auth=True
+        )
 
         return RelationLike(res)
 
@@ -255,10 +264,15 @@ class Tweet(Message):
         .. versionadded:: 1.2.0
         """
         my_id = self.http_client.access_token.partition("-")[0]
-        route = self.http_client.make_route("POST", "2", f"/users/{my_id}/retweets")
 
         payload = {"tweet_id": str(self.id)}
-        res = self.http_client.request(route, json=payload, auth=True)
+        res = self.http_client.request(
+            "POST", 
+            "2", 
+            f"/users/{my_id}/retweets", 
+            json=payload, 
+            auth=True
+        )
 
         return RelationRetweet(res)
 
@@ -267,12 +281,17 @@ class Tweet(Message):
 
         Returns
         ---------
-        Returns a :class:`RelationRetweet` object.
+        :class:`RelationRetweet`
+            Returns a :class:`RelationRetweet` object.
         """
         my_id = self.http_client.access_token.partition("-")[0]
-        route = self.http_client.make_route("DELETE", "2", f"/users/{my_id}/retweets/{self.id}")
 
-        res = self.http_client.request(route, auth=True)
+        res = self.http_client.request(
+            "DELETE",
+            "2",
+            f"/users/{my_id}/retweets/{self.id}",
+            auth=True
+        )
 
         return RelationRetweet(res)
 
@@ -373,10 +392,16 @@ class Tweet(Message):
         """
         user = (
             self.http_client.fetch_user(
-                int(self._payload.get("in_reply_to_user_id")),
+                int(
+                    self._payload.get(
+                        "in_reply_to_user_id"
+                    )
+                ),
                 http_client=self.http_client,
             )
-            if self._payload.get("in_reply_to_user_id")
+            if self._payload.get(
+                "in_reply_to_user_id"
+            )
             else None
         )
         return user

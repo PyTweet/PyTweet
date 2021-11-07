@@ -134,12 +134,12 @@ class Client:
         """:class:`DirectMessage`: A function for HTTPClient.fetch_message().
 
         .. warning::
-        This method uses api call and might cause ratelimit if used often! Recommended to use `get_message()` method, it only retrieves the client's message only.
+            This method uses api call and might cause ratelimit if used often! Recommended to use `get_message()` method, it only retrieves the client's message only.
 
         Parameters
         ------------
         event_id: Union[:class:`str`, :class:`int`]
-            Represent the tweet id that you wish to get info to fetch.
+            Represent the tweet id that you wish to fetch.
 
         Returns
         ---------
