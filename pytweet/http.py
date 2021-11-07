@@ -191,7 +191,9 @@ class HTTPClient:
 
         response = res(url, headers=headers, params=params, json=json, auth=auth)
         check_error(response)
-
+        if response.status_code in (201, 204):
+            return
+        
         res = response.json()
         if "meta" in res.keys():
             if res["meta"]["result_count"] == 0:
@@ -214,11 +216,11 @@ class HTTPClient:
 
         Raises:
         -------
-            pytweet.errors.NotFoundError:
-                Raise when the api can't find a user with that id.
+        pytweet.errors.NotFoundError:
+            Raise when the api can't find a user with that id.
 
-            ValueError:
-                Raise when user_id is not an int and is not a string of digits.
+        ValueError:
+            Raise when user_id is not an int and is not a string of digits.
 
         This function return a :class:`User` object.
 
@@ -227,7 +229,7 @@ class HTTPClient:
         try:
             int(user_id)
         except ValueError:
-            raise ValueError("user_id have to be an int, or a string of digits!")
+            raise ValueError("user_id must be an int, or a string of digits!")
 
         data = self.request(
             "GET", 
