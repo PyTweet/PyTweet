@@ -33,6 +33,12 @@ class Message:
         self._text = text
         self._id = id
 
+    def __repr__(self) -> str:
+        return "Message(text: {0.text} id: {0.id})".format(self)
+
+    def __str__(self) -> str:
+        return self.text
+
     @property
     def text(self) -> str:
         return self._text
