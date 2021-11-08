@@ -184,6 +184,7 @@ class Tweet(Message):
     """
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
+        print(data)
         self.original_payload = data
         self._payload = data.get("data") or None
         self._includes = self.original_payload.get("includes")
@@ -288,7 +289,9 @@ class Tweet(Message):
 
         .. versionadded: 1.0.0
         """
-        return User(self._includes.get("users")[0], http_client=self.http_client)
+        if self._includes:
+            return User(self._includes.get("users")[0], http_client=self.http_client)
+        return None
 
     @property
     def retweetes(self) -> Union[List[User], list]:
