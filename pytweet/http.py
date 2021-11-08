@@ -9,7 +9,7 @@ from typing import Any, Dict, NoReturn, Optional, Union
 
 from .auth import OauthSession
 from .errors import Forbidden, NotFoundError, PytweetException, TooManyRequests, Unauthorized, BadRequests, NotFound
-from .message import DirectMessage
+from .message import DirectMessage, Message
 from .relations import RelationFollow
 from .tweet import Tweet
 from .user import User
@@ -151,8 +151,12 @@ class HTTPClient:
 
         Parameters
         ------------
-        route: Route
-            Represent the Route class, this will be use to configure the endpoint's path, method, and version of the api.
+        method: str
+            The request method.
+        version: str
+            The api version that you are using.
+        path: str
+            The endpoint.
         headers: RequestModel
             Represent the http request headers, it usually filled with your bearer token. If this isn't specified then the default argument will be an empty dictionary. Later in the code it will update and gets your bearer token.
         params: RequestModel
@@ -543,18 +547,22 @@ class HTTPClient:
 
         .. versionchanged:: 1.2.0
 
-        Make the method functional and return :class:`Tweet`
+        Make the method functional and return :class:`Message`
         """
 
         payload = {}
         if text:
             payload["text"] = text
 
-        res = self.request("POST", "2", "/tweets", json=payload, auth=True)
-
-        tweet = Tweet(res, http_client=http_client if http_client else self)
-        self.tweet_cache[tweet.id] = tweet
-
+        res = self.request(
+            "POST", 
+            "2", 
+            "/tweets", 
+            json=payload, 
+            auth=True
+        )
+        data=res.get('data')
+        tweet = Message(data.get('text'), data.get('id'))
         return tweet
 
     def delete_tweet(self, tweet_id: Union[str, int]) -> None:
