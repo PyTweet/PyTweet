@@ -39,7 +39,7 @@ def check_error(response: requests.models.Response) -> NoReturn:
         raise BadRequests(response)
 
     elif code == 401:
-        raise Unauthorized(response, "Invalid credentials passed!")
+        raise Unauthorized(response)
 
     elif code == 403:
         raise Forbidden(response)
@@ -360,8 +360,7 @@ class HTTPClient:
                 "media.fields": "duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width",
                 "place.fields": "contained_within,country,country_code,full_name,geo,id,name,place_type",
                 "poll.fields": "duration_minutes,end_datetime,id,options,voting_status",
-            },
-            auth=True,
+            }
         )
 
         res2 = self.request(
