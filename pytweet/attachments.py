@@ -1,12 +1,8 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, Dict, List, NoReturn, Optional, TypeVar, Union
+from typing import Any, Dict, List, NoReturn, Optional, Union
 from .utils import time_parse_todt
-
-M = TypeVar("M", bound="Media")
-PO = TypeVar("PO", bound="PollOptions")
-P = TypeVar("P", bound="Poll")
 
 __all__ = (
     "Media",
@@ -41,12 +37,12 @@ class Media:
     def __str__(self) -> str:
         return self.url
 
-    def __eq__(self, other: M) -> Union[bool, NoReturn]:
+    def __eq__(self, other: Media) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError("== operation cannot be done with one of the element not a valid Media object")
         return self.media_key == other.media_key
 
-    def __ne__(self, other: M) -> Union[bool, NoReturn]:
+    def __ne__(self, other: Media) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError("!= operation cannot be done with one of the element not a valid Media object")
         return self.media_key != other.media_key
@@ -127,32 +123,32 @@ class PollOptions:
     def __repr__(self) -> str:
         return "PollOption({0.position} {0.label} {0.votes})".format(self)
 
-    def __eq__(self, other: PO) -> Union[bool, NoReturn]:
+    def __eq__(self, other: PollOptions) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError("== operation cannot be done with one of the element not a valid PollOptions object")
         return self.position == other.position
 
-    def __ne__(self, other: PO) -> Union[bool, NoReturn]:
+    def __ne__(self, other: PollOptions) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError("!= operation cannot be done with one of the element not a valid PollOptions object")
         return self.position != other.position
 
-    def __lt__(self, other: PO) -> Union[bool, NoReturn]:
+    def __lt__(self, other: PollOptions) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError("< operation cannot be done with one of the element not a valid PollOptions object")
         return self.position < other.position
 
-    def __gt__(self, other: PO) -> Union[bool, NoReturn]:
+    def __gt__(self, other: PollOptions) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError("> operation cannot be done with one of the element not a valid PollOptions object")
         return self.position > other.position
 
-    def __le__(self, other: PO) -> Union[bool, NoReturn]:
+    def __le__(self, other: PollOptions) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError("<= operation cannot be done with one of the element not a valid PollOptions object")
         return self.position <= other.position
 
-    def __ge__(self, other: PO) -> Union[bool, NoReturn]:
+    def __ge__(self, other: PollOptions) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError(">= operation cannot be done with one of the element not a valid PollOptions object")
         return self.position >= other.position
@@ -211,12 +207,12 @@ class Poll:
             self
         )
 
-    def __eq__(self, other: P) -> Union[bool, NoReturn]:
+    def __eq__(self, other: Poll) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError("== operation cannot be done with one of the element not a valid Poll object")
         return self.id == other.id
 
-    def __ne__(self, other: P) -> Union[bool, NoReturn]:
+    def __ne__(self, other: Poll) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError("!= operation cannot be done with one of the element not a valid Poll object")
         return self.id != other.id
@@ -292,7 +288,7 @@ class QuickReply:
         self.items: int = len(self.options)
 
     def add_option(self, *, label: str, description: str = None, metadata: str = None) -> QuickReply:
-        """:class:`QuickReply`: Method for adding an option in your quick reply instance.
+        """:class:`QuickReply`: Mediaethod for adding an option in your quick reply instance.
 
         Parameters
         ------------
@@ -311,6 +307,6 @@ class QuickReply:
         .. versionadded:: 1.2.0
         """
 
-        self.options.append({"label": label, "description": description, "metadata": metadata})
+        self.options.append({"label": label, "description": description, "metadata": Mediaetadata})
 
         return self

@@ -6,6 +6,7 @@ class RelationsTypeEnum(Enum):
     ACCEPT = 1
     LIKED = 2
     RETWEETED = 3
+    HIDE = 4
     NULL = None
 
 

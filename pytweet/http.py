@@ -56,36 +56,32 @@ def check_error(response: requests.models.Response) -> NoReturn:
 
     else:
         raise PytweetException(
-            f"Unknown exception raised (status code: {response.status_code}): Open an issue in github or go to the support server to report this error unknown exception!"
+            f"Unknown exception raised (status code: {response.status_code}): Open an issue in github or go to the support server to report this unknown exception!"
         )
 
 
-RequestModel: Union[Dict[str, Any], Any] = Any
+RequestModel = Union[Dict[str, Any], Any]
 
 
 class HTTPClient:
     """Represents the http/base client for :class:`Client`
-    This http/base client have methods for making requests to twitter's api!
+    This http/base client is responsible for making all requests.
 
     Parameters:
     -----------
-    bearer_token: str
+    bearer_token: :class:`str`
         The Bearer Token of the app. The most important one, because this make most of the requests for twitter's api version 2.
-
-    consumer_key: Optional[str]
+    consumer_key: Optional[:class:`str`]
         The Consumer Key of the app.
-
-    consumer_key_secret: Optional[str]
+    consumer_key_secret: Optional[:class:`str`]
         The Consumer Key Secret of the app.
-
-    access_token: Optional[str]
+    access_token: Optional[:class:`str`]
         The Access Token of the app.
-
-    access_token_secret: Optional[str]
+    access_token_secret: Optional[:class:`str`]
         The Access Token Secret of the app.
 
-    Attributes:
-    -----------
+    Attributes
+    ------------
     credentials
         The credentials in a dictionary.
 
@@ -124,7 +120,7 @@ class HTTPClient:
 
         for k, v in self.credentials.items():
             if not isinstance(v, str) and not isinstance(v, type(None)):
-                raise Unauthorized(None, f"Wrong authorization passed for credential: {k}.") from Exception
+                raise Unauthorized(None, f"Wrong authorization passed for credential: {k}.")
 
         self.bearer_token: Optional[str] = bearer_token
         self.consumer_key: Optional[str] = consumer_key
@@ -532,7 +528,12 @@ class HTTPClient:
         except ValueError:
             raise ValueError("event_id must be an integer or a :class:`str`ing of digits.")
 
-        res = self.request("GET", "1.1", f"/direct_messages/events/show.json?id={event_id}", auth=True)
+        res = self.request(
+            "GET", 
+            "1.1", 
+            f"/direct_messages/events/show.json?id={event_id}", 
+            auth=True
+        )
 
         return DirectMessage(res, http_client=http_client if http_client else self)
 
@@ -583,6 +584,31 @@ class HTTPClient:
             pass
 
         return None
+
+    def reply_toTweet(self, tweet_id: Union[str, int], text: str, username: str):
+        """Make a POST Request to reply a specific tweet present by the tweet_id parameter.
+
+        Parameters
+        ------------
+        tweet_id: Union[str, int]
+            The tweet's id that you wish to reply to.
+        text: str
+            The reply's text.
+        username: str
+            The tweet's username, To reply a tweet you need to mention the tweet's author then the text.
+
+        .. versionadded:: 1.2.5
+        """
+        self.request(
+            "POST",
+            "1.1",
+            f"/statuses/update.json",
+            params={"status": username + ' ' + text, "in_reply_to_status_id": tweet_id},
+            auth=True
+        )
+        return None
+
+    
 
     def follow_user(self, user_id: Union[str, int]) -> RelationFollow:
         """Make a POST Request to follow a User.
@@ -662,4 +688,48 @@ class HTTPClient:
         .. versionadded:: 1.2.0
         """
         my_id = self.access_token.partition("-")[0]
-        self.request("DELETE", "2", f"/users/{my_id}/blocking/{user_id}", auth=True)
+        self.request(
+            "DELETE", 
+            "2", 
+            f"/users/{my_id}/blocking/{user_id}", 
+            auth=True
+        )
+
+    def mute_user(self, user_id: Union[str, int]) -> None:
+        """Make a POST Request to mute a User.
+
+        Parameters:
+        -----------
+        user_id: Union[str, int]
+            The user's id that you wish to mute.
+
+        .. versionadded:: 1.2.5
+        """
+        my_id = self.access_token.partition("-")[0]
+        self.request(
+            "POST", 
+            "2", 
+            f"/users/{my_id}/muting",
+            json={
+                "target_user_id": str(user_id)
+            }, 
+            auth=True
+        )
+
+    def unmute_user(self, user_id: Union[str, int]) -> None:
+        """Make a DELETE Request to unmute a User.
+
+        Parameters:
+        -----------
+        user_id: Union[str, int]
+            The user's id that you wish to unmute.
+
+        .. versionadded:: 1.2.5
+        """
+        my_id = self.access_token.partition("-")[0]
+        self.request(
+            "DELETE", 
+            "2", 
+            f"/users/{my_id}/muting/{user_id}",
+            auth=True
+        )

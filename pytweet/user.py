@@ -126,6 +126,20 @@ class User:
         """
         self.http_client.unblock_user(self.id)
 
+    def mute(self) -> None:
+        """mute the user.
+
+        .. versionadded:: 1.2.5
+        """
+        self.http_client.mute_user(self.id)
+
+    def unmute(self) -> None:
+        """unmute the user.
+
+        .. versionadded:: 1.2.5
+        """
+        self.http_client.unmute_user(self.id)
+
     @property
     def name(self) -> str:
         """:class:`str`: Return the user's name.
