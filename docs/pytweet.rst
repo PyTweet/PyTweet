@@ -22,18 +22,6 @@ pytweet.client module
 .. automodule:: pytweet.client
    :members:
 
-pytweet.entities module
------------------------
-
-.. automodule:: pytweet.entities
-   :members:
-
-pytweet.enums module
---------------------
-
-.. automodule:: pytweet.enums
-   :members:
-
 pytweet.errors module
 ---------------------
 
@@ -46,22 +34,10 @@ pytweet.http module
 .. automodule:: pytweet.http
    :members:
 
-pytweet.message module
-----------------------
-
-.. automodule:: pytweet.message
-   :members:
-
 pytweet.metrics module
 ----------------------
 
 .. automodule:: pytweet.metrics
-   :members:
-
-pytweet.ratelimithandler module
--------------------------------
-
-.. automodule:: pytweet.ratelimithandler
    :members:
 
 pytweet.relations module
