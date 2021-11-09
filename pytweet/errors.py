@@ -101,7 +101,7 @@ class Forbidden(HTTPException):
         else:
             detail = response.json().get("detail")
 
-        super().__init__(response, msg if msg else detail if detail else "Forbidden to do that action.")
+        super().__init__(response, msg if msg else detail if detail != "Forbidden" else "Forbidden to do that action.")
 
 
 class NotFound(HTTPException):

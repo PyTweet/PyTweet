@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, TypeVar, Union
 
@@ -7,12 +9,10 @@ from .metrics import TweetPublicMetrics
 from .user import User
 from .utils import time_parse_todt
 from .message import Message
-from .relations import RelationLike, RelationRetweet
+from .relations import RelationLike, RelationRetweet, RelationHide
 
 if TYPE_CHECKING:
     from .http import HTTPClient
-
-TT = TypeVar("TT", bound="Tweet")
 
 __all__ = (
     "EmbedsImages",
@@ -198,18 +198,18 @@ class Tweet(Message):
     def __str__(self) -> str:
         return self.text
 
-    def __eq__(self, other: TT) -> Union[bool, NoReturn]:
+    def __eq__(self, other: Tweet) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError("== operation cannot be done with one of the element not a valid Tweet object")
         return self.id == other.id
 
-    def __ne__(self, other: TT) -> Union[bool, NoReturn]:
+    def __ne__(self, other: Tweet) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
             raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
     def like(self) -> Optional[RelationLike]:
-        """:class:`RelationLike`: Method for liking a tweet.
+        """:class:`RelationLike`: A Method for liking a tweet.
 
         Returns
         ---------
@@ -225,7 +225,7 @@ class Tweet(Message):
         return RelationLike(res)
 
     def unlike(self) -> Optional[RelationLike]:
-        """:class:`RelationLike`: Method for unliking a tweet.
+        """:class:`RelationLike`: A Method for unliking a tweet.
 
         Returns
         ---------
@@ -242,7 +242,7 @@ class Tweet(Message):
         return RelationLike(res)
 
     def retweet(self) -> RelationRetweet:
-        """:class:`RelationRetweet`: Method for retweet a tweet.
+        """:class:`RelationRetweet`: A Method for retweet a tweet.
 
         Returns
         ---------
@@ -260,7 +260,7 @@ class Tweet(Message):
         return RelationRetweet(res)
 
     def unretweet(self) -> RelationRetweet:
-        """:class:`RelationRetweet`: Method for unretweet a tweet.
+        """:class:`RelationRetweet`: A Method for unretweet a tweet.
 
         Returns
         ---------
@@ -274,13 +274,59 @@ class Tweet(Message):
         return RelationRetweet(res)
 
     def delete(self) -> None:
-        """:class:`None`: A method for HTTPClient.delete_message()
+        """:class:`None`: A method for deleting to a tweet using HTTPClient.delete_message()
 
         .. versionadded:: 1.2.0
         """
 
         self.http_client.delete_tweet(int(self.id))
         return None
+
+    def reply(self, text: str) -> None:
+        """:class:`None`: A method for replying to a tweet using HTTPClient.reply_toTweet()
+    
+        .. versionadded:: 1.2.5
+        """
+        self.http_client.reply_toTweet(self.id, text, self.author.username)
+        return None
+
+    def hide(self):
+        """Make a PUT Request to hide a specific reply tweet.
+
+        Parameters
+        ------------
+        tweet_id: Union[str, int]
+            The tweet's id that you wish to hide to.
+
+        .. versionadded:: 1.2.5
+        """
+        res = self.http_client.request(
+            "PUT",
+            "2",
+            f"/tweets/{self.id}/hidden",
+            json={"hidden": False},
+            auth=True
+        )
+        return RelationHide(res)
+
+    def unhide(self):
+        """Make a PUT Request to unhide a specific reply tweet.
+
+        Parameters
+        ------------
+        tweet_id: Union[str, int]
+            The tweet's id that you wish to unhide.
+
+        .. versionadded:: 1.2.5
+        """
+        res = self.http_client.request(
+            "PUT",
+            "2",
+            f"/tweets/{self.id}/hidden",
+            json={"hidden": False},
+            auth=True
+        )
+        return RelationHide(res)
 
     @property
     def author(self) -> User:
