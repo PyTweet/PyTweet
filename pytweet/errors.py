@@ -77,9 +77,17 @@ class Unauthorized(HTTPException):
 
     .. versionadded:: 1.0.0
     """
+    def __init__(self, response, message: str = None):
+        msg = None
+        detail = None
+        if response.json().get("errors"):
+            msg = response.json().get("errors")[0].get("message") if not message else message
+            detail = response.json().get("errors")[0].get("detail")
 
-    pass
+        else:
+            detail = response.json().get("detail")
 
+        super().__init__(response, msg if msg else detail if detail else "Unauthorize to do that action!")
 
 class Forbidden(HTTPException):
     """:class:`HTTPException`: Raised when a request return status code: 403.
