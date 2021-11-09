@@ -184,7 +184,6 @@ class Tweet(Message):
     """
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
-        print(data)
         self.original_payload = data
         self._payload = data.get("data") or None
         self._includes = self.original_payload.get("includes")
