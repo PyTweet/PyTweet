@@ -7,6 +7,7 @@ from .message import DirectMessage
 
 __all__ = ("Client",)
 
+
 class Client:
     """Represent a client that connected to Twitter!
 

@@ -284,7 +284,7 @@ class Tweet(Message):
 
     def reply(self, text: str) -> None:
         """:class:`None`: A method for replying to a tweet using HTTPClient.reply_toTweet()
-    
+
         .. versionadded:: 1.2.5
         """
         self.http_client.reply_toTweet(self.id, text, self.author.username)
@@ -300,13 +300,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        res = self.http_client.request(
-            "PUT",
-            "2",
-            f"/tweets/{self.id}/hidden",
-            json={"hidden": False},
-            auth=True
-        )
+        res = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
         return RelationHide(res)
 
     def unhide(self):
@@ -319,13 +313,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        res = self.http_client.request(
-            "PUT",
-            "2",
-            f"/tweets/{self.id}/hidden",
-            json={"hidden": False},
-            auth=True
-        )
+        res = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
         return RelationHide(res)
 
     @property

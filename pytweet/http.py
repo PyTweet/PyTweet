@@ -193,7 +193,7 @@ class HTTPClient:
 
         response = res(url, headers=headers, params=params, json=json, auth=auth)
         check_error(response)
-        res=None
+        res = None
 
         try:
             res = response.json()
@@ -360,7 +360,7 @@ class HTTPClient:
                 "media.fields": "duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width",
                 "place.fields": "contained_within,country,country_code,full_name,geo,id,name,place_type",
                 "poll.fields": "duration_minutes,end_datetime,id,options,voting_status",
-            }
+            },
         )
 
         res2 = self.request(
@@ -527,12 +527,7 @@ class HTTPClient:
         except ValueError:
             raise ValueError("event_id must be an integer or a :class:`str`ing of digits.")
 
-        res = self.request(
-            "GET", 
-            "1.1", 
-            f"/direct_messages/events/show.json?id={event_id}", 
-            auth=True
-        )
+        res = self.request("GET", "1.1", f"/direct_messages/events/show.json?id={event_id}", auth=True)
 
         return DirectMessage(res, http_client=http_client if http_client else self)
 
@@ -554,15 +549,9 @@ class HTTPClient:
         if text:
             payload["text"] = text
 
-        res = self.request(
-            "POST", 
-            "2", 
-            "/tweets", 
-            json=payload, 
-            auth=True
-        )
-        data=res.get('data')
-        tweet = Message(data.get('text'), data.get('id'))
+        res = self.request("POST", "2", "/tweets", json=payload, auth=True)
+        data = res.get("data")
+        tweet = Message(data.get("text"), data.get("id"))
         return tweet
 
     def delete_tweet(self, tweet_id: Union[str, int]) -> None:
@@ -602,12 +591,10 @@ class HTTPClient:
             "POST",
             "1.1",
             f"/statuses/update.json",
-            params={"status": username + ' ' + text, "in_reply_to_status_id": tweet_id},
-            auth=True
+            params={"status": username + " " + text, "in_reply_to_status_id": tweet_id},
+            auth=True,
         )
         return None
-
-    
 
     def follow_user(self, user_id: Union[str, int]) -> RelationFollow:
         """Make a POST Request to follow a User.
@@ -687,12 +674,7 @@ class HTTPClient:
         .. versionadded:: 1.2.0
         """
         my_id = self.access_token.partition("-")[0]
-        self.request(
-            "DELETE", 
-            "2", 
-            f"/users/{my_id}/blocking/{user_id}", 
-            auth=True
-        )
+        self.request("DELETE", "2", f"/users/{my_id}/blocking/{user_id}", auth=True)
 
     def mute_user(self, user_id: Union[str, int]) -> None:
         """Make a POST Request to mute a User.
@@ -705,15 +687,7 @@ class HTTPClient:
         .. versionadded:: 1.2.5
         """
         my_id = self.access_token.partition("-")[0]
-        self.request(
-            "POST", 
-            "2", 
-            f"/users/{my_id}/muting",
-            json={
-                "target_user_id": str(user_id)
-            }, 
-            auth=True
-        )
+        self.request("POST", "2", f"/users/{my_id}/muting", json={"target_user_id": str(user_id)}, auth=True)
 
     def unmute_user(self, user_id: Union[str, int]) -> None:
         """Make a DELETE Request to unmute a User.
@@ -726,9 +700,4 @@ class HTTPClient:
         .. versionadded:: 1.2.5
         """
         my_id = self.access_token.partition("-")[0]
-        self.request(
-            "DELETE", 
-            "2", 
-            f"/users/{my_id}/muting/{user_id}",
-            auth=True
-        )
+        self.request("DELETE", "2", f"/users/{my_id}/muting/{user_id}", auth=True)

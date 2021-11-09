@@ -3,13 +3,16 @@ from .enums import RelationsTypeEnum
 
 __all__ = ("Relations", "RelationFollow", "RelationLike", "RelationRetweet", "RelationHide")
 
+
 class Relations:
     """Represent the base class of(Relations) all relations type.
-    
+
     .. versionadded:: 1.2.5
     """
+
     def __init__(self, type: int):
         self.type = RelationsTypeEnum(type)
+
 
 class RelationFollow(Relations):
     """Represent the follow relation from a follow & unfollow request.
@@ -47,6 +50,7 @@ class RelationLike(Relations):
 
     .. versionadded:: 1.2.0
     """
+
     def __init__(self, data: Dict[str, Any]):
         self.original_payload: Dict[str, Any] = data
         self._payload: Dict[Any, Any] = data.get("data")
@@ -85,6 +89,7 @@ class RelationRetweet(Relations):
         .. versionadded:: 1.2.0
         """
         return self._payload.get("retweeted")
+
 
 class RelationHide(Relations):
     """Represent the hide relations from a hide & unhide request.
