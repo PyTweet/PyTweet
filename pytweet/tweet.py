@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
 from .attachments import Media, Poll
 from .enums import MessageTypeEnum
@@ -436,7 +436,11 @@ class Tweet(Message):
         """
         if self._includes:
             if self._includes.get("polls"):
-                return Poll(self._includes.get("polls")[0])
+                data = self._includes.get("polls")[0]
+                poll = Poll(data.get("id"), data.get("voting_status"), data.get("duration_minutes"), data.get("end_datetime"))
+                for option in data.get("options"):
+                    poll.add_option_FromRequest(option.get('position'), option.get('label'), option.get('votes'))
+                return poll
 
         return None
 
