@@ -13,7 +13,7 @@ from .message import DirectMessage, Message
 from .relations import RelationFollow
 from .tweet import Tweet
 from .user import User
-from .attachments import QuickReply
+from .attachments import QuickReply, Geo, CTA
 
 _log = logging.getLogger(__name__)
 
@@ -361,6 +361,7 @@ class HTTPClient:
                 "place.fields": "contained_within,country,country_code,full_name,geo,id,name,place_type",
                 "poll.fields": "duration_minutes,end_datetime,id,options,voting_status",
             },
+            auth = True
         )
 
         res2 = self.request(
@@ -415,38 +416,40 @@ class HTTPClient:
         text: str,
         *,
         quick_reply: QuickReply = None,
-        http_client=None,
+        geo: Union[Geo, list, str] = None,
+        cta: CTA,
+        http_client = None,
     ) -> Optional[NoReturn]:
         """Make a post Request for sending a message to a User.
 
-        Parameters:
-        -----------
+        Parameters
+        ------------
         user_id: Union[str, int]
             The user id that you wish to send message to.
-
         text: str
             The text that will be send to that user.
-
         quick_reply: QuickReply
             The message's quick reply attachment.
-
         http_client
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
-        This function return a :class: `DirrectMessage` object.
+        This function return a :class: `DirectMessage` object.
 
         .. versionadded:: 1.1.0
 
         .. versionchanged:: 1.2.0
-
-        Make the method functional and return :class:`DirectMessage`
+            Make the method functional and return :class:`DirectMessage`
         """
         data = {
             "event": {
                 "type": "message_create",
                 "message_create": {
-                    "target": {"recipient_id": str(user_id)},
-                    "message_data": {},
+                    "target": {
+                        "recipient_id": str(user_id)
+                    },
+                    "message_data": {
+                        
+                    },
                 },
             }
         }
@@ -467,6 +470,19 @@ class HTTPClient:
                 "type": quick_reply.type,
                 "options": quick_reply.options,
             }
+
+        if geo:
+            if geo.used_type == "shared_place": 
+                message_data['attachment'] = {}
+                message_data['attachment']['type'] = "location"
+                message_data['attachment']["location"] = {}
+                message_data['attachment']["location"]["type"] = "shared_place" 
+                message_data['attachment']["location"]["shared_place"] = {} 
+                message_data['attachment']["location"]["shared_place"]["place"] = {}
+                message_data['attachment']["location"]["shared_place"]["place"]["id"] = str(geo.id)
+
+        if cta:
+            message_data["ctas"] = cta._raw_buttons
 
         res = self.request(
             "POST",

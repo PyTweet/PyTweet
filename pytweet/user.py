@@ -15,7 +15,7 @@ from typing import (
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import time_parse_todt
-from .attachments import QuickReply
+from .attachments import QuickReply, Geo, CTA
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -63,13 +63,19 @@ class User:
             raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
-    def send(self, text: str = None, *, quick_reply: QuickReply = None):
+    def send(self, text: str = None, *, quick_reply: QuickReply = None, geo: Geo = None, cta: CTA = None):
         """:class:`DirectMessage`: Send a message to the user.
 
         Parameters
         ------------
         text: :class:`str`
             The text that will be send to that user.
+        quick_reply: :class:`QuickReply`
+            The QuickReply attachment that will be send to a user.
+        geo: :class:`Geo`
+            The Geo attachment that lets you to send location.
+        cta: :class:`CTA`
+            cta or call-to-actions is use to make an action whenever a user 'call' something, a quick example is buttons.
 
         Returns
         ---------
@@ -82,6 +88,8 @@ class User:
             self.id,
             text,
             quick_reply=quick_reply,
+            geo=geo,
+            cta=cta,
             http_client=self.http_client,
         )
         return res
