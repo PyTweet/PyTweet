@@ -361,7 +361,7 @@ class HTTPClient:
                 "place.fields": "contained_within,country,country_code,full_name,geo,id,name,place_type",
                 "poll.fields": "duration_minutes,end_datetime,id,options,voting_status",
             },
-            auth = True
+            auth=True,
         )
 
         res2 = self.request(
@@ -418,7 +418,7 @@ class HTTPClient:
         quick_reply: QuickReply = None,
         geo: Union[Geo, list, str] = None,
         cta: CTA,
-        http_client = None,
+        http_client=None,
     ) -> Optional[NoReturn]:
         """Make a post Request for sending a message to a User.
 
@@ -444,12 +444,8 @@ class HTTPClient:
             "event": {
                 "type": "message_create",
                 "message_create": {
-                    "target": {
-                        "recipient_id": str(user_id)
-                    },
-                    "message_data": {
-                        
-                    },
+                    "target": {"recipient_id": str(user_id)},
+                    "message_data": {},
                 },
             }
         }
@@ -472,14 +468,14 @@ class HTTPClient:
             }
 
         if geo:
-            if geo.used_type == "shared_place": 
-                message_data['attachment'] = {}
-                message_data['attachment']['type'] = "location"
-                message_data['attachment']["location"] = {}
-                message_data['attachment']["location"]["type"] = "shared_place" 
-                message_data['attachment']["location"]["shared_place"] = {} 
-                message_data['attachment']["location"]["shared_place"]["place"] = {}
-                message_data['attachment']["location"]["shared_place"]["place"]["id"] = str(geo.id)
+            if geo.used_type == "shared_place":
+                message_data["attachment"] = {}
+                message_data["attachment"]["type"] = "location"
+                message_data["attachment"]["location"] = {}
+                message_data["attachment"]["location"]["type"] = "shared_place"
+                message_data["attachment"]["location"]["shared_place"] = {}
+                message_data["attachment"]["location"]["shared_place"]["place"] = {}
+                message_data["attachment"]["location"]["shared_place"]["place"]["id"] = str(geo.id)
 
         if cta:
             message_data["ctas"] = cta._raw_buttons

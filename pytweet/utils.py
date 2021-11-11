@@ -21,12 +21,14 @@ def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
         second=int(s),
     )
 
+
 def compose_tweet() -> str:
     """:class:`str`: Make a link that lets you compose a tweet
 
     .. versionadded: 1.3.5
     """
     return "https://twitter.com/intent/tweet"
+
 
 def showcase_user(username: str):
     """:class:`str`: Make a link that lets you showcase user.
@@ -35,12 +37,17 @@ def showcase_user(username: str):
     """
     return f"https://twitter.com/{username}"
 
+
 def compose_tweet_action(tweet_id: Union[str, int], action: str):
     """:class:`str`: Make a link that lets you interact a tweet with certain actions.
 
     .. versionadded: 1.3.5
     """
-    actions=["retweet", "like", "reply"]
+    actions = ["retweet", "like", "reply"]
     if not action.lower() in actions:
         return TypeError("Action must be either 'retweet', 'like', or 'reply'")
-    return f"https://twitter.com/intent/{action}?tweet_id={tweet_id}" if action != "reply" else f"https://twitter.com/intent/tweet?in_reply_to={tweet_id}"
+    return (
+        f"https://twitter.com/intent/{action}?tweet_id={tweet_id}"
+        if action != "reply"
+        else f"https://twitter.com/intent/tweet?in_reply_to={tweet_id}"
+    )

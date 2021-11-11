@@ -437,15 +437,17 @@ class Tweet(Message):
         if self._includes:
             if self._includes.get("polls"):
                 data = self._includes.get("polls")[0]
-                poll = Poll(data.get("id"), data.get("voting_status"), data.get("duration_minutes"), data.get("end_datetime"))
+                poll = Poll(
+                    data.get("id"), data.get("voting_status"), data.get("duration_minutes"), data.get("end_datetime")
+                )
                 for option in data.get("options"):
-                    poll.add_option_FromRequest(option.get('position'), option.get('label'), option.get('votes'))
+                    poll.add_option_FromRequest(option.get("position"), option.get("label"), option.get("votes"))
                 return poll
 
         return None
 
     @property
-    def medias(self) -> Optional[Media]:
+    def media(self) -> Optional[Media]:
         """List[:class:`Media`]: Return a list of media(s) in a tweet.
 
         .. versionadded:: 1.1.0

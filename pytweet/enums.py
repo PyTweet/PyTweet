@@ -21,5 +21,6 @@ class MessageEventTypeEnum(Enum):
     MESSAGE_DELETE = "message_delete"
     NULL = None
 
+
 class ButtonStyle(Enum):
     web_url = "web_url"

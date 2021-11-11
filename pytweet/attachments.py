@@ -238,7 +238,7 @@ class Poll:
             The option's position, maximum position is 4.
         label: :class:`str`
             The option's label.
-        
+
         .. versionadded UKN
         """
 
@@ -258,8 +258,8 @@ class Poll:
             The option's label.
         votes: :class:`int`
             The option votes
-        
-        
+
+
         .. versionadded UKN
         """
 
@@ -356,6 +356,7 @@ class QuickReply:
 
         return self
 
+
 class Geo:
     def __init__(self, data: Dict[str, Any], used_type):
         self._payload = data
@@ -366,12 +367,12 @@ class Geo:
     def id(self) -> str:
         """:class:`str`: Returns place's unique id."""
         return self._payload.get("id")
-    
+
     @property
     def name(self) -> str:
         """:class:`str`: Returns place's name."""
         return self._payload.get("name")
-    
+
     @property
     def fullname(self) -> str:
         """:class:`str`: Returns place's fullname."""
@@ -384,7 +385,7 @@ class Geo:
 
     @property
     def used_type(self) -> str:
-        """:class:`str`: Returns place's type, this differ from :class:`type`,used_for is use for specified what type of attachment use to attach in a directmessage, theres 2 types: location and shared_coordinate."""
+        """:class:`str`: Returns place's type, this differ from :class:`type`,used_for is use for specified what type of attachment use to attach in a directmessage, there's 2 types: location and shared_coordinate."""
         return self._used_type
 
     @property
@@ -422,9 +423,11 @@ class Button:
     style: ButtonStyle
     label: str
     url: str
-    
+
+
 class WebIntents:
     pass
+
 
 class CTA:
     def __init__(self):
@@ -432,14 +435,8 @@ class CTA:
         self._raw_buttons = []
 
     def add_button(self, label: str, style: ButtonStyle, url: str):
-        self._raw_buttons.append({
-            "type": style.value,
-            "label": label,
-            "url": url
-        })
-        self._buttons.append(
-            Button(label, style, url)
-        )
+        self._raw_buttons.append({"type": style.value, "label": label, "url": url})
+        self._buttons.append(Button(label, style, url))
         return self
 
     @property

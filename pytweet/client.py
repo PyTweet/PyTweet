@@ -225,9 +225,19 @@ class Client:
 
         return self.http.message_cache.get(tweet_id)
 
-    def search_geo(self, query: str, used_type: str = "shared_place", *,lat: int = None, long: int = None, ip: Union[str, int] = None, granularity: str = "neighborhood", max_results: Union[str, int] = None) -> Geo:
+    def search_geo(
+        self,
+        query: str,
+        used_type: str = "shared_place",
+        *,
+        lat: int = None,
+        long: int = None,
+        ip: Union[str, int] = None,
+        granularity: str = "neighborhood",
+        max_results: Union[str, int] = None,
+    ) -> Geo:
         """:class:`Geo`: Get a location information from the given parameters.
-        
+
         Parameters
         ------------
         query: :class:`str`
@@ -240,7 +250,7 @@ class Client:
             An IP address. Used when attempting to fix geolocation based off of the user's IP address.
         granularity: :class:`str`
             This is the minimal granularity of place types to return and must be one of: neighborhood , city , admin or country. If no granularity is provided for the request neighborhood is assumed. Setting this to city, for example, will find places which have a type of city, admin or country
-        max_results: 
+        max_results:
             A hint as to the number of results to return. This does not guarantee that the number of results returned will equal max_results, but instead informs how many "nearby" results to return. Ideally, only pass in the number of places you intend to display to the user here
 
         Returns
@@ -262,9 +272,9 @@ class Client:
                 "long": long,
                 "ip": ip,
                 "granularity": granularity,
-                "max_results": max_results
+                "max_results": max_results,
             },
-            auth=True
+            auth=True,
         )
 
-        return [Geo(data, used_type=used_type) for data in data.get('result').get('places')]
+        return [Geo(data, used_type=used_type) for data in data.get("result").get("places")]
