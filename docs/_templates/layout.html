@@ -7,9 +7,6 @@
   {%- block extrahead %} {% endblock %}
   <!-- end extra head -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link rel="stylesheet" href="{{ pathto('_static/style.css', 1)|e }}" type="text/css" />
-  <link rel="stylesheet" href="{{ pathto('_static/codeblocks.css', 1) }}" type="text/css" />
-  <link rel="stylesheet" href="{{ pathto('_static/icons.css', 1)|e }}" type="text/css" />
   {%- block css %}
   {%- for css in css_files %}
     {%- if css|attr("filename") %}
@@ -19,6 +16,9 @@
     {%- endif %}
   {%- endfor %}
   {%- endblock %}
+  <link rel="stylesheet" href="{{ pathto('_static/style.css', 1)|e }}" type="text/css" />
+  <link rel="stylesheet" href="{{ pathto('_static/codeblocks.css', 1) }}" type="text/css" />
+  <link rel="stylesheet" href="{{ pathto('_static/icons.css', 1)|e }}" type="text/css" />
   {%- block scripts %}
   <script id="documentation_options" data-url_root="{{ pathto('', 1) }}" src="{{ pathto('_static/documentation_options.js', 1) }}"></script>
   {%- for js in script_files %}
@@ -60,6 +60,7 @@
       <nav>
         <a href="{{ pathto(master_doc)|e }}" class="main-heading">PyTweet</a>
         <a href="https://github.com/TheFarGG/PyTweet/" title="GitHub"><span class="material-icons custom-icons">github</span></a>
+        <a href="{{ discord_invite }}" title="{{ _('Discord') }}"><span class="material-icons custom-icons">discord</span></a>
         {#- If we have more links we can put them here #}
         <a onclick="mobileSearch.open();" title="{{ _('Search') }}" id="open-search" class="mobile-only"><span class="material-icons">search</span></a>
         <a onclick="mobileSearch.close();" title="{{ _('Close') }}" id="close-search" class="mobile-only" hidden><span class="material-icons">close</span></a>
@@ -79,7 +80,7 @@
     <div class="sub-header grid-item">
       <label for="documentation_select">{{ _('View Documentation For') }}</label>
       <select id="documentation_select" onchange="window.location = this.value;">
-        <option value="{{ pathto(master_doc)|e }}">PyTweet</option>
+        <option value="{{ pathto(master_doc)|e }}">pytweet</option>
       </select>
       <form role="search" class="search" action="{{ pathto('search') }}" method="get">
         <div class="search-wrapper">
@@ -144,6 +145,10 @@
         <span class="material-icons">close</span>
       </span>
       <h1>{{ _('Settings') }}</h1>
+
+      <div class="setting">
+        
+      </div>
 
       <h2>{{ _('Theme') }}</h2>
       <div class="setting">
