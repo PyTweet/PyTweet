@@ -3,6 +3,8 @@ from __future__ import annotations
 import datetime
 from typing import Any, Dict, List, NoReturn, Optional, Union
 from .utils import time_parse_todt
+from .enums import ButtonStyle
+from dataclasses import dataclass
 
 __all__ = (
     "Media",
@@ -199,8 +201,12 @@ class Poll:
     .. versionadded:: 1.1.0
     """
 
-    def __init__(self, data: Dict[str, Any]):
-        self._payload = data
+    def __init__(self, id: int, voting_status: str, duration: Union[str, int], end_date: Union[str, int]):
+        self._id = id
+        self._voting_status = voting_status
+        self._duration = duration
+        self._end_date = end_date
+        self._options = []
 
     def __repr__(self) -> str:
         return "Poll(id={0.id}, voting_status={0.voting_status}, duration={0.duration}, end_date={0.end_date} options={0.options})".format(
@@ -223,13 +229,52 @@ class Poll:
     def __bool__(self) -> bool:
         return self.voting_status
 
+    def add_option(self, position: int, label: str) -> Poll:
+        """Add option to your Poll instance.
+
+        Parameters
+        ------------
+        position: :class:`int`
+            The option's position, maximum position is 4.
+        label: :class:`str`
+            The option's label.
+        
+        .. versionadded UKN
+        """
+
+        if position > 4:
+            return
+        self._options.append({"position": position, "label": label})
+        return self
+
+    def add_option_FromRequest(self, position: int, label: str, votes: int) -> Poll:
+        """Add option from a request, this differ from add_option. This one has votes argument use to specified how many votes that an option has. You should be using the add_option rather then this since this function is only use when a request return votes
+
+        Parameters
+        ------------
+        position: :class:`int`
+            The option's position, maximum position is 4.
+        label: :class:`str`
+            The option's label.
+        votes: :class:`int`
+            The option votes
+        
+        
+        .. versionadded UKN
+        """
+
+        if position > 4:
+            return
+        self._options.append({"position": position, "label": label, "votes": votes})
+        return self
+
     @property
     def id(self) -> Optional[int]:
         """:class:`int`: Return the poll's unique ID.
 
         .. versionadded:: 1.1.0
         """
-        return int(self._payload.get("id"))
+        return int(self._id)
 
     @property
     def options(self) -> List[PollOptions]:
@@ -237,7 +282,7 @@ class Poll:
 
         .. versionadded:: 1.1.0
         """
-        return [PollOptions(option) for option in self._payload.get("options")]
+        return [PollOptions(option) for option in self._options]
 
     @property
     def voting_status(self) -> bool:
@@ -245,7 +290,7 @@ class Poll:
 
         .. versionadded:: 1.1.0
         """
-        return True if self._payload.get("voting_status") == "open" else False
+        return True if self._voting_status == "open" else False
 
     @property
     def duration(self) -> int:
@@ -253,7 +298,7 @@ class Poll:
 
         .. versionadded:: 1.1.0
         """
-        return int(self._payload.get("duration_minutes")) * 60
+        return int(self._duration) * 60
 
     @property
     def end_date(self) -> datetime.datetime:
@@ -261,7 +306,7 @@ class Poll:
 
         .. versionadded:: 1.1.0
         """
-        return time_parse_todt(self._payload.get("end_datetime"))
+        return time_parse_todt(self._end_date)
 
 
 class QuickReply:
@@ -288,7 +333,7 @@ class QuickReply:
         self.items: int = len(self.options)
 
     def add_option(self, *, label: str, description: str = None, metadata: str = None) -> QuickReply:
-        """:class:`QuickReply`: Mediaethod for adding an option in your quick reply instance.
+        """:class:`QuickReply`: Method for adding an option in your quick reply instance.
 
         Parameters
         ------------
@@ -307,6 +352,100 @@ class QuickReply:
         .. versionadded:: 1.2.0
         """
 
-        self.options.append({"label": label, "description": description, "metadata": Mediaetadata})
+        self.options.append({"label": label, "description": description, "metadata": metadata})
 
         return self
+
+class Geo:
+    def __init__(self, data: Dict[str, Any], used_type):
+        self._payload = data
+        self._bounding_box = self._payload.get("bounding_box")
+        self._used_type = used_type
+
+    @property
+    def id(self) -> str:
+        """:class:`str`: Returns place's unique id."""
+        return self._payload.get("id")
+    
+    @property
+    def name(self) -> str:
+        """:class:`str`: Returns place's name."""
+        return self._payload.get("name")
+    
+    @property
+    def fullname(self) -> str:
+        """:class:`str`: Returns place's fullname."""
+        return self._payload.get("full_name")
+
+    @property
+    def type(self) -> str:
+        """:class:`str`: Returns place's type."""
+        return self._payload.get("place_type")
+
+    @property
+    def used_type(self) -> str:
+        """:class:`str`: Returns place's type, this differ from :class:`type`,used_for is use for specified what type of attachment use to attach in a directmessage, theres 2 types: location and shared_coordinate."""
+        return self._used_type
+
+    @property
+    def country(self) -> str:
+        """:class:`str`: Returns the country where the place is in."""
+        return self._payload.get("country")
+
+    @property
+    def country_code(self) -> str:
+        """:class:`str`: Returns the country's code where the location is in."""
+        return self._payload.get("country_code")
+
+    @property
+    def centroid(self) -> str:
+        """:class:`str`: Returns the place's centroid."""
+        return self._payload.get("centroid")
+
+    @property
+    def bounding_box_type(self) -> str:
+        """:class:`str`: Returns the place's bounding box type."""
+        if self._bounding_box:
+            return self._bounding_box.get("type")
+        return None
+
+    @property
+    def coordinates(self) -> List[str]:
+        """List[:class:`str`]: Returns a list of coordinates where the place's located."""
+        if self._bounding_box:
+            return self._bounding_box.get("coordinates")
+        return None
+
+
+@dataclass
+class Button:
+    style: ButtonStyle
+    label: str
+    url: str
+    
+class WebIntents:
+    pass
+
+class CTA:
+    def __init__(self):
+        self._buttons = []
+        self._raw_buttons = []
+
+    def add_button(self, label: str, style: ButtonStyle, url: str):
+        self._raw_buttons.append({
+            "type": style.value,
+            "label": label,
+            "url": url
+        })
+        self._buttons.append(
+            Button(label, style, url)
+        )
+        return self
+
+    @property
+    def buttons(self) -> List[dict]:
+        return self._buttons
+
+    @property
+    def raw_buttons(self) -> list[Button]:
+        return self._raw_buttons
