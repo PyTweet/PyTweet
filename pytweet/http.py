@@ -13,7 +13,7 @@ from .message import DirectMessage, Message
 from .relations import RelationFollow
 from .tweet import Tweet
 from .user import User
-from .attachments import QuickReply, Geo, CTA
+from .attachments import QuickReply, CTA
 
 _log = logging.getLogger(__name__)
 
@@ -60,7 +60,7 @@ def check_error(response: requests.models.Response) -> NoReturn:
         )
 
 
-RequestModel = Union[Dict[str, Any], Any]
+RequestModel: Union[Dict[str, Any], Any] = Any
 
 
 class HTTPClient:
@@ -172,6 +172,8 @@ class HTTPClient:
             Raise when the api return code: 403. There's a lot of reason why, This usually happen when the client cannot do the request due to twitter's limitation e.g trying to follow someone that you blocked etc.
         pytweet.errors.TooManyRequests:
             Raise when the api return code: 429. This happen when you made too much request thus the api ratelimit you. The ratelimit will ware off in a couple of minutes.
+        json.decoder.JSONDecoderError:
+            Raise when a request doesnt support a json format. Usually request like :class:`User.typing()`
 
         .. versionadded:: 1.0.0
         """
@@ -197,7 +199,7 @@ class HTTPClient:
 
         try:
             res = response.json()
-        except j.JSONDecoderError:
+        except j.decoder.JSONDecodeError:
             return
 
         if "meta" in res.keys():
@@ -211,19 +213,17 @@ class HTTPClient:
     def fetch_user(self, user_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> User:
         """Make a Request to obtain the user from the given user id.
 
-        Parameters:
-        -----------
+        Parameters
+        ------------
         user_id: Union[str, int]
             Represent the user id that you wish to get info to, If you dont have it you may use `fetch_user_byusername` because it only required the user's username.
-
         http_client:
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
-        Raises:
-        -------
+        Raises
+        ---------
         pytweet.errors.NotFoundError:
             Raise when the api can't find a user with that id.
-
         ValueError:
             Raise when user_id is not an int and is not a string of digits.
 
@@ -287,18 +287,17 @@ class HTTPClient:
     def fetch_user_byusername(self, username: str, *, http_client: Optional[HTTPClient] = None) -> User:
         """Make a Request to obtain the user from their username.
 
-        Parameters:
-        -----------
+        Parameters
+        ------------
         username: str
             Represent the user's username. A Username usually start with '@' before any letters. If a username named @Jack, then the username argument must be 'Jack'.
-
         http_client:
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
-        Raises:
-        -------
-            pytweet.errors.NotFoundError:
-                Raise when the api can't find a user with that username.
+        Raises
+        --------
+        pytweet.errors.NotFoundError:
+            Raise when the api can't find a user with that username.
 
         This function return a :class:`User` object.
 
@@ -416,7 +415,6 @@ class HTTPClient:
         text: str,
         *,
         quick_reply: QuickReply = None,
-        geo: Union[Geo, list, str] = None,
         cta: CTA,
         http_client=None,
     ) -> Optional[NoReturn]:
@@ -430,6 +428,8 @@ class HTTPClient:
             The text that will be send to that user.
         quick_reply: QuickReply
             The message's quick reply attachment.
+        cta: :class:`CTA`
+            cta or call-to-actions is use to make an action whenever a user 'call' something, a quick example is buttons.
         http_client
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
@@ -458,8 +458,7 @@ class HTTPClient:
 
         message_data = data["event"]["message_create"]["message_data"]
 
-        if text or not text:
-            message_data["text"] = str(text)
+        message_data["text"] = str(text)
 
         if quick_reply:
             message_data["quick_reply"] = {
@@ -467,18 +466,8 @@ class HTTPClient:
                 "options": quick_reply.options,
             }
 
-        if geo:
-            if geo.used_type == "shared_place":
-                message_data["attachment"] = {}
-                message_data["attachment"]["type"] = "location"
-                message_data["attachment"]["location"] = {}
-                message_data["attachment"]["location"]["type"] = "shared_place"
-                message_data["attachment"]["location"]["shared_place"] = {}
-                message_data["attachment"]["location"]["shared_place"]["place"] = {}
-                message_data["attachment"]["location"]["shared_place"]["place"]["id"] = str(geo.id)
-
         if cta:
-            message_data["ctas"] = cta._raw_buttons
+            message_data["ctas"] = cta.raw_buttons
 
         res = self.request(
             "POST",
@@ -514,11 +503,9 @@ class HTTPClient:
         )
 
         try:
-            self.http_client.message_cache.pop(int(event_id))
+            self.message_cache.pop(int(event_id))
         except KeyError:
             pass
-
-        return None
 
     def fetch_message(self, event_id: Union[str, int], **kwargs: Any) -> Optional[DirectMessage]:
         """Optional[:class:`DirectMessage`]: Fetch a direct message with the event id.
@@ -583,8 +570,6 @@ class HTTPClient:
         except KeyError:
             pass
 
-        return None
-
     def reply_toTweet(self, tweet_id: Union[str, int], text: str, username: str):
         """Make a POST Request to reply a specific tweet present by the tweet_id parameter.
 
@@ -606,7 +591,6 @@ class HTTPClient:
             params={"status": username + " " + text, "in_reply_to_status_id": tweet_id},
             auth=True,
         )
-        return None
 
     def follow_user(self, user_id: Union[str, int]) -> RelationFollow:
         """Make a POST Request to follow a User.
