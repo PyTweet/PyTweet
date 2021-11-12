@@ -278,9 +278,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.0
         """
-
         self.http_client.delete_tweet(int(self.id))
-        return None
 
     def reply(self, text: str) -> None:
         """:class:`None`: A method for replying to a tweet using HTTPClient.reply_toTweet()
@@ -288,7 +286,6 @@ class Tweet(Message):
         .. versionadded:: 1.2.5
         """
         self.http_client.reply_toTweet(self.id, text, self.author.username)
-        return None
 
     def hide(self):
         """Make a PUT Request to hide a specific reply tweet.
