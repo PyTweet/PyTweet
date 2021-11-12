@@ -10,6 +10,9 @@ __all__ = (
     "Media",
     "PollOptions",
     "Poll",
+    "QuickReply",
+    "Geo",
+    "CTA"
 )
 
 
@@ -358,10 +361,18 @@ class QuickReply:
 
 
 class Geo:
-    def __init__(self, data: Dict[str, Any], used_type):
+    """Represent the Geo or location in twitter.
+    You can use this as attachment in a tweet or for searching a location
+
+    Parameters
+    ------------
+    data: Dict[:class:`str`, :class:`Any`]
+        The Geo data in a dictionary.
+    
+    """
+    def __init__(self, data: Dict[str, Any]):
         self._payload = data
         self._bounding_box = self._payload.get("bounding_box")
-        self._used_type = used_type
 
     @property
     def id(self) -> str:
@@ -382,11 +393,6 @@ class Geo:
     def type(self) -> str:
         """:class:`str`: Returns place's type."""
         return self._payload.get("place_type")
-
-    @property
-    def used_type(self) -> str:
-        """:class:`str`: Returns place's type, this differ from :class:`type`,used_for is use for specified what type of attachment use to attach in a directmessage, there's 2 types: location and shared_coordinate."""
-        return self._used_type
 
     @property
     def country(self) -> str:
@@ -420,14 +426,9 @@ class Geo:
 
 @dataclass
 class Button:
-    style: ButtonStyle
     label: str
+    style: ButtonStyle
     url: str
-
-
-class WebIntents:
-    pass
-
 
 class CTA:
     def __init__(self):
