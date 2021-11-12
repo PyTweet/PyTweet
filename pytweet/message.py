@@ -1,13 +1,14 @@
+from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, Optional, Union, List
 
 from .enums import MessageEventTypeEnum, MessageTypeEnum
 from .user import User
 from .entities import Hashtags, Symbols, UserMentions, Urls
+from .attachments import QuickReply
 
 if TYPE_CHECKING:
     from .http import HTTPClient
-
 
 __all__ = (
     "Message",
@@ -47,13 +48,11 @@ class Message:
     def id(self) -> int:
         return int(self._id)
 
-
 class DirectMessage(Message):
     """Represents a Direct Message in Twitter.
 
     .. versionadded:: 1.2.0
     """
-
     def __init__(self, data: Dict[str, Any], **kwargs: Any):
         self.original_payload = data
         self._payload = data.get("event", None)
@@ -72,17 +71,27 @@ class DirectMessage(Message):
         return self.text
 
     def delete(self) -> None:
-        """Delete a DirectMessage object.
-
-        Parameters
-        ------------
-        event_id: :class:`int`
-            The event id. Every time a Direct Message is created, its going to return a unique ID called event id.
+        """Delete the DirectMessage object.
 
         .. versionadded:: 1.1.0
         """
         self.http_client.delete_message(self.id)
-        return None
+
+    def mark_read(self):
+        """Mark the DirectMessage as read, it also mark other messages before the message was sent as read.
+
+        .. versionadded:: 1.3.5
+        """
+        self.http_client.request(
+            "POST",
+            "1.1",
+            "/direct_messages/mark_read.json",
+            params={
+                "last_read_event_id": str(self.id),
+                "recipient_id": str(self.author.id)
+            },
+            auth=True
+        )
 
     @property
     def event_type(self) -> MessageEventTypeEnum:
@@ -152,3 +161,145 @@ class DirectMessage(Message):
         .. versionadded:: 1.2.0
         """
         return [Urls(data) for data in self.entities.get("urls")]
+
+
+class WelcomeMessage(Message):
+    """Represent a Welcome Message in a Direct Message.
+    
+    .. versionadded:: 1.3.5
+    """
+    def __init__(self, name: Optional[str] = None, *,text: Optional[str] = None, welcome_message_id: Union[str, int], timestamp: str, http_client):
+        super().__init__(text, welcome_message_id)
+        self._name = name
+        self._timestamp = timestamp
+        self.http_client = http_client
+
+    def __repr__(self) -> str:
+        return "WelcomeMessage(id: {0.id} name: {0.name} timestamp: {0._timestamp} created_at: {0.created_at})".format(self)
+
+    def __str__(self) -> str:
+        return self.text
+
+    def set_rules(self) -> WelcomeMessageRule:
+        """Set a new Welcome Message Rule that determines which Welcome Message will be shown in a given conversation. Returns the created rule if successful.
+
+        .. versionadded:: 1.3.5
+        """
+        try:
+            int(self.id)
+        except Exception as e:
+            raise e
+
+        data = {
+            "welcome_message_rule": {
+                "welcome_message_id": str(self.id)
+            }
+        }
+        
+        res = self.http_client.request(
+            "POST",
+            "1.1",
+            "/direct_messages/welcome_messages/rules/new.json",
+            json=data,
+            auth=True
+        )
+
+        args=[v for k, v in res.get("welcome_message_rule").items()]
+        return WelcomeMessageRule(args[0], args[2], args[1], http_client=self.http_client)
+
+    def update(self, text: str = None, *,quick_reply: QuickReply = None) -> WelcomeMessage:
+        """Updates the Welcome Message, you dont need to use set_rule again since this update your default welcome message. 
+        
+        Parameters
+        -----------
+        text: :class:`str`
+            The welcome message main text
+
+        .. versionadded:: 1.3.5
+        """
+        data = {
+            "message_data":{
+                
+            }
+        }
+
+        data["message_data"]["text"] = str(text)
+
+        if quick_reply:
+            data["message_data"]["quick_reply"] = {
+                "type": quick_reply.type,
+                "options": quick_reply.options,
+            }
+
+        res = self.http_client.request(
+            "PUT",
+            "1.1",
+            "/direct_messages/welcome_messages/update.json",
+            params={
+                "id": str(self.id)
+            },
+            json=data,
+            auth=True
+        )
+
+        welcome_message = res.get("welcome_message")
+        message_data = welcome_message.get("message_data")
+
+        name = res.get("name")
+        id = welcome_message.get("id")
+        timestamp = welcome_message.get("created_timestamp")
+        text = message_data.get("text")
+
+        return WelcomeMessage(name, text=text, welcome_message_id = id, timestamp=timestamp)
+
+    def delete(self):
+        """Delete the Welcome Message. 
+
+        .. versionadded:: 1.3.5
+        """
+        self.http_client.request(
+            "DELETE",
+            "1.1",
+            "/direct_messages/welcome_messages/destroy.json",
+            params={
+                "id": str(self.id)
+            },
+            auth=True
+        )
+
+    @property
+    def created_at(self) -> datetime.datetime:
+        timestamp=str(self._timestamp)[:10]
+        return datetime.datetime.fromtimestamp(int(timestamp))
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+class WelcomeMessageRule(WelcomeMessage):
+    """Represent a Welcome Message Rule in a Direct Message. This object is returns by WelcomeMessage.set_rule or client.fetch_welcome_message_rules, it determines which Welcome Message will be shown in a given conversation.
+    
+    .. versionadded:: 1.3.5
+    """
+    def __init__(self, id: Union[str, int], welcome_message_id: Union[str, int], timestamp: Union[str, int], *,http_client):
+        super().__init__(welcome_message_id = welcome_message_id, timestamp = timestamp, http_client = http_client)
+        self._id = id
+
+    def delete(self):
+        """Delete the Welcome Message Rule. 
+
+        .. versionadded:: 1.3.5
+        """
+        self.http_client.request(
+            "DELETE",
+            "1.1",
+            "/direct_messages/welcome_messages/rules/destroy.json",
+            params={
+                "id": str(self.id)
+            },
+            auth=True
+        )
+
+    @property
+    def id(self) -> int:
+        return int(self._id)
