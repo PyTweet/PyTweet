@@ -45,6 +45,7 @@ extensions = [
 ]
 autodoc_member_order = "bysource"
 autodoc_typehints = "none"
+autodoc_inherit_docstrings = False
 
 extlinks = {
     "issue": ("https://github.com/TheFarGG/PyTweet/issues/%s", ""),
@@ -69,7 +70,9 @@ master_doc = "index"
 version = ""
 try:
     with open("../pytweet/__init__.py") as f:
-        version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
+        version = re.search(
+            r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE
+        ).group(1)
 except Exception:
     pass
 
@@ -110,6 +113,7 @@ htmlhelp_basename = "pytweet.pydoc"
 html_context = {
     "discord_invite": "https://discord.gg/XHBhg6A4jJ"
 }
+
 
 # Output is processed with HTML5 writer. Default is False.
 html_experimental_html5_writer = True

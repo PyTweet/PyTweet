@@ -9,6 +9,17 @@ The following section outlines the API of pytweet.
 
     This module uses the Python logging module to log to tell you what you are doing wrong, See :doc:`logging` for more info.
 
+Version Related Info
+---------------------
+
+.. data:: version_info
+
+    A named tuple that is similar to :obj:`py:sys.version_info`.
+
+.. data:: __version__
+
+    Get the version of the module (e.g ``1.0.0`` or ``1.0.0a``) this is based on :pep:`440`.
+
 Client
 -------
 
