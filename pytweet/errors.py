@@ -33,7 +33,7 @@ class APIException(PytweetException):
 
 
 class HTTPException(PytweetException):
-    """:class:`PytweetException`: A custom error that will be raised when ever a request return HTTP status code above 200.
+    """:class:`PytweetException`: A custom error that will be raise when ever a request return HTTP status code above 200.
 
     .. versionadded:: 1.2.0
     """
@@ -140,7 +140,7 @@ class TooManyRequests(HTTPException):
 
 
 class NotFoundError(APIException):
-    """This error is usually returns when trying to find specific Tweet, User that does not exist.
+    """:class:`APIException`: This error is usually returns when trying to find specific Tweet, User that does not exist.
 
     .. versionadded:: 1.0.0
     """
