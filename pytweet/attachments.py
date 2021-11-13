@@ -368,15 +368,18 @@ class Geo:
         self._payload = data
         self._bounding_box = self._payload.get("bounding_box")
 
-    @property
-    def id(self) -> str:
-        """:class:`str`: Returns place's unique id."""
-        return self._payload.get("id")
+    def __repr__(self) -> str:
+        return "Geo(name:{0.name} fullname:{0.fullname} country:{0.country} country_code:{0.country_code} id:{0.id})".format(self)
 
     @property
     def name(self) -> str:
         """:class:`str`: Returns place's name."""
         return self._payload.get("name")
+
+    @property
+    def id(self) -> str:
+        """:class:`str`: Returns place's unique id."""
+        return self._payload.get("id")
 
     @property
     def fullname(self) -> str:
