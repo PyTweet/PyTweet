@@ -42,12 +42,10 @@ class User:
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
         self.original_payload: Dict[str, Any] = data
         self._payload: Dict[Any, Any] = (
-            self.original_payload.get("data")
-            if self.original_payload.get("data") != None
-            else self.original_payload
+            self.original_payload.get("data") or self.original_payload
         )
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
-        self._metrics = UserPublicMetrics(self._payload) if self._payload != None else self.original_payload
+        self._metrics = UserPublicMetrics(self._payload) or self.original_payload
 
     def __str__(self) -> str:
         return self.username
