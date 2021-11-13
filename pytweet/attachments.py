@@ -6,14 +6,7 @@ from .utils import time_parse_todt
 from .enums import ButtonStyle
 from dataclasses import dataclass
 
-__all__ = (
-    "Media",
-    "PollOptions",
-    "Poll",
-    "QuickReply",
-    "Geo",
-    "CTA"
-)
+__all__ = ("Media", "PollOptions", "Poll", "QuickReply", "Geo", "CTA")
 
 
 class Media:
@@ -368,8 +361,9 @@ class Geo:
     ------------
     data: Dict[:class:`str`, :class:`Any`]
         The Geo data in a dictionary.
-    
+
     """
+
     def __init__(self, data: Dict[str, Any]):
         self._payload = data
         self._bounding_box = self._payload.get("bounding_box")
@@ -429,6 +423,7 @@ class Button:
     label: str
     style: ButtonStyle
     url: str
+
 
 class CTA:
     def __init__(self):

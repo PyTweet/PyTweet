@@ -16,6 +16,6 @@ user = client.fetch_user_by_username("TheGenocides")
 print(user.name, user.username, user.id)
 # Returns The user's name, username, and id
 
-tweet = client.fetch_tweet("The tweet id in INTEGER form!")
+tweet = client.fetch_tweet("The tweet id") # Better to make this a int!
 print(tweet.text, tweet.id, tweet.author.username)
 # Returns the tweet's text, id, and the author's username.

@@ -173,7 +173,7 @@ class HTTPClient:
         pytweet.errors.TooManyRequests:
             Raise when the api return code: 429. This happen when you made too much request thus the api ratelimit you. The ratelimit will ware off in a couple of minutes.
         json.decoder.JSONDecoderError:
-            Raise when a request doesnt support a json format. Usually request like :class:`User.typing()`
+            Raise when a request doesn't support a json format. Usually request like :class:`User.typing()`
 
         .. versionadded:: 1.0.0
         """

@@ -48,11 +48,13 @@ class Message:
     def id(self) -> int:
         return int(self._id)
 
+
 class DirectMessage(Message):
     """Represents a Direct Message in Twitter.
 
     .. versionadded:: 1.2.0
     """
+
     def __init__(self, data: Dict[str, Any], **kwargs: Any):
         self.original_payload = data
         self._payload = data.get("event", None)
@@ -86,11 +88,8 @@ class DirectMessage(Message):
             "POST",
             "1.1",
             "/direct_messages/mark_read.json",
-            params={
-                "last_read_event_id": str(self.id),
-                "recipient_id": str(self.author.id)
-            },
-            auth=True
+            params={"last_read_event_id": str(self.id), "recipient_id": str(self.author.id)},
+            auth=True,
         )
 
     @property
@@ -165,17 +164,28 @@ class DirectMessage(Message):
 
 class WelcomeMessage(Message):
     """Represent a Welcome Message in a Direct Message.
-    
+
     .. versionadded:: 1.3.5
     """
-    def __init__(self, name: Optional[str] = None, *,text: Optional[str] = None, welcome_message_id: Union[str, int], timestamp: str, http_client):
+
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        *,
+        text: Optional[str] = None,
+        welcome_message_id: Union[str, int],
+        timestamp: str,
+        http_client
+    ):
         super().__init__(text, welcome_message_id)
         self._name = name
         self._timestamp = timestamp
         self.http_client = http_client
 
     def __repr__(self) -> str:
-        return "WelcomeMessage(id: {0.id} name: {0.name} timestamp: {0._timestamp} created_at: {0.created_at})".format(self)
+        return "WelcomeMessage(id: {0.id} name: {0.name} timestamp: {0._timestamp} created_at: {0.created_at})".format(
+            self
+        )
 
     def __str__(self) -> str:
         return self.text
@@ -190,26 +200,18 @@ class WelcomeMessage(Message):
         except Exception as e:
             raise e
 
-        data = {
-            "welcome_message_rule": {
-                "welcome_message_id": str(self.id)
-            }
-        }
-        
+        data = {"welcome_message_rule": {"welcome_message_id": str(self.id)}}
+
         res = self.http_client.request(
-            "POST",
-            "1.1",
-            "/direct_messages/welcome_messages/rules/new.json",
-            json=data,
-            auth=True
+            "POST", "1.1", "/direct_messages/welcome_messages/rules/new.json", json=data, auth=True
         )
 
-        args=[v for k, v in res.get("welcome_message_rule").items()]
+        args = [v for k, v in res.get("welcome_message_rule").items()]
         return WelcomeMessageRule(args[0], args[2], args[1], http_client=self.http_client)
 
-    def update(self, text: str = None, *,quick_reply: QuickReply = None) -> WelcomeMessage:
-        """Updates the Welcome Message, you dont need to use set_rule again since this update your default welcome message. 
-        
+    def update(self, text: str = None, *, quick_reply: QuickReply = None) -> WelcomeMessage:
+        """Updates the Welcome Message, you dont need to use set_rule again since this update your default welcome message.
+
         Parameters
         -----------
         text: :class:`str`
@@ -217,11 +219,7 @@ class WelcomeMessage(Message):
 
         .. versionadded:: 1.3.5
         """
-        data = {
-            "message_data":{
-                
-            }
-        }
+        data = {"message_data": {}}
 
         data["message_data"]["text"] = str(text)
 
@@ -235,11 +233,9 @@ class WelcomeMessage(Message):
             "PUT",
             "1.1",
             "/direct_messages/welcome_messages/update.json",
-            params={
-                "id": str(self.id)
-            },
+            params={"id": str(self.id)},
             json=data,
-            auth=True
+            auth=True,
         )
 
         welcome_message = res.get("welcome_message")
@@ -250,43 +246,41 @@ class WelcomeMessage(Message):
         timestamp = welcome_message.get("created_timestamp")
         text = message_data.get("text")
 
-        return WelcomeMessage(name, text=text, welcome_message_id = id, timestamp=timestamp)
+        return WelcomeMessage(name, text=text, welcome_message_id=id, timestamp=timestamp)
 
     def delete(self):
-        """Delete the Welcome Message. 
+        """Delete the Welcome Message.
 
         .. versionadded:: 1.3.5
         """
         self.http_client.request(
-            "DELETE",
-            "1.1",
-            "/direct_messages/welcome_messages/destroy.json",
-            params={
-                "id": str(self.id)
-            },
-            auth=True
+            "DELETE", "1.1", "/direct_messages/welcome_messages/destroy.json", params={"id": str(self.id)}, auth=True
         )
 
     @property
     def created_at(self) -> datetime.datetime:
-        timestamp=str(self._timestamp)[:10]
+        timestamp = str(self._timestamp)[:10]
         return datetime.datetime.fromtimestamp(int(timestamp))
 
     @property
     def name(self) -> str:
         return self._name
 
+
 class WelcomeMessageRule(WelcomeMessage):
     """Represent a Welcome Message Rule in a Direct Message. This object is returns by WelcomeMessage.set_rule or client.fetch_welcome_message_rules, it determines which Welcome Message will be shown in a given conversation.
-    
+
     .. versionadded:: 1.3.5
     """
-    def __init__(self, id: Union[str, int], welcome_message_id: Union[str, int], timestamp: Union[str, int], *,http_client):
-        super().__init__(welcome_message_id = welcome_message_id, timestamp = timestamp, http_client = http_client)
+
+    def __init__(
+        self, id: Union[str, int], welcome_message_id: Union[str, int], timestamp: Union[str, int], *, http_client
+    ):
+        super().__init__(welcome_message_id=welcome_message_id, timestamp=timestamp, http_client=http_client)
         self._id = id
 
     def delete(self):
-        """Delete the Welcome Message Rule. 
+        """Delete the Welcome Message Rule.
 
         .. versionadded:: 1.3.5
         """
@@ -294,10 +288,8 @@ class WelcomeMessageRule(WelcomeMessage):
             "DELETE",
             "1.1",
             "/direct_messages/welcome_messages/rules/destroy.json",
-            params={
-                "id": str(self.id)
-            },
-            auth=True
+            params={"id": str(self.id)},
+            auth=True,
         )
 
     @property

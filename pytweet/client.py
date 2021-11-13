@@ -169,9 +169,9 @@ class Client:
         res = self.http.post_tweet(text, http_client=http_client if http_client else self.http, **kwargs)
         return res
 
-    def create_welcome_message(self, name: str = None, text: str = None, *,quick_reply: QuickReply = None):
-        """Make a default welcome message for the client. 
-        
+    def create_welcome_message(self, name: str = None, text: str = None, *, quick_reply: QuickReply = None):
+        """Make a default welcome message for the client.
+
         Parameters
         ------------
         name: :class:`str`
@@ -183,17 +183,11 @@ class Client:
 
         .. versionadded:: 1.3.5
         """
-        data={
-            "welcome_message": {
-                "message_data": {
-
-                }
-            }
-        }
+        data = {"welcome_message": {"message_data": {}}}
 
         message_data = data["welcome_message"]["message_data"]
         data["welcome_message"]["name"] = str(name)
-        message_data['text'] = str(text)
+        message_data["text"] = str(text)
 
         if quick_reply:
             message_data["quick_reply"] = {
@@ -201,23 +195,16 @@ class Client:
                 "options": quick_reply.options,
             }
 
-        
-        res = self.http.request(
-            "POST",
-            "1.1",
-            "/direct_messages/welcome_messages/new.json",
-            json=data,
-            auth=True
-        )
+        res = self.http.request("POST", "1.1", "/direct_messages/welcome_messages/new.json", json=data, auth=True)
         print(res)
 
         data = res.get("welcome_message")
         id = data.get("id")
         name = res.get("name")
-        timestamp = data.get('created_timestamp')
+        timestamp = data.get("created_timestamp")
         text = data.get("message_data").get("text")
 
-        return WelcomeMessage(name, text = text, welcome_message_id = id, timestamp = timestamp, http_client=self.http)
+        return WelcomeMessage(name, text=text, welcome_message_id=id, timestamp=timestamp, http_client=self.http)
 
     def fetch_welcome_message(self, welcome_message_id: Union[str, int]) -> WelcomeMessage:
         """Fetch the welcome message with the given welcome message id argument.
@@ -233,17 +220,15 @@ class Client:
             "GET",
             "1.1",
             "/direct_messages/welcome_messages/show.json",
-            params={
-                "id": str(welcome_message_id)
-            },
-            auth=True
+            params={"id": str(welcome_message_id)},
+            auth=True,
         )
         data = res.get("welcome_message")
         message_data = data.get("message_data")
-        id = data.get('id')
-        timestamp = data.get('created_timestamp')
+        id = data.get("id")
+        timestamp = data.get("created_timestamp")
         text = message_data.get("text")
-        return WelcomeMessage(text = text, welcome_message_id = id, timestamp = timestamp, http_client=self.http)
+        return WelcomeMessage(text=text, welcome_message_id=id, timestamp=timestamp, http_client=self.http)
 
     def fetch_welcome_message_rules(self, welcome_message_rules_id: Union[str, int]) -> WelcomeMessageRule:
         """Fetch the welcome message rules with the given welcome message rules id argument.
@@ -259,16 +244,14 @@ class Client:
             "GET",
             "1.1",
             "/direct_messages/welcome_messages/rules/show.json",
-            params={
-                "id": str(welcome_message_rules_id)
-            },
-            auth=True
+            params={"id": str(welcome_message_rules_id)},
+            auth=True,
         )
         data = res.get("welcome_message_rule")
         id = data.get("id")
         timestamp = data.get("created_timestamp")
         welcome_message_id = data.get("welcome_message_id")
-        return WelcomeMessageRule(id, welcome_message_id, timestamp, http_client = self)
+        return WelcomeMessageRule(id, welcome_message_id, timestamp, http_client=self)
 
     def get_message(self, event_id: Union[str, int] = None) -> Optional[DirectMessage]:
         """Get a direct message through the client message cache. Return None if the message is not in the cache.
@@ -378,4 +361,4 @@ class Client:
             auth=True,
         )
 
-        return [Geo(data, used_type=used_type) for data in data.get("result").get("places")] 
+        return [Geo(data, used_type=used_type) for data in data.get("result").get("places")]

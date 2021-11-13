@@ -148,13 +148,7 @@ class User:
     def typing(self):
         """Indicates that the client is typing in a user Dm."""
         self.http_client.request(
-            "POST",
-            "1.1",
-            "/direct_messages/indicate_typing.json",
-            params={
-                "recipient_id": str(self.id)
-            },
-            auth=True
+            "POST", "1.1", "/direct_messages/indicate_typing.json", params={"recipient_id": str(self.id)}, auth=True
         )
 
     @property
