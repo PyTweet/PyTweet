@@ -497,11 +497,8 @@ class HTTPClient:
             }
         }
 
-        if not isinstance(quick_reply, QuickReply):
-            if not quick_reply:
-                pass
-            else:
-                raise PytweetException("'quick_reply' is not an instance of pytweet.QuickReply")
+        if quick_reply and (not isinstance(quick_reply, QuickReply)):
+            raise PytweetException("'quick_reply' is not an instance of pytweet.QuickReply")
 
         message_data = data["event"]["message_create"]["message_data"]
 
@@ -526,10 +523,10 @@ class HTTPClient:
 
         message_create = res.get("event").get("message_create")
         user_id = message_create.get("target").get("recipient_id")
-        user = self.fetch_user(user_id, http_client=http_client if http_client else self)
+        user = self.fetch_user(user_id, http_client=http_client or self)
         res["event"]["message_create"]["target"]["recipient"] = user
 
-        msg = DirectMessage(res, http_client=http_client if http_client else self)
+        msg = DirectMessage(res, http_client=http_client or self)
         self.message_cache[msg.id] = msg
 
         return msg
