@@ -197,7 +197,7 @@ class Poll:
     .. versionadded:: 1.1.0
     """
 
-    def __init__(self, id: int, voting_status: str, duration: Union[str, int], end_date: Union[str, int]):
+    def __init__(self, id: int = None, voting_status: str = None, duration: Union[str, int] = None, end_date: Union[str, int] = None):
         self._id = id
         self._voting_status = voting_status
         self._duration = duration
@@ -205,7 +205,7 @@ class Poll:
         self._options = []
 
     def __repr__(self) -> str:
-        return "Poll(id={0.id}, voting_status={0.voting_status}, duration={0.duration}, end_date={0.end_date} options={0.options})".format(
+        return "Poll(id={0.id}, voting_status={0.voting_status}, duration={0.duration})".format(
             self
         )
 
@@ -222,10 +222,7 @@ class Poll:
     def __len__(self) -> int:
         return len(self.options)
 
-    def __bool__(self) -> bool:
-        return self.voting_status
-
-    def add_option(self, position: int, label: str) -> Poll:
+    def add_option(self, label: str) -> Poll:
         """Add option to your Poll instance.
 
         Parameters
@@ -235,12 +232,10 @@ class Poll:
         label: :class:`str`
             The option's label.
 
-        .. versionadded UKN
+        .. versionadded 1.3.5
         """
 
-        if position > 4:
-            return
-        self._options.append({"position": position, "label": label})
+        self._options.append({"label": label})
         return self
 
     def add_option_FromRequest(self, position: int, label: str, votes: int) -> Poll:
@@ -256,7 +251,7 @@ class Poll:
             The option votes
 
 
-        .. versionadded UKN
+        .. versionadded 1.3.5
         """
 
         if position > 4:
@@ -270,7 +265,7 @@ class Poll:
 
         .. versionadded:: 1.1.0
         """
-        return int(self._id)
+        return int(self._id) if self._id else None
 
     @property
     def options(self) -> List[PollOptions]:
@@ -289,12 +284,20 @@ class Poll:
         return True if self._voting_status == "open" else False
 
     @property
-    def duration(self) -> int:
+    def duration_inSeconds(self) -> int:
         """:class:`int`: Return the poll duration in seconds.
 
         .. versionadded:: 1.1.0
         """
-        return int(self._duration) * 60
+        return int(self._duration) * 60 if self._duration else None
+
+    @property
+    def duration(self) -> int:
+        """:class:`int`: Return the poll duration in minutes.
+
+        .. versionadded:: 1.3.5
+        """
+        return int(self._duration) if self._duration else None
 
     @property
     def end_date(self) -> datetime.datetime:
@@ -302,7 +305,7 @@ class Poll:
 
         .. versionadded:: 1.1.0
         """
-        return time_parse_todt(self._end_date)
+        return time_parse_todt(self._end_date) if self._end_date else None
 
 
 class QuickReply:
