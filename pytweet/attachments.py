@@ -371,6 +371,9 @@ class Geo:
     def __repr__(self) -> str:
         return "Geo(name:{0.name} fullname:{0.fullname} country:{0.country} country_code:{0.country_code} id:{0.id})".format(self)
 
+    def __str__(self) -> str:
+        return self.name 
+
     @property
     def name(self) -> str:
         """:class:`str`: Returns place's name."""
