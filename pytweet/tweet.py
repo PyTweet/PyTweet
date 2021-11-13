@@ -275,18 +275,39 @@ class Tweet(Message):
         return RelationRetweet(res)
 
     def delete(self) -> None:
-        """A method for deleting to a tweet using HTTPClient.delete_message()
+        """
+        .. note::
+            This function is almost complete! though you can still use and open an issue in github if it cause an error.
+
+        Make a DELETE Request to delete a tweet through the tweet_id.
 
         .. versionadded:: 1.2.0
         """
-        self.http_client.delete_tweet(int(self.id))
+
+        self.http_client.request("DELETE", "2", f"/tweets/{self.id}", auth=True)
+
+        try:
+            self.http_client.tweet_cache.pop(self.id)
+        except KeyError:
+            pass
 
     def reply(self, text: str) -> None:
-        """A method for replying to a tweet using HTTPClient.reply_toTweet()
+        """Post a tweet to reply a specific tweet present by the tweet_id parameter.
+
+        Parameters
+        ------------
+        text: str
+            The reply's main text.
 
         .. versionadded:: 1.2.5
         """
-        self.http_client.reply_toTweet(self.id, text, self.author.username)
+        self.http_client.request(
+            "POST",
+            "1.1",
+            f"/statuses/update.json",
+            params={"status": self.author.username + ' ' + text, "in_reply_to_status_id": str(self.id)},
+            auth=True,
+        )
 
     def hide(self):
         """Make a PUT Request to hide a specific reply tweet.

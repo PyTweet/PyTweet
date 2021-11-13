@@ -92,58 +92,101 @@ class User:
         return res
 
     def follow(self) -> RelationFollow:
-        """:class:`RelationFollow`: follow the user.
+        """Make a Request to follow a User.
 
-        Returns
-        ---------
-        :class:`RelationFollow`
-            This method return :class:`RelationFollow` object.
+        Parameters:
+        -----------
+        user_id: Union[str, int]
+            The user's id that you wish to follow.
+
+        This function return a :class: `RelationFollow` object.
 
         .. versionadded:: 1.1.0
         """
-        follow = self.http_client.follow_user(self.id)
-        return follow
+        my_id = self.http_client.access_token.partition("-")[0]
+        res = self.http_client.request(
+            "POST",
+            "2",
+            f"/users/{my_id}/following",
+            json={"target_user_id": str(self.id)},
+            auth=True,
+        )
+        return RelationFollow(res)
 
     def unfollow(self) -> RelationFollow:
-        """:class:`RelationFollow`: unfollow the user.
+        """Make a DELETE Request to unfollow a User.
 
-        Returns
-        ---------
-        :class:`RelationFollow`
-            This method return a :class:`RelationFollow` object
+        Parameters
+        ------------
+        user_id: Union[str, int]
+            The user's id that you wish to unfollow.
+
+        This function return a :class:`RelationFollow` object.
 
         .. versionadded:: 1.1.0
         """
-        unfollow = self.http_client.unfollow_user(self.id)
-        return unfollow
+        my_id = self.http_clientaccess_token.partition("-")[0]
+        res = self.http_client.request("DELETE", "2", f"/users/{my_id}/following/{self.id}", auth=True)
+        return RelationFollow(res)
 
     def block(self) -> None:
-        """block the user.
+        """Make a POST Request to Block a User.
 
-        .. versionadded:: 1.1.0
+        Parameters:
+        -----------
+        user_id: Union[str, int]
+            The user's id that you wish to block.
+
+        .. versionadded:: 1.2.0
         """
-        self.http_client.block_user(self.id)
+        my_id = self.http_client.access_token.partition("-")[0]
+        self.http_client.request(
+            "POST",
+            "2",
+            f"/users/{my_id}/blocking",
+            json={"target_user_id": str(self.id)},
+            auth=True,
+        )
 
     def unblock(self) -> None:
-        """unblock the user.
+        """Make a DELETE Request to unblock a User.
 
-        .. versionadded:: 1.1.0
+        Parameters:
+        -----------
+        user_id: Union[str, int]
+            The user's id that you wish to unblock.
+
+
+        .. versionadded:: 1.2.0
         """
-        self.http_client.unblock_user(self.id)
+        my_id = self.http_client.access_token.partition("-")[0]
+        self.http_client.request("DELETE", "2", f"/users/{my_id}/blocking/{self.id}", auth=True)
 
     def mute(self) -> None:
-        """mute the user.
+        """Make a POST Request to mute a User.
+
+        Parameters
+        ------------
+        user_id: Union[str, int]
+            The user's id that you wish to mute.
 
         .. versionadded:: 1.2.5
         """
-        self.http_client.mute_user(self.id)
+        my_id = self.http_client.access_token.partition("-")[0]
+        self.http_client.request("POST", "2", f"/users/{my_id}/muting", json={"target_user_id": str(self.id)}, auth=True)
 
     def unmute(self) -> None:
-        """unmute the user.
+        """Make a DELETE Request to unmute the User.
+
+        Parameters
+        ------------
+        user_id: Union[str, int]
+        The user's id that you wish to unmute.
 
         .. versionadded:: 1.2.5
         """
-        self.http_client.unmute_user(self.id)
+        my_id = self.http_client.access_token.partition("-")[0]
+        self.http_client.request("DELETE", "2", f"/users/{my_id}/muting/{self.id}", auth=True)
 
     def typing(self):
         """Indicates that the client is typing in a user Dm."""
