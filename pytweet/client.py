@@ -66,8 +66,7 @@ class Client:
             return None
 
         my_id = self.http.access_token.partition("-")[0]
-        me = self.fetch_user(my_id)
-        return me
+        return self.fetch_user(my_id)
 
     def fetch_user(self, user_id: Union[str, int] = None) -> User:
         """:class:`User`: A function for HTTPClient.fetch_user().
@@ -168,8 +167,9 @@ class Client:
         .. versionadded:: 1.1.0
         """
         http_client = kwargs.get("http_client", None)
-        res = self.http.post_tweet(text, http_client=http_client if http_client else self.http, **kwargs)
-        return res
+        return self.http.post_tweet(
+            text, http_client=http_client or self.http, **kwargs
+        )
 
     def create_welcome_message(
         self, name: str = None, text: str = None, *, quick_reply: QuickReply = None
@@ -286,8 +286,7 @@ class Client:
 
         .. versionadded:: 1.3.5
         """
-        space = self.http.fetch_space(space_id)
-        return space
+        return self.http.fetch_space(space_id)
 
     def fetch_space_by_title(self, title: str, state: SpaceState = SpaceState.live) -> Space:
         """Fetch a space using its title.
