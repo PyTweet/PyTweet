@@ -13,6 +13,8 @@ if TYPE_CHECKING:
 __all__ = (
     "Message",
     "DirectMessage",
+    "WelcomeMessage",
+    "WelcomeMessageRule"
 )
 
 
@@ -30,9 +32,10 @@ class Message:
     .. versionadded:: 1.2.0
     """
 
-    def __init__(self, text: Optional[str], id: Union[str, int]):
+    def __init__(self, text: Optional[str], id: Union[str, int], type: int):
         self._text = text
         self._id = id
+        self._type = type
 
     def __repr__(self) -> str:
         return "Message(text: {0.text} id: {0.id})".format(self)
@@ -48,6 +51,10 @@ class Message:
     def id(self) -> int:
         return int(self._id)
 
+    @property
+    def type(self) -> MessageTypeEnum:
+        return MessageTypeEnum(self._type)
+
 
 class DirectMessage(Message):
     """Represents a Direct Message in Twitter.
@@ -62,12 +69,14 @@ class DirectMessage(Message):
         self.message_data = self.message_create.get("message_data", None)
         self.entities = self.message_data.get("entities", None)
 
-        super().__init__(self.message_data.get("text"), self._payload.get("id"))
+        super().__init__(self.message_data.get("text"), self._payload.get("id"), 0)
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client", None)
         self.timestamp = round(datetime.datetime.utcnow().timestamp())
 
     def __repr__(self) -> str:
-        return "Message(text:{0.text} id:{0.id} author: {0.author})"
+        return "Message(text:{0.text} id:{0.id} author: {0.author})".format(
+            self
+        )
 
     def __str__(self) -> str:
         return self.text
@@ -101,24 +110,12 @@ class DirectMessage(Message):
         return MessageEventTypeEnum(self._payload.get("type", None))
 
     @property
-    def type(self) -> MessageTypeEnum:
-        """:class:`MessageTypesEnum`: Returns the message type.
-
-        .. versionadded:: 1.2.0
-        """
-        return MessageTypeEnum(0)
-
-    @property
     def author(self) -> User:
         """:class:`User`: Returns the author of the message in User object.
 
         .. versionadded:: 1.2.0
         """
-        if not self.http_client:
-            return None
-
-        user_id = self.message_create.get("target").get("recipient_id")
-        user = self.http_client.fetch_user(user_id, http_client=self.http_client)
+        user = self.message_create.get("target").get("recipient")
         return user
 
     @property
@@ -177,7 +174,7 @@ class WelcomeMessage(Message):
         timestamp: str,
         http_client
     ):
-        super().__init__(text, welcome_message_id)
+        super().__init__(text, welcome_message_id, 2)
         self._name = name
         self._timestamp = timestamp
         self.http_client = http_client
@@ -267,17 +264,24 @@ class WelcomeMessage(Message):
         return self._name
 
 
-class WelcomeMessageRule(WelcomeMessage):
+class WelcomeMessageRule(Message):
     """Represent a Welcome Message Rule in a Direct Message. This object is returns by WelcomeMessage.set_rule or client.fetch_welcome_message_rules, it determines which Welcome Message will be shown in a given conversation.
 
     .. versionadded:: 1.3.5
     """
 
     def __init__(
-        self, id: Union[str, int], welcome_message_id: Union[str, int], timestamp: Union[str, int], *, http_client
+        self, welcome_message_rule_id: Union[str, int], welcome_message_id: Union[str, int], timestamp: Union[str, int], *, http_client
     ):
-        super().__init__(welcome_message_id=welcome_message_id, timestamp=timestamp, http_client=http_client)
-        self._id = id
+        super().__init__(id=welcome_message_rule_id, type=3)
+        self._welcome_message_id = welcome_message_id
+        self._timestamp = timestamp
+        self.http_client = http_client
+
+    def __repr__(self) -> str:
+        return "WelcomeMessageRule(id: {0.id} welcome_message_id: {0.} created_at: {0.created_at})".format(
+            self
+        )
 
     def delete(self):
         """Delete the Welcome Message Rule.
@@ -293,5 +297,12 @@ class WelcomeMessageRule(WelcomeMessage):
         )
 
     @property
-    def id(self) -> int:
-        return int(self._id)
+    def created_at(self) -> datetime.datetime:
+        """:class:`datetime.datetime`: Returns a datetime.datetime object with the WelcomeMessageRule created time."""
+        timestamp = str(self._timestamp)[:10]
+        return datetime.datetime.fromtimestamp(int(timestamp))
+
+    @property
+    def welcome_message_id(self) -> Union[str, int]:
+        """Union[:class:`str`, :class:`int`]: Returns the welcome message's id."""
+        return int(self._welcome_message_id)     
