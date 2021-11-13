@@ -332,7 +332,6 @@ class Client:
     def search_geo(
         self,
         query: str,
-        used_type: str = "shared_place",
         *,
         lat: int = None,
         long: int = None,
@@ -381,4 +380,4 @@ class Client:
             auth=True,
         )
 
-        return [Geo(data, used_type=used_type) for data in data.get("result").get("places")]
+        return [Geo(data) for data in data.get("result").get("places")]
