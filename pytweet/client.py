@@ -5,6 +5,8 @@ from .tweet import Tweet
 from .user import User
 from .message import DirectMessage, WelcomeMessage, WelcomeMessageRule
 from .attachments import Geo, QuickReply
+from .space import Space
+from .enums import SpaceState
 
 __all__ = ("Client",)
 
@@ -273,6 +275,35 @@ class Client:
         welcome_message_id = data.get("welcome_message_id")
         return WelcomeMessageRule(id, welcome_message_id, timestamp, http_client=self)
 
+    def fetch_space(self, space_id: Union[str, int]) -> Space:
+        """Fetch a space using the space_id parameter
+
+        Parameters
+        ------------
+        space_id: Union[:class:`str`, :class:`int`]
+            The space id that you are going to use to fetch a Space.
+
+
+        .. versionadded:: 1.3.5
+        """
+        space = self.http.fetch_space(space_id)
+        return space
+
+    def fetch_space_by_title(self, title: str, state: SpaceState = SpaceState.live) -> Space:
+        """Fetch a space using its title.
+
+        Parameters
+        ------------
+        title: Union[:class:`str`, :class:`int`]
+            The space title that you are going use for fetching the space.
+        state: :class:`SpaceState`
+            The type of state the space has. Theres only 2 type: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host. Default to SpaceState.live
+
+        .. versionadded:: 1.3.5
+        """
+        Space = self.http.fetch_space_bytitle(title, state)
+        return Space
+
     def get_message(self, event_id: Union[str, int] = None) -> Optional[DirectMessage]:
         """Get a direct message through the client message cache. Return None if the message is not in the cache.
 
@@ -325,7 +356,7 @@ class Client:
         try:
             tweet_id = int(tweet_id)
         except ValueError:
-            raise ValueError("tweet_id must be an integer or a :class:`str`ing of digits.")
+            raise ValueError("tweet_id must be an integer or a string of digits.")
 
         return self.http.message_cache.get(tweet_id)
 

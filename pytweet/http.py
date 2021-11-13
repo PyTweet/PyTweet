@@ -419,7 +419,7 @@ class HTTPClient:
         space_id: Union[:class:`str`, :class:`int`]
             The space id that you are going to fetch.
 
-            
+
         .. versionadded:: 1.3.5
         """
         res = self.request(
@@ -428,7 +428,7 @@ class HTTPClient:
             f"/spaces/{str(space_id)}",
             params={
                 "space.fields": "host_ids,created_at,creator_id,id,lang,invited_user_ids,participant_count,speaker_ids,started_at,state,title,updated_at,scheduled_start,is_ticketed"
-            }
+            },
         )
         return Space(res)
 
@@ -441,7 +441,7 @@ class HTTPClient:
             The space title that you are going use for fetching the space.
         state: :class:`SpaceState`
             The type of state the space has. Theres only 2 type: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host.
-            
+
         .. versionadded:: 1.3.5
         """
         res = self.request(
@@ -451,8 +451,8 @@ class HTTPClient:
             params={
                 "query": title,
                 "state": state.value,
-                "space.fields": "host_ids,created_at,creator_id,id,lang,invited_user_ids,participant_count,speaker_ids,started_at,state,title,updated_at,scheduled_start,is_ticketed"
-            }
+                "space.fields": "host_ids,created_at,creator_id,id,lang,invited_user_ids,participant_count,speaker_ids,started_at,state,title,updated_at,scheduled_start,is_ticketed",
+            },
         )
         return Space(res)
 
