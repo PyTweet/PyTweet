@@ -1,12 +1,12 @@
-from typing import Any, Optional, Union
+from typing import List, Optional, Union
 
+from .attachments import Geo, Poll, QuickReply
+from .enums import ReplySetting, SpaceState
 from .http import HTTPClient
+from .message import DirectMessage, WelcomeMessage, WelcomeMessageRule
+from .space import Space
 from .tweet import Tweet
 from .user import User
-from .message import DirectMessage, WelcomeMessage, WelcomeMessageRule
-from .attachments import Geo, QuickReply
-from .space import Space
-from .enums import SpaceState
 
 __all__ = ("Client",)
 
@@ -150,7 +150,19 @@ class Client:
         """
         return self.http.fetch_message(event_id, http_client=self.http)
 
-    def tweet(self, text: str, **kwargs: Any) -> Tweet:
+    def tweet(
+        self,
+        text: str = None,
+        *,
+        poll: Optional[Poll] = None,
+        geo: Optional[Union[Geo, str]] = None,
+        quote_tweet_id: Optional[Union[str, int]] = None,
+        direct_message_deep_link: Optional[str] = None,
+        reply_setting: Optional[Union[ReplySetting, str]] = None,
+        reply_to_tweet: Optional[Union[str, int]] = None,
+        exclude_reply_users: List[Union[str, int]] = None,
+        super_followers_only: Optional[bool] = False,
+    ) -> Tweet:
         """:class:`Tweet`: Post a tweet directly to twitter from the given parameters.
 
         Parameters
@@ -166,10 +178,19 @@ class Client:
 
         .. versionadded:: 1.1.0
         """
-        http_client = kwargs.get("http_client", None)
-        return self.http.post_tweet(
-            text, http_client=http_client or self.http, **kwargs
+        res = self.http.post_tweet(
+            text,
+            poll=poll,
+            geo=geo,
+            quote_tweet_id=quote_tweet_id,
+            direct_message_deep_link=direct_message_deep_link,
+            reply_setting=reply_setting,
+            reply_to_tweet=reply_to_tweet,
+            exclude_reply_users=exclude_reply_users,
+            super_followers_only=super_followers_only,
+            http_client=self.http,
         )
+        return res
 
     def create_welcome_message(
         self, name: str = None, text: str = None, *, quick_reply: QuickReply = None
@@ -205,7 +226,13 @@ class Client:
                 "options": quick_reply.options,
             }
 
-        res = self.http.request("POST", "1.1", "/direct_messages/welcome_messages/new.json", json=data, auth=True)
+        res = self.http.request(
+            "POST",
+            "1.1",
+            "/direct_messages/welcome_messages/new.json",
+            json=data,
+            auth=True,
+        )
         print(res)
 
         data = res.get("welcome_message")
@@ -214,7 +241,13 @@ class Client:
         timestamp = data.get("created_timestamp")
         text = data.get("message_data").get("text")
 
-        return WelcomeMessage(name, text=text, welcome_message_id=id, timestamp=timestamp, http_client=self.http)
+        return WelcomeMessage(
+            name,
+            text=text,
+            welcome_message_id=id,
+            timestamp=timestamp,
+            http_client=self.http,
+        )
 
     def fetch_welcome_message(self, welcome_message_id: Union[str, int]) -> WelcomeMessage:
         """Fetch the welcome message with the given welcome message id argument.
@@ -296,7 +329,7 @@ class Client:
         title: Union[:class:`str`, :class:`int`]
             The space title that you are going use for fetching the space.
         state: :class:`SpaceState`
-            The type of state the space has. Theres only 2 type: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host. Default to SpaceState.live
+            The type of state the space has. There's only 2 type: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host. Default to SpaceState.live
 
         .. versionadded:: 1.3.5
         """

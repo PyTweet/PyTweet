@@ -31,3 +31,9 @@ class ButtonStyle(Enum):
 class SpaceState(Enum):
     live = "live"
     scheduled = "scheduled"
+
+
+class ReplySetting(Enum):
+    everyone = "everyone"
+    mentionn_users = "mentionedUsers"
+    following = "following"
