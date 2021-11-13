@@ -181,7 +181,7 @@ class WelcomeMessage(Message):
         text: Optional[str] = None,
         welcome_message_id: Union[str, int],
         timestamp: str,
-        http_client
+        http_client,
     ):
         super().__init__(text, welcome_message_id, 2)
         self._name = name
@@ -285,7 +285,7 @@ class WelcomeMessageRule(Message):
         welcome_message_id: Union[str, int],
         timestamp: Union[str, int],
         *,
-        http_client
+        http_client,
     ):
         super().__init__(id=welcome_message_rule_id, type=3)
         self._welcome_message_id = welcome_message_id

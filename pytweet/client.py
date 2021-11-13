@@ -152,17 +152,17 @@ class Client:
         return self.http.fetch_message(event_id, http_client=self.http)
 
     def tweet(
-        self, 
-        text: str = None, 
-        *, 
-        poll: Optional[Poll] = None, 
-        geo: Optional[Union[Geo, str]] = None, 
-        quote_tweet_id: Optional[Union[str, int]] = None, 
+        self,
+        text: str = None,
+        *,
+        poll: Optional[Poll] = None,
+        geo: Optional[Union[Geo, str]] = None,
+        quote_tweet_id: Optional[Union[str, int]] = None,
         direct_message_deep_link: Optional[str] = None,
         reply_setting: Optional[Union[ReplySetting, str]] = None,
         reply_to_tweet: Optional[Union[str, int]] = None,
-        exclude_reply_users: List[Union[str, int]] = None, 
-        super_followers_only: Optional[bool] = False
+        exclude_reply_users: List[Union[str, int]] = None,
+        super_followers_only: Optional[bool] = False,
     ) -> Tweet:
         """:class:`Tweet`: Post a tweet directly to twitter from the given parameters.
 
@@ -179,7 +179,18 @@ class Client:
 
         .. versionadded:: 1.1.0
         """
-        res = self.http.post_tweet(text, poll=poll, geo=geo, quote_tweet_id = quote_tweet_id, direct_message_deep_link = direct_message_deep_link, reply_setting = reply_setting, reply_to_tweet = reply_to_tweet, exclude_reply_users = exclude_reply_users, super_followers_only = super_followers_only, http_client=self.http)
+        res = self.http.post_tweet(
+            text,
+            poll=poll,
+            geo=geo,
+            quote_tweet_id=quote_tweet_id,
+            direct_message_deep_link=direct_message_deep_link,
+            reply_setting=reply_setting,
+            reply_to_tweet=reply_to_tweet,
+            exclude_reply_users=exclude_reply_users,
+            super_followers_only=super_followers_only,
+            http_client=self.http,
+        )
         return res
 
     def create_welcome_message(

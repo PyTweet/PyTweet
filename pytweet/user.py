@@ -173,7 +173,9 @@ class User:
         .. versionadded:: 1.2.5
         """
         my_id = self.http_client.access_token.partition("-")[0]
-        self.http_client.request("POST", "2", f"/users/{my_id}/muting", json={"target_user_id": str(self.id)}, auth=True)
+        self.http_client.request(
+            "POST", "2", f"/users/{my_id}/muting", json={"target_user_id": str(self.id)}, auth=True
+        )
 
     def unmute(self) -> None:
         """Make a DELETE Request to unmute the User.

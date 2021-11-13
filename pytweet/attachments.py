@@ -197,7 +197,13 @@ class Poll:
     .. versionadded:: 1.1.0
     """
 
-    def __init__(self, id: int = None, voting_status: str = None, duration: Union[str, int] = None, end_date: Union[str, int] = None):
+    def __init__(
+        self,
+        id: int = None,
+        voting_status: str = None,
+        duration: Union[str, int] = None,
+        end_date: Union[str, int] = None,
+    ):
         self._id = id
         self._voting_status = voting_status
         self._duration = duration
@@ -205,9 +211,7 @@ class Poll:
         self._options = []
 
     def __repr__(self) -> str:
-        return "Poll(id={0.id}, voting_status={0.voting_status}, duration={0.duration})".format(
-            self
-        )
+        return "Poll(id={0.id}, voting_status={0.voting_status}, duration={0.duration})".format(self)
 
     def __eq__(self, other: Poll) -> Union[bool, NoReturn]:
         if not isinstance(other, self):

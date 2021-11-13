@@ -305,7 +305,7 @@ class Tweet(Message):
             "POST",
             "1.1",
             f"/statuses/update.json",
-            params={"status": self.author.username + ' ' + text, "in_reply_to_status_id": str(self.id)},
+            params={"status": self.author.username + " " + text, "in_reply_to_status_id": str(self.id)},
             auth=True,
         )
 

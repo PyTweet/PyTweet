@@ -563,18 +563,18 @@ class HTTPClient:
         return DirectMessage(res, http_client=http_client if http_client else self)
 
     def post_tweet(
-        self, 
-        text: str = None, 
-        *, 
-        poll: Optional[Poll] = None, 
-        geo: Optional[Union[Geo, str]] = None, 
-        quote_tweet_id: Optional[Union[str, int]] = None, 
+        self,
+        text: str = None,
+        *,
+        poll: Optional[Poll] = None,
+        geo: Optional[Union[Geo, str]] = None,
+        quote_tweet_id: Optional[Union[str, int]] = None,
         direct_message_deep_link: Optional[str] = None,
         reply_setting: str = None,
         reply_to_tweet: Optional[Union[str, int]] = None,
-        exclude_reply_users: List[Union[str, int]] = None, 
-        super_followers_only: Optional[bool] = None, 
-        http_client = None
+        exclude_reply_users: List[Union[str, int]] = None,
+        super_followers_only: Optional[bool] = None,
+        http_client=None,
     ) -> Union[NoReturn, Any]:
         """
         .. note::
@@ -611,7 +611,9 @@ class HTTPClient:
             payload["direct_message_deep_link"] = direct_message_deep_link
 
         if reply_setting:
-            payload["reply_settings"] = reply_setting.value if isinstance(reply_setting, ReplySetting) else reply_setting
+            payload["reply_settings"] = (
+                reply_setting.value if isinstance(reply_setting, ReplySetting) else reply_setting
+            )
 
         if reply_to_tweet or exclude_reply_users:
             if reply_to_tweet:
