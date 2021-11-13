@@ -199,10 +199,10 @@ class Poll:
 
     def __init__(
         self,
-        id: int = None,
-        voting_status: str = None,
-        duration: Union[str, int] = None,
-        end_date: Union[str, int] = None,
+        id: Optional[int] = None,
+        voting_status: Optional[str] = None,
+        duration: Optional[Union[str, int]] = None,
+        end_date: Optional[Union[str, int]] = None,
     ):
         self._id = id
         self._voting_status = voting_status
@@ -335,7 +335,7 @@ class QuickReply:
         self.options: List[Any, Any] = []
         self.items: int = len(self.options)
 
-    def add_option(self, *, label: str, description: str = None, metadata: str = None) -> QuickReply:
+    def add_option(self, *, label: str, description: Optional[str] = None, metadata: Optional[str] = None) -> QuickReply:
         """:class:`QuickReply`: Method for adding an option in your quick reply instance.
 
         Parameters

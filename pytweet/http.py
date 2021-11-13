@@ -462,10 +462,10 @@ class HTTPClient:
         text: str,
         *,
         quick_reply: QuickReply = None,
-        cta: CTA,
-        http_client=None,
+        cta: Optional[CTA] = None,
+        http_client = None,
     ) -> Optional[NoReturn]:
-        """Make a post Request for sending a message to a User.
+        """Make a post request for sending a message to a User.
 
         Parameters
         ------------
@@ -475,7 +475,7 @@ class HTTPClient:
             The text that will be send to that user.
         quick_reply: QuickReply
             The message's quick reply attachment.
-        cta: :class:`CTA`
+        cta: Optional[:class:`CTA`]
             cta or call-to-actions is use to make an action whenever a user 'call' something, a quick example is buttons.
         http_client
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
