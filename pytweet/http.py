@@ -11,8 +11,7 @@ import requests
 from .attachments import CTA, Geo, Poll, QuickReply
 from .auth import OauthSession
 from .enums import ReplySetting, SpaceState
-from .errors import (BadRequests, Forbidden, NotFound, NotFoundError,
-                     PytweetException, TooManyRequests, Unauthorized)
+from .errors import BadRequests, Forbidden, NotFound, NotFoundError, PytweetException, TooManyRequests, Unauthorized
 from .message import DirectMessage, Message
 from .relations import RelationFollow
 from .space import Space
