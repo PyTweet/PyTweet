@@ -5,7 +5,6 @@ from dateutil import parser
 
 def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
     """:class:`datetime.datetime`: Parse time return from twitter to datetime object!
-
     .. versionadded: 1.1.3
     """
     date = str(parser.parse(date))
@@ -24,7 +23,6 @@ def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
 
 def compose_tweet() -> str:
     """:class:`str`: Make a link that lets you compose a tweet
-
     .. versionadded: 1.3.5
     """
     return "https://twitter.com/intent/tweet"
@@ -32,7 +30,6 @@ def compose_tweet() -> str:
 
 def showcase_user(username: str):
     """:class:`str`: Make a link that lets you showcase user.
-
     .. versionadded: 1.3.5
     """
     return f"https://twitter.com/{username}"
@@ -40,7 +37,6 @@ def showcase_user(username: str):
 
 def compose_tweet_action(tweet_id: Union[str, int], action: str):
     """:class:`str`: Make a link that lets you interact a tweet with certain actions.
-
     .. versionadded: 1.3.5
     """
     actions = ["retweet", "like", "reply"]

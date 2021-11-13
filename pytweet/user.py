@@ -15,7 +15,7 @@ from typing import (
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import time_parse_todt
-from .attachments import QuickReply, Geo, CTA
+from .attachments import QuickReply, CTA
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -63,7 +63,7 @@ class User:
             raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
-    def send(self, text: str = None, *, quick_reply: QuickReply = None, geo: Geo = None, cta: CTA = None):
+    def send(self, text: str = None, *, quick_reply: QuickReply = None, cta: CTA = None):
         """:class:`DirectMessage`: Send a message to the user.
 
         Parameters
@@ -72,8 +72,6 @@ class User:
             The text that will be send to that user.
         quick_reply: :class:`QuickReply`
             The QuickReply attachment that will be send to a user.
-        geo: :class:`Geo`
-            The Geo attachment that lets you to send location.
         cta: :class:`CTA`
             cta or call-to-actions is use to make an action whenever a user 'call' something, a quick example is buttons.
 
@@ -88,65 +86,115 @@ class User:
             self.id,
             text,
             quick_reply=quick_reply,
-            geo=geo,
             cta=cta,
             http_client=self.http_client,
         )
         return res
 
     def follow(self) -> RelationFollow:
-        """:class:`RelationFollow`: follow the user.
+        """Make a Request to follow a User.
 
-        Returns
-        ---------
-        :class:`RelationFollow`
-            This method return :class:`RelationFollow` object.
+        Parameters:
+        -----------
+        user_id: Union[str, int]
+            The user's id that you wish to follow.
+
+        This function return a :class: `RelationFollow` object.
 
         .. versionadded:: 1.1.0
         """
-        follow = self.http_client.follow_user(self.id)
-        return follow
+        my_id = self.http_client.access_token.partition("-")[0]
+        res = self.http_client.request(
+            "POST",
+            "2",
+            f"/users/{my_id}/following",
+            json={"target_user_id": str(self.id)},
+            auth=True,
+        )
+        return RelationFollow(res)
 
     def unfollow(self) -> RelationFollow:
-        """:class:`RelationFollow`: unfollow the user.
+        """Make a DELETE Request to unfollow a User.
 
-        Returns
-        ---------
-        :class:`RelationFollow`
-            This method return a :class:`RelationFollow` object
+        Parameters
+        ------------
+        user_id: Union[str, int]
+            The user's id that you wish to unfollow.
+
+        This function return a :class:`RelationFollow` object.
 
         .. versionadded:: 1.1.0
         """
-        unfollow = self.http_client.unfollow_user(self.id)
-        return unfollow
+        my_id = self.http_clientaccess_token.partition("-")[0]
+        res = self.http_client.request("DELETE", "2", f"/users/{my_id}/following/{self.id}", auth=True)
+        return RelationFollow(res)
 
     def block(self) -> None:
-        """block the user.
+        """Make a POST Request to Block a User.
 
-        .. versionadded:: 1.1.0
+        Parameters:
+        -----------
+        user_id: Union[str, int]
+            The user's id that you wish to block.
+
+        .. versionadded:: 1.2.0
         """
-        self.http_client.block_user(self.id)
+        my_id = self.http_client.access_token.partition("-")[0]
+        self.http_client.request(
+            "POST",
+            "2",
+            f"/users/{my_id}/blocking",
+            json={"target_user_id": str(self.id)},
+            auth=True,
+        )
 
     def unblock(self) -> None:
-        """unblock the user.
+        """Make a DELETE Request to unblock a User.
 
-        .. versionadded:: 1.1.0
+        Parameters:
+        -----------
+        user_id: Union[str, int]
+            The user's id that you wish to unblock.
+
+
+        .. versionadded:: 1.2.0
         """
-        self.http_client.unblock_user(self.id)
+        my_id = self.http_client.access_token.partition("-")[0]
+        self.http_client.request("DELETE", "2", f"/users/{my_id}/blocking/{self.id}", auth=True)
 
     def mute(self) -> None:
-        """mute the user.
+        """Make a POST Request to mute a User.
+
+        Parameters
+        ------------
+        user_id: Union[str, int]
+            The user's id that you wish to mute.
 
         .. versionadded:: 1.2.5
         """
-        self.http_client.mute_user(self.id)
+        my_id = self.http_client.access_token.partition("-")[0]
+        self.http_client.request(
+            "POST", "2", f"/users/{my_id}/muting", json={"target_user_id": str(self.id)}, auth=True
+        )
 
     def unmute(self) -> None:
-        """unmute the user.
+        """Make a DELETE Request to unmute the User.
+
+        Parameters
+        ------------
+        user_id: Union[str, int]
+        The user's id that you wish to unmute.
 
         .. versionadded:: 1.2.5
         """
-        self.http_client.unmute_user(self.id)
+        my_id = self.http_client.access_token.partition("-")[0]
+        self.http_client.request("DELETE", "2", f"/users/{my_id}/muting/{self.id}", auth=True)
+
+    def typing(self):
+        """Indicates that the client is typing in a user Dm."""
+        self.http_client.request(
+            "POST", "1.1", "/direct_messages/indicate_typing.json", params={"recipient_id": str(self.id)}, auth=True
+        )
 
     @property
     def name(self) -> str:

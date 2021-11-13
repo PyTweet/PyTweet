@@ -6,11 +6,7 @@ from .utils import time_parse_todt
 from .enums import ButtonStyle
 from dataclasses import dataclass
 
-__all__ = (
-    "Media",
-    "PollOptions",
-    "Poll",
-)
+__all__ = ("Media", "PollOptions", "Poll", "QuickReply", "Geo", "CTA")
 
 
 class Media:
@@ -201,7 +197,13 @@ class Poll:
     .. versionadded:: 1.1.0
     """
 
-    def __init__(self, id: int, voting_status: str, duration: Union[str, int], end_date: Union[str, int]):
+    def __init__(
+        self,
+        id: Optional[int] = None,
+        voting_status: Optional[str] = None,
+        duration: Optional[Union[str, int]] = None,
+        end_date: Optional[Union[str, int]] = None,
+    ):
         self._id = id
         self._voting_status = voting_status
         self._duration = duration
@@ -209,9 +211,7 @@ class Poll:
         self._options = []
 
     def __repr__(self) -> str:
-        return "Poll(id={0.id}, voting_status={0.voting_status}, duration={0.duration}, end_date={0.end_date} options={0.options})".format(
-            self
-        )
+        return "Poll(id={0.id}, voting_status={0.voting_status}, duration={0.duration})".format(self)
 
     def __eq__(self, other: Poll) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
@@ -226,10 +226,7 @@ class Poll:
     def __len__(self) -> int:
         return len(self.options)
 
-    def __bool__(self) -> bool:
-        return self.voting_status
-
-    def add_option(self, position: int, label: str) -> Poll:
+    def add_option(self, label: str) -> Poll:
         """Add option to your Poll instance.
 
         Parameters
@@ -239,12 +236,10 @@ class Poll:
         label: :class:`str`
             The option's label.
 
-        .. versionadded UKN
+        .. versionadded 1.3.5
         """
 
-        if position > 4:
-            return
-        self._options.append({"position": position, "label": label})
+        self._options.append({"label": label})
         return self
 
     def add_option_FromRequest(self, position: int, label: str, votes: int) -> Poll:
@@ -260,7 +255,7 @@ class Poll:
             The option votes
 
 
-        .. versionadded UKN
+        .. versionadded 1.3.5
         """
 
         if position > 4:
@@ -274,7 +269,7 @@ class Poll:
 
         .. versionadded:: 1.1.0
         """
-        return int(self._id)
+        return int(self._id) if self._id else None
 
     @property
     def options(self) -> List[PollOptions]:
@@ -293,12 +288,20 @@ class Poll:
         return True if self._voting_status == "open" else False
 
     @property
-    def duration(self) -> int:
+    def duration_inSeconds(self) -> int:
         """:class:`int`: Return the poll duration in seconds.
 
         .. versionadded:: 1.1.0
         """
-        return int(self._duration) * 60
+        return int(self._duration) * 60 if self._duration else None
+
+    @property
+    def duration(self) -> int:
+        """:class:`int`: Return the poll duration in minutes.
+
+        .. versionadded:: 1.3.5
+        """
+        return int(self._duration) if self._duration else None
 
     @property
     def end_date(self) -> datetime.datetime:
@@ -306,7 +309,7 @@ class Poll:
 
         .. versionadded:: 1.1.0
         """
-        return time_parse_todt(self._end_date)
+        return time_parse_todt(self._end_date) if self._end_date else None
 
 
 class QuickReply:
@@ -332,7 +335,7 @@ class QuickReply:
         self.options: List[Any, Any] = []
         self.items: int = len(self.options)
 
-    def add_option(self, *, label: str, description: str = None, metadata: str = None) -> QuickReply:
+    def add_option(self, *, label: str, description: Optional[str] = None, metadata: Optional[str] = None) -> QuickReply:
         """:class:`QuickReply`: Method for adding an option in your quick reply instance.
 
         Parameters
@@ -358,20 +361,37 @@ class QuickReply:
 
 
 class Geo:
-    def __init__(self, data: Dict[str, Any], used_type):
+    """Represent the Geo or location in twitter.
+    You can use this as attachment in a tweet or for searching a location
+
+    Parameters
+    ------------
+    data: Dict[:class:`str`, :class:`Any`]
+        The Geo data in a dictionary.
+
+    """
+
+    def __init__(self, data: Dict[str, Any]):
         self._payload = data
         self._bounding_box = self._payload.get("bounding_box")
-        self._used_type = used_type
 
-    @property
-    def id(self) -> str:
-        """:class:`str`: Returns place's unique id."""
-        return self._payload.get("id")
+    def __repr__(self) -> str:
+        return "Geo(name:{0.name} fullname:{0.fullname} country:{0.country} country_code:{0.country_code} id:{0.id})".format(
+            self
+        )
+
+    def __str__(self) -> str:
+        return self.name
 
     @property
     def name(self) -> str:
         """:class:`str`: Returns place's name."""
         return self._payload.get("name")
+
+    @property
+    def id(self) -> str:
+        """:class:`str`: Returns place's unique id."""
+        return self._payload.get("id")
 
     @property
     def fullname(self) -> str:
@@ -382,11 +402,6 @@ class Geo:
     def type(self) -> str:
         """:class:`str`: Returns place's type."""
         return self._payload.get("place_type")
-
-    @property
-    def used_type(self) -> str:
-        """:class:`str`: Returns place's type, this differ from :class:`type`,used_for is use for specified what type of attachment use to attach in a directmessage, there's 2 types: location and shared_coordinate."""
-        return self._used_type
 
     @property
     def country(self) -> str:
@@ -420,13 +435,9 @@ class Geo:
 
 @dataclass
 class Button:
-    style: ButtonStyle
     label: str
+    style: ButtonStyle
     url: str
-
-
-class WebIntents:
-    pass
 
 
 class CTA:

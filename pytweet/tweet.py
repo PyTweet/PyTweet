@@ -4,7 +4,6 @@ import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
 from .attachments import Media, Poll
-from .enums import MessageTypeEnum
 from .metrics import TweetPublicMetrics
 from .user import User
 from .utils import time_parse_todt
@@ -179,8 +178,7 @@ class Tweet(Message):
     .. versionadded:: 1.0.0
 
     .. versionchanged:: 1.2.0
-
-    Inherite :class:`Message`. The text and ID property is now provided by :class:`Message`,
+        Inherite :class:`Message`. The text and ID property is now provided by :class:`Message`,
     """
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
@@ -189,7 +187,7 @@ class Tweet(Message):
         self._includes = self.original_payload.get("includes")
         self.tweet_metrics: TweetPublicMetrics = TweetPublicMetrics(self._payload)
 
-        super().__init__(self._payload.get("text"), self._payload.get("id"))
+        super().__init__(self._payload.get("text"), self._payload.get("id"), 1)
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
 
     def __repr__(self) -> str:
@@ -209,7 +207,7 @@ class Tweet(Message):
         return self.id != other.id
 
     def like(self) -> Optional[RelationLike]:
-        """:class:`RelationLike`: A Method for liking a tweet.
+        """A Method for liking a tweet.
 
         Returns
         ---------
@@ -225,7 +223,7 @@ class Tweet(Message):
         return RelationLike(res)
 
     def unlike(self) -> Optional[RelationLike]:
-        """:class:`RelationLike`: A Method for unliking a tweet.
+        """A Method for unliking a tweet.
 
         Returns
         ---------
@@ -242,7 +240,7 @@ class Tweet(Message):
         return RelationLike(res)
 
     def retweet(self) -> RelationRetweet:
-        """:class:`RelationRetweet`: A Method for retweet a tweet.
+        """A Method for retweet a tweet.
 
         Returns
         ---------
@@ -260,12 +258,15 @@ class Tweet(Message):
         return RelationRetweet(res)
 
     def unretweet(self) -> RelationRetweet:
-        """:class:`RelationRetweet`: A Method for unretweet a tweet.
+        """A Method for unretweet a tweet.
 
         Returns
         ---------
         :class:`RelationRetweet`
             Returns a :class:`RelationRetweet` object.
+
+
+        .. versionadded:: 1.2.0
         """
         my_id = self.http_client.access_token.partition("-")[0]
 
@@ -274,21 +275,39 @@ class Tweet(Message):
         return RelationRetweet(res)
 
     def delete(self) -> None:
-        """:class:`None`: A method for deleting to a tweet using HTTPClient.delete_message()
+        """
+        .. note::
+            This function is almost complete! though you can still use and open an issue in github if it cause an error.
+
+        Make a DELETE Request to delete a tweet through the tweet_id.
 
         .. versionadded:: 1.2.0
         """
 
-        self.http_client.delete_tweet(int(self.id))
-        return None
+        self.http_client.request("DELETE", "2", f"/tweets/{self.id}", auth=True)
+
+        try:
+            self.http_client.tweet_cache.pop(self.id)
+        except KeyError:
+            pass
 
     def reply(self, text: str) -> None:
-        """:class:`None`: A method for replying to a tweet using HTTPClient.reply_toTweet()
+        """Post a tweet to reply a specific tweet present by the tweet_id parameter.
+
+        Parameters
+        ------------
+        text: str
+            The reply's main text.
 
         .. versionadded:: 1.2.5
         """
-        self.http_client.reply_toTweet(self.id, text, self.author.username)
-        return None
+        self.http_client.request(
+            "POST",
+            "1.1",
+            f"/statuses/update.json",
+            params={"status": self.author.username + " " + text, "in_reply_to_status_id": str(self.id)},
+            auth=True,
+        )
 
     def hide(self):
         """Make a PUT Request to hide a specific reply tweet.
@@ -310,6 +329,11 @@ class Tweet(Message):
         ------------
         tweet_id: Union[str, int]
             The tweet's id that you wish to unhide.
+
+        Returns
+        ---------
+        :class:`RelationHide`
+            This method returns a :class:`RelationHide` object.
 
         .. versionadded:: 1.2.5
         """
@@ -467,14 +491,6 @@ class Tweet(Message):
             if self._payload.get("entities").get("urls"):
                 return [Embed(url) for url in self._payload.get("entities").get("urls")]
         return None
-
-    @property
-    def type(self) -> MessageTypeEnum:
-        """:class:`MessageTypeEnum`: Return the Message type.
-
-        .. versionadded:: 1.2.0
-        """
-        return MessageTypeEnum(1)
 
     @property
     def like_count(self) -> int:

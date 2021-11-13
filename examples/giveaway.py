@@ -22,18 +22,18 @@ client = pytweet.Client(
 
 
 def giveaway():
-    user = client.fetch_user_by_username("TheGenocides")
-    followers = user.followers #Note that, maximum users for followers is 100 users.
-    if len(followers) == 0:  # Check if the user doesnt have a followers.
+    user = client.fetch_user_by_username("TheGenocides") #1
+    followers = user.followers #2
+    if len(followers) == 0:
         return print("This user doesnt have a followers!")
 
-    seconds = 60 * 3  # mark for 60 seconds and 3 minutes. You can change to whatever minutes you like.
+    seconds = 60 * 3  
     print(
         f"Giveaway! there's a total of {len(followers)} users participate! Please wait for {seconds} seconds!"
     )
 
-    time.sleep(seconds)
-    winner = random.choice(followers)
+    time.sleep(seconds) #3
+    winner = random.choice(followers) #4
     print(f"Giveaway Ended | Congrats! {winner.username} won the giveaway!")
 
 
