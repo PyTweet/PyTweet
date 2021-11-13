@@ -26,3 +26,7 @@ class MessageEventTypeEnum(Enum):
 
 class ButtonStyle(Enum):
     web_url = "web_url"
+
+class SpaceState(Enum):
+    live = "live"
+    scheduled = "scheduled"
