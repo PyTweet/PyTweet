@@ -42,16 +42,10 @@ class User:
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
         self.original_payload: Dict[str, Any] = data
         self._payload: Dict[Any, Any] = (
-            self.original_payload.get("data")
-            if self.original_payload.get("data") != None
-            else self.original_payload
+            self.original_payload.get("data") if self.original_payload.get("data") != None else self.original_payload
         )
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
-        self._metrics = (
-            UserPublicMetrics(self._payload)
-            if self._payload != None
-            else self.original_payload
-        )
+        self._metrics = UserPublicMetrics(self._payload) if self._payload != None else self.original_payload
 
     def __str__(self) -> str:
         return self.username
@@ -61,21 +55,15 @@ class User:
 
     def __eq__(self, other: User) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "== operation cannot be done with one of the element not a valid User object"
-            )
+            raise ValueError("== operation cannot be done with one of the element not a valid User object")
         return self.id == other.id
 
     def __ne__(self, other: User) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "!= operation cannot be done with one of the element not a valid User object"
-            )
+            raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
-    def send(
-        self, text: str = None, *, quick_reply: QuickReply = None, cta: CTA = None
-    ):
+    def send(self, text: str = None, *, quick_reply: QuickReply = None, cta: CTA = None):
         """:class:`DirectMessage`: Send a message to the user.
 
         Parameters
@@ -138,9 +126,7 @@ class User:
         .. versionadded:: 1.1.0
         """
         my_id = self.http_clientaccess_token.partition("-")[0]
-        res = self.http_client.request(
-            "DELETE", "2", f"/users/{my_id}/following/{self.id}", auth=True
-        )
+        res = self.http_client.request("DELETE", "2", f"/users/{my_id}/following/{self.id}", auth=True)
         return RelationFollow(res)
 
     def block(self) -> None:
@@ -174,9 +160,7 @@ class User:
         .. versionadded:: 1.2.0
         """
         my_id = self.http_client.access_token.partition("-")[0]
-        self.http_client.request(
-            "DELETE", "2", f"/users/{my_id}/blocking/{self.id}", auth=True
-        )
+        self.http_client.request("DELETE", "2", f"/users/{my_id}/blocking/{self.id}", auth=True)
 
     def mute(self) -> None:
         """Make a POST Request to mute a User.
@@ -208,9 +192,7 @@ class User:
         .. versionadded:: 1.2.5
         """
         my_id = self.http_client.access_token.partition("-")[0]
-        self.http_client.request(
-            "DELETE", "2", f"/users/{my_id}/muting/{self.id}", auth=True
-        )
+        self.http_client.request("DELETE", "2", f"/users/{my_id}/muting/{self.id}", auth=True)
 
     def typing(self):
         """Indicates that the client is typing in a user Dm."""
@@ -325,11 +307,7 @@ class User:
         .. versionadded: 1.1.3
         """
         id = self._payload.get("pinned_tweet_id")
-        return (
-            None
-            if not id
-            else self.http_client.fetch_tweet(int(id), http_client=self.http_client)
-        )
+        return None if not id else self.http_client.fetch_tweet(int(id), http_client=self.http_client)
 
     @property
     def followers(self) -> Union[List[User], List]:

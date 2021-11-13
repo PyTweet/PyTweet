@@ -40,8 +40,6 @@ class VersionInfo(NamedTuple):
     serial: int
 
 
-version_info: VersionInfo = VersionInfo(
-    major=1, minor=3, micro=5, releaselevel="alpha", serial=2
-)
+version_info: VersionInfo = VersionInfo(major=1, minor=3, micro=5, releaselevel="alpha", serial=2)
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())

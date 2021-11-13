@@ -220,13 +220,9 @@ class WelcomeMessage(Message):
         )
 
         args = [v for k, v in res.get("welcome_message_rule").items()]
-        return WelcomeMessageRule(
-            args[0], args[2], args[1], http_client=self.http_client
-        )
+        return WelcomeMessageRule(args[0], args[2], args[1], http_client=self.http_client)
 
-    def update(
-        self, text: str = None, *, quick_reply: QuickReply = None
-    ) -> WelcomeMessage:
+    def update(self, text: str = None, *, quick_reply: QuickReply = None) -> WelcomeMessage:
         """Updates the Welcome Message, you dont need to use set_rule again since this update your default welcome message.
 
         Parameters
@@ -263,9 +259,7 @@ class WelcomeMessage(Message):
         timestamp = welcome_message.get("created_timestamp")
         text = message_data.get("text")
 
-        return WelcomeMessage(
-            name, text=text, welcome_message_id=id, timestamp=timestamp
-        )
+        return WelcomeMessage(name, text=text, welcome_message_id=id, timestamp=timestamp)
 
     def delete(self):
         """Delete the Welcome Message.
@@ -310,9 +304,7 @@ class WelcomeMessageRule(Message):
         self.http_client = http_client
 
     def __repr__(self) -> str:
-        return "WelcomeMessageRule(id: {0.id} welcome_message_id: {0.} created_at: {0.created_at})".format(
-            self
-        )
+        return "WelcomeMessageRule(id: {0.id} welcome_message_id: {0.} created_at: {0.created_at})".format(self)
 
     def delete(self):
         """Delete the Welcome Message Rule.

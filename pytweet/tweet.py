@@ -30,9 +30,7 @@ class EmbedsImages:
         self._payload = data
 
     def __repr__(self) -> str:
-        return "EmbedsImages(url={0.url} width={0.width} height={0.height})".format(
-            self
-        )
+        return "EmbedsImages(url={0.url} width={0.width} height={0.height})".format(self)
 
     def __str__(self) -> str:
         return self.url
@@ -72,9 +70,7 @@ class Embed:
         self._payload = data
 
     def __repr__(self) -> str:
-        return "Embed(title={0.title} description={0.description} url={0.url})".format(
-            self
-        )
+        return "Embed(title={0.title} description={0.description} url={0.url})".format(self)
 
     def __str__(self) -> str:
         return self.url
@@ -202,16 +198,12 @@ class Tweet(Message):
 
     def __eq__(self, other: Tweet) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "== operation cannot be done with one of the element not a valid Tweet object"
-            )
+            raise ValueError("== operation cannot be done with one of the element not a valid Tweet object")
         return self.id == other.id
 
     def __ne__(self, other: Tweet) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
-            raise ValueError(
-                "!= operation cannot be done with one of the element not a valid User object"
-            )
+            raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
     def like(self) -> Optional[RelationLike]:
@@ -226,9 +218,7 @@ class Tweet(Message):
         my_id = self.http_client.access_token.partition("-")[0]
 
         payload = {"tweet_id": str(self.id)}
-        res = self.http_client.request(
-            "POST", "2", f"/users/{my_id}/likes", json=payload, auth=True
-        )
+        res = self.http_client.request("POST", "2", f"/users/{my_id}/likes", json=payload, auth=True)
 
         return RelationLike(res)
 
@@ -245,9 +235,7 @@ class Tweet(Message):
         """
         my_id = self.http_client.access_token.partition("-")[0]
 
-        res = self.http_client.request(
-            "DELETE", "2", f"/users/{my_id}/likes/{self.id}", auth=True
-        )
+        res = self.http_client.request("DELETE", "2", f"/users/{my_id}/likes/{self.id}", auth=True)
 
         return RelationLike(res)
 
@@ -265,9 +253,7 @@ class Tweet(Message):
         my_id = self.http_client.access_token.partition("-")[0]
 
         payload = {"tweet_id": str(self.id)}
-        res = self.http_client.request(
-            "POST", "2", f"/users/{my_id}/retweets", json=payload, auth=True
-        )
+        res = self.http_client.request("POST", "2", f"/users/{my_id}/retweets", json=payload, auth=True)
 
         return RelationRetweet(res)
 
@@ -284,9 +270,7 @@ class Tweet(Message):
         """
         my_id = self.http_client.access_token.partition("-")[0]
 
-        res = self.http_client.request(
-            "DELETE", "2", f"/users/{my_id}/retweets/{self.id}", auth=True
-        )
+        res = self.http_client.request("DELETE", "2", f"/users/{my_id}/retweets/{self.id}", auth=True)
 
         return RelationRetweet(res)
 
@@ -338,9 +322,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        res = self.http_client.request(
-            "PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True
-        )
+        res = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
         return RelationHide(res)
 
     def unhide(self):
@@ -358,9 +340,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        res = self.http_client.request(
-            "PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True
-        )
+        res = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
         return RelationHide(res)
 
     @property
@@ -470,9 +450,7 @@ class Tweet(Message):
         if self._includes:
             if self._includes.get("mentions"):
                 return [
-                    self.http_client.fetch_user_byusername(
-                        user.get("username"), http_client=self.http_client
-                    )
+                    self.http_client.fetch_user_byusername(user.get("username"), http_client=self.http_client)
                     for user in self._includes.get("mentions")
                 ]
         return None
@@ -493,9 +471,7 @@ class Tweet(Message):
                     data.get("end_datetime"),
                 )
                 for option in data.get("options"):
-                    poll.add_option_FromRequest(
-                        option.get("position"), option.get("label"), option.get("votes")
-                    )
+                    poll.add_option_FromRequest(option.get("position"), option.get("label"), option.get("votes"))
                 return poll
 
         return None
