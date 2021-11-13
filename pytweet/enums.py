@@ -13,6 +13,8 @@ class RelationsTypeEnum(Enum):
 class MessageTypeEnum(Enum):
     DIRECT_MESSAGE = 0
     MESSAGE_TWEET = 1
+    MESSAGE_WELCOME_MESSAGE = 2
+    MESSAGE_WELCOME_MESSAGE_RULE = 3
     NULL = None
 
 
