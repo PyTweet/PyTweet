@@ -1,14 +1,18 @@
 import datetime
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from .utils import time_parse_todt 
+from .enums import SpaceState
 
 class Space:
     def __init__(self, data: Dict[str, Any]):
         self.original_payload = data
-        self._payload = data.get("data")
+        if isinstance(data.get("data"), list):
+            self._payload = data.get("data")[0]
+        else:
+            self._payload = data.get("data")
 
     def __repr__(self) -> str:
-        return "Space(name:{0.title} state:{0.state} id:{0.id})".format(self)
+        return "Space(name:{0.title} state:{0.state} id:{0.id} type:{0.state_type})".format(self)
 
     @property
     def title(self) -> str:
@@ -19,11 +23,16 @@ class Space:
     def state(self) -> str:
         """:class:`str`: The space's state."""
         return self._payload.get("state")
+        
+    @property
+    def state_type(self) -> str:
+        """:class:`SpaceState`: The type of the space's state."""
+        return SpaceState(self.state)
 
     @property
-    def id(self) -> int:
-        """:class:`int`: The space's id."""
-        return int(self._payload.get("id"))
+    def id(self) -> str:
+        """:class:`str`: The space's unique id."""
+        return self._payload.get("id")
 
     @property
     def lang(self) -> str:
@@ -41,14 +50,18 @@ class Space:
         return time_parse_todt(self._payload.get("created_at"))
 
     @property
-    def hosts(self) -> List[int]:
-        """List[:class:`int`]: Returns a list of the hosts id."""
-        return [int(id) for id in self._payload.get("host_ids")]
+    def hosts(self) -> Optional[List[int]]:
+        """Optional[List[:class:`int`]]: Returns a list of the hosts id."""
+        if self._payload.get("host_ids"):
+            return [int(id) for id in self._payload.get("host_ids")]
+        return None
     
     @property
-    def invited_users(self) -> List[int]:
-        """List[:class:`int`]: Returns the a list of users id. Usually, users in this list are invited to speak via the Invite user option and have a Speaker role when the Space starts."""
-        return [int(id) for id in self._payload.get("invited_users")]
+    def invited_users(self) -> Optional[List[int]]:
+        """Optional[List[:class:`int`]]: Returns the a list of users id. Usually, users in this list are invited to speak via the Invite user option and have a Speaker role when the Space starts.Returns None if there isnt invited users."""
+        if self._payload.get("invited_users"):
+            return [int(id) for id in self._payload.get("invited_users")]
+        return None
 
     @property
     def started_at(self) -> datetime.datetime:
