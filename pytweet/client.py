@@ -169,8 +169,8 @@ class Client:
         res = self.http.post_tweet(text, http_client=http_client if http_client else self.http, **kwargs)
         return res
 
-    def create_welcome_message(self, name: str = None, text: str = None, *, quick_reply: QuickReply = None):
-        """Make a default welcome message for the client.
+    def create_welcome_message(self, name: str = None, text: str = None, *, quick_reply: QuickReply = None) -> WelcomeMessage:
+        """create a welcome message.
 
         Parameters
         ------------
@@ -180,6 +180,12 @@ class Client:
             The welcome message's text. Please do not make this empty if you want to showup the text.
         quick_reply: :class:`QuickReply`
             The message QuickReply attachments.
+
+        Returns
+        ---------
+        :class:`WelcomeMessage`
+            This method returns :class:`WelcomeMessage` object.
+
 
         .. versionadded:: 1.3.5
         """
@@ -212,7 +218,13 @@ class Client:
         Parameters
         ------------
         welcome_message_id: Union[:class:`str`, :class:`int`]
-            The welcome message id you want to delete.
+            The welcome message id you want to fetch.
+
+        Returns
+        ---------
+        :class:`WelcomeMessage`
+            This method returns :class:`WelcomeMessage` object.
+
 
         .. versionadded:: 1.3.5
         """
@@ -237,6 +249,12 @@ class Client:
         ------------
         welcome_message_rules_id: Union[:class:`str`, :class:`int`]
             The welcome message rules id you want to delete.
+
+        Returns
+        ---------
+        :class:`WelcomeMessageRule`
+            This method returns :class:`WelcomeMessageRule` object.
+
 
         .. versionadded:: 1.3.5
         """
