@@ -42,7 +42,9 @@ class User:
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
         self.original_payload: Dict[str, Any] = data
         self._payload: Dict[Any, Any] = (
-            self.original_payload.get("data") if self.original_payload.get("data") != None else self.original_payload
+            self.original_payload.get("data")
+            if self.original_payload.get("data") != None
+            else self.original_payload
         )
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
         self._metrics = UserPublicMetrics(self._payload) if self._payload != None else self.original_payload
@@ -82,14 +84,13 @@ class User:
 
         .. versionadded:: 1.1.0
         """
-        res = self.http_client.send_message(
+        return self.http_client.send_message(
             self.id,
             text,
             quick_reply=quick_reply,
             cta=cta,
             http_client=self.http_client,
         )
-        return res
 
     def follow(self) -> RelationFollow:
         """:class:`RelationFollow`: follow the user.
@@ -101,8 +102,7 @@ class User:
 
         .. versionadded:: 1.1.0
         """
-        follow = self.http_client.follow_user(self.id)
-        return follow
+        return self.http_client.follow_user(self.id)
 
     def unfollow(self) -> RelationFollow:
         """:class:`RelationFollow`: unfollow the user.
@@ -114,8 +114,7 @@ class User:
 
         .. versionadded:: 1.1.0
         """
-        unfollow = self.http_client.unfollow_user(self.id)
-        return unfollow
+        return self.http_client.unfollow_user(self.id)
 
     def block(self) -> None:
         """block the user.
@@ -148,7 +147,11 @@ class User:
     def typing(self):
         """Indicates that the client is typing in a user Dm."""
         self.http_client.request(
-            "POST", "1.1", "/direct_messages/indicate_typing.json", params={"recipient_id": str(self.id)}, auth=True
+            "POST", 
+            "1.1", 
+            "/direct_messages/indicate_typing.json", 
+            params={"recipient_id": str(self.id)}, 
+            auth=True
         )
 
     @property
