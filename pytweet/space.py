@@ -59,7 +59,7 @@ class Space:
 
     @property
     def invited_users(self) -> Optional[List[int]]:
-        """Optional[List[:class:`int`]]: Returns the a list of users id. Usually, users in this list are invited to speak via the Invite user option and have a Speaker role when the Space starts.Returns None if there isnt invited users."""
+        """Optional[List[:class:`int`]]: Returns the a list of users id. Usually, users in this list are invited to speak via the Invite user option and have a Speaker role when the Space starts.Returns None if there isn't invited users."""
         if self._payload.get("invited_users"):
             return [int(id) for id in self._payload.get("invited_users")]
         return None
