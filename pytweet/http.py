@@ -476,6 +476,12 @@ class HTTPClient:
             json=data,
             auth=True,
         )
+
+        message_create = res.get('event').get("message_create")
+        user_id = message_create.get("target").get("recipient_id")
+        user = self.fetch_user(user_id, http_client=http_client if http_client else self)
+        res["event"]["message_create"]["target"]["recipient"] = user
+
         msg = DirectMessage(res, http_client=http_client if http_client else self)
         self.message_cache[msg.id] = msg
 
@@ -527,6 +533,11 @@ class HTTPClient:
             raise ValueError("event_id must be an integer or a :class:`str`ing of digits.")
 
         res = self.request("GET", "1.1", f"/direct_messages/events/show.json?id={event_id}", auth=True)
+
+        message_create = res.get('event').get("message_create")
+        user_id = message_create.get("target").get("recipient_id")
+        user = self.fetch_user(user_id, http_client=http_client if http_client else self)
+        res["event"]["message_create"]["target"]["recipient"] = user
 
         return DirectMessage(res, http_client=http_client if http_client else self)
 
