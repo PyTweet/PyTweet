@@ -1,11 +1,12 @@
 from __future__ import annotations
-import datetime
-from typing import TYPE_CHECKING, Any, Dict, Optional, Union, List
 
+import datetime
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+
+from .attachments import QuickReply
+from .entities import Hashtags, Symbols, Urls, UserMentions
 from .enums import MessageEventTypeEnum, MessageTypeEnum
 from .user import User
-from .entities import Hashtags, Symbols, UserMentions, Urls
-from .attachments import QuickReply
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -75,11 +76,27 @@ class DirectMessage(Message):
         return self.text
 
     def delete(self) -> None:
-        """Delete the DirectMessage object.
+        """Make a Request to delete the DirectMessage.
+
+        Parameters
+        -----------
+        id:
+            The Direct Message event id.
+
 
         .. versionadded:: 1.1.0
         """
-        self.http_client.delete_message(self.id)
+        self.http_client.request(
+            "DELETE",
+            "1.1",
+            f"/direct_messages/events/destroy.json?id={self.id}",
+            auth=True,
+        )
+
+        try:
+            self.http_client.message_cache.pop(int(self.id))
+        except KeyError:
+            pass
 
     def mark_read(self):
         """Mark the DirectMessage as read, it also mark other messages before the message was sent as read.
@@ -90,7 +107,10 @@ class DirectMessage(Message):
             "POST",
             "1.1",
             "/direct_messages/mark_read.json",
-            params={"last_read_event_id": str(self.id), "recipient_id": str(self.author.id)},
+            params={
+                "last_read_event_id": str(self.id),
+                "recipient_id": str(self.author.id),
+            },
             auth=True,
         )
 
@@ -165,7 +185,7 @@ class WelcomeMessage(Message):
         text: Optional[str] = None,
         welcome_message_id: Union[str, int],
         timestamp: str,
-        http_client
+        http_client,
     ):
         super().__init__(text, welcome_message_id, 2)
         self._name = name
@@ -193,7 +213,11 @@ class WelcomeMessage(Message):
         data = {"welcome_message_rule": {"welcome_message_id": str(self.id)}}
 
         res = self.http_client.request(
-            "POST", "1.1", "/direct_messages/welcome_messages/rules/new.json", json=data, auth=True
+            "POST",
+            "1.1",
+            "/direct_messages/welcome_messages/rules/new.json",
+            json=data,
+            auth=True,
         )
 
         args = [v for k, v in res.get("welcome_message_rule").items()]
@@ -244,7 +268,11 @@ class WelcomeMessage(Message):
         .. versionadded:: 1.3.5
         """
         self.http_client.request(
-            "DELETE", "1.1", "/direct_messages/welcome_messages/destroy.json", params={"id": str(self.id)}, auth=True
+            "DELETE",
+            "1.1",
+            "/direct_messages/welcome_messages/destroy.json",
+            params={"id": str(self.id)},
+            auth=True,
         )
 
     @property
@@ -269,7 +297,7 @@ class WelcomeMessageRule(Message):
         welcome_message_id: Union[str, int],
         timestamp: Union[str, int],
         *,
-        http_client
+        http_client,
     ):
         super().__init__(id=welcome_message_rule_id, type=3)
         self._welcome_message_id = welcome_message_id

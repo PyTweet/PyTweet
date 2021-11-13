@@ -4,18 +4,19 @@ import json as j
 import logging
 import sys
 import time
-import requests
-from typing import Any, Dict, NoReturn, Optional, Union
+from typing import Any, Dict, List, NoReturn, Optional, Union
 
+import requests
+
+from .attachments import CTA, Geo, Poll, QuickReply
 from .auth import OauthSession
-from .errors import Forbidden, NotFoundError, PytweetException, TooManyRequests, Unauthorized, BadRequests, NotFound
+from .enums import ReplySetting, SpaceState
+from .errors import BadRequests, Forbidden, NotFound, NotFoundError, PytweetException, TooManyRequests, Unauthorized
 from .message import DirectMessage, Message
 from .relations import RelationFollow
+from .space import Space
 from .tweet import Tweet
 from .user import User
-from .attachments import QuickReply, CTA
-from .space import Space
-from .enums import SpaceState
 
 _log = logging.getLogger(__name__)
 
@@ -411,7 +412,7 @@ class HTTPClient:
 
         return Tweet(res, http_client=http_client if http_client else None)
 
-    def fetch_space(self, space_id: Union[str, int]) -> Space:
+    def fetch_space(self, space_id: str) -> Space:
         """Fetch the space using the space_id parameter
 
         Parameters
@@ -437,10 +438,10 @@ class HTTPClient:
 
         Parameters
         ------------
-        title: Union[:class:`str`, :class:`int`]
+        title: :class:`str`
             The space title that you are going use for fetching the space.
         state: :class:`SpaceState`
-            The type of state the space has. Theres only 2 type: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host.
+            The type of state the space has. There's only 2 type: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host.
 
         .. versionadded:: 1.3.5
         """
@@ -461,11 +462,11 @@ class HTTPClient:
         user_id: Union[str, int],
         text: str,
         *,
-        quick_reply: QuickReply = None,
-        cta: CTA,
+        quick_reply: Optional[QuickReply] = None,
+        cta: Optional[CTA] = None,
         http_client=None,
     ) -> Optional[NoReturn]:
-        """Make a post Request for sending a message to a User.
+        """Make a post request for sending a message to a User.
 
         Parameters
         ------------
@@ -475,7 +476,7 @@ class HTTPClient:
             The text that will be send to that user.
         quick_reply: QuickReply
             The message's quick reply attachment.
-        cta: :class:`CTA`
+        cta: Optional[:class:`CTA`]
             cta or call-to-actions is use to make an action whenever a user 'call' something, a quick example is buttons.
         http_client
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
@@ -529,33 +530,7 @@ class HTTPClient:
         msg = DirectMessage(res, http_client=http_client or self)
         self.message_cache[msg.id] = msg
 
-        return msg
-
-    def delete_message(self, event_id: Union[str, int]) -> None:
-        """Make a DELETE Request for deleting a certain DirectMessage.
-
-        Parameters
-        -----------
-        id:
-            The id of the Direct Message event that you want to delete.
-
-        .. versionadded:: 1.1.0
-
-        .. versionchanged:: 1.2.0
-
-        Make the method functional and return :class:`Tweet`
-        """
-        self.request(
-            "DELETE",
-            "1.1",
-            f"/direct_messages/events/destroy.json?id={event_id}",
-            auth=True,
-        )
-
-        try:
-            self.message_cache.pop(int(event_id))
-        except KeyError:
-            pass
+        return
 
     def fetch_message(self, event_id: Union[str, int], **kwargs: Any) -> Optional[DirectMessage]:
         """Optional[:class:`DirectMessage`]: Fetch a direct message with the event id.
@@ -585,7 +560,20 @@ class HTTPClient:
 
         return DirectMessage(res, http_client=http_client if http_client else self)
 
-    def post_tweet(self, text: str, *, http_client=None, **kwargs: Any) -> Union[NoReturn, Any]:
+    def post_tweet(
+        self,
+        text: str = None,
+        *,
+        poll: Optional[Poll] = None,
+        geo: Optional[Union[Geo, str]] = None,
+        quote_tweet_id: Optional[Union[str, int]] = None,
+        direct_message_deep_link: Optional[str] = None,
+        reply_setting: str = None,
+        reply_to_tweet: Optional[Union[str, int]] = None,
+        exclude_reply_users: List[Union[str, int]] = None,
+        super_followers_only: Optional[bool] = None,
+        http_client=None,
+    ) -> Union[NoReturn, Any]:
         """
         .. note::
             This function is almost complete! though you can still use and open an issue in github if it cause an error.
@@ -598,157 +586,49 @@ class HTTPClient:
 
         Make the method functional and return :class:`Message`
         """
-
         payload = {}
         if text:
             payload["text"] = text
+
+        if poll:
+            payload["poll"] = {}
+            payload["poll"]["options"] = [option.label for option in poll.options]
+            payload["poll"]["duration_minutes"] = int(poll.duration)
+
+        if geo:
+            if not isinstance(geo, Geo) and not isinstance(geo, str):
+                raise TypeError("'geo' is not an instance of Geo or str")
+
+            payload["geo"] = {}
+            payload["geo"]["place_id"] = geo.id if isinstance(geo, Geo) else geo
+
+        if quote_tweet_id:
+            payload["quote_tweet_id"] = str(quote_tweet_id)
+
+        if direct_message_deep_link:
+            payload["direct_message_deep_link"] = direct_message_deep_link
+
+        if reply_setting:
+            payload["reply_settings"] = (
+                reply_setting.value if isinstance(reply_setting, ReplySetting) else reply_setting
+            )
+
+        if reply_to_tweet or exclude_reply_users:
+            if reply_to_tweet:
+                payload["reply"] = {}
+                payload["reply"]["in_reply_to_tweet_id"] = str(reply_to_tweet)
+
+            if exclude_reply_users:
+                if "reply" in payload.keys():
+                    payload["reply"]["exclude_reply_user_ids"] = [str(id) for id in exclude_reply_users]
+                else:
+                    payload["reply"] = {}
+                    payload["reply"]["exclude_reply_user_ids"] = [str(id) for id in exclude_reply_users]
+
+        if super_followers_only:
+            payload["for_super_followers_only"] = True
 
         res = self.request("POST", "2", "/tweets", json=payload, auth=True)
         data = res.get("data")
         tweet = Message(data.get("text"), data.get("id"), 1)
         return tweet
-
-    def delete_tweet(self, tweet_id: Union[str, int]) -> None:
-        """
-        .. note::
-            This function is almost complete! though you can still use and open an issue in github if it cause an error.
-
-        Make a DELETE Request to delete a tweet through the tweet_id.
-
-        .. versionadded:: 1.2.0
-        """
-
-        self.request("DELETE", "2", f"/tweets/{tweet_id}", auth=True)
-
-        try:
-            self.tweet_cache.pop(tweet_id)
-        except KeyError:
-            pass
-
-    def reply_toTweet(self, tweet_id: Union[str, int], text: str, username: str):
-        """Make a POST Request to reply a specific tweet present by the tweet_id parameter.
-
-        Parameters
-        ------------
-        tweet_id: Union[str, int]
-            The tweet's id that you wish to reply to.
-        text: str
-            The reply's text.
-        username: str
-            The tweet's username, To reply a tweet you need to mention the tweet's author then the text.
-
-        .. versionadded:: 1.2.5
-        """
-        self.request(
-            "POST",
-            "1.1",
-            f"/statuses/update.json",
-            params={"status": username + " " + text, "in_reply_to_status_id": tweet_id},
-            auth=True,
-        )
-
-    def follow_user(self, user_id: Union[str, int]) -> RelationFollow:
-        """Make a POST Request to follow a User.
-
-        Parameters:
-        -----------
-
-        user_id: Union[str, int]
-            The user's id that you wish to follow.
-
-        This function return a :class: `RelationFollow` object.
-
-        .. versionadded:: 1.1.0
-
-        .. versionchanged:: 1.2.0
-
-        Make the method functional and return :class:`RelationFollow`
-        """
-        my_id = self.access_token.partition("-")[0]
-        res = self.request(
-            "POST",
-            "2",
-            f"/users/{my_id}/following",
-            json={"target_user_id": str(user_id)},
-            auth=True,
-        )
-        return RelationFollow(res)
-
-    def unfollow_user(self, user_id: Union[str, int]) -> RelationFollow:
-        """Make a DELETE Request to unfollow a User.
-
-        Parameters:
-        -----------
-        user_id: Union[str, int]
-            The user's id that you wish to unfollow.
-
-        This function return a :class:`RelationFollow` object.
-
-        .. versionadded:: 1.1.0
-
-        .. versionchanged:: 1.2.0
-
-        Make the method functional and return :class:`RelationFollow`
-        """
-        my_id = self.access_token.partition("-")[0]
-        res = self.request("DELETE", "2", f"/users/{my_id}/following/{user_id}", auth=True)
-        return RelationFollow(res)
-
-    def block_user(self, user_id: Union[str, int]) -> None:
-        """Make a POST Request to Block a User.
-
-        Parameters:
-        -----------
-        user_id: Union[str, int]
-            The user's id that you wish to block.
-
-        .. versionadded:: 1.2.0
-        """
-        my_id = self.access_token.partition("-")[0]
-        self.request(
-            "POST",
-            "2",
-            f"/users/{my_id}/blocking",
-            json={"target_user_id": str(user_id)},
-            auth=True,
-        )
-
-    def unblock_user(self, user_id: Union[str, int]) -> None:
-        """Make a DELETE Request to unblock a User.
-
-        Parameters:
-        -----------
-        user_id: Union[str, int]
-            The user's id that you wish to unblock.
-
-
-        .. versionadded:: 1.2.0
-        """
-        my_id = self.access_token.partition("-")[0]
-        self.request("DELETE", "2", f"/users/{my_id}/blocking/{user_id}", auth=True)
-
-    def mute_user(self, user_id: Union[str, int]) -> None:
-        """Make a POST Request to mute a User.
-
-        Parameters:
-        -----------
-        user_id: Union[str, int]
-            The user's id that you wish to mute.
-
-        .. versionadded:: 1.2.5
-        """
-        my_id = self.access_token.partition("-")[0]
-        self.request("POST", "2", f"/users/{my_id}/muting", json={"target_user_id": str(user_id)}, auth=True)
-
-    def unmute_user(self, user_id: Union[str, int]) -> None:
-        """Make a DELETE Request to unmute a User.
-
-        Parameters:
-        -----------
-        user_id: Union[str, int]
-            The user's id that you wish to unmute.
-
-        .. versionadded:: 1.2.5
-        """
-        my_id = self.access_token.partition("-")[0]
-        self.request("DELETE", "2", f"/users/{my_id}/muting/{user_id}", auth=True)
