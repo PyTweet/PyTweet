@@ -1,5 +1,6 @@
-import requests
 from typing import Optional
+
+import requests
 
 
 class PytweetException(Exception):
@@ -88,7 +89,10 @@ class Unauthorized(HTTPException):
         else:
             detail = response.json().get("detail")
 
-        super().__init__(response, msg if msg else detail if detail else "Unauthorize to do that action!")
+        super().__init__(
+            response,
+            msg if msg else detail if detail else "Unauthorize to do that action!",
+        )
 
 
 class Forbidden(HTTPException):
@@ -111,7 +115,10 @@ class Forbidden(HTTPException):
         else:
             detail = response.json().get("detail")
 
-        super().__init__(response, msg if msg else detail if detail != "Forbidden" else "Forbidden to do that action.")
+        super().__init__(
+            response,
+            msg if msg else detail if detail != "Forbidden" else "Forbidden to do that action.",
+        )
 
 
 class NotFound(HTTPException):

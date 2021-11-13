@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, Dict, List, NoReturn, Optional, Union
-from .utils import time_parse_todt
-from .enums import ButtonStyle
 from dataclasses import dataclass
+from typing import Any, Dict, List, NoReturn, Optional, Union
+
+from .enums import ButtonStyle
+from .utils import time_parse_todt
 
 __all__ = ("Media", "PollOptions", "Poll", "QuickReply", "Geo", "CTA")
 
@@ -335,7 +336,9 @@ class QuickReply:
         self.options: List[Any, Any] = []
         self.items: int = len(self.options)
 
-    def add_option(self, *, label: str, description: Optional[str] = None, metadata: Optional[str] = None) -> QuickReply:
+    def add_option(
+        self, *, label: str, description: Optional[str] = None, metadata: Optional[str] = None
+    ) -> QuickReply:
         """:class:`QuickReply`: Method for adding an option in your quick reply instance.
 
         Parameters

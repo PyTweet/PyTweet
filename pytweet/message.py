@@ -1,11 +1,12 @@
 from __future__ import annotations
-import datetime
-from typing import TYPE_CHECKING, Any, Dict, Optional, Union, List
 
+import datetime
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+
+from .attachments import QuickReply
+from .entities import Hashtags, Symbols, Urls, UserMentions
 from .enums import MessageEventTypeEnum, MessageTypeEnum
 from .user import User
-from .entities import Hashtags, Symbols, UserMentions, Urls
-from .attachments import QuickReply
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -106,7 +107,10 @@ class DirectMessage(Message):
             "POST",
             "1.1",
             "/direct_messages/mark_read.json",
-            params={"last_read_event_id": str(self.id), "recipient_id": str(self.author.id)},
+            params={
+                "last_read_event_id": str(self.id),
+                "recipient_id": str(self.author.id),
+            },
             auth=True,
         )
 
@@ -209,7 +213,11 @@ class WelcomeMessage(Message):
         data = {"welcome_message_rule": {"welcome_message_id": str(self.id)}}
 
         res = self.http_client.request(
-            "POST", "1.1", "/direct_messages/welcome_messages/rules/new.json", json=data, auth=True
+            "POST",
+            "1.1",
+            "/direct_messages/welcome_messages/rules/new.json",
+            json=data,
+            auth=True,
         )
 
         args = [v for k, v in res.get("welcome_message_rule").items()]
@@ -260,7 +268,11 @@ class WelcomeMessage(Message):
         .. versionadded:: 1.3.5
         """
         self.http_client.request(
-            "DELETE", "1.1", "/direct_messages/welcome_messages/destroy.json", params={"id": str(self.id)}, auth=True
+            "DELETE",
+            "1.1",
+            "/direct_messages/welcome_messages/destroy.json",
+            params={"id": str(self.id)},
+            auth=True,
         )
 
     @property

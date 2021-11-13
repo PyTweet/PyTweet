@@ -1,7 +1,14 @@
 from typing import Any, Dict
+
 from .enums import RelationsTypeEnum
 
-__all__ = ("Relations", "RelationFollow", "RelationLike", "RelationRetweet", "RelationHide")
+__all__ = (
+    "Relations",
+    "RelationFollow",
+    "RelationLike",
+    "RelationRetweet",
+    "RelationHide",
+)
 
 
 class Relations:

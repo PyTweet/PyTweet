@@ -1,21 +1,12 @@
 from __future__ import annotations
 
 import datetime
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    List,
-    NoReturn,
-    Optional,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
-
+from .attachments import CTA, QuickReply
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import time_parse_todt
-from .attachments import QuickReply, CTA
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -174,7 +165,11 @@ class User:
         """
         my_id = self.http_client.access_token.partition("-")[0]
         self.http_client.request(
-            "POST", "2", f"/users/{my_id}/muting", json={"target_user_id": str(self.id)}, auth=True
+            "POST",
+            "2",
+            f"/users/{my_id}/muting",
+            json={"target_user_id": str(self.id)},
+            auth=True,
         )
 
     def unmute(self) -> None:
@@ -193,7 +188,11 @@ class User:
     def typing(self):
         """Indicates that the client is typing in a user Dm."""
         self.http_client.request(
-            "POST", "1.1", "/direct_messages/indicate_typing.json", params={"recipient_id": str(self.id)}, auth=True
+            "POST",
+            "1.1",
+            "/direct_messages/indicate_typing.json",
+            params={"recipient_id": str(self.id)},
+            auth=True,
         )
 
     @property

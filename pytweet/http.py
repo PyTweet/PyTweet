@@ -4,18 +4,19 @@ import json as j
 import logging
 import sys
 import time
-import requests
-from typing import Any, Dict, NoReturn, Optional, Union, List
+from typing import Any, Dict, List, NoReturn, Optional, Union
 
+import requests
+
+from .attachments import CTA, Geo, Poll, QuickReply
 from .auth import OauthSession
-from .errors import Forbidden, NotFoundError, PytweetException, TooManyRequests, Unauthorized, BadRequests, NotFound
+from .enums import ReplySetting, SpaceState
+from .errors import BadRequests, Forbidden, NotFound, NotFoundError, PytweetException, TooManyRequests, Unauthorized
 from .message import DirectMessage, Message
 from .relations import RelationFollow
+from .space import Space
 from .tweet import Tweet
 from .user import User
-from .attachments import QuickReply, CTA, Poll, Geo
-from .space import Space
-from .enums import SpaceState, ReplySetting
 
 _log = logging.getLogger(__name__)
 
@@ -461,9 +462,9 @@ class HTTPClient:
         user_id: Union[str, int],
         text: str,
         *,
-        quick_reply: QuickReply = None,
+        quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
-        http_client = None,
+        http_client=None,
     ) -> Optional[NoReturn]:
         """Make a post request for sending a message to a User.
 

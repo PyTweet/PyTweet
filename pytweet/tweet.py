@@ -4,11 +4,11 @@ import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
 from .attachments import Media, Poll
+from .message import Message
 from .metrics import TweetPublicMetrics
+from .relations import RelationHide, RelationLike, RelationRetweet
 from .user import User
 from .utils import time_parse_todt
-from .message import Message
-from .relations import RelationLike, RelationRetweet, RelationHide
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -305,7 +305,10 @@ class Tweet(Message):
             "POST",
             "1.1",
             f"/statuses/update.json",
-            params={"status": self.author.username + " " + text, "in_reply_to_status_id": str(self.id)},
+            params={
+                "status": self.author.username + " " + text,
+                "in_reply_to_status_id": str(self.id),
+            },
             auth=True,
         )
 
@@ -462,7 +465,10 @@ class Tweet(Message):
             if self._includes.get("polls"):
                 data = self._includes.get("polls")[0]
                 poll = Poll(
-                    data.get("id"), data.get("voting_status"), data.get("duration_minutes"), data.get("end_datetime")
+                    data.get("id"),
+                    data.get("voting_status"),
+                    data.get("duration_minutes"),
+                    data.get("end_datetime"),
                 )
                 for option in data.get("options"):
                     poll.add_option_FromRequest(option.get("position"), option.get("label"), option.get("votes"))

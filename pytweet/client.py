@@ -1,12 +1,12 @@
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
+from .attachments import Geo, Poll, QuickReply
+from .enums import ReplySetting, SpaceState
 from .http import HTTPClient
+from .message import DirectMessage, WelcomeMessage, WelcomeMessageRule
+from .space import Space
 from .tweet import Tweet
 from .user import User
-from .message import DirectMessage, WelcomeMessage, WelcomeMessageRule
-from .attachments import Geo, Poll, QuickReply
-from .space import Space
-from .enums import SpaceState, ReplySetting
 
 __all__ = ("Client",)
 
@@ -227,7 +227,13 @@ class Client:
                 "options": quick_reply.options,
             }
 
-        res = self.http.request("POST", "1.1", "/direct_messages/welcome_messages/new.json", json=data, auth=True)
+        res = self.http.request(
+            "POST",
+            "1.1",
+            "/direct_messages/welcome_messages/new.json",
+            json=data,
+            auth=True,
+        )
         print(res)
 
         data = res.get("welcome_message")
@@ -236,7 +242,13 @@ class Client:
         timestamp = data.get("created_timestamp")
         text = data.get("message_data").get("text")
 
-        return WelcomeMessage(name, text=text, welcome_message_id=id, timestamp=timestamp, http_client=self.http)
+        return WelcomeMessage(
+            name,
+            text=text,
+            welcome_message_id=id,
+            timestamp=timestamp,
+            http_client=self.http,
+        )
 
     def fetch_welcome_message(self, welcome_message_id: Union[str, int]) -> WelcomeMessage:
         """Fetch the welcome message with the given welcome message id argument.
