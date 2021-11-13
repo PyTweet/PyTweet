@@ -20,6 +20,7 @@ from .http import *
 from .message import *
 from .metrics import *
 from .relations import *
+from .space import *
 from .tweet import *
 from .user import *
 from .utils import *
