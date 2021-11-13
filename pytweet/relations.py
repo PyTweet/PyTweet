@@ -1,7 +1,13 @@
 from typing import Any, Dict
 from .enums import RelationsTypeEnum
 
-__all__ = ("Relations", "RelationFollow", "RelationLike", "RelationRetweet", "RelationHide")
+__all__ = (
+    "Relations",
+    "RelationFollow",
+    "RelationLike",
+    "RelationRetweet",
+    "RelationHide",
+)
 
 
 class Relations:
@@ -26,7 +32,9 @@ class RelationFollow(Relations):
         super().__init__(1 if self.following else 0)
 
     def __repr__(self) -> str:
-        return "RelationFollow(type: {0.type} following: {0.following} pending: {0.pending})".format(self)
+        return "RelationFollow(type: {0.type} following: {0.following} pending: {0.pending})".format(
+            self
+        )
 
     @property
     def pending(self) -> bool:

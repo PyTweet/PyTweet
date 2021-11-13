@@ -13,7 +13,9 @@ class Space:
             self._payload = data.get("data")
 
     def __repr__(self) -> str:
-        return "Space(name:{0.title} state:{0.state} id:{0.id} type:{0.state_type})".format(self)
+        return "Space(name:{0.title} state:{0.state} id:{0.id} type:{0.state_type})".format(
+            self
+        )
 
     @property
     def title(self) -> str:

@@ -46,7 +46,9 @@ class HTTPException(PytweetException):
         self.res = response
         self.json = response.json() if response else None
         self.message = message
-        super().__init__(f"Request Return an Exception (status code: {self.res.status_code}): {self.message}")
+        super().__init__(
+            f"Request Return an Exception (status code: {self.res.status_code}): {self.message}"
+        )
 
     @property
     def status_code(self) -> Optional[int]:
@@ -67,7 +69,9 @@ class BadRequests(HTTPException):
         response: Optional[requests.models.Response] = None,
         message: Optional[str] = None,
     ):
-        msg = response.json().get("errors")[0].get("message") if not message else message
+        msg = (
+            response.json().get("errors")[0].get("message") if not message else message
+        )
         detail = response.json().get("errors")[0].get("detail")
         super().__init__(response, msg if msg else detail if detail else "Not Found!")
 
@@ -82,13 +86,20 @@ class Unauthorized(HTTPException):
         msg = None
         detail = None
         if response.json().get("errors"):
-            msg = response.json().get("errors")[0].get("message") if not message else message
+            msg = (
+                response.json().get("errors")[0].get("message")
+                if not message
+                else message
+            )
             detail = response.json().get("errors")[0].get("detail")
 
         else:
             detail = response.json().get("detail")
 
-        super().__init__(response, msg if msg else detail if detail else "Unauthorize to do that action!")
+        super().__init__(
+            response,
+            msg if msg else detail if detail else "Unauthorize to do that action!",
+        )
 
 
 class Forbidden(HTTPException):
@@ -105,13 +116,24 @@ class Forbidden(HTTPException):
         msg = None
         detail = None
         if response.json().get("errors"):
-            msg = response.json().get("errors")[0].get("message") if not message else message
+            msg = (
+                response.json().get("errors")[0].get("message")
+                if not message
+                else message
+            )
             detail = response.json().get("errors")[0].get("detail")
 
         else:
             detail = response.json().get("detail")
 
-        super().__init__(response, msg if msg else detail if detail != "Forbidden" else "Forbidden to do that action.")
+        super().__init__(
+            response,
+            msg
+            if msg
+            else detail
+            if detail != "Forbidden"
+            else "Forbidden to do that action.",
+        )
 
 
 class NotFound(HTTPException):
@@ -125,7 +147,9 @@ class NotFound(HTTPException):
         response: Optional[requests.models.Response] = None,
         message: Optional[str] = None,
     ):
-        msg = response.json().get("errors")[0].get("message") if not message else message
+        msg = (
+            response.json().get("errors")[0].get("message") if not message else message
+        )
         detail = response.json().get("errors")[0].get("detail")
         super().__init__(response, msg if msg else detail if detail else "Not Found!")
 
@@ -150,6 +174,8 @@ class NotFoundError(APIException):
         response: Optional[requests.models.Response] = None,
         message: Optional[str] = None,
     ):
-        msg = response.json().get("errors")[0].get("message") if not message else message
+        msg = (
+            response.json().get("errors")[0].get("message") if not message else message
+        )
         detail = response.json().get("errors")[0].get("detail")
         super().__init__(response, msg if msg else detail if detail else "Not Found!")

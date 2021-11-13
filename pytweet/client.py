@@ -227,7 +227,13 @@ class Client:
                 "options": quick_reply.options,
             }
 
-        res = self.http.request("POST", "1.1", "/direct_messages/welcome_messages/new.json", json=data, auth=True)
+        res = self.http.request(
+            "POST",
+            "1.1",
+            "/direct_messages/welcome_messages/new.json",
+            json=data,
+            auth=True,
+        )
         print(res)
 
         data = res.get("welcome_message")
@@ -236,9 +242,17 @@ class Client:
         timestamp = data.get("created_timestamp")
         text = data.get("message_data").get("text")
 
-        return WelcomeMessage(name, text=text, welcome_message_id=id, timestamp=timestamp, http_client=self.http)
+        return WelcomeMessage(
+            name,
+            text=text,
+            welcome_message_id=id,
+            timestamp=timestamp,
+            http_client=self.http,
+        )
 
-    def fetch_welcome_message(self, welcome_message_id: Union[str, int]) -> WelcomeMessage:
+    def fetch_welcome_message(
+        self, welcome_message_id: Union[str, int]
+    ) -> WelcomeMessage:
         """Fetch the welcome message with the given welcome message id argument.
 
         Parameters
@@ -266,9 +280,13 @@ class Client:
         id = data.get("id")
         timestamp = data.get("created_timestamp")
         text = message_data.get("text")
-        return WelcomeMessage(text=text, welcome_message_id=id, timestamp=timestamp, http_client=self.http)
+        return WelcomeMessage(
+            text=text, welcome_message_id=id, timestamp=timestamp, http_client=self.http
+        )
 
-    def fetch_welcome_message_rules(self, welcome_message_rules_id: Union[str, int]) -> WelcomeMessageRule:
+    def fetch_welcome_message_rules(
+        self, welcome_message_rules_id: Union[str, int]
+    ) -> WelcomeMessageRule:
         """Fetch the welcome message rules with the given welcome message rules id argument.
 
         Parameters
@@ -311,7 +329,9 @@ class Client:
         space = self.http.fetch_space(space_id)
         return space
 
-    def fetch_space_by_title(self, title: str, state: SpaceState = SpaceState.live) -> Space:
+    def fetch_space_by_title(
+        self, title: str, state: SpaceState = SpaceState.live
+    ) -> Space:
         """Fetch a space using its title.
 
         Parameters
@@ -348,7 +368,9 @@ class Client:
         try:
             event_id = int(event_id)
         except ValueError:
-            raise ValueError("Event id must be an integer or a :class:`str`ing of digits.")
+            raise ValueError(
+                "Event id must be an integer or a :class:`str`ing of digits."
+            )
 
         return self.http.message_cache.get(event_id)
 

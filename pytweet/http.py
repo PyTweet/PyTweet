@@ -8,7 +8,15 @@ import requests
 from typing import Any, Dict, NoReturn, Optional, Union, List
 
 from .auth import OauthSession
-from .errors import Forbidden, NotFoundError, PytweetException, TooManyRequests, Unauthorized, BadRequests, NotFound
+from .errors import (
+    Forbidden,
+    NotFoundError,
+    PytweetException,
+    TooManyRequests,
+    Unauthorized,
+    BadRequests,
+    NotFound,
+)
 from .message import DirectMessage, Message
 from .relations import RelationFollow
 from .tweet import Tweet
@@ -118,11 +126,15 @@ class HTTPClient:
         if not access_token:
             _log.warning("Access token is missing this is recommended to have")
         if not access_token_secret:
-            _log.warning("Access token secret is missing this is required if you have passed in the access_toke param.")
+            _log.warning(
+                "Access token secret is missing this is required if you have passed in the access_toke param."
+            )
 
         for k, v in self.credentials.items():
             if not isinstance(v, str) and not isinstance(v, type(None)):
-                raise Unauthorized(None, f"Wrong authorization passed for credential: {k}.")
+                raise Unauthorized(
+                    None, f"Wrong authorization passed for credential: {k}."
+                )
 
         self.bearer_token: Optional[str] = bearer_token
         self.consumer_key: Optional[str] = consumer_key
@@ -184,7 +196,9 @@ class HTTPClient:
         if headers == {}:
             headers = {"Authorization": f"Bearer {self.bearer_token}"}
 
-        headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
+        headers["User-Agent"] = user_agent.format(
+            sys.version_info, requests.__version__
+        )
 
         res = getattr(requests, method.lower(), None)
         if not res:
@@ -212,7 +226,9 @@ class HTTPClient:
             return res
         return response
 
-    def fetch_user(self, user_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> User:
+    def fetch_user(
+        self, user_id: Union[str, int], *, http_client: Optional[HTTPClient] = None
+    ) -> User:
         """Make a Request to obtain the user from the given user id.
 
         Parameters
@@ -271,14 +287,20 @@ class HTTPClient:
 
         data["data"].update(
             {
-                "followers": [User(follower, http_client=http_client) for follower in followers["data"]]
+                "followers": [
+                    User(follower, http_client=http_client)
+                    for follower in followers["data"]
+                ]
                 if followers != []
                 else []
             }
         )
         data["data"].update(
             {
-                "following": [User(following, http_client=http_client) for following in following["data"]]
+                "following": [
+                    User(following, http_client=http_client)
+                    for following in following["data"]
+                ]
                 if following != []
                 else []
             }
@@ -286,7 +308,9 @@ class HTTPClient:
 
         return User(data, http_client=http_client)
 
-    def fetch_user_byusername(self, username: str, *, http_client: Optional[HTTPClient] = None) -> User:
+    def fetch_user_byusername(
+        self, username: str, *, http_client: Optional[HTTPClient] = None
+    ) -> User:
         """Make a Request to obtain the user from their username.
 
         Parameters
@@ -320,13 +344,17 @@ class HTTPClient:
             is_json=True,
         )
 
-        user_payload = self.fetch_user(int(data["data"].get("id")), http_client=http_client)
+        user_payload = self.fetch_user(
+            int(data["data"].get("id")), http_client=http_client
+        )
         data["data"].update({"followers": user_payload.followers})
         data["data"].update({"following": user_payload.following})
 
         return User(data, http_client=http_client)
 
-    def fetch_tweet(self, tweet_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> Tweet:
+    def fetch_tweet(
+        self, tweet_id: Union[str, int], *, http_client: Optional[HTTPClient] = None
+    ) -> Tweet:
         """Fetch a tweet info from the specified id. Return if consumer_key or consumer_key_secret or access_token or access_token_secret is not specified.
 
         Parameters:
@@ -395,7 +423,12 @@ class HTTPClient:
             res2["data"]
 
             res["data"].update(
-                {"retweetes": [User(user, http_client=http_client if http_client else self) for user in res2["data"]]}
+                {
+                    "retweetes": [
+                        User(user, http_client=http_client if http_client else self)
+                        for user in res2["data"]
+                    ]
+                }
             )
         except (KeyError, TypeError):
             res["data"].update({"retweetes": []})
@@ -404,7 +437,12 @@ class HTTPClient:
             res3["data"]
 
             res["data"].update(
-                {"likes": [User(user, http_client=http_client if http_client else self) for user in res3["data"]]}
+                {
+                    "likes": [
+                        User(user, http_client=http_client if http_client else self)
+                        for user in res3["data"]
+                    ]
+                }
             )
         except (KeyError, TypeError):
             res["data"].update({"likes": []})
@@ -461,9 +499,9 @@ class HTTPClient:
         user_id: Union[str, int],
         text: str,
         *,
-        quick_reply: QuickReply = None,
+        quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
-        http_client = None,
+        http_client=None,
     ) -> Optional[NoReturn]:
         """Make a post request for sending a message to a User.
 
@@ -501,7 +539,9 @@ class HTTPClient:
             if not quick_reply:
                 pass
             else:
-                raise PytweetException("'quick_reply' is not an instance of pytweet.QuickReply")
+                raise PytweetException(
+                    "'quick_reply' is not an instance of pytweet.QuickReply"
+                )
 
         message_data = data["event"]["message_create"]["message_data"]
 
@@ -526,7 +566,9 @@ class HTTPClient:
 
         message_create = res.get("event").get("message_create")
         user_id = message_create.get("target").get("recipient_id")
-        user = self.fetch_user(user_id, http_client=http_client if http_client else self)
+        user = self.fetch_user(
+            user_id, http_client=http_client if http_client else self
+        )
         res["event"]["message_create"]["target"]["recipient"] = user
 
         msg = DirectMessage(res, http_client=http_client if http_client else self)
@@ -534,7 +576,9 @@ class HTTPClient:
 
         return
 
-    def fetch_message(self, event_id: Union[str, int], **kwargs: Any) -> Optional[DirectMessage]:
+    def fetch_message(
+        self, event_id: Union[str, int], **kwargs: Any
+    ) -> Optional[DirectMessage]:
         """Optional[:class:`DirectMessage`]: Fetch a direct message with the event id.
 
         .. warning::
@@ -551,13 +595,19 @@ class HTTPClient:
         try:
             event_id = str(event_id)
         except ValueError:
-            raise ValueError("event_id must be an integer or a :class:`str`ing of digits.")
+            raise ValueError(
+                "event_id must be an integer or a :class:`str`ing of digits."
+            )
 
-        res = self.request("GET", "1.1", f"/direct_messages/events/show.json?id={event_id}", auth=True)
+        res = self.request(
+            "GET", "1.1", f"/direct_messages/events/show.json?id={event_id}", auth=True
+        )
 
         message_create = res.get("event").get("message_create")
         user_id = message_create.get("target").get("recipient_id")
-        user = self.fetch_user(user_id, http_client=http_client if http_client else self)
+        user = self.fetch_user(
+            user_id, http_client=http_client if http_client else self
+        )
         res["event"]["message_create"]["target"]["recipient"] = user
 
         return DirectMessage(res, http_client=http_client if http_client else self)
@@ -612,7 +662,9 @@ class HTTPClient:
 
         if reply_setting:
             payload["reply_settings"] = (
-                reply_setting.value if isinstance(reply_setting, ReplySetting) else reply_setting
+                reply_setting.value
+                if isinstance(reply_setting, ReplySetting)
+                else reply_setting
             )
 
         if reply_to_tweet or exclude_reply_users:
@@ -622,10 +674,14 @@ class HTTPClient:
 
             if exclude_reply_users:
                 if "reply" in payload.keys():
-                    payload["reply"]["exclude_reply_user_ids"] = [str(id) for id in exclude_reply_users]
+                    payload["reply"]["exclude_reply_user_ids"] = [
+                        str(id) for id in exclude_reply_users
+                    ]
                 else:
                     payload["reply"] = {}
-                    payload["reply"]["exclude_reply_user_ids"] = [str(id) for id in exclude_reply_users]
+                    payload["reply"]["exclude_reply_user_ids"] = [
+                        str(id) for id in exclude_reply_users
+                    ]
 
         if super_followers_only:
             payload["for_super_followers_only"] = True

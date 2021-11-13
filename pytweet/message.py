@@ -106,7 +106,10 @@ class DirectMessage(Message):
             "POST",
             "1.1",
             "/direct_messages/mark_read.json",
-            params={"last_read_event_id": str(self.id), "recipient_id": str(self.author.id)},
+            params={
+                "last_read_event_id": str(self.id),
+                "recipient_id": str(self.author.id),
+            },
             auth=True,
         )
 
@@ -209,13 +212,21 @@ class WelcomeMessage(Message):
         data = {"welcome_message_rule": {"welcome_message_id": str(self.id)}}
 
         res = self.http_client.request(
-            "POST", "1.1", "/direct_messages/welcome_messages/rules/new.json", json=data, auth=True
+            "POST",
+            "1.1",
+            "/direct_messages/welcome_messages/rules/new.json",
+            json=data,
+            auth=True,
         )
 
         args = [v for k, v in res.get("welcome_message_rule").items()]
-        return WelcomeMessageRule(args[0], args[2], args[1], http_client=self.http_client)
+        return WelcomeMessageRule(
+            args[0], args[2], args[1], http_client=self.http_client
+        )
 
-    def update(self, text: str = None, *, quick_reply: QuickReply = None) -> WelcomeMessage:
+    def update(
+        self, text: str = None, *, quick_reply: QuickReply = None
+    ) -> WelcomeMessage:
         """Updates the Welcome Message, you dont need to use set_rule again since this update your default welcome message.
 
         Parameters
@@ -252,7 +263,9 @@ class WelcomeMessage(Message):
         timestamp = welcome_message.get("created_timestamp")
         text = message_data.get("text")
 
-        return WelcomeMessage(name, text=text, welcome_message_id=id, timestamp=timestamp)
+        return WelcomeMessage(
+            name, text=text, welcome_message_id=id, timestamp=timestamp
+        )
 
     def delete(self):
         """Delete the Welcome Message.
@@ -260,7 +273,11 @@ class WelcomeMessage(Message):
         .. versionadded:: 1.3.5
         """
         self.http_client.request(
-            "DELETE", "1.1", "/direct_messages/welcome_messages/destroy.json", params={"id": str(self.id)}, auth=True
+            "DELETE",
+            "1.1",
+            "/direct_messages/welcome_messages/destroy.json",
+            params={"id": str(self.id)},
+            auth=True,
         )
 
     @property
@@ -293,7 +310,9 @@ class WelcomeMessageRule(Message):
         self.http_client = http_client
 
     def __repr__(self) -> str:
-        return "WelcomeMessageRule(id: {0.id} welcome_message_id: {0.} created_at: {0.created_at})".format(self)
+        return "WelcomeMessageRule(id: {0.id} welcome_message_id: {0.} created_at: {0.created_at})".format(
+            self
+        )
 
     def delete(self):
         """Delete the Welcome Message Rule.
