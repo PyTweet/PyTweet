@@ -10,12 +10,7 @@ from .attachments import QuickReply
 if TYPE_CHECKING:
     from .http import HTTPClient
 
-__all__ = (
-    "Message",
-    "DirectMessage",
-    "WelcomeMessage",
-    "WelcomeMessageRule"
-)
+__all__ = ("Message", "DirectMessage", "WelcomeMessage", "WelcomeMessageRule")
 
 
 class Message:
@@ -74,9 +69,7 @@ class DirectMessage(Message):
         self.timestamp = round(datetime.datetime.utcnow().timestamp())
 
     def __repr__(self) -> str:
-        return "Message(text:{0.text} id:{0.id} author: {0.author})".format(
-            self
-        )
+        return "Message(text:{0.text} id:{0.id} author: {0.author})".format(self)
 
     def __str__(self) -> str:
         return self.text
@@ -271,7 +264,12 @@ class WelcomeMessageRule(Message):
     """
 
     def __init__(
-        self, welcome_message_rule_id: Union[str, int], welcome_message_id: Union[str, int], timestamp: Union[str, int], *, http_client
+        self,
+        welcome_message_rule_id: Union[str, int],
+        welcome_message_id: Union[str, int],
+        timestamp: Union[str, int],
+        *,
+        http_client
     ):
         super().__init__(id=welcome_message_rule_id, type=3)
         self._welcome_message_id = welcome_message_id
@@ -279,9 +277,7 @@ class WelcomeMessageRule(Message):
         self.http_client = http_client
 
     def __repr__(self) -> str:
-        return "WelcomeMessageRule(id: {0.id} welcome_message_id: {0.} created_at: {0.created_at})".format(
-            self
-        )
+        return "WelcomeMessageRule(id: {0.id} welcome_message_id: {0.} created_at: {0.created_at})".format(self)
 
     def delete(self):
         """Delete the Welcome Message Rule.
@@ -305,4 +301,4 @@ class WelcomeMessageRule(Message):
     @property
     def welcome_message_id(self) -> Union[str, int]:
         """Union[:class:`str`, :class:`int`]: Returns the welcome message's id."""
-        return int(self._welcome_message_id)     
+        return int(self._welcome_message_id)
