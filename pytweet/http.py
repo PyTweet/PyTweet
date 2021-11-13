@@ -477,7 +477,7 @@ class HTTPClient:
             auth=True,
         )
 
-        message_create = res.get('event').get("message_create")
+        message_create = res.get("event").get("message_create")
         user_id = message_create.get("target").get("recipient_id")
         user = self.fetch_user(user_id, http_client=http_client if http_client else self)
         res["event"]["message_create"]["target"]["recipient"] = user
@@ -534,7 +534,7 @@ class HTTPClient:
 
         res = self.request("GET", "1.1", f"/direct_messages/events/show.json?id={event_id}", auth=True)
 
-        message_create = res.get('event').get("message_create")
+        message_create = res.get("event").get("message_create")
         user_id = message_create.get("target").get("recipient_id")
         user = self.fetch_user(user_id, http_client=http_client if http_client else self)
         res["event"]["message_create"]["target"]["recipient"] = user
@@ -561,7 +561,7 @@ class HTTPClient:
 
         res = self.request("POST", "2", "/tweets", json=payload, auth=True)
         data = res.get("data")
-        tweet = Message(data.get("text"), data.get("id"))
+        tweet = Message(data.get("text"), data.get("id"), 1)
         return tweet
 
     def delete_tweet(self, tweet_id: Union[str, int]) -> None:

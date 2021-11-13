@@ -265,7 +265,7 @@ class Tweet(Message):
         :class:`RelationRetweet`
             Returns a :class:`RelationRetweet` object.
 
-        
+
         .. versionadded:: 1.2.0
         """
         my_id = self.http_client.access_token.partition("-")[0]

@@ -169,7 +169,9 @@ class Client:
         res = self.http.post_tweet(text, http_client=http_client if http_client else self.http, **kwargs)
         return res
 
-    def create_welcome_message(self, name: str = None, text: str = None, *, quick_reply: QuickReply = None) -> WelcomeMessage:
+    def create_welcome_message(
+        self, name: str = None, text: str = None, *, quick_reply: QuickReply = None
+    ) -> WelcomeMessage:
         """create a welcome message.
 
         Parameters
