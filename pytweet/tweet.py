@@ -407,7 +407,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.1.3
         """
-        user = (
+        return (
             self.http_client.fetch_user(
                 int(self._payload.get("in_reply_to_user_id")),
                 http_client=self.http_client,
@@ -415,7 +415,6 @@ class Tweet(Message):
             if self._payload.get("in_reply_to_user_id")
             else None
         )
-        return user
 
     @property
     def mentions(self) -> Optional[List[User]]:
@@ -423,12 +422,11 @@ class Tweet(Message):
 
         .. versionadded:: 1.1.3
         """
-        if self._includes:
-            if self._includes.get("mentions"):
-                return [
-                    self.http_client.fetch_user_byusername(user.get("username"), http_client=self.http_client)
-                    for user in self._includes.get("mentions")
-                ]
+        if self._includes and self._includes.get("mentions"):
+            return [
+                self.http_client.fetch_user_byusername(user.get("username"), http_client=self.http_client)
+                for user in self._includes.get("mentions")
+            ]
         return None
 
     @property
@@ -437,15 +435,14 @@ class Tweet(Message):
 
         .. versionadded:: 1.1.0
         """
-        if self._includes:
-            if self._includes.get("polls"):
-                data = self._includes.get("polls")[0]
-                poll = Poll(
-                    data.get("id"), data.get("voting_status"), data.get("duration_minutes"), data.get("end_datetime")
-                )
-                for option in data.get("options"):
-                    poll.add_option_FromRequest(option.get("position"), option.get("label"), option.get("votes"))
-                return poll
+        if self._includes and self._includes.get("polls"):
+            data = self._includes.get("polls")[0]
+            poll = Poll(
+                data.get("id"), data.get("voting_status"), data.get("duration_minutes"), data.get("end_datetime")
+            )
+            for option in data.get("options"):
+                poll.add_option_FromRequest(option.get("position"), option.get("label"), option.get("votes"))
+            return poll
 
         return None
 
@@ -455,9 +452,8 @@ class Tweet(Message):
 
         .. versionadded:: 1.1.0
         """
-        if self._includes:
-            if self._includes.get("media"):
-                return [Media(img) for img in self._includes.get("media")]
+        if self._includes and self._includes.get("media"):
+            return [Media(img) for img in self._includes.get("media")]
         return None
 
     @property
@@ -466,9 +462,10 @@ class Tweet(Message):
 
         .. versionadded:: 1.1.3
         """
-        if self._payload.get("entities"):
-            if self._payload.get("entities").get("urls"):
-                return [Embed(url) for url in self._payload.get("entities").get("urls")]
+        if self._payload.get("entities") and self._payload.get("entities").get(
+            "urls"
+        ):
+            return [Embed(url) for url in self._payload.get("entities").get("urls")]
         return None
 
     @property
