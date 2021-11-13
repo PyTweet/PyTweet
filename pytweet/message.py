@@ -75,11 +75,27 @@ class DirectMessage(Message):
         return self.text
 
     def delete(self) -> None:
-        """Delete the DirectMessage object.
+        """Make a Request to delete the DirectMessage.
+
+        Parameters
+        -----------
+        id:
+            The Direct Message event id.
+
 
         .. versionadded:: 1.1.0
         """
-        self.http_client.delete_message(self.id)
+        self.http_client.request(
+            "DELETE",
+            "1.1",
+            f"/direct_messages/events/destroy.json?id={self.id}",
+            auth=True,
+        )
+
+        try:
+            self.http_client.message_cache.pop(int(self.id))
+        except KeyError:
+            pass
 
     def mark_read(self):
         """Mark the DirectMessage as read, it also mark other messages before the message was sent as read.
