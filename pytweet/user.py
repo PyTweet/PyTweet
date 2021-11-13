@@ -1,21 +1,12 @@
 from __future__ import annotations
 
 import datetime
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    List,
-    NoReturn,
-    Optional,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
-
+from .attachments import CTA, QuickReply
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import time_parse_todt
-from .attachments import QuickReply, CTA
 
 if TYPE_CHECKING:
     from .http import HTTPClient

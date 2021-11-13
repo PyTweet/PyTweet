@@ -1,4 +1,5 @@
 from typing import Any, Dict
+
 from .enums import RelationsTypeEnum
 
 __all__ = (

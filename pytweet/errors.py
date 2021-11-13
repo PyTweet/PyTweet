@@ -1,5 +1,6 @@
-import requests
 from typing import Optional
+
+import requests
 
 
 class PytweetException(Exception):

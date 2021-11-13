@@ -1,7 +1,8 @@
 import datetime
-from typing import Dict, Any, List, Optional
-from .utils import time_parse_todt
+from typing import Any, Dict, List, Optional
+
 from .enums import SpaceState
+from .utils import time_parse_todt
 
 
 class Space:

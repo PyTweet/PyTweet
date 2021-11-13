@@ -7,8 +7,8 @@ PyTweet is a Synchronous python API wrapper for Twitter's API!
 :copyright: (c) 2021 TheFarGG & TheGenocides
 :license: MIT, see LICENSE for more details.
 """
-from typing import Literal, NamedTuple
 import logging
+from typing import Literal, NamedTuple
 
 from .attachments import *
 from .auth import *

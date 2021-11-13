@@ -1,11 +1,12 @@
 from __future__ import annotations
-import datetime
-from typing import TYPE_CHECKING, Any, Dict, Optional, Union, List
 
+import datetime
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+
+from .attachments import QuickReply
+from .entities import Hashtags, Symbols, Urls, UserMentions
 from .enums import MessageEventTypeEnum, MessageTypeEnum
 from .user import User
-from .entities import Hashtags, Symbols, UserMentions, Urls
-from .attachments import QuickReply
 
 if TYPE_CHECKING:
     from .http import HTTPClient
