@@ -56,8 +56,7 @@ def compose_tweet_action(tweet_id: Union[str, int], action: str):
 
     .. versionadded: 1.3.5
     """
-    actions = ["retweet", "like", "reply"]
-    if action.lower() not in actions:
+    if action.lower() not in ("retweet", "like", "reply"):
         return TypeError("Action must be either 'retweet', 'like', or 'reply'")
     return (
         f"https://twitter.com/intent/{action}?tweet_id={tweet_id}"
