@@ -13,7 +13,6 @@ from .auth import OauthSession
 from .enums import ReplySetting, SpaceState
 from .errors import BadRequests, Forbidden, NotFound, NotFoundError, PytweetException, TooManyRequests, Unauthorized
 from .message import DirectMessage, Message
-from .relations import RelationFollow
 from .space import Space
 from .tweet import Tweet
 from .user import User
@@ -433,7 +432,7 @@ class HTTPClient:
         )
         return Space(res)
 
-    def fetch_space_bytitle(self, title: str, state: SpaceState) -> Space:
+    def fetch_space_bytitle(self, title: str, state: SpaceState = SpaceState.live) -> Space:
         """Fetch a space using its title.
 
         Parameters
@@ -464,7 +463,7 @@ class HTTPClient:
         *,
         quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
-        http_client=None,
+        http_client: Optional[HTTPClient] = None,
     ) -> Optional[NoReturn]:
         """Make a post request for sending a message to a User.
 
@@ -481,12 +480,12 @@ class HTTPClient:
         http_client
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
-        This function return a :class: `DirectMessage` object.
+        Returns
+        ---------
+        :class:`DirectMessage`
+            This function return a :class:`DirectMessage` object.
 
         .. versionadded:: 1.1.0
-
-        .. versionchanged:: 1.2.0
-            Make the method functional and return :class:`DirectMessage`
         """
         data = {
             "event": {
@@ -530,8 +529,6 @@ class HTTPClient:
         msg = DirectMessage(res, http_client=http_client or self)
         self.message_cache[msg.id] = msg
 
-        return
-
     def fetch_message(self, event_id: Union[str, int], **kwargs: Any) -> Optional[DirectMessage]:
         """Optional[:class:`DirectMessage`]: Fetch a direct message with the event id.
 
@@ -568,23 +565,39 @@ class HTTPClient:
         geo: Optional[Union[Geo, str]] = None,
         quote_tweet_id: Optional[Union[str, int]] = None,
         direct_message_deep_link: Optional[str] = None,
-        reply_setting: str = None,
+        reply_setting: Optional[str] = None,
         reply_to_tweet: Optional[Union[str, int]] = None,
-        exclude_reply_users: List[Union[str, int]] = None,
+        exclude_reply_users: Optional[List[Union[str, int]]] = None,
         super_followers_only: Optional[bool] = None,
-        http_client=None,
+        http_client: Optional[HTTPClient] =None,
     ) -> Union[NoReturn, Any]:
-        """
+        """Make a POST Request to post a tweet through twitter with the given arguments.
+
         .. note::
             This function is almost complete! though you can still use and open an issue in github if it cause an error.
 
-        Make a POST Request to post a tweet through with the given arguments.
+        Parameters
+        ------------
+        text: :class:`str`
+            The tweets text, it will showup as the main text in a tweet.
+        poll: Optional[:class:`Poll`]
+            The poll attachment.
+        geo: Optional[Union[:class:`Geo`, :class:`str`]]
+            The geo attachment, you can put an object that is an instance of :class:`Geo` or the place id in a string.
+        quote_tweet_id: Optional[Union[:class:`str`, :class:`int`]]
+            The tweet id you want to quote.
+        direct_message_deep_link: Optional[:class:`str`]
+            The direct message deep link, It will showup as a CTA(call-to-action) with button attachment.
+        reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
+            The reply setting, you can set it to: ReplySetting.everyone indicates everyone can reply to your tweet, ReplySetting.mention_users indicates only the mentioned users in the tweet can reply, and ReplySetting.following indicates only the client's followers can reply.
+        reply_to_tweet: Optional[Union[:class:`str`, :class:`int`]]
+            The tweet id you want to reply. If have a :class:`Tweet` instance, you can use the reply() method rather then using this method.
+        exclude_reply_users: Optional[List[Union[:class:`str`, :class:`int`]]]
+            Exclude the users when replying to a tweet, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you dont want to mention.
+        super_followers_only: :class:`bool`
+            Allows you to Tweet exclusively for Super Followers.
 
         .. versionadded:: 1.1.0
-
-        .. versionchanged:: 1.2.0
-
-        Make the method functional and return :class:`Message`
         """
         payload = {}
         if text:

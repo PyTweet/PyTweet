@@ -35,5 +35,5 @@ class SpaceState(Enum):
 
 class ReplySetting(Enum):
     everyone = "everyone"
-    mentionn_users = "mentionedUsers"
+    mention_users = "mentionedUsers"
     following = "following"

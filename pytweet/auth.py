@@ -24,11 +24,6 @@ class OauthSession(OAuth1Session):
     def oauth1(self) -> OAuth1:
         """:class:`Oauth1`: Wrap the credentials in a function that return Oauth1. Usually Uses for Authorization.
 
-        Returns
-        ---------
-        :class:`OAuth1`
-            This function returns an OAuth1 object.
-
         .. versionadded:: 1.2.0
         """
         return OAuth1(

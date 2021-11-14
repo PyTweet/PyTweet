@@ -185,7 +185,7 @@ class WelcomeMessage(Message):
         text: Optional[str] = None,
         welcome_message_id: Union[str, int],
         timestamp: str,
-        http_client,
+        http_client: HTTPClient,
     ):
         super().__init__(text, welcome_message_id, 2)
         self._name = name
@@ -322,11 +322,17 @@ class WelcomeMessageRule(Message):
 
     @property
     def created_at(self) -> datetime.datetime:
-        """:class:`datetime.datetime`: Returns a datetime.datetime object with the WelcomeMessageRule created time."""
+        """:class:`datetime.datetime`: Returns a datetime.datetime object with the WelcomeMessageRule created time.
+        
+        .. versionadded:: 1.3.5
+        """
         timestamp = str(self._timestamp)[:10]
         return datetime.datetime.fromtimestamp(int(timestamp))
 
     @property
     def welcome_message_id(self) -> Union[str, int]:
-        """Union[:class:`str`, :class:`int`]: Returns the welcome message's id."""
+        """Union[:class:`str`, :class:`int`]: Returns the welcome message's id.
+        
+        .. versionadded:: 1.3.5
+        """
         return int(self._welcome_message_id)

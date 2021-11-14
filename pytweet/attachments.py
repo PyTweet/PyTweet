@@ -31,7 +31,7 @@ class Media:
         self._payload = data
 
     def __repr__(self) -> str:
-        return "Media(type={0.type} url={0.url} width={0.width} height={0.height} media_key={0.media_key})".format(self)
+        return "Media(type={0.type} url={0.url} media_key={0.media_key})".format(self)
 
     def __str__(self) -> str:
         return self.url
@@ -120,7 +120,7 @@ class PollOptions:
         self.options = options
 
     def __repr__(self) -> str:
-        return "PollOption({0.position} {0.label} {0.votes})".format(self)
+        return "PollOption(position={0.position} label={0.label} votes={0.votes})".format(self)
 
     def __eq__(self, other: PollOptions) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
@@ -169,7 +169,7 @@ class PollOptions:
         return self.options.get("label")
 
     @property
-    def votes(self) -> Optional[int]:
+    def votes(self) -> int:
         """Optional[:class:`int`]: The option's votes.
 
         .. versionadded:: 1.1.0
@@ -189,11 +189,19 @@ class Poll:
 
 
     .. describe:: len(x)
-        return how many options in the poll.
+        returns how many options in the poll.
 
+    Parameters
+    ------------
+    id: Optional[:class:`int`]
+        The poll's unique ID.
+    voting_status: Optional[Union[:class:`str`, :class:`int`]]
+        The poll's voting status.
+    duration: Optional[Union[:class:`str`, :class:`int`]]
+        The poll duration in minutes.
+    end_date: Optional[Union[:class:`str`, :class:`int`]]
+        The poll's end date.
 
-    .. describe:: bool(x)
-        return True if the poll is open else it return False.
 
     .. versionadded:: 1.1.0
     """
@@ -212,7 +220,7 @@ class Poll:
         self._options = []
 
     def __repr__(self) -> str:
-        return "Poll(id={0.id}, voting_status={0.voting_status}, duration={0.duration})".format(self)
+        return "Poll(id={0.id} voting_status={0.voting_status} duration={0.duration})".format(self)
 
     def __eq__(self, other: Poll) -> Union[bool, NoReturn]:
         if not isinstance(other, self):
@@ -232,10 +240,13 @@ class Poll:
 
         Parameters
         ------------
-        position: :class:`int`
-            The option's position, maximum position is 4.
         label: :class:`str`
             The option's label.
+
+        Returns
+        ---------
+        :class:`Poll`
+            This method return your :class:`Poll` instance.
 
         .. versionadded 1.3.5
         """
@@ -255,6 +266,11 @@ class Poll:
         votes: :class:`int`
             The option votes
 
+        Returns
+        ---------
+        :class:`Poll`
+            This method return your :class:`Poll` instance.
+
 
         .. versionadded 1.3.5
         """
@@ -266,7 +282,7 @@ class Poll:
 
     @property
     def id(self) -> Optional[int]:
-        """:class:`int`: Return the poll's unique ID.
+        """Optional[:class:`int`]: Return the poll's unique ID.
 
         .. versionadded:: 1.1.0
         """
@@ -305,8 +321,8 @@ class Poll:
         return int(self._duration) if self._duration else None
 
     @property
-    def end_date(self) -> datetime.datetime:
-        """:class:`datetime.datetime`: Return the end date in datetime.datetime object.
+    def end_date(self) -> Optional[datetime.datetime]:
+        """Optional[:class:`datetime.datetime`]: Return the end date in datetime.datetime object.
 
         .. versionadded:: 1.1.0
         """
@@ -339,7 +355,7 @@ class QuickReply:
     def add_option(
         self, *, label: str, description: Optional[str] = None, metadata: Optional[str] = None
     ) -> QuickReply:
-        """:class:`QuickReply`: Method for adding an option in your quick reply instance.
+        """Method for adding an option in your quick reply instance.
 
         Parameters
         ------------
@@ -353,7 +369,8 @@ class QuickReply:
         Returns
         ---------
         :class:`QuickReply`
-            Returns the :class:`QuickReply` object.
+            This method return your :class:`QuickReply` instance.
+
 
         .. versionadded:: 1.2.0
         """
@@ -364,7 +381,7 @@ class QuickReply:
 
 
 class Geo:
-    """Represent the Geo or location in twitter.
+    """Represent the Geo location in twitter.
     You can use this as attachment in a tweet or for searching a location
 
     Parameters
@@ -444,19 +461,41 @@ class Button:
 
 
 class CTA:
+    """"Represent call-to-action attachment(CTA)
+    You can use this in a post_tweet method via direct_message_deep_link kwarg or use it in direct message via CTA kwarg. CTA will perform and action whenever a user "call" it, an example of this is buttons.
+    """
     def __init__(self):
         self._buttons = []
         self._raw_buttons = []
 
-    def add_button(self, label: str, style: ButtonStyle, url: str):
+    @staticmethod
+    def add_button(self, label: str, url: str, style: ButtonStyle = ButtonStyle.web_url) -> CTA:
+        """Add a button in your CTA instance.
+        
+        Parameters
+        ------------
+        label: str
+            The button's label, will be shown in the main text.
+        url: str
+            A url that specified where to take you when you click the button, e.g you can take a user to someone's dm, a tweet, etc.
+        style: :class:`ButtonStyle`
+            The button's style, For now twitter only use web_url, if none specified the default style is ButtonStyle.web_url.
+
+        Returns
+        ---------
+        :class:`CTA`
+            Returns your :class:`CTA` instance.
+        """
         self._raw_buttons.append({"type": style.value, "label": label, "url": url})
         self._buttons.append(Button(label, style, url))
         return self
 
     @property
-    def buttons(self) -> List[dict]:
+    def buttons(self) -> List[Button]:
+        """List[:class:`Button`]: Returns a list of pre-made buttons object."""
         return self._buttons
 
     @property
-    def raw_buttons(self) -> list[Button]:
+    def raw_buttons(self) -> List[dict]:
+        """List[:class:`Button`]: Returns the list of dictionaries filled with raw buttons."""
         return self._raw_buttons

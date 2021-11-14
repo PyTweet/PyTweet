@@ -57,8 +57,8 @@ class Client:
         return "Client(bearer_token=SECRET consumer_key=SECRET consumer_key_secret=SECRET access_token=SECRET access_token_secret=SECRET)"
 
     @property
-    def user(self) -> Optional[User]:
-        """:class:`User`: Returns the client in user object, return None if access token isn't specified.
+    def account(self) -> Optional[User]:
+        """:class:`User`: Returns the client's account information, This returns in a user object.
 
         .. versionadded:: 1.2.0
         """
@@ -77,7 +77,7 @@ class Client:
         Parameters
         ------------
         user_id: Union[:class:`str`, :class:`int`]
-            Represent the user id that you wish to get info to, If you dont have it you may use `fetch_user_byusername` because it only required the user's username.
+            Represent the user id that you wish to get info to, If you dont have it you may use `fetch_user_by_username` because it only required the user's username.
 
         Returns
         ---------
@@ -160,8 +160,8 @@ class Client:
         direct_message_deep_link: Optional[str] = None,
         reply_setting: Optional[Union[ReplySetting, str]] = None,
         reply_to_tweet: Optional[Union[str, int]] = None,
-        exclude_reply_users: List[Union[str, int]] = None,
-        super_followers_only: Optional[bool] = False,
+        exclude_reply_users: Optional[List[Union[str, int]]] = None,
+        super_followers_only: bool = False,
     ) -> Tweet:
         """:class:`Tweet`: Post a tweet directly to twitter from the given parameters.
 
@@ -169,6 +169,22 @@ class Client:
         ------------
         text: :class:`str`
             The tweets text, it will showup as the main text in a tweet.
+        poll: Optional[:class:`Poll`]
+            The poll attachment.
+        geo: Optional[Union[:class:`Geo`, :class:`str`]]
+            The geo attachment, you can put an object that is an instance of :class:`Geo` or the place id in a string.
+        quote_tweet_id: Optional[Union[:class:`str`, :class:`int`]]
+            The tweet id you want to quote.
+        direct_message_deep_link: Optional[:class:`str`]
+            The direct message deep link, It will showup as a CTA(call-to-action) with button attachment.
+        reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
+            The reply setting, you can set it to: ReplySetting.everyone indicates everyone can reply to your tweet, ReplySetting.mention_users indicates only the mentioned users in the tweet can reply, and ReplySetting.following indicates only the client's followers can reply.
+        reply_to_tweet: Optional[Union[:class:`str`, :class:`int`]]
+            The tweet id you want to reply. If have a :class:`Tweet` instance, you can use the reply() method rather then using this method.
+        exclude_reply_users: Optional[List[Union[:class:`str`, :class:`int`]]]
+            Exclude the users when replying to a tweet, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you dont want to mention.
+        super_followers_only: :class:`bool`
+            Allows you to Tweet exclusively for Super Followers.
 
         Returns
         ---------
@@ -233,7 +249,6 @@ class Client:
             json=data,
             auth=True,
         )
-        print(res)
 
         data = res.get("welcome_message")
         id = data.get("id")
@@ -316,6 +331,11 @@ class Client:
         space_id: Union[:class:`str`, :class:`int`]
             The space id that you are going to use to fetch a Space.
 
+        Returns
+        ---------
+        :class:`Space`
+            This method returns a :class:`Space` object.
+
 
         .. versionadded:: 1.3.5
         """
@@ -330,6 +350,11 @@ class Client:
             The space title that you are going use for fetching the space.
         state: :class:`SpaceState`
             The type of state the space has. There's only 2 type: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host. Default to SpaceState.live
+
+        Returns
+        ---------
+        :class:`Space`
+            This method returns a :class:`Space` object.
 
         .. versionadded:: 1.3.5
         """
@@ -396,11 +421,11 @@ class Client:
         self,
         query: str,
         *,
-        lat: int = None,
-        long: int = None,
-        ip: Union[str, int] = None,
+        lat: Optional[int] = None,
+        long: Optional[int] = None,
+        ip: Optional[Union[str, int]] = None,
         granularity: str = "neighborhood",
-        max_results: Union[str, int] = None,
+        max_results: Optional[Union[str, int]] = None,
     ) -> Geo:
         """:class:`Geo`: Get a location information from the given parameters.
 
