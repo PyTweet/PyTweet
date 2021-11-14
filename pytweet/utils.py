@@ -6,6 +6,7 @@ from dateutil import parser
 
 def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
     """:class:`datetime.datetime`: Parse time return from twitter to datetime object!
+
     .. versionadded: 1.1.3
     """
     date = str(parser.parse(date))

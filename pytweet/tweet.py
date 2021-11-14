@@ -177,9 +177,6 @@ class Tweet(Message):
 
 
     .. versionadded:: 1.0.0
-
-    .. versionchanged:: 1.2.0
-        Inherite :class:`Message`. The text and ID property is now provided by :class:`Message`,
     """
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:

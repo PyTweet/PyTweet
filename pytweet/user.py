@@ -10,6 +10,7 @@ from .utils import time_parse_todt
 
 if TYPE_CHECKING:
     from .http import HTTPClient
+    from .message import DirectMessage
 
 
 class User:
@@ -52,8 +53,8 @@ class User:
             raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
-    def send(self, text: str = None, *, quick_reply: QuickReply = None, cta: CTA = None):
-        """:class:`DirectMessage`: Send a message to the user.
+    def send(self, text: str, *, quick_reply: QuickReply = None, cta: CTA = None) -> DirectMessage:
+        """Send a message to the user.
 
         Parameters
         ------------
@@ -69,6 +70,7 @@ class User:
         :class:`DirectMessage`
             This method return a :class:`DirectMessage` object.
 
+
         .. versionadded:: 1.1.0
         """
         return self.http_client.send_message(
@@ -82,12 +84,16 @@ class User:
     def follow(self) -> RelationFollow:
         """Make a Request to follow a User.
 
-        Parameters:
-        -----------
-        user_id: Union[str, int]
+        Parameters
+        ------------
+        user_id: Union[:class:`str`, :class:`int`]
             The user's id that you wish to follow.
 
-        This function return a :class: `RelationFollow` object.
+        Returns
+        ---------
+        :class:`RelationFollow`
+            This method return a :class:`RelationFollow` object.
+
 
         .. versionadded:: 1.1.0
         """
@@ -106,10 +112,14 @@ class User:
 
         Parameters
         ------------
-        user_id: Union[str, int]
+        user_id: Union[:class:`str`, :class:`int`]
             The user's id that you wish to unfollow.
 
-        This function return a :class:`RelationFollow` object.
+        Returns
+        ---------
+        :class:`RelationFollow`
+            This method return a :class:`RelationFollow` object.
+
 
         .. versionadded:: 1.1.0
         """
@@ -120,10 +130,11 @@ class User:
     def block(self) -> None:
         """Make a POST Request to Block a User.
 
-        Parameters:
-        -----------
-        user_id: Union[str, int]
+        Parameters
+        ------------
+        user_id: Union[:class:`str`, :class:`int`]
             The user's id that you wish to block.
+
 
         .. versionadded:: 1.2.0
         """
@@ -139,9 +150,9 @@ class User:
     def unblock(self) -> None:
         """Make a DELETE Request to unblock a User.
 
-        Parameters:
-        -----------
-        user_id: Union[str, int]
+        Parameters
+        ------------
+        user_id: Union[:class:`str`, :class:`int`]
             The user's id that you wish to unblock.
 
 
@@ -155,8 +166,9 @@ class User:
 
         Parameters
         ------------
-        user_id: Union[str, int]
+        user_id: Union[:class:`str`, :class:`int`]
             The user's id that you wish to mute.
+
 
         .. versionadded:: 1.2.5
         """
@@ -174,8 +186,9 @@ class User:
 
         Parameters
         ------------
-        user_id: Union[str, int]
-        The user's id that you wish to unmute.
+        user_id: Union[:class:`str`, :class:`int`]
+            The user's id that you wish to unmute.
+
 
         .. versionadded:: 1.2.5
         """
@@ -183,7 +196,10 @@ class User:
         self.http_client.request("DELETE", "2", f"/users/{my_id}/muting/{self.id}", auth=True)
 
     def typing(self):
-        """Indicates that the client is typing in a user Dm."""
+        """Indicates that the client is typing in a user Dm.
+
+        .. versionadded:: 1.3.5
+        """
         self.http_client.request(
             "POST",
             "1.1",

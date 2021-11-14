@@ -210,7 +210,7 @@ class Poll:
         self,
         id: Optional[int] = None,
         voting_status: Optional[str] = None,
-        duration: Optional[Union[str, int]] = None,
+        duration: Optional[Union[str, int]] = 20,
         end_date: Optional[Union[str, int]] = None,
     ):
         self._id = id
@@ -469,7 +469,6 @@ class CTA:
         self._buttons = []
         self._raw_buttons = []
 
-    @staticmethod
     def add_button(self, label: str, url: str, style: ButtonStyle = ButtonStyle.web_url) -> CTA:
         """Add a button in your CTA instance.
 
