@@ -30,45 +30,68 @@ Client
 
 
 Commonly used Classes 
--------
+---------------------
 
 There a lot of commonly used classes that is used frequently when using PyTweet, and here they are.
+
+User
+-------
 
 .. attributetable:: User
 
 .. autoclass:: User
     :members:
 
+UserPublicMetrics
+-------
+
 .. attributetable:: UserPublicMetrics
 
 .. autoclass:: UserPublicMetrics
     :members:
+
+Tweet
+-------
 
 .. attributetable:: Tweet
 
 .. autoclass:: Tweet
     :members:
 
-.. attributetable:: TweetPublicMetrics
+TweetPublicMetrics
+-------
 
+.. attributetable:: TweetPublicMetrics
 
 .. autoclass:: TweetPublicMetrics
     :members:
+
+Message
+-------
 
 .. attributetable:: Message
 
 .. autoclass:: Message
     :members:
 
+DirectMessage
+-------
+
 .. attributetable:: DirectMessage
 
 .. autoclass:: DirectMessage
     :members:
 
+Media
+-------
+
 .. attributetable:: Media
 
 .. autoclass:: Media
     :members:
+
+Poll
+-------
 
 .. attributetable:: Poll
 
@@ -80,35 +103,50 @@ There a lot of commonly used classes that is used frequently when using PyTweet,
 .. autoclass:: PollOptions
     :members:
 
+PollOptions
+-------
+
 .. attributetable:: RelationFollow
 
 .. autoclass:: RelationFollow
     :members:
+
+RelationLike
+-------
 
 .. attributetable:: RelationLike
 
 .. autoclass:: RelationLike
     :members:
 
+RelationReTweet
+-------
+
 .. attributetable:: RelationRetweet
 
 .. autoclass:: RelationRetweet
     :members:
+
+Embed
+-------
 
 .. attributetable:: Embed
 
 .. autoclass:: Embed
     :members:
 
-.. attributetable:: EmbedsImages
 
+EmbedsImages
+-------
+
+.. attributetable:: EmbedsImages
 
 .. autoclass:: EmbedsImages
     :members:
 
 
 Errors
--------
+--------------------------
 
 Error raised by pytweet.
 
