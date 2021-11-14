@@ -66,8 +66,7 @@ class Client:
             return None
 
         my_id = self.http.access_token.partition("-")[0]
-        me = self.fetch_user(my_id)
-        return me
+        return self.fetch_user(my_id)
 
     def fetch_user(self, user_id: Union[str, int] = None) -> User:
         """:class:`User`: A function for HTTPClient.fetch_user().
@@ -320,8 +319,7 @@ class Client:
 
         .. versionadded:: 1.3.5
         """
-        space = self.http.fetch_space(space_id)
-        return space
+        return self.http.fetch_space(space_id)
 
     def fetch_space_by_title(self, title: str, state: SpaceState = SpaceState.live) -> Space:
         """Fetch a space using its title.
