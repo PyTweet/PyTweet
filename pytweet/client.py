@@ -165,7 +165,7 @@ class Client:
         exclude_reply_users: Optional[List[Union[str, int]]] = None,
         super_followers_only: bool = False,
     ) -> Message:
-        """:class:`Tweet`: Post a tweet directly to twitter from the given parameters.
+        """Post a tweet directly to twitter from the given parameters.
 
         Parameters
         ------------
@@ -178,9 +178,9 @@ class Client:
         quote_tweet: Optional[Union[:class:`str`, :class:`int`]]
             The tweet id you want to quote.
         direct_message_deep_link: Optional[:class:`str`]
-            The direct message deep link, It will showup as a CTA(call-to-action) with button attachment. Example of direct message deep link: 
+            The direct message deep link, It will showup as a CTA(call-to-action) with button attachment. Example of direct message deep link:
         reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
-            The reply setting, you can set it to: ReplySetting.everyone indicates everyone can reply to your tweet, ReplySetting.mention_users indicates only the mentioned users in the tweet can reply, and ReplySetting.following indicates only the client's followers can reply.
+            The reply setting that you can set to minimize users that can reply. If None specified, the defauly 'everyone' can reply.
         reply_to_tweet: Optional[Union[:class:`str`, :class:`int`]]
             The tweet id you want to reply. If you have an instance of :class:`Tweet`, you can use the reply() method rather then using this method.
         exclude_reply_users: Optional[List[Union[:class:`str`, :class:`int`]]]
@@ -190,7 +190,7 @@ class Client:
 
         Returns
         ---------
-        :class:`Tweet`
+        :class:`Message`
             This method returns a :class:`Message` object.
 
 
@@ -200,7 +200,7 @@ class Client:
             text,
             poll=poll,
             geo=geo,
-            quote_tweet_id=quote_tweet,
+            quote_tweet=quote_tweet,
             direct_message_deep_link=direct_message_deep_link,
             reply_setting=reply_setting,
             reply_to_tweet=reply_to_tweet,
@@ -452,7 +452,7 @@ class Client:
         :class:`Geo`
             This method return a :class:`Geo` object.
 
-        
+
         .. versionadded:: 1.5.3
         """
 

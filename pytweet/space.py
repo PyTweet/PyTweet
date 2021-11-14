@@ -19,7 +19,7 @@ class Space:
     @property
     def title(self) -> str:
         """:class:`str`: The space's title.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("title")
@@ -27,7 +27,7 @@ class Space:
     @property
     def state(self) -> str:
         """:class:`str`: The space's state.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("state")
@@ -35,7 +35,7 @@ class Space:
     @property
     def state_type(self) -> str:
         """:class:`SpaceState`: The type of the space's state.
-        
+
         .. versionadded:: 1.3.5
         """
         return SpaceState(self.state)
@@ -43,7 +43,7 @@ class Space:
     @property
     def id(self) -> str:
         """:class:`str`: The space's unique id.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("id")
@@ -51,7 +51,7 @@ class Space:
     @property
     def lang(self) -> str:
         """:class:`str`: The space's language.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("lang")
@@ -59,7 +59,7 @@ class Space:
     @property
     def creator_id(self) -> int:
         """:class:`str`: Returns the creator's id.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("creator_id")
@@ -67,7 +67,7 @@ class Space:
     @property
     def created_at(self) -> datetime.datetime:
         """:class:`datetime.datetime`: Returns a datetime.datetime object with the space's created datetime.
-        
+
         .. versionadded:: 1.3.5
         """
         return time_parse_todt(self._payload.get("created_at"))
@@ -75,7 +75,7 @@ class Space:
     @property
     def hosts(self) -> Optional[List[int]]:
         """Optional[List[:class:`int`]]: Returns a list of the hosts id.
-        
+
         .. versionadded:: 1.3.5
         """
         if self._payload.get("host_ids"):
@@ -85,7 +85,7 @@ class Space:
     @property
     def invited_users(self) -> Optional[List[int]]:
         """Optional[List[:class:`int`]]: Returns the a list of users id. Usually, users in this list are invited to speak via the Invite user option and have a Speaker role when the Space starts.Returns None if there isn't invited users.
-        
+
         .. versionadded:: 1.3.5
         """
         if self._payload.get("invited_users"):
@@ -95,7 +95,7 @@ class Space:
     @property
     def started_at(self) -> datetime.datetime:
         """:class:`datetime.datetime`: Returns a datetime.datetime object with the space's started time. Only available if the space has started.
-        
+
         .. versionadded:: 1.3.5
         """
         return time_parse_todt(self._payload.get("started_at"))
@@ -103,7 +103,7 @@ class Space:
     @property
     def updated_at(self) -> datetime.datetime:
         """:class:`datetime.datetime`: Returns a datetime.datetime object with the space's last update to any of this Space's metadata, such as the title or scheduled time. Only available if the space has started.
-        
+
         .. versionadded:: 1.3.5
         """
         return time_parse_todt(self._payload.get("started_at"))
@@ -115,7 +115,7 @@ class Space:
         ---------
         :class:`bool`
             This method returns a bool object.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("is_ticketed")
