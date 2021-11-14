@@ -3,7 +3,7 @@ from typing import List, Optional, Union
 from .attachments import Geo, Poll, QuickReply
 from .enums import ReplySetting, SpaceState
 from .http import HTTPClient
-from .message import DirectMessage, WelcomeMessage, WelcomeMessageRule
+from .message import DirectMessage, WelcomeMessage, WelcomeMessageRule, Message
 from .space import Space
 from .tweet import Tweet
 from .user import User
@@ -69,7 +69,7 @@ class Client:
         return self.fetch_user(my_id)
 
     def fetch_user(self, user_id: Union[str, int] = None) -> User:
-        """:class:`User`: A function for HTTPClient.fetch_user().
+        """A method for fetching user with the user's id.
 
         .. warning::
             This method uses api call and might cause ratelimit if used often!
@@ -84,12 +84,13 @@ class Client:
         :class:`User`
             This method returns a :class:`User` object.
 
+
         .. versionadded:: 1.0.0
         """
         return self.http.fetch_user(user_id, http_client=self.http)
 
     def fetch_user_by_username(self, username: str) -> User:
-        """:class:`User`: A function for HTTPClient.fetch_user_byusername().
+        """A method for fetching user with the user's username.
 
         .. warning::
             This method uses api call and might cause ratelimit if used often!
@@ -110,15 +111,15 @@ class Client:
         return self.http.fetch_user_byusername(username, http_client=self.http)
 
     def fetch_tweet(self, tweet_id: Union[str, int] = None) -> Tweet:
-        """:class:`Tweet`: A function for HTTPClient.fetch_tweet().
+        """A method for fetching tweet with the tweet's id.
 
         .. warning::
-        This method uses api call and might cause ratelimit if used often! More recommended to use get_tweet to get the client's tweet.
+            This method uses api call and might cause ratelimit if used often! More recommended to use get_tweet to get the client's tweet.
 
         Parameters
         ------------
         tweet_id: Union[:class:`str`, :class:`int`]
-        Represent the tweet id that you wish to get info to.
+            Represent the tweet id that you wish to get info to.
 
         Returns
         ---------
@@ -131,7 +132,7 @@ class Client:
         return self.http.fetch_tweet(tweet_id, http_client=self.http)
 
     def fetch_message(self, event_id: Union[str, int] = None) -> DirectMessage:
-        """:class:`DirectMessage`: A function for HTTPClient.fetch_message().
+        """A method for fetching message with the message's event id.
 
         .. warning::
             This method uses api call and might cause ratelimit if used often! Recommended to use `get_message()` method, it only retrieves the client's message only.
@@ -139,12 +140,13 @@ class Client:
         Parameters
         ------------
         event_id: Union[:class:`str`, :class:`int`]
-            Represent the tweet id that you wish to fetch.
+            Represent the event's id that you wish to fetch with.
 
         Returns
         ---------
         :class:`DirectMessage`
             This method returns a :class:`DirectMessage` object.
+
 
         .. versionadded:: 1.2.0
         """
@@ -162,7 +164,7 @@ class Client:
         reply_to_tweet: Optional[Union[str, int]] = None,
         exclude_reply_users: Optional[List[Union[str, int]]] = None,
         super_followers_only: bool = False,
-    ) -> Tweet:
+    ) -> Message:
         """:class:`Tweet`: Post a tweet directly to twitter from the given parameters.
 
         Parameters
@@ -180,16 +182,16 @@ class Client:
         reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
             The reply setting, you can set it to: ReplySetting.everyone indicates everyone can reply to your tweet, ReplySetting.mention_users indicates only the mentioned users in the tweet can reply, and ReplySetting.following indicates only the client's followers can reply.
         reply_to_tweet: Optional[Union[:class:`str`, :class:`int`]]
-            The tweet id you want to reply. If have a :class:`Tweet` instance, you can use the reply() method rather then using this method.
+            The tweet id you want to reply. If you have an instance of :class:`Tweet`, you can use the reply() method rather then using this method.
         exclude_reply_users: Optional[List[Union[:class:`str`, :class:`int`]]]
             Exclude the users when replying to a tweet, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you dont want to mention.
         super_followers_only: :class:`bool`
-            Allows you to Tweet exclusively for Super Followers.
+            Allows you to Tweet exclusively for super followers.
 
         Returns
         ---------
         :class:`Tweet`
-            This method returns a :class:`Tweet` object.
+            This method returns a :class:`Message` object.
 
 
         .. versionadded:: 1.1.0
@@ -211,7 +213,7 @@ class Client:
     def create_welcome_message(
         self, name: str = None, text: str = None, *, quick_reply: QuickReply = None
     ) -> WelcomeMessage:
-        """create a welcome message.
+        """Create a welcome message which you can set with :class:`WelcomeMessage.set_rule()`.
 
         Parameters
         ------------
@@ -270,7 +272,7 @@ class Client:
         Parameters
         ------------
         welcome_message_id: Union[:class:`str`, :class:`int`]
-            The welcome message id you want to fetch.
+            Represent the welcome message id that you wish to fetch with.
 
         Returns
         ---------
@@ -295,12 +297,12 @@ class Client:
         return WelcomeMessage(text=text, welcome_message_id=id, timestamp=timestamp, http_client=self.http)
 
     def fetch_welcome_message_rules(self, welcome_message_rules_id: Union[str, int]) -> WelcomeMessageRule:
-        """Fetch the welcome message rules with the given welcome message rules id argument.
+        """A method for fetching a welcome message rules.
 
         Parameters
         ------------
         welcome_message_rules_id: Union[:class:`str`, :class:`int`]
-            The welcome message rules id you want to delete.
+            Represent the welcome message rule id that you wish to fetch with.
 
         Returns
         ---------
@@ -324,12 +326,12 @@ class Client:
         return WelcomeMessageRule(id, welcome_message_id, timestamp, http_client=self)
 
     def fetch_space(self, space_id: Union[str, int]) -> Space:
-        """Fetch a space using the space_id parameter
+        """A method for fetching a space.
 
         Parameters
         ------------
         space_id: Union[:class:`str`, :class:`int`]
-            The space id that you are going to use to fetch a Space.
+            Represent the space id that you wish to fetch with.
 
         Returns
         ---------
@@ -356,6 +358,7 @@ class Client:
         :class:`Space`
             This method returns a :class:`Space` object.
 
+
         .. versionadded:: 1.3.5
         """
         Space = self.http.fetch_space_bytitle(title, state)
@@ -365,7 +368,7 @@ class Client:
         """Get a direct message through the client message cache. Return None if the message is not in the cache.
 
         .. note::
-            Note that, only the client's message stored in the cache!
+            Note that, only the client's tweet is going to be stored in the cache which mean you cant get someone's message other then the client itself from the cache.
 
         Parameters
         ------------
@@ -388,10 +391,10 @@ class Client:
         return self.http.message_cache.get(event_id)
 
     def get_tweet(self, tweet_id: Union[str, int] = None) -> Optional[Tweet]:
-        """Optional[:class:`Tweet`]: Get a tweet through the client tweet cache. Return None if the tweet is not in the cache.
+        """Get a tweet through the client internal tweet cache. Return None if the tweet is not in the cache.
 
         .. note::
-            Note that, only the client's tweet is going to be stored.
+            Note that, only the client's tweet is going to be stored in the cache which mean you cant get someone's tweet other then the client itself from the cache.
 
         Parameters
         ------------
@@ -427,7 +430,7 @@ class Client:
         granularity: str = "neighborhood",
         max_results: Optional[Union[str, int]] = None,
     ) -> Geo:
-        """:class:`Geo`: Get a location information from the given parameters.
+        """Search a location with the given arguments.
 
         Parameters
         ------------
@@ -441,13 +444,16 @@ class Client:
             An IP address. Used when attempting to fix geolocation based off of the user's IP address.
         granularity: :class:`str`
             This is the minimal granularity of place types to return and must be one of: neighborhood , city , admin or country. If no granularity is provided for the request neighborhood is assumed. Setting this to city, for example, will find places which have a type of city, admin or country
-        max_results:
+        max_results: Optional[Union[:class:`str`, :class:`int`]]
             A hint as to the number of results to return. This does not guarantee that the number of results returned will equal max_results, but instead informs how many "nearby" results to return. Ideally, only pass in the number of places you intend to display to the user here
 
         Returns
         ---------
         :class:`Geo`
-            This method return a :class:`Geo` objects.
+            This method return a :class:`Geo` object.
+
+        
+        .. versionadded:: 1.5.3
         """
 
         if query:
