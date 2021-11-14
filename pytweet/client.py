@@ -58,15 +58,21 @@ class Client:
 
     @property
     def account(self) -> Optional[User]:
-        """:class:`User`: Returns the client's account information, This returns in a user object.
+        """:class:`Optional[User]`: Returns the client's account information, This returns in a user object.
 
         .. versionadded:: 1.2.0
         """
+        attr = getattr(self, "_account_user", None)
+        if not attr:
+            self._get_account_user()
+            return self._account_user
+        return attr
+
+    def _get_account_user(self) -> None:
         if not self.http.access_token:
             return None
 
-        my_id = self.http.access_token.partition("-")[0]
-        return self.fetch_user(my_id)
+        self._account_user = self.fetch_user(self.http.access_token.partition("-")[0])
 
     def fetch_user(self, user_id: Union[str, int] = None) -> User:
         """A method for fetching user with the user's id.
