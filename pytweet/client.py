@@ -64,11 +64,11 @@ class Client:
         """
         attr = getattr(self, "_account_user", None)
         if not attr:
-            self._get_account_user()
-            return self._account_user
+            self._set_account_user()
+            return getattr(self, "_account_user", None)
         return attr
 
-    def _get_account_user(self) -> None:
+    def _set_account_user(self) -> None:
         if not self.http.access_token:
             return None
 
