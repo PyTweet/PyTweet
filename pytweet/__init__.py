@@ -43,3 +43,5 @@ class VersionInfo(NamedTuple):
 version_info: VersionInfo = VersionInfo(major=1, minor=3, micro=5, releaselevel="alpha", serial=2)
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
+
+assert version_info.releaselevel in ("alpha", "beta", "candidate", "final")
