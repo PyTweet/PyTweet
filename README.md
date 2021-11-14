@@ -8,9 +8,9 @@
 
 <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/PyTweet">
 
-<img src="https://img.shields.io/github/commit-activity/m/TheFarGG/PyTweet?color=turquoise&logo=github&logoColor=black">
+<img src="https://img.shields.io/github/commit-activity/m/PyTweet/PyTweet?color=turquoise&logo=github&logoColor=black">
 
-<img src="https://img.shields.io/github/issues-pr/TheFarGG/PyTweet?color=yellow&label=Pull%20Requests&logo=github&logoColor=black">
+<img src="https://img.shields.io/github/issues-pr/PyTweet/PyTweet?color=yellow&label=Pull%20Requests&logo=github&logoColor=black">
 
 <img src="https://img.shields.io/discord/858312394236624957?color=blue&label=PyTweet&logo=discord">
 
@@ -66,12 +66,12 @@ You can check in `examples` directory for more example code.
 
 - [Support Server](https://discord.gg/XHBhg6A4jJ)
 
-- [github](https://github.com/TheFarGG/PyTweet) 
+- [github](https://github.com/PyTweet/PyTweet)
 
-- [Pypi](https://pypi.org/project/PyTweet) 
+- [Pypi](https://pypi.org/project/PyTweet)
 
 # Contribute
-You can Contribute or open an issue regarding this wrapper in [github](https://github.com/TheFarGG/PyTweet)! 
+You can Contribute or open an issue regarding this wrapper in [github](https://github.com/PyTweet/PyTweet)! 
 
 # Licence & Copyright
 All files of this repo are protected by the [MIT](https://opensource.org/licenses/MIT) license given below.
