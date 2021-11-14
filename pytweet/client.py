@@ -156,7 +156,7 @@ class Client:
         *,
         poll: Optional[Poll] = None,
         geo: Optional[Union[Geo, str]] = None,
-        quote_tweet_id: Optional[Union[str, int]] = None,
+        quote_tweet: Optional[Union[str, int]] = None,
         direct_message_deep_link: Optional[str] = None,
         reply_setting: Optional[Union[ReplySetting, str]] = None,
         reply_to_tweet: Optional[Union[str, int]] = None,
@@ -173,10 +173,10 @@ class Client:
             The poll attachment.
         geo: Optional[Union[:class:`Geo`, :class:`str`]]
             The geo attachment, you can put an object that is an instance of :class:`Geo` or the place id in a string.
-        quote_tweet_id: Optional[Union[:class:`str`, :class:`int`]]
+        quote_tweet: Optional[Union[:class:`str`, :class:`int`]]
             The tweet id you want to quote.
         direct_message_deep_link: Optional[:class:`str`]
-            The direct message deep link, It will showup as a CTA(call-to-action) with button attachment.
+            The direct message deep link, It will showup as a CTA(call-to-action) with button attachment. Example of direct message deep link: 
         reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
             The reply setting, you can set it to: ReplySetting.everyone indicates everyone can reply to your tweet, ReplySetting.mention_users indicates only the mentioned users in the tweet can reply, and ReplySetting.following indicates only the client's followers can reply.
         reply_to_tweet: Optional[Union[:class:`str`, :class:`int`]]
@@ -198,7 +198,7 @@ class Client:
             text,
             poll=poll,
             geo=geo,
-            quote_tweet_id=quote_tweet_id,
+            quote_tweet_id=quote_tweet,
             direct_message_deep_link=direct_message_deep_link,
             reply_setting=reply_setting,
             reply_to_tweet=reply_to_tweet,

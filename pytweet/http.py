@@ -563,7 +563,7 @@ class HTTPClient:
         *,
         poll: Optional[Poll] = None,
         geo: Optional[Union[Geo, str]] = None,
-        quote_tweet_id: Optional[Union[str, int]] = None,
+        quote_tweet: Optional[Union[str, int]] = None,
         direct_message_deep_link: Optional[str] = None,
         reply_setting: Optional[str] = None,
         reply_to_tweet: Optional[Union[str, int]] = None,
@@ -584,7 +584,7 @@ class HTTPClient:
             The poll attachment.
         geo: Optional[Union[:class:`Geo`, :class:`str`]]
             The geo attachment, you can put an object that is an instance of :class:`Geo` or the place id in a string.
-        quote_tweet_id: Optional[Union[:class:`str`, :class:`int`]]
+        quote_tweet: Optional[Union[:class:`str`, :class:`int`]]
             The tweet id you want to quote.
         direct_message_deep_link: Optional[:class:`str`]
             The direct message deep link, It will showup as a CTA(call-to-action) with button attachment.
@@ -615,8 +615,8 @@ class HTTPClient:
             payload["geo"] = {}
             payload["geo"]["place_id"] = geo.id if isinstance(geo, Geo) else geo
 
-        if quote_tweet_id:
-            payload["quote_tweet_id"] = str(quote_tweet_id)
+        if quote_tweet:
+            payload["quote_tweet_id"] = str(quote_tweet)
 
         if direct_message_deep_link:
             payload["direct_message_deep_link"] = direct_message_deep_link
