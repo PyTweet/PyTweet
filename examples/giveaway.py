@@ -22,7 +22,7 @@ client = pytweet.Client(
 
 
 def giveaway():
-    user = client.fetch_user_by_username("TheGenocides") #1
+    user = client.fetch_user_by_name("TheGenocides") #1
     followers = user.followers #2
     if len(followers) == 0:
         return print("This user doesnt have a followers!")
