@@ -368,7 +368,7 @@ class Client:
         """Get a direct message through the client message cache. Return None if the message is not in the cache.
 
         .. note::
-            Note that, only the client's tweet is going to be stored in the cache which mean you cant get someone's message other then the client itself from the cache.
+            Note that, only the client's tweet is going to be stored in the cache which mean you can't get someone's message other then the client itself from the cache.
 
         Parameters
         ------------
@@ -394,7 +394,7 @@ class Client:
         """Get a tweet through the client internal tweet cache. Return None if the tweet is not in the cache.
 
         .. note::
-            Note that, only the client's tweet is going to be stored in the cache which mean you cant get someone's tweet other then the client itself from the cache.
+            Note that, only the client's tweet is going to be stored in the cache which mean you can't get someone's tweet other then the client itself from the cache.
 
         Parameters
         ------------
