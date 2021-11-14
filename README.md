@@ -4,13 +4,13 @@
 
 <img src="https://img.shields.io/badge/code%20style-black-000000.svg">  
 
-<img alt="PyPI - License" src="https://img.shields.io/pypi/l/PyTweet"> 
+<img alt="PyPI - License" src="https://img.shields.io/pypi/l/PyTweet">
 
 <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/PyTweet">
 
-<img src="https://img.shields.io/github/commit-activity/m/TheFarGG/PyTweet?color=turquoise&logo=github&logoColor=black">
+<img src="https://img.shields.io/github/commit-activity/m/PyTweet/PyTweet?color=turquoise&logo=github&logoColor=black">
 
-<img src="https://img.shields.io/github/issues-pr/TheFarGG/PyTweet?color=yellow&label=Pull%20Requests&logo=github&logoColor=black">
+<img src="https://img.shields.io/github/issues-pr/PyTweet/PyTweet?color=yellow&label=Pull%20Requests&logo=github&logoColor=black">
 
 <img src="https://img.shields.io/discord/858312394236624957?color=blue&label=PyTweet&logo=discord">
 
@@ -24,10 +24,13 @@
 ## Installation
 
 ### Windows
+
 ```bash
 py3 -m pip install PyTweet
 ```
+
 ### Linux/MacOS
+
 ```bash
 python3 -m pip install PyTweet
 ```
@@ -35,6 +38,7 @@ python3 -m pip install PyTweet
 ## Usage
 
 #### First we create our client instance using pytweet.Client()
+
 ```py
 import pytweet
 
@@ -47,7 +51,8 @@ client = pytweet.Client(
 ) #if you dont have one make an application in https://apps.twitter.com
 ```
 
-#### After that we use functions to get info from twitter api.
+#### After that we use functions to get info from twitter api
+
 ```py
 user = client.get_user_by_username("TheGenocides")
 print(user.name, user.username, user.id)
@@ -66,14 +71,16 @@ You can check in `examples` directory for more example code.
 
 - [Support Server](https://discord.gg/XHBhg6A4jJ)
 
-- [github](https://github.com/TheFarGG/PyTweet) 
+- [github](https://github.com/PyTweet/PyTweet)
 
-- [Pypi](https://pypi.org/project/PyTweet) 
+- [Pypi](https://pypi.org/project/PyTweet)
 
 # Contribute
-You can Contribute or open an issue regarding this wrapper in [github](https://github.com/TheFarGG/PyTweet)! 
+
+You can Contribute or open an issue regarding this wrapper in [github](https://github.com/PyTweet/PyTweet)!
 
 # Licence & Copyright
+
 All files of this repo are protected by the [MIT](https://opensource.org/licenses/MIT) license given below.
 
 ```
