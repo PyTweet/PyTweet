@@ -174,7 +174,7 @@ class HTTPClient:
             Raise when the api return code: 403. There's a lot of reason why, This usually happen when the client cannot do the request due to twitter's limitation e.g trying to follow someone that you blocked etc.
         pytweet.errors.TooManyRequests:
             Raise when the api return code: 429. This happen when you made too much request thus the api ratelimit you. The ratelimit will ware off in a couple of minutes.
-        json.decoder.JSONDecoderError:
+        json.decoder.JSONDecodeError:
             Raise when a request doesn't support a json format. Usually request like :class:`User.typing()`
 
         .. versionadded:: 1.0.0
@@ -419,6 +419,11 @@ class HTTPClient:
         space_id: Union[:class:`str`, :class:`int`]
             The space id that you are going to fetch.
 
+        Returns
+        ---------
+        :class:`Space`
+            This method returns a :class:`Space` object.
+
 
         .. versionadded:: 1.3.5
         """
@@ -441,6 +446,11 @@ class HTTPClient:
             The space title that you are going use for fetching the space.
         state: :class:`SpaceState`
             The type of state the space has. There's only 2 type: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host.
+
+        Returns
+        ---------
+        :class:`Space`
+            This method returns a :class:`Space` object.
 
         .. versionadded:: 1.3.5
         """
@@ -566,7 +576,7 @@ class HTTPClient:
         quote_tweet: Optional[Union[str, int]] = None,
         direct_message_deep_link: Optional[str] = None,
         reply_setting: Optional[str] = None,
-        reply_to_tweet: Optional[Union[str, int]] = None,
+        reply_tweet: Optional[Union[str, int]] = None,
         exclude_reply_users: Optional[List[Union[str, int]]] = None,
         super_followers_only: Optional[bool] = None,
         http_client: Optional[HTTPClient] = None,
@@ -590,7 +600,7 @@ class HTTPClient:
             The direct message deep link, It will showup as a CTA(call-to-action) with button attachment.
         reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
             The reply setting, you can set it to: ReplySetting.everyone indicates everyone can reply to your tweet, ReplySetting.mention_users indicates only the mentioned users in the tweet can reply, and ReplySetting.following indicates only the client's followers can reply.
-        reply_to_tweet: Optional[Union[:class:`str`, :class:`int`]]
+        reply_tweet: Optional[Union[:class:`str`, :class:`int`]]
             The tweet id you want to reply. If have a :class:`Tweet` instance, you can use the reply() method rather then using this method.
         exclude_reply_users: Optional[List[Union[:class:`str`, :class:`int`]]]
             Exclude the users when replying to a tweet, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you dont want to mention.
@@ -626,10 +636,10 @@ class HTTPClient:
                 reply_setting.value if isinstance(reply_setting, ReplySetting) else reply_setting
             )
 
-        if reply_to_tweet or exclude_reply_users:
-            if reply_to_tweet:
+        if reply_tweet or exclude_reply_users:
+            if reply_tweet:
                 payload["reply"] = {}
-                payload["reply"]["in_reply_to_tweet_id"] = str(reply_to_tweet)
+                payload["reply"]["in_reply_to_tweet_id"] = str(reply_tweet)
 
             if exclude_reply_users:
                 if "reply" in payload.keys():

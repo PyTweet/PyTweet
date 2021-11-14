@@ -167,7 +167,7 @@ class Client:
         quote_tweet: Optional[Union[str, int]] = None,
         direct_message_deep_link: Optional[str] = None,
         reply_setting: Optional[Union[ReplySetting, str]] = None,
-        reply_to_tweet: Optional[Union[str, int]] = None,
+        reply_tweet: Optional[Union[str, int]] = None,
         exclude_reply_users: Optional[List[Union[str, int]]] = None,
         super_followers_only: bool = False,
     ) -> Message:
@@ -187,7 +187,7 @@ class Client:
             The direct message deep link, It will showup as a CTA(call-to-action) with button attachment. Example of direct message deep link:
         reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
             The reply setting that you can set to minimize users that can reply. If None specified, the default 'everyone' can reply.
-        reply_to_tweet: Optional[Union[:class:`str`, :class:`int`]]
+        reply_tweet: Optional[Union[:class:`str`, :class:`int`]]
             The tweet id you want to reply. If you have an instance of :class:`Tweet`, you can use the reply() method rather then using this method.
         exclude_reply_users: Optional[List[Union[:class:`str`, :class:`int`]]]
             Exclude the users when replying to a tweet, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you dont want to mention.
@@ -209,7 +209,7 @@ class Client:
             quote_tweet=quote_tweet,
             direct_message_deep_link=direct_message_deep_link,
             reply_setting=reply_setting,
-            reply_to_tweet=reply_to_tweet,
+            reply_tweet=reply_tweet,
             exclude_reply_users=exclude_reply_users,
             super_followers_only=super_followers_only,
             http_client=self.http,
