@@ -24,7 +24,7 @@ def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
 
 def compose_tweet() -> str:
     """:class:`str`: Make a link that lets you compose a tweet
-    
+
     .. versionadded: 1.3.5
     """
     return "https://twitter.com/intent/tweet"

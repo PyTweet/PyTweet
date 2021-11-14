@@ -569,7 +569,7 @@ class HTTPClient:
         reply_to_tweet: Optional[Union[str, int]] = None,
         exclude_reply_users: Optional[List[Union[str, int]]] = None,
         super_followers_only: Optional[bool] = None,
-        http_client: Optional[HTTPClient] =None,
+        http_client: Optional[HTTPClient] = None,
     ) -> Union[NoReturn, Any]:
         """Make a POST Request to post a tweet through twitter with the given arguments.
 

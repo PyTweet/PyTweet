@@ -178,7 +178,7 @@ class Client:
         quote_tweet: Optional[Union[:class:`str`, :class:`int`]]
             The tweet id you want to quote.
         direct_message_deep_link: Optional[:class:`str`]
-            The direct message deep link, It will showup as a CTA(call-to-action) with button attachment. Example of direct message deep link: 
+            The direct message deep link, It will showup as a CTA(call-to-action) with button attachment. Example of direct message deep link:
         reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
             The reply setting, you can set it to: ReplySetting.everyone indicates everyone can reply to your tweet, ReplySetting.mention_users indicates only the mentioned users in the tweet can reply, and ReplySetting.following indicates only the client's followers can reply.
         reply_to_tweet: Optional[Union[:class:`str`, :class:`int`]]
@@ -452,7 +452,7 @@ class Client:
         :class:`Geo`
             This method return a :class:`Geo` object.
 
-        
+
         .. versionadded:: 1.5.3
         """
 

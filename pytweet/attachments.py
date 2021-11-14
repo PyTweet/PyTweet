@@ -461,9 +461,10 @@ class Button:
 
 
 class CTA:
-    """"Represent call-to-action attachment(CTA)
+    """ "Represent call-to-action attachment(CTA)
     You can use this in a post_tweet method via direct_message_deep_link kwarg or use it in direct message via CTA kwarg. CTA will perform and action whenever a user "call" it, an example of this is buttons.
     """
+
     def __init__(self):
         self._buttons = []
         self._raw_buttons = []
@@ -471,7 +472,7 @@ class CTA:
     @staticmethod
     def add_button(self, label: str, url: str, style: ButtonStyle = ButtonStyle.web_url) -> CTA:
         """Add a button in your CTA instance.
-        
+
         Parameters
         ------------
         label: str

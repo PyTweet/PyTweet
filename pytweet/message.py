@@ -323,7 +323,7 @@ class WelcomeMessageRule(Message):
     @property
     def created_at(self) -> datetime.datetime:
         """:class:`datetime.datetime`: Returns a datetime.datetime object with the WelcomeMessageRule created time.
-        
+
         .. versionadded:: 1.3.5
         """
         timestamp = str(self._timestamp)[:10]
@@ -332,7 +332,7 @@ class WelcomeMessageRule(Message):
     @property
     def welcome_message_id(self) -> Union[str, int]:
         """Union[:class:`str`, :class:`int`]: Returns the welcome message's id.
-        
+
         .. versionadded:: 1.3.5
         """
         return int(self._welcome_message_id)

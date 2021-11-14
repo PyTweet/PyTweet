@@ -499,9 +499,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.1.3
         """
-        if self._payload.get("entities") and self._payload.get("entities").get(
-            "urls"
-        ):
+        if self._payload.get("entities") and self._payload.get("entities").get("urls"):
             return [Embed(url) for url in self._payload.get("entities").get("urls")]
         return None
 
