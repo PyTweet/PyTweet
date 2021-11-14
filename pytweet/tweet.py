@@ -9,6 +9,7 @@ from .metrics import TweetPublicMetrics
 from .relations import RelationHide, RelationLike, RelationRetweet
 from .user import User
 from .utils import time_parse_todt
+from .enums import ReplySetting
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -394,12 +395,20 @@ class Tweet(Message):
         return self._payload.get("source")
 
     @property
-    def reply_setting(self) -> str:
-        """:class:`str`: Return the reply setting. If everyone can replied, reply_setting return 'Everyone'.
+    def raw_reply_setting(self) -> str:
+        """:class:`str`: Return the raw reply setting value. If everyone can replied, this method return 'Everyone'.
 
         .. versionadded: 1.0.0
         """
         return self._payload.get("reply_settings")
+
+    @property
+    def reply_setting(self) -> ReplySetting:
+        """:class:`ReplySetting`: Return a :class:`ReplySetting` object with the tweet's reply setting. If everyone can reply, this method return ReplySetting.everyone.
+
+        .. versionadded: 1.0.0
+        """
+        return ReplySetting(self._payload.get("reply_settings"))
 
     @property
     def lang(self) -> str:
