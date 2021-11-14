@@ -180,7 +180,7 @@ class Client:
         direct_message_deep_link: Optional[:class:`str`]
             The direct message deep link, It will showup as a CTA(call-to-action) with button attachment. Example of direct message deep link:
         reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
-            The reply setting that you can set to minimize users that can reply. If None specified, the defauly 'everyone' can reply.
+            The reply setting that you can set to minimize users that can reply. If None specified, the default 'everyone' can reply.
         reply_to_tweet: Optional[Union[:class:`str`, :class:`int`]]
             The tweet id you want to reply. If you have an instance of :class:`Tweet`, you can use the reply() method rather then using this method.
         exclude_reply_users: Optional[List[Union[:class:`str`, :class:`int`]]]
