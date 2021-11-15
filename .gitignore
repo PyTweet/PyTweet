@@ -14,3 +14,4 @@ dist/
 *.egg-info
 tests/
 *DS_Store
+images/
