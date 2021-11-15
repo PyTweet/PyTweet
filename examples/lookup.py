@@ -12,7 +12,7 @@ client = pytweet.Client(
 )  # if you dont have one make an application in https://apps.twitter.com
 
 
-user = client.fetch_user_by_username("TheGenocides")
+user = client.fetch_user_by_name("TheGenocides")
 print(user.name, user.username, user.id)
 # Returns The user's name, username, and id
 

@@ -83,7 +83,7 @@ class Client:
         Parameters
         ------------
         user_id: Union[:class:`str`, :class:`int`]
-            Represent the user id that you wish to get info to, If you dont have it you may use `fetch_user_by_username` because it only required the user's username.
+            Represent the user id that you wish to get info to, If you dont have it you may use `fetch_user_by_name` because it only required the user's username.
 
         Returns
         ---------
@@ -95,7 +95,7 @@ class Client:
         """
         return self.http.fetch_user(user_id, http_client=self.http)
 
-    def fetch_user_by_username(self, username: str) -> User:
+    def fetch_user_by_name(self, username: str) -> User:
         """A method for fetching user with the user's username.
 
         .. warning::
@@ -114,7 +114,7 @@ class Client:
 
         .. versionadded:: 1.0.0
         """
-        return self.http.fetch_user_byusername(username, http_client=self.http)
+        return self.http.fetch_user_byname(username, http_client=self.http)
 
     def fetch_tweet(self, tweet_id: Union[str, int] = None) -> Tweet:
         """A method for fetching tweet with the tweet's id.

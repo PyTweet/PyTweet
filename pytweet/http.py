@@ -218,7 +218,7 @@ class HTTPClient:
         Parameters
         ------------
         user_id: Union[str, int]
-            Represent the user id that you wish to get info to, If you dont have it you may use `fetch_user_byusername` because it only required the user's username.
+            Represent the user id that you wish to get info to, If you dont have it you may use `fetch_user_byname` because it only required the user's username.
         http_client:
             Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
 
@@ -286,7 +286,7 @@ class HTTPClient:
 
         return User(data, http_client=http_client)
 
-    def fetch_user_byusername(self, username: str, *, http_client: Optional[HTTPClient] = None) -> User:
+    def fetch_user_byname(self, username: str, *, http_client: Optional[HTTPClient] = None) -> User:
         """Make a Request to obtain the user from their username.
 
         Parameters
