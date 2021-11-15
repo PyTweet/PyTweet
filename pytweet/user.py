@@ -195,7 +195,7 @@ class User:
         my_id = self.http_client.access_token.partition("-")[0]
         self.http_client.request("DELETE", "2", f"/users/{my_id}/muting/{self.id}", auth=True)
 
-    def typing(self):
+    def trigger_typing(self):
         """Indicates that the client is typing in a user Dm.
 
         .. versionadded:: 1.3.5
