@@ -208,6 +208,23 @@ class User:
             auth=True,
         )
 
+    def report(self, block: bool = True):
+        """Report the user as a spam account to twitter.
+
+        Parameters
+        -----------
+        block:
+            Indicates that the client perform a block action to the user if set to True. Default to True.
+
+        .. versionadded:: 1.3.5
+        """
+        self.http_client.request(
+            "POST",
+            "1.1",
+            "/users/report_spam.json",
+            params={"user_id": str(self.id), "perform_block": block},
+        )
+
     @property
     def name(self) -> str:
         """:class:`str`: Return the user's name.

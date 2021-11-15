@@ -452,10 +452,7 @@ class Tweet(Message):
         .. versionadded:: 1.1.3
         """
         if self._includes and self._includes.get("mentions"):
-            return [
-                user
-                for user in self._includes.get("mentions")
-            ]
+            return [user for user in self._includes.get("mentions")]
         return None
 
     @property
