@@ -273,11 +273,10 @@ class Tweet(Message):
         return RelationRetweet(res)
 
     def delete(self) -> None:
-        """
+        """Make a DELETE Request to delete a tweet through the tweet_id.
+
         .. note::
             This function is almost complete! though you can still use and open an issue in github if it cause an error.
-
-        Make a DELETE Request to delete a tweet through the tweet_id.
 
         .. versionadded:: 1.2.0
         """
