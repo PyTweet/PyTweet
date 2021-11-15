@@ -123,8 +123,8 @@ class DirectMessage(Message):
         return MessageEventTypeEnum(self._payload.get("type", None))
 
     @property
-    def author(self) -> User:
-        """:class:`User`: Returns the author of the message in User object.
+    def recipient(self) -> User:
+        """:class:`User`: Returns the recipient that received the message.
 
         .. versionadded:: 1.2.0
         """
