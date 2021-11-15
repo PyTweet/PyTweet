@@ -157,7 +157,7 @@ class DirectMessage(Message):
 
     @property
     def mentions(self) -> Optional[List[UserMentions]]:
-        """List[:class:`UserMentions`]: Returns the messages usermetions.
+        """List[:class:`UserMentions`]: Returns the messages usermentions.
 
         .. versionadded:: 1.2.0
         """
