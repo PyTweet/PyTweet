@@ -446,14 +446,14 @@ class Tweet(Message):
         )
 
     @property
-    def mentions(self) -> Optional[List[User]]:
-        """Optional[List[:class:`User`]]: Return the mentioned users, if there isn't it return None.
+    def mentions(self) -> Optional[List[str]]:
+        """Optional[List[:class:`str`]]: Return the mentioned user's username.
 
         .. versionadded:: 1.1.3
         """
         if self._includes and self._includes.get("mentions"):
             return [
-                self.http_client.fetch_user_byusername(user.get("username"), http_client=self.http_client)
+                user
                 for user in self._includes.get("mentions")
             ]
         return None
