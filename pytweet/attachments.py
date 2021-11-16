@@ -456,7 +456,7 @@ class Geo:
 @dataclass
 class Button:
     label: str
-    type: ButtonType
+    type: Union[ButtonType, str]
     url: str
     tco_url: Optional[str] = None
 
@@ -470,7 +470,7 @@ class CTA:
         self._buttons = []
         self._raw_buttons = []
 
-    def add_button(self, *,label: str, url: str, type: ButtonType = ButtonType.web_url, tco_url: Optional[str] = None) -> CTA:
+    def add_button(self, *,label: str, url: str, type: Union[ButtonType, str] = ButtonType.web_url, tco_url: Optional[str] = None) -> CTA:
         """Add a button in your CTA instance.
 
         Parameters
@@ -489,9 +489,12 @@ class CTA:
         :class:`CTA`
             Returns your :class:`CTA` instance.
         """
-        self._raw_buttons.append({"type": type.value, "label": label, "url": url})
+        self._raw_buttons.append({"type": type.value if isinstance(type, ButtonType) else type, "label": label, "url": url})
+
         self._buttons.append(Button(label, type, url, tco_url))
         return self
+            
+
 
     @property
     def buttons(self) -> List[Button]:
