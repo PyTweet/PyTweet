@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from .attachments import QuickReply
+from .attachments import QuickReply, CTA
 from .entities import Hashtags, Symbols, Urls, UserMentions
 from .enums import MessageEventTypeEnum, MessageTypeEnum
 from .user import User
@@ -64,6 +64,8 @@ class DirectMessage(Message):
         self.message_create = self._payload.get("message_create", None)
         self.message_data = self.message_create.get("message_data", None)
         self.entities = self.message_data.get("entities", None)
+        self.quick_reply_data = self.message_data.get('quick_reply')
+        self.cta_data = self.message_data.get('ctas')
 
         super().__init__(self.message_data.get("text"), self._payload.get("id"), 0)
         self.http_client: Optional[HTTPClient] = kwargs.get("http_client", None)
@@ -99,7 +101,7 @@ class DirectMessage(Message):
             pass
 
     def mark_read(self):
-        """Mark the DirectMessage as read, it also mark other messages before the message was sent as read.
+        """Mark the DirectMessage as read, it also mark other messages before the DirectMessage was sent as read.
 
         .. versionadded:: 1.3.5
         """
@@ -171,6 +173,29 @@ class DirectMessage(Message):
         """
         return [Urls(data) for data in self.entities.get("urls")]
 
+    @property
+    def quick_reply(self) -> Optional[QuickReply]:
+        """Optional[:class:`QuickReply`]: Returns the quick reply attachment in a message, if none found it return None."""
+        if self.quick_reply_data and self.quick_reply_data.get("options"):
+            attachment=QuickReply(self.quick_reply_data.get("type"))
+            for option in self.quick_reply_data.get("options"):
+                attachment.add_option(**option)
+            return attachment
+        return None
+
+    @property
+    def cta(self) -> Optional[CTA]:
+        """Optional[:class:`CTA`]: Returns the message's cta."""
+        if self.cta_data:
+            attachment = CTA()
+            for button in self.cta_data:
+                attachment.add_button(**button)
+            return attachment
+        return None
+
+        
+
+#{'event': {'type': 'message_create', 'id': '1460461055352528902', 'created_timestamp': '1637036024307', 'message_create': {'target': {'recipient_id': '1382006704171196419', 'recipient': User(name=TheGenocide username=@TheGenocides id=1382006704171196419)}, 'sender_id': '1445987330582405122', 'message_data': {'text': 'hello there!', 'entities': {'hashtags': [], 'symbols': [], 'user_mentions': [], 'urls': []}, 'quick_reply': {'type': 'options', 'options': [{'label': 'Fruit', 'metadata': 'Fruit', 'description': 'healthy foods'}, {'label': 'Junk Food', 'metadata': 'Junk', 'description': 'unhealthy foods'}, {'label': 'Both', 'metadata': 'Both', 'description': 'Both'}]}, 'ctas': [{'type': 'web_url', 'label': 'Button1', 'url': 'https://www.google.co.id/', 'tco_url': 'https://t.co/urgEmeONrV'}, {'type': 'web_url', 'label': 'Button2', 'url': 'https://www.google.co.id/', 'tco_url': 'https://t.co/urgEmeONrV'}, {'type': 'web_url', 'label': 'Button3', 'url': 'https://www.google.co.id/', 'tco_url': 'https://t.co/urgEmeONrV'}]}}}}
 
 class WelcomeMessage(Message):
     """Represent a Welcome Message in a Direct Message.
