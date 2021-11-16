@@ -10,6 +10,21 @@ from .utils import time_parse_todt
 __all__ = ("Media", "PollOptions", "Poll", "QuickReply", "Geo", "CTA")
 
 
+@dataclass
+class Button:
+    label: str
+    type: Union[ButtonType, str]
+    url: str
+    tco_url: Optional[str] = None
+
+
+@dataclass
+class Option:
+    label: str
+    description: str
+    metadata: str
+
+
 class Media:
     """Represent a Media attachment in a tweet.
 
@@ -341,16 +356,14 @@ class QuickReply:
     ------------
     options: List[Any, Any]
         The QuickReply's options. An option must have a label, description and metadata, Maximum options is 20.
-    items: :class:`int`
-        Return how many options in your quick_reply object.
 
     .. versionadded:: 1.2.0
     """
 
     def __init__(self, type: str = "options"):
         self.type = type if type == "options" else "options"
-        self.options: List[Any, Any] = []
-        self.items: int = len(self.options)
+        self._options: List[Option] = []
+        self._raw_options: List[Dict] = []
 
     def add_option(
         self, *, label: str, description: Optional[str] = None, metadata: Optional[str] = None
@@ -375,9 +388,20 @@ class QuickReply:
         .. versionadded:: 1.2.0
         """
 
-        self.options.append({"label": label, "description": description, "metadata": metadata})
+        self._raw_options.append({"label": label, "description": description, "metadata": metadata})
+        self._options.append(Option(label=label, description=description, metadata=metadata))
 
         return self
+
+    @property
+    def raw_options(self) -> List[Dict]:
+        """List[Dict]: Returns the raw options."""
+        return self._raw_options
+
+    @property
+    def options(self) -> List[Option]:
+        """List[:class:`Option`]: Returns the pre-made Option object."""
+        return self._options
 
 
 class Geo:
@@ -453,14 +477,6 @@ class Geo:
         return None
 
 
-@dataclass
-class Button:
-    label: str
-    type: Union[ButtonType, str]
-    url: str
-    tco_url: Optional[str] = None
-
-
 class CTA:
     """ "Represent call-to-action attachment(CTA)
     You can use this in a post_tweet method via direct_message_deep_link kwarg or use it in direct message via CTA kwarg. CTA will perform and action whenever a user "call" it, an example of this is buttons.
@@ -470,7 +486,9 @@ class CTA:
         self._buttons = []
         self._raw_buttons = []
 
-    def add_button(self, *,label: str, url: str, type: Union[ButtonType, str] = ButtonType.web_url, tco_url: Optional[str] = None) -> CTA:
+    def add_button(
+        self, *, label: str, url: str, type: Union[ButtonType, str] = ButtonType.web_url, tco_url: Optional[str] = None
+    ) -> CTA:
         """Add a button in your CTA instance.
 
         Parameters
@@ -489,12 +507,12 @@ class CTA:
         :class:`CTA`
             Returns your :class:`CTA` instance.
         """
-        self._raw_buttons.append({"type": type.value if isinstance(type, ButtonType) else type, "label": label, "url": url})
+        self._raw_buttons.append(
+            {"type": type.value if isinstance(type, ButtonType) else type, "label": label, "url": url}
+        )
 
         self._buttons.append(Button(label, type, url, tco_url))
         return self
-            
-
 
     @property
     def buttons(self) -> List[Button]:
@@ -502,6 +520,6 @@ class CTA:
         return self._buttons
 
     @property
-    def raw_buttons(self) -> List[dict]:
-        """List[:class:`Button`]: Returns the list of dictionaries filled with raw buttons."""
+    def raw_buttons(self) -> List[Dict]:
+        """List[dict]: Returns the list of dictionaries filled with raw buttons."""
         return self._raw_buttons
