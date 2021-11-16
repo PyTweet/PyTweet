@@ -517,7 +517,7 @@ class HTTPClient:
         if quick_reply:
             message_data["quick_reply"] = {
                 "type": quick_reply.type,
-                "options": quick_reply.options,
+                "options": quick_reply.raw_options,
             }
 
         if cta:
