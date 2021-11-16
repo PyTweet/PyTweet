@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 from .enums import SpaceState
 from .utils import time_parse_todt
 
+__all__ = ("Space",)
 
 class Space:
     def __init__(self, data: Dict[str, Any]):
@@ -33,7 +34,7 @@ class Space:
         return self._payload.get("state")
 
     @property
-    def state_type(self) -> str:
+    def state_type(self) -> SpaceState:
         """:class:`SpaceState`: The type of the space's state.
 
         .. versionadded:: 1.3.5
@@ -84,7 +85,7 @@ class Space:
 
     @property
     def invited_users(self) -> Optional[List[int]]:
-        """Optional[List[:class:`int`]]: Returns the a list of users id. Usually, users in this list are invited to speak via the Invite user option and have a Speaker role when the Space starts.Returns None if there isn't invited users.
+        """Optional[List[:class:`int`]]: Returns the a list of users id. Usually, users in this list are invited to speak via the Invite user option and have a Speaker role when the Space starts. Returns None if there isn't invited users.
 
         .. versionadded:: 1.3.5
         """
