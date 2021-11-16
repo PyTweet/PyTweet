@@ -7,7 +7,7 @@ from typing import Any, Dict, List, NoReturn, Optional, Union
 from .enums import ButtonType
 from .utils import time_parse_todt
 
-__all__ = ("Media", "PollOptions", "Poll", "QuickReply", "Geo", "CTA")
+__all__ = ("Media", "PollOptions", "Poll", "QuickReply", "Geo", "CTA", "Button", "Option")
 
 
 @dataclass
@@ -395,12 +395,18 @@ class QuickReply:
 
     @property
     def raw_options(self) -> List[Dict]:
-        """List[Dict]: Returns the raw options."""
+        """List[Dict]: Returns the raw options.
+        
+        .. versionadded:: 1.2.0
+        """
         return self._raw_options
 
     @property
     def options(self) -> List[Option]:
-        """List[:class:`Option`]: Returns the pre-made Option object."""
+        """List[:class:`Option`]: Returns a list of pre-made Option objects.
+        
+        .. versionadded:: 1.3.5
+        """
         return self._options
 
 
@@ -413,6 +419,8 @@ class Geo:
     data: Dict[:class:`str`, :class:`Any`]
         The Geo data in a dictionary.
 
+
+    .. versionadded:: 1.3.5
     """
 
     def __init__(self, data: Dict[str, Any]):
@@ -429,57 +437,86 @@ class Geo:
 
     @property
     def name(self) -> str:
-        """:class:`str`: Returns place's name."""
+        """:class:`str`: Returns place's name.
+        
+        .. versionadded:: 1.3.5
+        """
         return self._payload.get("name")
 
     @property
     def id(self) -> str:
-        """:class:`str`: Returns place's unique id."""
+        """:class:`str`: Returns place's unique id.
+        
+        .. versionadded:: 1.3.5
+        """
         return self._payload.get("id")
 
     @property
     def fullname(self) -> str:
-        """:class:`str`: Returns place's fullname."""
+        """:class:`str`: Returns place's fullname.
+        
+        .. versionadded:: 1.3.5
+        """
         return self._payload.get("full_name")
 
     @property
     def type(self) -> str:
-        """:class:`str`: Returns place's type."""
+        """:class:`str`: Returns place's type.
+        
+        .. versionadded:: 1.3.5
+        """
         return self._payload.get("place_type")
 
     @property
     def country(self) -> str:
-        """:class:`str`: Returns the country where the place is in."""
+        """:class:`str`: Returns the country where the place is in.
+        
+        .. versionadded:: 1.3.5
+        """
         return self._payload.get("country")
 
     @property
     def country_code(self) -> str:
-        """:class:`str`: Returns the country's code where the location is in."""
+        """:class:`str`: Returns the country's code where the location is in.
+        
+        .. versionadded:: 1.3.5
+        """
         return self._payload.get("country_code")
 
     @property
     def centroid(self) -> str:
-        """:class:`str`: Returns the place's centroid."""
+        """:class:`str`: Returns the place's centroid.
+        
+        .. versionadded:: 1.3.5
+        """
         return self._payload.get("centroid")
 
     @property
     def bounding_box_type(self) -> str:
-        """:class:`str`: Returns the place's bounding box type."""
+        """:class:`str`: Returns the place's bounding box type.
+        
+        .. versionadded:: 1.3.5
+        """
         if self._bounding_box:
             return self._bounding_box.get("type")
         return None
 
     @property
     def coordinates(self) -> List[str]:
-        """List[:class:`str`]: Returns a list of coordinates where the place's located."""
+        """List[:class:`str`]: Returns a list of coordinates where the place's located.
+        
+        .. versionadded:: 1.3.5
+        """
         if self._bounding_box:
             return self._bounding_box.get("coordinates")
         return None
 
 
 class CTA:
-    """ "Represent call-to-action attachment(CTA)
-    You can use this in a post_tweet method via direct_message_deep_link kwarg or use it in direct message via CTA kwarg. CTA will perform and action whenever a user "call" it, an example of this is buttons.
+    """Represent call-to-action attachment(CTA)
+    You can use this in a post_tweet method via direct_message_deep_link kwarg or use it in direct message via CTA kwarg. CTA will perform and action whenever a user "call" something, an example of this is buttons.
+
+    .. versionadded:: 1.3.5
     """
 
     def __init__(self):
@@ -516,10 +553,16 @@ class CTA:
 
     @property
     def buttons(self) -> List[Button]:
-        """List[:class:`Button`]: Returns a list of pre-made buttons object."""
+        """List[:class:`Button`]: Returns a list of pre-made buttons object.
+        
+        .. versionadded:: 1.3.5
+        """
         return self._buttons
 
     @property
     def raw_buttons(self) -> List[Dict]:
-        """List[dict]: Returns the list of dictionaries filled with raw buttons."""
+        """List[dict]: Returns the list of dictionaries filled with raw buttons.
+        
+        .. versionadded:: 1.3.5
+        """
         return self._raw_buttons

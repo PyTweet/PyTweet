@@ -197,6 +197,19 @@ class DirectMessage(Message):
 class WelcomeMessage(Message):
     """Represent a Welcome Message in a Direct Message.
 
+    Parameters
+    ------------
+    name: Optional[:class:`str`]
+        A human readable name for the Welcome Message.
+    text: :class:`str`
+        The welcome message main text.
+    welcome_message_id: Union[:class:`str`, :class:`int`]
+        The welcome message unique id.
+    timestamp: Optional[:class:`str`]
+        The welcome message timestamp.
+    http_client: :class:`HTTPClient`
+        The http client that make the request.
+
     .. versionadded:: 1.3.5
     """
 
@@ -204,7 +217,7 @@ class WelcomeMessage(Message):
         self,
         name: Optional[str] = None,
         *,
-        text: Optional[str] = None,
+        text: str,
         welcome_message_id: Union[str, int],
         timestamp: str,
         http_client: HTTPClient,
@@ -299,16 +312,35 @@ class WelcomeMessage(Message):
 
     @property
     def created_at(self) -> datetime.datetime:
+        """:class:`dateitme.datetime`: Returns the welcome message created date.
+        
+        .. versionadded:: 1.3.5
+        """
         timestamp = str(self._timestamp)[:10]
         return datetime.datetime.fromtimestamp(int(timestamp))
 
     @property
     def name(self) -> str:
+        """:class:`str`: Returns the welcome message's name.
+        
+        .. versionadded:: 1.3.5
+        """
         return self._name
 
 
 class WelcomeMessageRule(Message):
     """Represent a Welcome Message Rule in a Direct Message. This object is returns by WelcomeMessage.set_rule or client.fetch_welcome_message_rules, it determines which Welcome Message will be shown in a given conversation.
+
+    Parameters
+    ------------
+    welcome_message_rule_id: Union[:class:`str`, :class:`int`]
+        The welcome message rule unique id.
+    welcome_message_id: Union[:class:`str`, :class:`int`]
+        The welcome message unique id.
+    timestamp: Optional[:class:`str`]
+        The welcome message rule created timestamp.
+    http_client: :class:`HTTPClient`
+        The http client that make the request.
 
     .. versionadded:: 1.3.5
     """
@@ -319,7 +351,7 @@ class WelcomeMessageRule(Message):
         welcome_message_id: Union[str, int],
         timestamp: Union[str, int],
         *,
-        http_client,
+        http_client: HTTPClient,
     ):
         super().__init__(id=welcome_message_rule_id, type=3)
         self._welcome_message_id = welcome_message_id
@@ -327,7 +359,7 @@ class WelcomeMessageRule(Message):
         self.http_client = http_client
 
     def __repr__(self) -> str:
-        return "WelcomeMessageRule(id: {0.id} welcome_message_id: {0.} created_at: {0.created_at})".format(self)
+        return "WelcomeMessageRule(id= {0.id} welcome_message_id= {0.} created_at= {0.created_at})".format(self)
 
     def delete(self):
         """Delete the Welcome Message Rule.
