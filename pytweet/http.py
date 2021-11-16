@@ -538,8 +538,9 @@ class HTTPClient:
 
         msg = DirectMessage(res, http_client=http_client or self)
         self.message_cache[msg.id] = msg
+        return msg
 
-    def fetch_message(self, event_id: Union[str, int], **kwargs: Any) -> Optional[DirectMessage]:
+    def fetch_message(self, event_id: Union[str, int], http_client: HTTPClient) -> Optional[DirectMessage]:
         """Optional[:class:`DirectMessage`]: Fetch a direct message with the event id.
 
         .. warning::
@@ -552,7 +553,6 @@ class HTTPClient:
 
         .. versionadded:: 1.2.0
         """
-        http_client: HTTPClient = kwargs.get("http_client", None)
         try:
             event_id = str(event_id)
         except ValueError:
