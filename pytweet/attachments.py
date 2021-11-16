@@ -4,7 +4,7 @@ import datetime
 from dataclasses import dataclass
 from typing import Any, Dict, List, NoReturn, Optional, Union
 
-from .enums import ButtonStyle
+from .enums import ButtonType
 from .utils import time_parse_todt
 
 __all__ = ("Media", "PollOptions", "Poll", "QuickReply", "Geo", "CTA")
@@ -456,8 +456,9 @@ class Geo:
 @dataclass
 class Button:
     label: str
-    style: ButtonStyle
+    style: ButtonType
     url: str
+    tco_url: Optional[str] = None
 
 
 class CTA:
@@ -469,25 +470,27 @@ class CTA:
         self._buttons = []
         self._raw_buttons = []
 
-    def add_button(self, label: str, url: str, style: ButtonStyle = ButtonStyle.web_url) -> CTA:
+    def add_button(self, *,label: str, url: str, type: ButtonType = ButtonStyle.web_url, tco_url: Optional[str] = None) -> CTA:
         """Add a button in your CTA instance.
 
         Parameters
         ------------
-        label: str
+        label: :class:`str`
             The button's label, will be shown in the main text.
-        url: str
+        url: :class:`str`
             A url that specified where to take you when you click the button, e.g you can take a user to someone's dm, a tweet, etc.
-        style: :class:`ButtonStyle`
-            The button's style, For now twitter only use web_url, if none specified the default style is ButtonStyle.web_url.
+        type: :class:`ButtonType`
+            The button's type, For now twitter only use web_url, if none specified the default style is ButtonType.web_url.
+        tco_url: Optional[:class:`str`]
+            The url in tco style.
 
         Returns
         ---------
         :class:`CTA`
             Returns your :class:`CTA` instance.
         """
-        self._raw_buttons.append({"type": style.value, "label": label, "url": url})
-        self._buttons.append(Button(label, style, url))
+        self._raw_buttons.append({"type": type.value, "label": label, "url": url})
+        self._buttons.append(Button(label, type, url, tco_url))
         return self
 
     @property

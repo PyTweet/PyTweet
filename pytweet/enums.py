@@ -24,7 +24,7 @@ class MessageEventTypeEnum(Enum):
     NULL = None
 
 
-class ButtonStyle(Enum):
+class ButtonType(Enum):
     web_url = "web_url"
 
 
