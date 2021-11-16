@@ -17,7 +17,7 @@ class Client:
     Parameters
     ------------
     bearer_token: Optional[:class:`str`]
-        The Bearer Token of the app. The most important one, because this make most of the requests for twitter's api version 2.
+        The Bearer Token of the app. The most important one, because this makes most of the requests for Twitter's api version 2.
     consumer_key: Optional[:class:`str`]
         The Consumer Key of the app.
     consumer_key_secret: Optional[:class:`str`]
@@ -30,7 +30,7 @@ class Client:
     Attributes
     ------------
     http: Optional[:class:`HTTPClient`]
-        Return the HTTPClient, HTTPClient is responsible for making most of the Requests.
+        Returns the HTTPClient,  the HTTPClient is responsible for making most of the Requests.
 
 
     .. versionadded:: 1.0.0
@@ -58,7 +58,7 @@ class Client:
 
     @property
     def account(self) -> Optional[User]:
-        """:class:`Optional[User]`: Returns the client's account information, This returns in a user object.
+        """:class:`Optional[User]`: Returns the client's account information. The callback is a User object.
 
         .. versionadded:: 1.2.0
         """
@@ -75,15 +75,15 @@ class Client:
         self._account_user = self.fetch_user(self.http.access_token.partition("-")[0])
 
     def fetch_user(self, user_id: Union[str, int] = None) -> User:
-        """A method for fetching user with the user's id.
+        """A method for fetching the user with the user's id.
 
         .. warning::
-            This method uses api call and might cause ratelimit if used often!
+            This method uses API call and might cause ratelimits if used often!
 
         Parameters
         ------------
         user_id: Union[:class:`str`, :class:`int`]
-            Represent the user id that you wish to get info to, If you dont have it you may use `fetch_user_by_name` because it only required the user's username.
+            Represents the user ID that you wish to get info for. If you don't have it you may use `fetch_user_by_name` because it only requires the user's username.
 
         Returns
         ---------
@@ -96,15 +96,15 @@ class Client:
         return self.http.fetch_user(user_id, http_client=self.http)
 
     def fetch_user_by_name(self, username: str) -> User:
-        """A method for fetching user with the user's username.
+        """A method for fetching the user with the user's username.
 
         .. warning::
-            This method uses api call and might cause ratelimit if used often!
+            This method uses API call and might cause ratelimits if used often!
 
         Parameters
         ------------
         username: :class:`str`
-            Represent the user's username that you wish to get info. A Username usually start with '@' before any letters. If a username named @Jack,then the username argument must be 'Jack'.
+            Represents the user's username that you wish to get info. A Username usually starts with '@' before any letters. If a username named @Jack, then the username argument must be 'Jack'.
 
         Returns
         ---------
@@ -120,12 +120,12 @@ class Client:
         """A method for fetching tweet with the tweet's id.
 
         .. warning::
-            This method uses api call and might cause ratelimit if used often! More recommended to use get_tweet to get the client's tweet.
+            This method uses API call and might cause ratelimits if used often! More recommended is to use get_tweet to get the client's tweet.
 
         Parameters
         ------------
         tweet_id: Union[:class:`str`, :class:`int`]
-            Represent the tweet id that you wish to get info to.
+            Represents the tweet id that you wish to get info about.
 
         Returns
         ---------
@@ -138,15 +138,15 @@ class Client:
         return self.http.fetch_tweet(tweet_id, http_client=self.http)
 
     def fetch_message(self, event_id: Union[str, int] = None) -> DirectMessage:
-        """A method for fetching message with the message's event id.
+        """A method for fetching the message with the message's event ID.
 
         .. warning::
-            This method uses api call and might cause ratelimit if used often! Recommended to use `get_message()` method, it only retrieves the client's message only.
+            This method uses API call and might cause ratelimit if used often! It is more ecommended to use `get_message()` method, as it only retrieves the client's message only.
 
         Parameters
         ------------
         event_id: Union[:class:`str`, :class:`int`]
-            Represent the event's id that you wish to fetch with.
+            Represents the event's ID that you wish to fetch with.
 
         Returns
         ---------
@@ -171,28 +171,28 @@ class Client:
         exclude_reply_users: Optional[List[Union[str, int]]] = None,
         super_followers_only: bool = False,
     ) -> Message:
-        """Post a tweet directly to twitter from the given parameters.
+        """Posts a tweet directly to twitter from the given parameters.
 
         Parameters
         ------------
         text: :class:`str`
-            The tweets text, it will showup as the main text in a tweet.
+            The tweet's text, it will show up as the main text in a tweet.
         poll: Optional[:class:`Poll`]
             The poll attachment.
         geo: Optional[Union[:class:`Geo`, :class:`str`]]
-            The geo attachment, you can put an object that is an instance of :class:`Geo` or the place id in a string.
+            The geo attachment, you can put an object that is an instance of :class:`Geo` or the place ID in a string.
         quote_tweet: Optional[Union[:class:`str`, :class:`int`]]
-            The tweet id you want to quote.
+            The tweet ID you want to quote.
         direct_message_deep_link: Optional[:class:`str`]
             The direct message deep link, It will showup as a CTA(call-to-action) with button attachment. Example of direct message deep link:
         reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
-            The reply setting that you can set to minimize users that can reply. If None specified, the default 'everyone' can reply.
+            The reply setting that you can set to minimize users that can reply. If None is specified, the default is set to 'everyone' can reply.
         reply_tweet: Optional[Union[:class:`str`, :class:`int`]]
-            The tweet id you want to reply. If you have an instance of :class:`Tweet`, you can use the reply() method rather then using this method.
+            The tweet ID you want to reply to. If you have an instance of :class:`Tweet`, you can use the reply() method rather then using this method.
         exclude_reply_users: Optional[List[Union[:class:`str`, :class:`int`]]]
-            Exclude the users when replying to a tweet, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you dont want to mention.
+            Exclude the users when replying to a tweet, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you don't want to mention.
         super_followers_only: :class:`bool`
-            Allows you to Tweet exclusively for super followers.
+            Allows you to tweet exclusively for super followers.
 
         Returns
         ---------
@@ -226,7 +226,7 @@ class Client:
         name: :class:`str`
             A human readable name for the Welcome Message
         text: :class:`str`
-            The welcome message's text. Please do not make this empty if you want to showup the text.
+            The welcome message's text. Please do not make this empty if you don't want the text to be blank.
         quick_reply: :class:`QuickReply`
             The message QuickReply attachments.
 
@@ -273,12 +273,12 @@ class Client:
         )
 
     def fetch_welcome_message(self, welcome_message_id: Union[str, int]) -> WelcomeMessage:
-        """Fetch the welcome message with the given welcome message id argument.
+        """Fetches the welcome message with the given welcome message ID argument.
 
         Parameters
         ------------
         welcome_message_id: Union[:class:`str`, :class:`int`]
-            Represent the welcome message id that you wish to fetch with.
+            Represents the welcome message ID that you wish to fetch with.
 
         Returns
         ---------
@@ -308,7 +308,7 @@ class Client:
         Parameters
         ------------
         welcome_message_rules_id: Union[:class:`str`, :class:`int`]
-            Represent the welcome message rule id that you wish to fetch with.
+            Represents the welcome message rule ID that you wish to fetch with.
 
         Returns
         ---------
@@ -337,7 +337,7 @@ class Client:
         Parameters
         ------------
         space_id: Union[:class:`str`, :class:`int`]
-            Represent the space id that you wish to fetch with.
+            Represents the space ID that you wish to fetch with.
 
         Returns
         ---------
@@ -357,7 +357,7 @@ class Client:
         title: Union[:class:`str`, :class:`int`]
             The space title that you are going use for fetching the space.
         state: :class:`SpaceState`
-            The type of state the space has. There's only 2 type: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host. Default to SpaceState.live
+            The type of state the space has. There are only 2 types: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host. Default to SpaceState.live
 
         Returns
         ---------
@@ -371,15 +371,15 @@ class Client:
         return Space
 
     def get_message(self, event_id: Union[str, int] = None) -> Optional[DirectMessage]:
-        """Get a direct message through the client message cache. Return None if the message is not in the cache.
+        """Get a direct message through the client message cache. Returns None if the message is not in the cache.
 
         .. note::
-            Note that, only the client's tweet is going to be stored in the cache which mean you can't get someone's message other then the client itself from the cache.
+            Note that only the client's tweet is going to be stored in the cache which means you can't get someone's message other then the client itself from the cache.
 
         Parameters
         ------------
         event_id: Union[:class:`str`, :class:`int`]
-            The event id of the Direct Message event that you want to get.
+            The event ID of the Direct Message event that you want to get.
 
         Returns
         ---------
@@ -397,7 +397,7 @@ class Client:
         return self.http.message_cache.get(event_id)
 
     def get_tweet(self, tweet_id: Union[str, int] = None) -> Optional[Tweet]:
-        """Get a tweet through the client internal tweet cache. Return None if the tweet is not in the cache.
+        """Gets a tweet through the client internal tweet cache. Return None if the tweet is not in the cache.
 
         .. note::
             Note that, only the client's tweet is going to be stored in the cache which mean you can't get someone's tweet other then the client itself from the cache.
@@ -405,12 +405,12 @@ class Client:
         Parameters
         ------------
         event_id: Union[:class:`str`, :class:`int`]
-            The id of a tweet that you want to get.
+            The ID of a tweet that you want to get.
 
         Raises
         --------
         ValueError:
-            Raise when the tweet_id argument is not an integer or a string of digits.
+            Raised when the tweet_id argument is not an integer or a string of digits.
 
         Returns
         ---------
@@ -445,11 +445,11 @@ class Client:
         lat: :class:`int`
             The latitude to search around. This parameter will be ignored unless it is inside the range -90.0 to +90.0 (North is positive) inclusive. It will also be ignored if there isn't a corresponding long parameter.
         long: :class:`int`
-            The longitude to search around. The valid ranges for longitude are -180.0 to +180.0 (East is positive) inclusive. This parameter will be ignored if outside that range, if it is not a number, if geo_enabled is turned off, or if there not a corresponding lat parameter.
+            The longitude to search around. The valid ranges for longitude are -180.0 to +180.0 (East is positive) inclusive. This parameter will be ignored if outside that range, if it is not a number, if geo_enabled is turned off, or if there is not a corresponding lat parameter.
         ip: Union[:class:`str`, :class:`int`]
             An IP address. Used when attempting to fix geolocation based off of the user's IP address.
         granularity: :class:`str`
-            This is the minimal granularity of place types to return and must be one of: neighborhood , city , admin or country. If no granularity is provided for the request neighborhood is assumed. Setting this to city, for example, will find places which have a type of city, admin or country
+            This is the minimal granularity of place types to return and must be one of: neighborhood ,ity ,admin or country. If no granularity is provided for the request neighborhood is assumed. Setting this to city, for example, will find places which have a type of city, admin or country
         max_results: Optional[Union[:class:`str`, :class:`int`]]
             A hint as to the number of results to return. This does not guarantee that the number of results returned will equal max_results, but instead informs how many "nearby" results to return. Ideally, only pass in the number of places you intend to display to the user here
 
