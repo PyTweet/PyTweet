@@ -456,7 +456,7 @@ class Geo:
 @dataclass
 class Button:
     label: str
-    style: ButtonType
+    type: ButtonType
     url: str
     tco_url: Optional[str] = None
 
@@ -470,7 +470,7 @@ class CTA:
         self._buttons = []
         self._raw_buttons = []
 
-    def add_button(self, *,label: str, url: str, type: ButtonType = ButtonStyle.web_url, tco_url: Optional[str] = None) -> CTA:
+    def add_button(self, *,label: str, url: str, type: ButtonType = ButtonType.web_url, tco_url: Optional[str] = None) -> CTA:
         """Add a button in your CTA instance.
 
         Parameters
@@ -480,7 +480,7 @@ class CTA:
         url: :class:`str`
             A url that specified where to take you when you click the button, e.g you can take a user to someone's dm, a tweet, etc.
         type: :class:`ButtonType`
-            The button's type, For now twitter only use web_url, if none specified the default style is ButtonType.web_url.
+            The button's type, For now twitter only use web_url, if none specified the default type is ButtonType.web_url.
         tco_url: Optional[:class:`str`]
             The url in tco style.
 
