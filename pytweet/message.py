@@ -58,7 +58,7 @@ class DirectMessage(Message):
     .. versionadded:: 1.2.0
     """
 
-    def __init__(self, data: Dict[str, Any], **kwargs: Any):
+    def __init__(self, data: Dict[str, Any], *,http_client: HTTPClient):
         self.original_payload = data
         self._payload = data.get("event", None)
         self.message_create = self._payload.get("message_create", None)
@@ -68,7 +68,7 @@ class DirectMessage(Message):
         self.cta_data = self.message_data.get("ctas")
 
         super().__init__(self.message_data.get("text"), self._payload.get("id"), 0)
-        self.http_client: Optional[HTTPClient] = kwargs.get("http_client", None)
+        self.http_client = http_client
         self.timestamp = round(datetime.datetime.utcnow().timestamp())
 
     def __repr__(self) -> str:
