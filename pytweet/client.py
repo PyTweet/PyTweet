@@ -93,7 +93,7 @@ class Client:
 
         .. versionadded:: 1.0.0
         """
-        return self.http.fetch_user(user_id, http_client=self.http)
+        return self.http.fetch_user(user_id)
 
     def fetch_user_by_name(self, username: str) -> User:
         """A method for fetching the user with the user's username.
@@ -114,7 +114,7 @@ class Client:
 
         .. versionadded:: 1.0.0
         """
-        return self.http.fetch_user_byname(username, http_client=self.http)
+        return self.http.fetch_user_byname(username)
 
     def fetch_tweet(self, tweet_id: Union[str, int] = None) -> Tweet:
         """A method for fetching tweet with the tweet's id.
@@ -135,7 +135,7 @@ class Client:
 
         .. versionadded:: 1.0.0
         """
-        return self.http.fetch_tweet(tweet_id, http_client=self.http)
+        return self.http.fetch_tweet(tweet_id)
 
     def fetch_message(self, event_id: Union[str, int] = None) -> DirectMessage:
         """A method for fetching the message with the message's event ID.
@@ -156,7 +156,7 @@ class Client:
 
         .. versionadded:: 1.2.0
         """
-        return self.http.fetch_message(event_id, http_client=self.http)
+        return self.http.fetch_message(event_id)
 
     def tweet(
         self,
@@ -211,8 +211,7 @@ class Client:
             reply_setting=reply_setting,
             reply_tweet=reply_tweet,
             exclude_reply_users=exclude_reply_users,
-            super_followers_only=super_followers_only,
-            http_client=self.http,
+            super_followers_only=super_followers_only
         )
         return res
 
