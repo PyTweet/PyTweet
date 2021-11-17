@@ -4,9 +4,9 @@ import json as j
 import logging
 import sys
 import time
-from typing import Any, Dict, List, NoReturn, Optional, Union
-
 import requests
+import mimetypes
+from typing import Any, Dict, List, NoReturn, Optional, Union
 
 from .attachments import CTA, Geo, Poll, QuickReply
 from .auth import OauthSession
@@ -66,35 +66,6 @@ RequestModel: Union[Dict[str, Any], Any] = Any
 
 
 class HTTPClient:
-    """Represents the http/base client for :class:`Client`
-    This http/base client is responsible for making all requests.
-
-    Parameters:
-    -----------
-    bearer_token: :class:`str`
-        The Bearer Token of the app. The most important one, because this make most of the requests for twitter's api version 2.
-    consumer_key: Optional[:class:`str`]
-        The Consumer Key of the app.
-    consumer_key_secret: Optional[:class:`str`]
-        The Consumer Key Secret of the app.
-    access_token: Optional[:class:`str`]
-        The Access Token of the app.
-    access_token_secret: Optional[:class:`str`]
-        The Access Token Secret of the app.
-
-    Attributes
-    ------------
-    credentials
-        The credentials in a dictionary.
-
-    Raises
-    --------
-    pytweet.errors.Unauthorized:
-        Raise when the api return code: 401. This usually because you passed invalid credentials.
-
-    .. versionadded:: 1.0.0
-    """
-
     def __init__(
         self,
         bearer_token: str,
@@ -130,6 +101,7 @@ class HTTPClient:
         self.access_token: Optional[str] = access_token
         self.access_token_secret: Optional[str] = access_token_secret
         self.base_url = "https://api.twitter.com/"
+        self.upload_url = "https://upload.twitter.com/"
         self.message_cache = {}
         self.tweet_cache = {}
 
@@ -145,43 +117,10 @@ class HTTPClient:
         auth: bool = False,
         is_json: bool = True,
     ) -> Union[str, Dict[Any, Any], NoReturn]:
-        """This function make an HTTP Request with the given parameters then return a dictionary in a json format.
-
-        Parameters
-        ------------
-        method: str
-            The request method.
-        version: str
-            The api version that you are using.
-        path: str
-            The endpoint.
-        headers: RequestModel
-            Represent the http request headers, it usually filled with your bearer token. If this isn't specified then the default argument will be an empty dictionary. Later in the code it will update and gets your bearer token.
-        params: RequestModel
-            Represent the http request parameters, If this isn't specified then the default argument will be an empty dictionary.
-        json: RequestModel
-            Represent the Json data. This usually use for request with POST method.
-        auth: bool
-           Represent a toggle, if auth is True then the request will be handle with Oauth1 particularly OauthSession.
-        is_json: bool
-            Represent a toggle, if its True then the return will be in a json format else its going to be a requests.models.Response object. Default to True.
-
-        Raises
-        --------
-        pytweet.errors.Unauthorized:
-            Raise when the api return code: 401. This usually because you passed invalid credentials
-        pytweet.errors.Forbidden:
-            Raise when the api return code: 403. There's a lot of reason why, This usually happen when the client cannot do the request due to twitter's limitation e.g trying to follow someone that you blocked etc.
-        pytweet.errors.TooManyRequests:
-            Raise when the api return code: 429. This happen when you made too much request thus the api ratelimit you. The ratelimit will ware off in a couple of minutes.
-        json.decoder.JSONDecodeError:
-            Raise when a request doesn't support a json format. Usually request like :class:`User.typing()`
-
-        .. versionadded:: 1.0.0
-        """
         url = self.base_url + version + path
         user_agent = "Py-Tweet (https://github.com/TheFarGG/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
-        if headers == {}:
+
+        if headers == {} and not "Authorization" in headers.keys():
             headers = {"Authorization": f"Bearer {self.bearer_token}"}
 
         headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
@@ -212,27 +151,7 @@ class HTTPClient:
             return res
         return response
 
-    def fetch_user(self, user_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> User:
-        """Make a Request to obtain the user from the given user id.
-
-        Parameters
-        ------------
-        user_id: Union[str, int]
-            Represent the user id that you wish to get info to, If you dont have it you may use `fetch_user_byname` because it only required the user's username.
-        http_client:
-            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
-
-        Raises
-        ---------
-        pytweet.errors.NotFoundError:
-            Raise when the api can't find a user with that id.
-        ValueError:
-            Raise when user_id is not an int and is not a string of digits.
-
-        This function return a :class:`User` object.
-
-        .. versionadded:: 1.0.0
-        """
+    def fetch_user(self, user_id: Union[str, int]) -> User:
         try:
             int(user_id)
         except ValueError:
@@ -271,41 +190,22 @@ class HTTPClient:
 
         data["data"].update(
             {
-                "followers": [User(follower, http_client=http_client) for follower in followers["data"]]
+                "followers": [User(follower, http_client=self) for follower in followers["data"]]
                 if followers != []
                 else []
             }
         )
         data["data"].update(
             {
-                "following": [User(following, http_client=http_client) for following in following["data"]]
+                "following": [User(following, http_client=self) for following in following["data"]]
                 if following != []
                 else []
             }
         )
 
-        return User(data, http_client=http_client)
+        return User(data, http_client=self)
 
-    def fetch_user_byname(self, username: str, *, http_client: Optional[HTTPClient] = None) -> User:
-        """Make a Request to obtain the user from their username.
-
-        Parameters
-        ------------
-        username: str
-            Represent the user's username. A Username usually start with '@' before any letters. If a username named @Jack, then the username argument must be 'Jack'.
-        http_client:
-            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
-
-        Raises
-        --------
-        pytweet.errors.NotFoundError:
-            Raise when the api can't find a user with that username.
-
-        This function return a :class:`User` object.
-
-        .. versionadded:: 1.0.0
-        """
-
+    def fetch_user_byname(self, username: str) -> User:
         if "@" in username:
             username = username.replace("@", "", 1)
 
@@ -320,32 +220,13 @@ class HTTPClient:
             is_json=True,
         )
 
-        user_payload = self.fetch_user(int(data["data"].get("id")), http_client=http_client)
+        user_payload = self.fetch_user(int(data["data"].get("id")))
         data["data"].update({"followers": user_payload.followers})
         data["data"].update({"following": user_payload.following})
 
-        return User(data, http_client=http_client)
+        return User(data, http_client=self)
 
-    def fetch_tweet(self, tweet_id: Union[str, int], *, http_client: Optional[HTTPClient] = None) -> Tweet:
-        """Fetch a tweet info from the specified id. Return if consumer_key or consumer_key_secret or access_token or access_token_secret is not specified.
-
-        Parameters:
-        -----------
-        tweet_id: Union[str, int]
-            Represent the tweet's id that you wish .
-
-        http_client
-            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
-
-        Raises:
-        -------
-            pytweet.errors.NotFoundError:
-                Raise when the api can't find a tweet with that id.
-
-        This function return a :class:`Tweet`.
-
-        .. versionadded:: 1.0.0
-        """
+    def fetch_tweet(self, tweet_id: Union[str, int]) -> Tweet:
         if not any([v for v in self.credentials.values()]):
             return None
 
@@ -386,7 +267,7 @@ class HTTPClient:
         )
 
         user_id = res["includes"]["users"][0].get("id")
-        user = self.fetch_user(int(user_id), http_client=http_client)
+        user = self.fetch_user(int(user_id))
 
         res["includes"]["users"][0].update({"followers": user.followers})
         res["includes"]["users"][0].update({"following": user.following})
@@ -395,7 +276,7 @@ class HTTPClient:
             res2["data"]
 
             res["data"].update(
-                {"retweetes": [User(user, http_client=http_client if http_client else self) for user in res2["data"]]}
+                {"retweetes": [User(user, http_client=self) for user in res2["data"]]}
             )
         except (KeyError, TypeError):
             res["data"].update({"retweetes": []})
@@ -404,29 +285,14 @@ class HTTPClient:
             res3["data"]
 
             res["data"].update(
-                {"likes": [User(user, http_client=http_client if http_client else self) for user in res3["data"]]}
+                {"likes": [User(user, http_client=self) for user in res3["data"]]}
             )
         except (KeyError, TypeError):
             res["data"].update({"likes": []})
 
-        return Tweet(res, http_client=http_client if http_client else None)
+        return Tweet(res, http_client=self)
 
     def fetch_space(self, space_id: str) -> Space:
-        """Fetch the space using the space_id parameter
-
-        Parameters
-        ------------
-        space_id: Union[:class:`str`, :class:`int`]
-            The space id that you are going to fetch.
-
-        Returns
-        ---------
-        :class:`Space`
-            This method returns a :class:`Space` object.
-
-
-        .. versionadded:: 1.3.5
-        """
         res = self.request(
             "GET",
             "2",
@@ -438,22 +304,6 @@ class HTTPClient:
         return Space(res)
 
     def fetch_space_bytitle(self, title: str, state: SpaceState = SpaceState.live) -> Space:
-        """Fetch a space using its title.
-
-        Parameters
-        ------------
-        title: :class:`str`
-            The space title that you are going use for fetching the space.
-        state: :class:`SpaceState`
-            The type of state the space has. There's only 2 type: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host.
-
-        Returns
-        ---------
-        :class:`Space`
-            This method returns a :class:`Space` object.
-
-        .. versionadded:: 1.3.5
-        """
         res = self.request(
             "GET",
             "2",
@@ -473,30 +323,7 @@ class HTTPClient:
         *,
         quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
-        http_client: Optional[HTTPClient] = None,
     ) -> Optional[NoReturn]:
-        """Make a post request for sending a message to a User.
-
-        Parameters
-        ------------
-        user_id: Union[str, int]
-            The user id that you wish to send message to.
-        text: str
-            The text that will be send to that user.
-        quick_reply: QuickReply
-            The message's quick reply attachment.
-        cta: Optional[:class:`CTA`]
-            cta or call-to-actions is use to make an action whenever a user 'call' something, a quick example is buttons.
-        http_client
-            Represent the HTTP Client that make the request, this will be use for interaction between the client and the user. If this isn't a class or a subclass of HTTPClient, the current HTTPClient instance will be a default one.
-
-        Returns
-        ---------
-        :class:`DirectMessage`
-            This function return a :class:`DirectMessage` object.
-
-        .. versionadded:: 1.1.0
-        """
         data = {
             "event": {
                 "type": "message_create",
@@ -533,26 +360,14 @@ class HTTPClient:
 
         message_create = res.get("event").get("message_create")
         user_id = message_create.get("target").get("recipient_id")
-        user = self.fetch_user(user_id, http_client=http_client or self)
+        user = self.fetch_user(user_id)
         res["event"]["message_create"]["target"]["recipient"] = user
 
-        msg = DirectMessage(res, http_client=http_client or self)
+        msg = DirectMessage(res, http_client=self or self)
         self.message_cache[msg.id] = msg
         return msg
 
-    def fetch_message(self, event_id: Union[str, int], http_client: HTTPClient) -> Optional[DirectMessage]:
-        """Optional[:class:`DirectMessage`]: Fetch a direct message with the event id.
-
-        .. warning::
-            This method uses api call and might cause ratelimit if used often!
-
-        Parameters
-        ------------
-        event_id: Union[:class:`str`, :class:`int`]
-            The event id of the Direct Message event that you want to fetch.
-
-        .. versionadded:: 1.2.0
-        """
+    def fetch_message(self, event_id: Union[str, int]) -> Optional[DirectMessage]:
         try:
             event_id = str(event_id)
         except ValueError:
@@ -562,10 +377,10 @@ class HTTPClient:
 
         message_create = res.get("event").get("message_create")
         user_id = message_create.get("target").get("recipient_id")
-        user = self.fetch_user(user_id, http_client=http_client if http_client else self)
+        user = self.fetch_user(user_id)
         res["event"]["message_create"]["target"]["recipient"] = user
 
-        return DirectMessage(res, http_client=http_client if http_client else self)
+        return DirectMessage(res, http_client=self)
 
     def post_tweet(
         self,
@@ -579,36 +394,7 @@ class HTTPClient:
         reply_tweet: Optional[Union[str, int]] = None,
         exclude_reply_users: Optional[List[Union[str, int]]] = None,
         super_followers_only: Optional[bool] = None,
-        http_client: Optional[HTTPClient] = None,
     ) -> Union[NoReturn, Any]:
-        """Make a POST Request to post a tweet through twitter with the given arguments.
-
-        .. note::
-            This function is almost complete! though you can still use and open an issue in github if it cause an error.
-
-        Parameters
-        ------------
-        text: :class:`str`
-            The tweets text, it will showup as the main text in a tweet.
-        poll: Optional[:class:`Poll`]
-            The poll attachment.
-        geo: Optional[Union[:class:`Geo`, :class:`str`]]
-            The geo attachment, you can put an object that is an instance of :class:`Geo` or the place id in a string.
-        quote_tweet: Optional[Union[:class:`str`, :class:`int`]]
-            The tweet id you want to quote.
-        direct_message_deep_link: Optional[:class:`str`]
-            The direct message deep link, It will showup as a CTA(call-to-action) with button attachment.
-        reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
-            The reply setting, you can set it to: ReplySetting.everyone indicates everyone can reply to your tweet, ReplySetting.mention_users indicates only the mentioned users in the tweet can reply, and ReplySetting.following indicates only the client's followers can reply.
-        reply_tweet: Optional[Union[:class:`str`, :class:`int`]]
-            The tweet id you want to reply. If have a :class:`Tweet` instance, you can use the reply() method rather then using this method.
-        exclude_reply_users: Optional[List[Union[:class:`str`, :class:`int`]]]
-            Exclude the users when replying to a tweet, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you dont want to mention.
-        super_followers_only: :class:`bool`
-            Allows you to Tweet exclusively for Super Followers.
-
-        .. versionadded:: 1.1.0
-        """
         payload = {}
         if text:
             payload["text"] = text
