@@ -9,13 +9,16 @@ __all__ = ("Space",)
 class Space:
     def __init__(self, data: Dict[str, Any]):
         self.original_payload = data
-        if isinstance(data.get("data"), list):
-            self._payload = data.get("data")[0]
-        else:
-            self._payload = data.get("data")
+        try:
+            if isinstance(data.get("data"), list):
+                self._payload = data.get("data")[0]
+            else:
+                self._payload = data.get("data")
+        except AttributeError:
+            return self.original_payload
 
     def __repr__(self) -> str:
-        return "Space(name:{0.title} state:{0.state} id:{0.id} type:{0.state_type})".format(self)
+        return "Space(name={0.title} id={0.id} state={0.state})".format(self)
 
     @property
     def title(self) -> str:
@@ -26,20 +29,20 @@ class Space:
         return self._payload.get("title")
 
     @property
-    def state(self) -> str:
-        """:class:`str`: The space's state.
+    def raw_state(self) -> str:
+        """:class:`str`: The raw space's state in  a string.
 
         .. versionadded:: 1.3.5
         """
         return self._payload.get("state")
 
     @property
-    def state_type(self) -> SpaceState:
+    def state(self) -> SpaceState:
         """:class:`SpaceState`: The type of the space's state.
 
         .. versionadded:: 1.3.5
         """
-        return SpaceState(self.state)
+        return SpaceState(self.raw_state)
 
     @property
     def id(self) -> str:
@@ -74,7 +77,7 @@ class Space:
         return time_parse_todt(self._payload.get("created_at"))
 
     @property
-    def hosts(self) -> Optional[List[int]]:
+    def hosts_id(self) -> Optional[List[int]]:
         """Optional[List[:class:`int`]]: Returns a list of the hosts id.
 
         .. versionadded:: 1.3.5
@@ -94,20 +97,20 @@ class Space:
         return None
 
     @property
-    def started_at(self) -> datetime.datetime:
-        """:class:`datetime.datetime`: Returns a datetime.datetime object with the space's started time. Only available if the space has started.
+    def started_at(self) -> Optional[datetime.datetime]:
+        """Optional[:class:`datetime.datetime`]: Returns a datetime.datetime object with the space's started time. Only available if the space has started.
 
         .. versionadded:: 1.3.5
         """
-        return time_parse_todt(self._payload.get("started_at"))
+        return time_parse_todt(self._payload.get("started_at")) if self._payload.get("started_at") else None
 
     @property
-    def updated_at(self) -> datetime.datetime:
-        """:class:`datetime.datetime`: Returns a datetime.datetime object with the space's last update to any of this Space's metadata, such as the title or scheduled time. Only available if the space has started.
+    def updated_at(self) -> Optional[datetime.datetime]:
+        """Optional[:class:`datetime.datetime`]: Returns a datetime.datetime object with the space's last update to any of this Space's metadata, such as the title or scheduled time. Only available if the space has started.
 
         .. versionadded:: 1.3.5
         """
-        return time_parse_todt(self._payload.get("started_at"))
+        return time_parse_todt(self._payload.get("updated_at"))
 
     def is_ticketed(self) -> bool:
         """Returns a bool indicate if the space is ticketed.
