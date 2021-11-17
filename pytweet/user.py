@@ -78,8 +78,7 @@ class User:
             self.id,
             text,
             quick_reply=quick_reply,
-            cta=cta,
-            http_client=self.http_client,
+            cta=cta
         )
 
     def follow(self) -> RelationFollow:
@@ -324,13 +323,13 @@ class User:
         return time_parse_todt(self._payload.get("created_at"))
 
     @property
-    def pinned_tweet(self) -> Optional[object]:
-        """Optional[:class:`object`]: Returns the user's pinned tweet.
+    def pinned_tweet_id(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the user's pinned tweet id.
         
         .. versionadded: 1.1.3
         """
         id = self._payload.get("pinned_tweet_id")
-        return None if not id else self.http_client.fetch_tweet(int(id), http_client=self.http_client)
+        return int(id) if id else None
 
     @property
     def followers(self) -> Union[List[User], List]:
