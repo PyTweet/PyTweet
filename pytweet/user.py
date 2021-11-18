@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
-from .attachments import CTA, QuickReply
+from .attachments import CTA, QuickReply, File
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import time_parse_todt
@@ -54,16 +54,18 @@ class User:
             raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
-    def send(self, text: str, *, quick_reply: QuickReply = None, cta: CTA = None) -> DirectMessage:
+    def send(self, text: str, *, file: Optional[File] = None, quick_reply: Optional[QuickReply] = None, cta: Optional[CTA] = None) -> DirectMessage:
         """Send a message to the user.
 
         Parameters
         ------------
         text: :class:`str`
             The text that will be send to that user.
-        quick_reply: :class:`QuickReply`
+        file: Optional[:class:`File`]
+            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
+        quick_reply: Optional[:class:`QuickReply`]
             The QuickReply attachment that will be send to a user.
-        cta: :class:`CTA`
+        cta: Optional[:class:`CTA`]
             cta or call-to-actions is use to make an action whenever a user 'call' something, a quick example is buttons.
 
         Returns
@@ -77,6 +79,7 @@ class User:
         return self.http_client.send_message(
             self.id,
             text,
+            file=file,
             quick_reply=quick_reply,
             cta=cta
         )
