@@ -24,7 +24,6 @@ class Option:
     description: str
     metadata: str
 
-
 class Media:
     """Represent a Media attachment in a tweet.
 
