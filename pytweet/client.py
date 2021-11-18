@@ -179,7 +179,7 @@ class Client:
         text: :class:`str`
             The tweet's text, it will show up as the main text in a tweet.
         file: Optional[:class:`File`]
-            The tweet's single file attachment. It must be an instance of pytweet.File
+            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
         poll: Optional[:class:`Poll`]
             The poll attachment.
         geo: Optional[Union[:class:`Geo`, :class:`str`]]
