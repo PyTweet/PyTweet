@@ -27,10 +27,11 @@ class Option:
     metadata: str
 
 class File:
-    def __init__(self, path_to_filename: str):
+    def __init__(self, path_to_filename: str, *, dm_only: bool = False):
         self.__path = path_to_filename
         self._total_bytes = os.path.getsize(self.path)
         self._mimetype = mimetypes.MimeTypes().guess_type(self.path)[0]
+        self.dm_only = dm_only
 
     def __repr__(self) -> str:
         return "File(filename={0.filename})".format(self)
@@ -54,12 +55,12 @@ class File:
     @property
     def media_category(self) -> str:
         startpoint = "TWEET_"
-        if "image" in self.mimetype:
-            return startpoint + "IMAGE"
+        if "image" in self.mimetype and not "gif" in self.mimetype:
+            return startpoint + "IMAGE" if not self.dm_only else "dm_image"
         elif "gif" in self.mimetype:
-            return startpoint + "GIF"
+            return startpoint + "GIF" if not self.dm_only else "dm_gif"
         elif "video" in self.mimetype:
-            return startpoint + "VIDEO"
+            return startpoint + "VIDEO" if not self.dm_only else "dm_video"
 
 
 class Media:
