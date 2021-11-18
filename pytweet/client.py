@@ -1,6 +1,6 @@
 from typing import List, Optional, Union
 
-from .attachments import Geo, Poll, QuickReply
+from .attachments import Geo, Poll, QuickReply, File
 from .enums import ReplySetting, SpaceState
 from .http import HTTPClient
 from .message import DirectMessage, WelcomeMessage, WelcomeMessageRule, Message
@@ -162,6 +162,7 @@ class Client:
         self,
         text: str = None,
         *,
+        file: Optional[File] = None,
         poll: Optional[Poll] = None,
         geo: Optional[Union[Geo, str]] = None,
         quote_tweet: Optional[Union[str, int]] = None,
@@ -177,6 +178,8 @@ class Client:
         ------------
         text: :class:`str`
             The tweet's text, it will show up as the main text in a tweet.
+        file: Optional[:class:`File`]
+            The tweet's single file attachment. It must be an instance of pytweet.File
         poll: Optional[:class:`Poll`]
             The poll attachment.
         geo: Optional[Union[:class:`Geo`, :class:`str`]]
@@ -204,6 +207,7 @@ class Client:
         """
         res = self.http.post_tweet(
             text,
+            file=file,
             poll=poll,
             geo=geo,
             quote_tweet=quote_tweet,
