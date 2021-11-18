@@ -27,6 +27,15 @@ class Option:
     metadata: str
 
 class File:
+    """Represent a File attachment for messages.
+    
+    Parameters
+    ------------
+    path_to_filename: :class:`str`
+        The file's path.
+    dm_only: :class:`bool`
+        Indicates if the file is use in dm only. Default to False.
+    """
     def __init__(self, path_to_filename: str, *, dm_only: bool = False):
         self.__path = path_to_filename
         self._total_bytes = os.path.getsize(self.path)
@@ -38,22 +47,42 @@ class File:
 
     @property
     def path(self) -> str:
+        """:class:`str`: Returns the file's path.
+        
+        .. versionadded:: 1.3.5
+        """
         return self.__path
 
     @property
     def mimetype(self) -> str:
+        """:class:`str`: Returns the file's mimetype.
+        
+        .. versionadded:: 1.3.5
+        """
         return self._mimetype
     
     @property
     def filename(self) -> str:
+        """:class:`str`: Returns the file's basename.
+        
+        .. versionadded:: 1.3.5
+        """
         return os.path.basename(self.path)
 
     @property
-    def total_bytes(self):
+    def total_bytes(self) -> int:
+        """:class:`int`: Returns an integer value that represents the size of the specified path in bytes.
+        
+        .. versionadded:: 1.3.5
+        """
         return os.path.getsize(self.path)
 
     @property
     def media_category(self) -> str:
+        """:class:`str`: Returns the file's media category. e.g If its more tweet messages it can be TWEET_IMAGE if its in direct messages it will be dm_image.
+        
+        .. versionadded:: 1.3.5
+        """
         startpoint = "TWEET_"
         if "image" in self.mimetype and not "gif" in self.mimetype:
             return startpoint + "IMAGE" if not self.dm_only else "dm_image"
@@ -61,84 +90,6 @@ class File:
             return startpoint + "GIF" if not self.dm_only else "dm_gif"
         elif "video" in self.mimetype:
             return startpoint + "VIDEO" if not self.dm_only else "dm_video"
-
-
-class Media:
-    """Represent a Media attachment in a tweet.
-
-    .. describe:: x == y
-        Check if one Media key is equal to another.
-
-
-    .. describe:: x != y
-        Check if one Media key is not equal to another.
-
-
-    .. describe:: str(x)
-        Get the media url.
-
-    .. versionadded:: 1.1.0
-    """
-
-    def __init__(self, data: Dict[str, Any]):
-        self._payload = data
-
-    def __repr__(self) -> str:
-        return "Media(type={0.type} url={0.url} media_key={0.media_key})".format(self)
-
-    def __str__(self) -> str:
-        return self.url
-
-    def __eq__(self, other: Media) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
-            raise ValueError("== operation cannot be done with one of the element not a valid Media object")
-        return self.media_key == other.media_key
-
-    def __ne__(self, other: Media) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
-            raise ValueError("!= operation cannot be done with one of the element not a valid Media object")
-        return self.media_key != other.media_key
-
-    @property
-    def type(self) -> Optional[str]:
-        """Optional[:class:`str`]: Return the media's type.
-
-        .. versionadded:: 1.1.0
-        """
-        return self._payload.get("type")
-
-    @property
-    def url(self) -> Optional[str]:
-        """Optional[:class:`str`]: Return the media's url.
-
-        .. versionadded:: 1.1.0
-        """
-        return self._payload.get("url")
-
-    @property
-    def width(self) -> Optional[int]:
-        """Optional[:class:`int`]: the media's width.
-
-        .. versionadded:: 1.1.0
-        """
-        return self._payload.get("width")
-
-    @property
-    def height(self) -> Optional[int]:
-        """Optional[:class:`int`]: Return the media's height.
-
-        .. versionadded:: 1.1.0
-        """
-        return self._payload.get("height")
-
-    @property
-    def media_key(self) -> Optional[Union[int, str]]:
-        """Optional[Union[:class:`int`, :class:`str`]]: Returns the media's unique key.
-
-        .. versionadded:: 1.1.0
-        """
-        return self._payload.get("media_key")
-
 
 class PollOptions:
     """Represent the Poll Options, The minimum options in a poll is 2 and maximum is 4.
