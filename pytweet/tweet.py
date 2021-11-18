@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
-from .attachments import Media, Poll
+from .attachments import Poll
 from .message import Message
 from .metrics import TweetPublicMetrics
 from .relations import RelationHide, RelationLike, RelationRetweet
@@ -18,8 +18,84 @@ __all__ = (
     "EmbedsImages",
     "Embed",
     "Tweet",
+    "Media"
 )
 
+class Media:
+    """Represent a Media attachment in a tweet.
+
+    .. describe:: x == y
+        Check if one Media key is equal to another.
+
+
+    .. describe:: x != y
+        Check if one Media key is not equal to another.
+
+
+    .. describe:: str(x)
+        Get the media url.
+
+    .. versionadded:: 1.1.0
+    """
+
+    def __init__(self, data: Dict[str, Any]):
+        self._payload = data
+
+    def __repr__(self) -> str:
+        return "Media(type={0.type} url={0.url} media_key={0.media_key})".format(self)
+
+    def __str__(self) -> str:
+        return self.url
+
+    def __eq__(self, other: Media) -> Union[bool, NoReturn]:
+        if not isinstance(other, self):
+            raise ValueError("== operation cannot be done with one of the element not a valid Media object")
+        return self.media_key == other.media_key
+
+    def __ne__(self, other: Media) -> Union[bool, NoReturn]:
+        if not isinstance(other, self):
+            raise ValueError("!= operation cannot be done with one of the element not a valid Media object")
+        return self.media_key != other.media_key
+
+    @property
+    def type(self) -> Optional[str]:
+        """Optional[:class:`str`]: Return the media's type.
+
+        .. versionadded:: 1.1.0
+        """
+        return self._payload.get("type")
+
+    @property
+    def url(self) -> Optional[str]:
+        """Optional[:class:`str`]: Return the media's url.
+
+        .. versionadded:: 1.1.0
+        """
+        return self._payload.get("url")
+
+    @property
+    def width(self) -> Optional[int]:
+        """Optional[:class:`int`]: the media's width.
+
+        .. versionadded:: 1.1.0
+        """
+        return self._payload.get("width")
+
+    @property
+    def height(self) -> Optional[int]:
+        """Optional[:class:`int`]: Return the media's height.
+
+        .. versionadded:: 1.1.0
+        """
+        return self._payload.get("height")
+
+    @property
+    def media_key(self) -> Optional[Union[int, str]]:
+        """Optional[Union[:class:`int`, :class:`str`]]: Returns the media's unique key.
+
+        .. versionadded:: 1.1.0
+        """
+        return self._payload.get("media_key")
 
 class EmbedsImages:
     """Represent the tweets embed images.
