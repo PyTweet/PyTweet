@@ -9,7 +9,7 @@ from typing import Any, Dict, List, NoReturn, Optional, Union
 from .enums import ButtonType
 from .utils import time_parse_todt
 
-__all__ = ("Media", "PollOptions", "Poll", "QuickReply", "Geo", "CTA", "Button", "Option")
+__all__ = ("PollOptions", "Poll", "QuickReply", "Geo", "CTA", "Button", "Option")
 
 
 @dataclass
