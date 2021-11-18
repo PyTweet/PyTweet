@@ -186,12 +186,7 @@ class HTTPClient:
         
 
         if command.upper() == "INIT":
-            data = {
-                'command': "INIT",
-                'media_type': file.mimetype,
-                'total_bytes': file.total_bytes,
-                'media_category': file.media_category
-            }
+            data = {'command': "INIT", 'media_type': file.mimetype, 'total_bytes': file.total_bytes, 'media_category': file.media_category, "shared": file.dm_only}
             res = requests.post(self.upload_url, data=data, auth=auth)
             check_error(res)
             media_id = res.json()['media_id']
@@ -402,6 +397,7 @@ class HTTPClient:
         user_id: Union[str, int],
         text: str,
         *,
+        file: Optional[File] = None,
         quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
     ) -> Optional[NoReturn]:
@@ -415,12 +411,23 @@ class HTTPClient:
             }
         }
 
+
         if quick_reply and (not isinstance(quick_reply, QuickReply)):
             raise PytweetException("'quick_reply' is not an instance of pytweet.QuickReply")
 
         message_data = data["event"]["message_create"]["message_data"]
 
         message_data["text"] = str(text)
+
+        if file:
+            media_id = self.upload(file, "INIT")
+            self.upload(file, "APPEND", media_id = media_id)
+            self.upload(file, "FINALIZE", media_id = media_id)
+
+            message_data["attachment"] = {}
+            message_data["attachment"]["type"] = "media"
+            message_data["attachment"]["media"] = {}
+            message_data["attachment"]["media"]["id"] = str(media_id)
 
         if quick_reply:
             message_data["quick_reply"] = {
@@ -487,7 +494,7 @@ class HTTPClient:
             self.upload(file, "FINALIZE", media_id = media_id)
 
             payload["media"] = {}
-            payload["media"]["media_ids"] = [str(media_id), "1461278081394434051"]
+            payload["media"]["media_ids"] = [str(media_id)]
 
         if poll:
             payload["poll"] = {}
@@ -527,7 +534,6 @@ class HTTPClient:
         if super_followers_only:
             payload["for_super_followers_only"] = True
 
-        print(payload)
         res = self.request("POST", "2", "/tweets", json=payload, auth=True)
         data = res.get("data")
         tweet = Message(data.get("text"), data.get("id"), 1)
