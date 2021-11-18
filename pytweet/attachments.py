@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import datetime
+import mimetypes
+import os
 from dataclasses import dataclass
 from typing import Any, Dict, List, NoReturn, Optional, Union
 
@@ -23,6 +25,42 @@ class Option:
     label: str
     description: str
     metadata: str
+
+class File:
+    def __init__(self, path_to_filename: str):
+        self.__path = path_to_filename
+        self._total_bytes = os.path.getsize(self.path)
+        self._mimetype = mimetypes.MimeTypes().guess_type(self.path)[0]
+
+    def __repr__(self) -> str:
+        return "File(filename={0.filename})".format(self)
+
+    @property
+    def path(self) -> str:
+        return self.__path
+
+    @property
+    def mimetype(self) -> str:
+        return self._mimetype
+    
+    @property
+    def filename(self) -> str:
+        return os.path.basename(self.path)
+
+    @property
+    def total_bytes(self):
+        return os.path.getsize(self.path)
+
+    @property
+    def media_category(self) -> str:
+        startpoint = "TWEET_"
+        if "image" in self.mimetype:
+            return startpoint + "IMAGE"
+        elif "gif" in self.mimetype:
+            return startpoint + "GIF"
+        elif "video" in self.mimetype:
+            return startpoint + "VIDEO"
+
 
 class Media:
     """Represent a Media attachment in a tweet.
