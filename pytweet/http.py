@@ -5,10 +5,9 @@ import logging
 import sys
 import time
 import requests
-import mimetypes
 from typing import Any, Dict, List, NoReturn, Optional, Union
 
-from .attachments import CTA, Geo, Poll, QuickReply
+from .attachments import CTA, Geo, Poll, QuickReply, File
 from .auth import OauthSession
 from .enums import ReplySetting, SpaceState
 from .errors import BadRequests, Forbidden, NotFound, NotFoundError, PytweetException, TooManyRequests, Unauthorized
@@ -34,7 +33,7 @@ def check_error(response: requests.models.Response) -> NoReturn:
             except KeyError:
                 raise PytweetException(res)
 
-    elif code in (201, 204):
+    elif code in (201, 202, 204):
         pass
 
     elif code == 400:
@@ -101,7 +100,7 @@ class HTTPClient:
         self.access_token: Optional[str] = access_token
         self.access_token_secret: Optional[str] = access_token_secret
         self.base_url = "https://api.twitter.com/"
-        self.upload_url = "https://upload.twitter.com/"
+        self.upload_url = "https://upload.twitter.com/1.1/media/upload.json"
         self.message_cache = {}
         self.tweet_cache = {}
 
@@ -150,6 +149,88 @@ class HTTPClient:
         if is_json:
             return res
         return response
+
+    def upload(self, file: File, command: str, *,media_id = None):
+        assert command in ["INIT", "APPEND", "FINALIZE", "STATUS"]
+        auth = OauthSession(self.consumer_key, self.consumer_key_secret)
+        auth.set_access_token(self.access_token, self.access_token_secret)
+        auth = auth.oauth1
+
+        def CheckStatus(processing_info, media_id):
+            if not processing_info:
+                return
+
+            state = processing_info["state"]
+            try:
+                seconds = processing_info['check_after_secs']
+            except KeyError:
+                return
+            
+            if state == u"succeeded":
+                return
+
+            if state == u"failed":
+                raise PytweetException("Failed to finalize Media!")
+
+            time.sleep(seconds)
+            params = {
+                'command': 'STATUS',
+                'media_id': media_id
+            }
+
+            res = requests.get(url=self.upload_url, params=params, auth=auth)
+            check_error(res)
+    
+            processing_info = res.json().get('processing_info', None)
+            CheckStatus(processing_info, media_id)
+        
+
+        if command.upper() == "INIT":
+            data = {
+                'command': "INIT",
+                'media_type': file.mimetype,
+                'total_bytes': file.total_bytes,
+                'media_category': file.media_category
+            }
+            res = requests.post(self.upload_url, data=data, auth=auth)
+            check_error(res)
+            media_id = res.json()['media_id']
+            return media_id
+
+        elif command.upper() == "APPEND":
+            segment_id = 0
+            bytes_sent = 0
+            open_file = open(file.path, 'rb')
+            if not media_id:
+                raise ValueError("'media_id' is None! Please specified it.")
+
+            while bytes_sent < file.total_bytes:
+                chunk = open_file.read(4*1024*1024)
+                data = {
+                    'command': 'APPEND',
+                    'media_id': media_id,
+                    'segment_index': segment_id
+                }
+
+                files = {
+                    'media': chunk
+                }
+
+                res = requests.post(url=self.upload_url, data=data, files=files, auth=auth)
+                bytes_sent = open_file.tell()
+                segment_id = segment_id + 1
+
+        elif command.upper() == "FINALIZE":
+            data = {
+                'command': 'FINALIZE',
+                'media_id': media_id
+            }
+
+            res = requests.post(url=self.upload_url, data=data, auth=auth)
+            check_error(res)
+
+            processing_info = res.json().get('processing_info', None)
+            CheckStatus(processing_info, media_id)
 
     def fetch_user(self, user_id: Union[str, int]) -> User:
         try:
@@ -386,6 +467,7 @@ class HTTPClient:
         self,
         text: str = None,
         *,
+        file: Optional[File] = None,
         poll: Optional[Poll] = None,
         geo: Optional[Union[Geo, str]] = None,
         quote_tweet: Optional[Union[str, int]] = None,
@@ -398,6 +480,14 @@ class HTTPClient:
         payload = {}
         if text:
             payload["text"] = text
+
+        if file:
+            media_id = self.upload(file, "INIT")
+            self.upload(file, "APPEND", media_id = media_id)
+            self.upload(file, "FINALIZE", media_id = media_id)
+
+            payload["media"] = {}
+            payload["media"]["media_ids"] = [str(media_id), "1461278081394434051"]
 
         if poll:
             payload["poll"] = {}
@@ -437,6 +527,7 @@ class HTTPClient:
         if super_followers_only:
             payload["for_super_followers_only"] = True
 
+        print(payload)
         res = self.request("POST", "2", "/tweets", json=payload, auth=True)
         data = res.get("data")
         tweet = Message(data.get("text"), data.get("id"), 1)
