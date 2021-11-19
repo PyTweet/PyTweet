@@ -38,8 +38,12 @@ Client
     :members:
 
 
-Users
-----------------
+
+Twitter Models
+---------------------
+
+These following object are not meant to be create as an instance rather its for knowledge of what you can do with them.
+
 
 User
 ~~~~~~~
@@ -48,17 +52,6 @@ User
 
 .. autoclass:: User
     :members:
-
-UserPublicMetrics
-~~~~~~~
-
-.. attributetable:: UserPublicMetrics
-
-.. autoclass:: UserPublicMetrics
-    :members:
-
-Tweets 
-----------------
 
 Tweet
 ~~~~~~~
@@ -69,19 +62,10 @@ Tweet
     :members:
 
 
-
-TweetPublicMetrics
-~~~~~~~
-
-.. attributetable:: TweetPublicMetrics
-
-
-.. autoclass:: TweetPublicMetrics
-    :members:
-
 Messages
-----------------
+---------------------
 
+These following object are not meant to be create as an instance rather its for knowledge of what you can do with them.
 
 Message
 ~~~~~~~
@@ -99,17 +83,40 @@ DirectMessage
 .. autoclass:: DirectMessage
     :members:
 
+
+WelcomeMessage
+~~~~~~~
+
+
+.. attributetable:: WelcomeMessage
+
+.. autoclass:: WelcomeMessage
+    :members:
+
+
+WelcomeMessageRule
+~~~~~~~
+
+.. attributetable:: WelcomeMessageRule
+
+.. autoclass:: WelcomeMessageRule
+    :members:
+
+
+Attachments
+---------------------
+
+These following object are not meant to be create as an instance rather its for knowledge of what you can do with them.
+
 Media
-----------------
+~~~~~~~
+
 
 .. attributetable:: Media
 
 .. autoclass:: Media
     :members:
 
-
-Polls
-----------------
 
 Poll
 ~~~~~~~
@@ -130,6 +137,61 @@ PollOption
 .. autoclass:: PollOption
     :members:
 
+
+
+CTA
+~~~~~~~
+
+.. attributetable:: CTA
+
+.. autoclass:: CTA
+    :members:
+
+
+QuickReply
+~~~~~~~
+
+.. attributetable:: QuickReply
+
+.. autoclass:: QuickReply
+    :members:
+
+
+Geo
+~~~~~~~
+
+.. attributetable:: Geo
+
+.. autoclass:: Geo
+    :members:
+
+
+File
+~~~~~~~
+
+.. attributetable:: File
+
+.. autoclass:: File
+    :members:
+
+
+Button
+~~~~~~~
+
+
+.. attributetable:: Button
+
+.. autoclass:: Button
+    :members:
+
+Option
+~~~~~~~
+
+
+.. attributetable:: Option
+
+.. autoclass:: Option
+    :members:
 
 Relations
 ----------------
@@ -180,41 +242,6 @@ EmbedsImages
 
 
 .. autoclass:: EmbedsImages
-    :members:
-
-CTA
-----------------
-
-CTA
-~~~~~~~
-
-.. attributetable:: CTA
-
-.. autoclass:: CTA
-    :members:
-
-
-QuickReply
-----------------
-
-QuickReply
-~~~~~~~
-
-.. attributetable:: QuickReply
-
-.. autoclass:: QuickReply
-    :members:
-
-
-Geo
-----------------
-
-Geo
-~~~~~~~
-
-.. attributetable:: Geo
-
-.. autoclass:: Geo
     :members:
 
 
