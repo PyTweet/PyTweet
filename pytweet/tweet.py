@@ -547,7 +547,7 @@ class Tweet(Message):
                     data.get("end_datetime"),
                 )
                 for option in data.get("options"):
-                    poll.add_option_FromRequest(option.get("position"), option.get("label"), option.get("votes"))
+                    poll.add_option(**option)
                 return poll
 
         return None

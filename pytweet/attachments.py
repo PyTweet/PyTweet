@@ -9,7 +9,7 @@ from typing import Any, Dict, List, NoReturn, Optional, Union
 from .enums import ButtonType
 from .utils import time_parse_todt
 
-__all__ = ("PollOptions", "Poll", "QuickReply", "Geo", "CTA", "Button", "Option")
+__all__ = ("PollOption", "Poll", "QuickReply", "Geo", "CTA", "Button", "Option")
 
 
 @dataclass
@@ -19,12 +19,17 @@ class Button:
     url: str
     tco_url: Optional[str] = None
 
-
 @dataclass
 class Option:
     label: str
     description: str
     metadata: str
+
+@dataclass
+class PollOption:
+    label: str
+    position: int = 0
+    votes: int = 0
 
 class File:
     """Represent a File attachment for messages.
@@ -91,97 +96,6 @@ class File:
         elif "video" in self.mimetype:
             return startpoint + "VIDEO" if not self.dm_only else "dm_video"
 
-
-@dataclass(repr=False, eq=False)
-class PollOptions:
-    options: Dict[str, Any]
-
-    """Represent the Poll Options, The minimum options in a poll is 2 and maximum is 4.
-
-    .. describe:: x == y
-        Check if one PollOption position is equal to another.
-
-
-    .. describe:: x != y
-        Check if one PollOption position is not equal to another.
-
-
-    .. describe:: x > y
-        Check if one PollOption position is higher then to another.
-
-
-    .. describe:: x < y
-        Check if one PollOption position is less then to another.
-
-
-    .. describe:: x >= y
-        Check if one PollOption position is higher then equal to another.
-
-
-    .. describe:: x <= y
-        Check if one PollOption position is less then equal to another.
-
-    .. versionadded:: 1.1.0
-    """
-
-    def __repr__(self) -> str:
-        return "PollOption(position={0.position} label={0.label} votes={0.votes})".format(self)
-
-    def __eq__(self, other: PollOptions) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
-            raise ValueError("== operation cannot be done with one of the element not a valid PollOptions object")
-        return self.position == other.position
-
-    def __ne__(self, other: PollOptions) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
-            raise ValueError("!= operation cannot be done with one of the element not a valid PollOptions object")
-        return self.position != other.position
-
-    def __lt__(self, other: PollOptions) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
-            raise ValueError("< operation cannot be done with one of the element not a valid PollOptions object")
-        return self.position < other.position
-
-    def __gt__(self, other: PollOptions) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
-            raise ValueError("> operation cannot be done with one of the element not a valid PollOptions object")
-        return self.position > other.position
-
-    def __le__(self, other: PollOptions) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
-            raise ValueError("<= operation cannot be done with one of the element not a valid PollOptions object")
-        return self.position <= other.position
-
-    def __ge__(self, other: PollOptions) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
-            raise ValueError(">= operation cannot be done with one of the element not a valid PollOptions object")
-        return self.position >= other.position
-
-    @property
-    def position(self) -> Optional[int]:
-        """Optional[:class:`int`]: The option's position.
-
-        .. versionadded:: 1.1.0
-        """
-        return self.options.get("position")
-
-    @property
-    def label(self) -> Optional[str]:
-        """Optional[:class:`str`]: The option's label.
-
-        .. versionadded:: 1.1.0
-        """
-        return self.options.get("label")
-
-    @property
-    def votes(self) -> int:
-        """Optional[:class:`int`]: The option's votes.
-
-        .. versionadded:: 1.1.0
-        """
-        return self.options.get("votes", 0)
-
-
 class Poll:
     """Represent a Poll attachment in a tweet.
 
@@ -240,36 +154,20 @@ class Poll:
     def __len__(self) -> int:
         return len(self.options)
 
-    def add_option(self, label: str) -> Poll:
+    def add_option(self, *,label: str, position: int = 0, votes: int = 0) -> Poll:
         """Add option to your Poll instance.
 
+        .. note::
+            For attaching a poll object you should use the label argument and only label as the api only need labels to make poll.
+
         Parameters
         ------------
         label: :class:`str`
             The option's label.
-
-        Returns
-        ---------
-        :class:`Poll`
-            This method return your :class:`Poll` instance.
-
-        .. versionadded 1.3.5
-        """
-
-        self._options.append({"label": label})
-        return self
-
-    def add_option_FromRequest(self, position: int, label: str, votes: int) -> Poll:
-        """Add option from a request, this differ from add_option. This one has votes argument use to specified how many votes that an option has. You should be using the add_option rather then this since this function is only use when a request return votes
-
-        Parameters
-        ------------
         position: :class:`int`
-            The option's position, maximum position is 4.
-        label: :class:`str`
-            The option's label.
+            The option's position.
         votes: :class:`int`
-            The option votes
+            The option's votes.
 
         Returns
         ---------
@@ -279,11 +177,9 @@ class Poll:
 
         .. versionadded 1.3.5
         """
-
-        if position > 4:
-            return
-        self._options.append({"position": position, "label": label, "votes": votes})
+        self._options.append({"position": position or 0, "label": label, "votes": votes or 0})
         return self
+
 
     @property
     def id(self) -> Optional[int]:
@@ -294,12 +190,12 @@ class Poll:
         return int(self._id) if self._id else None
 
     @property
-    def options(self) -> List[PollOptions]:
-        """List[:class:`PollOptions`]: Return a list of :class:`PollOptions`.
+    def options(self) -> List[PollOption]:
+        """List[:class:`PollOption`]: Return a list of :class:`PollOption`.
 
         .. versionadded:: 1.1.0
         """
-        return [PollOptions(option) for option in self._options]
+        return [PollOption(**option) for option in self._options]
 
     @property
     def voting_status(self) -> bool:
