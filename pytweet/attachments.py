@@ -19,11 +19,13 @@ class Button:
     url: str
     tco_url: Optional[str] = None
 
+
 @dataclass
 class Option:
     label: str
     description: str
     metadata: str
+
 
 @dataclass
 class PollOption:
@@ -31,9 +33,10 @@ class PollOption:
     position: int = 0
     votes: int = 0
 
+
 class File:
     """Represent a File attachment for messages.
-    
+
     Parameters
     ------------
     path_to_filename: :class:`str`
@@ -41,6 +44,7 @@ class File:
     dm_only: :class:`bool`
         Indicates if the file is use in dm only. Default to False.
     """
+
     def __init__(self, path_to_filename: str, *, dm_only: bool = False):
         self.__path = path_to_filename
         self._total_bytes = os.path.getsize(self.path)
@@ -53,7 +57,7 @@ class File:
     @property
     def path(self) -> str:
         """:class:`str`: Returns the file's path.
-        
+
         .. versionadded:: 1.3.5
         """
         return self.__path
@@ -61,15 +65,15 @@ class File:
     @property
     def mimetype(self) -> str:
         """:class:`str`: Returns the file's mimetype.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._mimetype
-    
+
     @property
     def filename(self) -> str:
         """:class:`str`: Returns the file's basename.
-        
+
         .. versionadded:: 1.3.5
         """
         return os.path.basename(self.path)
@@ -77,7 +81,7 @@ class File:
     @property
     def total_bytes(self) -> int:
         """:class:`int`: Returns an integer value that represents the size of the specified path in bytes.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._total_bytes
@@ -85,7 +89,7 @@ class File:
     @property
     def media_category(self) -> str:
         """:class:`str`: Returns the file's media category. e.g If its more tweet messages it can be TWEET_IMAGE if its in direct messages it will be dm_image.
-        
+
         .. versionadded:: 1.3.5
         """
         startpoint = "TWEET_"
@@ -95,6 +99,7 @@ class File:
             return startpoint + "GIF" if not self.dm_only else "dm_gif"
         elif "video" in self.mimetype:
             return startpoint + "VIDEO" if not self.dm_only else "dm_video"
+
 
 class Poll:
     """Represent a Poll attachment in a tweet.
@@ -154,7 +159,7 @@ class Poll:
     def __len__(self) -> int:
         return len(self.options)
 
-    def add_option(self, *,label: str, position: int = 0, votes: int = 0) -> Poll:
+    def add_option(self, *, label: str, position: int = 0, votes: int = 0) -> Poll:
         """Add option to your Poll instance.
 
         .. note::
@@ -179,7 +184,6 @@ class Poll:
         """
         self._options.append({"position": position or 0, "label": label, "votes": votes or 0})
         return self
-
 
     @property
     def id(self) -> Optional[int]:
@@ -282,7 +286,7 @@ class QuickReply:
     @property
     def raw_options(self) -> List[Dict]:
         """List[Dict]: Returns the raw options.
-        
+
         .. versionadded:: 1.2.0
         """
         return self._raw_options
@@ -290,7 +294,7 @@ class QuickReply:
     @property
     def options(self) -> List[Option]:
         """List[:class:`Option`]: Returns a list of pre-made Option objects.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._options
@@ -324,7 +328,7 @@ class Geo:
     @property
     def name(self) -> str:
         """:class:`str`: Returns place's name.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("name")
@@ -332,7 +336,7 @@ class Geo:
     @property
     def id(self) -> str:
         """:class:`str`: Returns place's unique id.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("id")
@@ -340,7 +344,7 @@ class Geo:
     @property
     def fullname(self) -> str:
         """:class:`str`: Returns place's fullname.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("full_name")
@@ -348,7 +352,7 @@ class Geo:
     @property
     def type(self) -> str:
         """:class:`str`: Returns place's type.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("place_type")
@@ -356,7 +360,7 @@ class Geo:
     @property
     def country(self) -> str:
         """:class:`str`: Returns the country where the place is in.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("country")
@@ -364,7 +368,7 @@ class Geo:
     @property
     def country_code(self) -> str:
         """:class:`str`: Returns the country's code where the location is in.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("country_code")
@@ -372,7 +376,7 @@ class Geo:
     @property
     def centroid(self) -> str:
         """:class:`str`: Returns the place's centroid.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("centroid")
@@ -380,7 +384,7 @@ class Geo:
     @property
     def bounding_box_type(self) -> str:
         """:class:`str`: Returns the place's bounding box type.
-        
+
         .. versionadded:: 1.3.5
         """
         if self._bounding_box:
@@ -390,7 +394,7 @@ class Geo:
     @property
     def coordinates(self) -> List[str]:
         """List[:class:`str`]: Returns a list of coordinates where the place's located.
-        
+
         .. versionadded:: 1.3.5
         """
         if self._bounding_box:
@@ -440,7 +444,7 @@ class CTA:
     @property
     def buttons(self) -> List[Button]:
         """List[:class:`Button`]: Returns a list of pre-made buttons object.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._buttons
@@ -448,7 +452,7 @@ class CTA:
     @property
     def raw_buttons(self) -> List[Dict]:
         """List[dict]: Returns the list of dictionaries filled with raw buttons.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._raw_buttons

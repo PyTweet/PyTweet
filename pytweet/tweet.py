@@ -14,12 +14,8 @@ from .enums import ReplySetting
 if TYPE_CHECKING:
     from .http import HTTPClient
 
-__all__ = (
-    "EmbedsImages",
-    "Embed",
-    "Tweet",
-    "Media"
-)
+__all__ = ("EmbedsImages", "Embed", "Tweet", "Media")
+
 
 class Media:
     """Represent a Media attachment in a tweet.
@@ -96,6 +92,7 @@ class Media:
         .. versionadded:: 1.1.0
         """
         return self._payload.get("media_key")
+
 
 class EmbedsImages:
     """Represent the tweets embed images.

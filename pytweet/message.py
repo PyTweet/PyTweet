@@ -58,7 +58,7 @@ class DirectMessage(Message):
     .. versionadded:: 1.2.0
     """
 
-    def __init__(self, data: Dict[str, Any], *,http_client: HTTPClient):
+    def __init__(self, data: Dict[str, Any], *, http_client: HTTPClient):
         self.original_payload = data
         self._payload = data.get("event", None)
         self.message_create = self._payload.get("message_create", None)
@@ -218,17 +218,17 @@ class WelcomeMessage(Message):
         name: Optional[str] = None,
         *,
         text: str,
-        welcome_message_id: Union[str, int],
+        id: Union[str, int],
         timestamp: str,
         http_client: HTTPClient,
     ):
-        super().__init__(text, welcome_message_id, 2)
+        super().__init__(text, id, 2)
         self._name = name
         self._timestamp = timestamp
         self.http_client = http_client
 
     def __repr__(self) -> str:
-        return "WelcomeMessage(id: {0.id} name: {0.name} timestamp: {0._timestamp} created_at: {0.created_at})".format(
+        return "WelcomeMessage(text={0.text} id={0.id})".format(
             self
         )
 
@@ -295,7 +295,7 @@ class WelcomeMessage(Message):
         timestamp = welcome_message.get("created_timestamp")
         text = message_data.get("text")
 
-        return WelcomeMessage(name, text=text, welcome_message_id=id, timestamp=timestamp)
+        return WelcomeMessage(name, text=text, id=id, timestamp=timestamp)
 
     def delete(self):
         """Delete the Welcome Message.
@@ -313,7 +313,7 @@ class WelcomeMessage(Message):
     @property
     def created_at(self) -> datetime.datetime:
         """:class:`dateitme.datetime`: Returns the welcome message created date.
-        
+
         .. versionadded:: 1.3.5
         """
         timestamp = str(self._timestamp)[:10]
@@ -322,7 +322,7 @@ class WelcomeMessage(Message):
     @property
     def name(self) -> str:
         """:class:`str`: Returns the welcome message's name.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._name

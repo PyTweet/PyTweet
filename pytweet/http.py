@@ -150,7 +150,7 @@ class HTTPClient:
             return res
         return response
 
-    def upload(self, file: File, command: str, *,media_id = None):
+    def upload(self, file: File, command: str, *, media_id=None):
         assert command in ["INIT", "APPEND", "FINALIZE", "STATUS"]
         auth = OauthSession(self.consumer_key, self.consumer_key_secret)
         auth.set_access_token(self.access_token, self.access_token_secret)
@@ -162,69 +162,62 @@ class HTTPClient:
 
             state = processing_info["state"]
             try:
-                seconds = processing_info['check_after_secs']
+                seconds = processing_info["check_after_secs"]
             except KeyError:
                 return
-            
-            if state == u"succeeded":
+
+            if state == "succeeded":
                 return
 
-            if state == u"failed":
+            if state == "failed":
                 raise PytweetException("Failed to finalize Media!")
 
             time.sleep(seconds)
-            params = {
-                'command': 'STATUS',
-                'media_id': media_id
-            }
+            params = {"command": "STATUS", "media_id": media_id}
 
             res = requests.get(url=self.upload_url, params=params, auth=auth)
             check_error(res)
-    
-            processing_info = res.json().get('processing_info', None)
+
+            processing_info = res.json().get("processing_info", None)
             CheckStatus(processing_info, media_id)
-        
 
         if command.upper() == "INIT":
-            data = {'command': "INIT", 'media_type': file.mimetype, 'total_bytes': file.total_bytes, 'media_category': file.media_category, "shared": file.dm_only}
+            data = {
+                "command": "INIT",
+                "media_type": file.mimetype,
+                "total_bytes": file.total_bytes,
+                "media_category": file.media_category,
+                "shared": file.dm_only,
+            }
             res = requests.post(self.upload_url, data=data, auth=auth)
             check_error(res)
-            media_id = res.json()['media_id']
+            media_id = res.json()["media_id"]
             return media_id
 
         elif command.upper() == "APPEND":
             segment_id = 0
             bytes_sent = 0
-            open_file = open(file.path, 'rb')
+            open_file = open(file.path, "rb")
             if not media_id:
                 raise ValueError("'media_id' is None! Please specified it.")
 
             while bytes_sent < file.total_bytes:
-                chunk = open_file.read(4*1024*1024)
-                data = {
-                    'command': 'APPEND',
-                    'media_id': media_id,
-                    'segment_index': segment_id
-                }
+                chunk = open_file.read(4 * 1024 * 1024)
+                data = {"command": "APPEND", "media_id": media_id, "segment_index": segment_id}
 
-                files = {
-                    'media': chunk
-                }
+                files = {"media": chunk}
 
                 res = requests.post(url=self.upload_url, data=data, files=files, auth=auth)
                 bytes_sent = open_file.tell()
                 segment_id = segment_id + 1
 
         elif command.upper() == "FINALIZE":
-            data = {
-                'command': 'FINALIZE',
-                'media_id': media_id
-            }
+            data = {"command": "FINALIZE", "media_id": media_id}
 
             res = requests.post(url=self.upload_url, data=data, auth=auth)
             check_error(res)
 
-            processing_info = res.json().get('processing_info', None)
+            processing_info = res.json().get("processing_info", None)
             CheckStatus(processing_info, media_id)
 
     def fetch_user(self, user_id: Union[str, int]) -> User:
@@ -351,18 +344,14 @@ class HTTPClient:
         try:
             res2["data"]
 
-            res["data"].update(
-                {"retweetes": [User(user, http_client=self) for user in res2["data"]]}
-            )
+            res["data"].update({"retweetes": [User(user, http_client=self) for user in res2["data"]]})
         except (KeyError, TypeError):
             res["data"].update({"retweetes": []})
 
         try:
             res3["data"]
 
-            res["data"].update(
-                {"likes": [User(user, http_client=self) for user in res3["data"]]}
-            )
+            res["data"].update({"likes": [User(user, http_client=self) for user in res3["data"]]})
         except (KeyError, TypeError):
             res["data"].update({"likes": []})
 
@@ -411,7 +400,6 @@ class HTTPClient:
             }
         }
 
-
         if quick_reply and (not isinstance(quick_reply, QuickReply)):
             raise PytweetException("'quick_reply' is not an instance of pytweet.QuickReply")
 
@@ -421,8 +409,8 @@ class HTTPClient:
 
         if file:
             media_id = self.upload(file, "INIT")
-            self.upload(file, "APPEND", media_id = media_id)
-            self.upload(file, "FINALIZE", media_id = media_id)
+            self.upload(file, "APPEND", media_id=media_id)
+            self.upload(file, "FINALIZE", media_id=media_id)
 
             message_data["attachment"] = {}
             message_data["attachment"]["type"] = "media"
@@ -490,8 +478,8 @@ class HTTPClient:
 
         if file:
             media_id = self.upload(file, "INIT")
-            self.upload(file, "APPEND", media_id = media_id)
-            self.upload(file, "FINALIZE", media_id = media_id)
+            self.upload(file, "APPEND", media_id=media_id)
+            self.upload(file, "FINALIZE", media_id=media_id)
 
             payload["media"] = {}
             payload["media"]["media_ids"] = [str(media_id)]
