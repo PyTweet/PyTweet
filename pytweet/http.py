@@ -119,7 +119,7 @@ class HTTPClient:
         url = self.base_url + version + path
         user_agent = "Py-Tweet (https://github.com/TheFarGG/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
 
-        if headers == {} and not "Authorization" in headers.keys():
+        if headers == {} and "Authorization" not in headers.keys():
             headers = {"Authorization": f"Bearer {self.bearer_token}"}
 
         headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
