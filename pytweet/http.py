@@ -7,7 +7,7 @@ import time
 import requests
 from typing import Any, Dict, List, NoReturn, Optional, Union
 
-from .attachments import CTA, Geo, Poll, QuickReply, File
+from .attachments import CTA, Geo, Poll, QuickReply, File, CustomProfile
 from .auth import OauthSession
 from .enums import ReplySetting, SpaceState
 from .errors import BadRequests, Forbidden, NotFound, NotFoundError, PytweetException, TooManyRequests, Unauthorized
@@ -204,7 +204,6 @@ class HTTPClient:
             while bytes_sent < file.total_bytes:
                 chunk = open_file.read(4 * 1024 * 1024)
                 data = {"command": "APPEND", "media_id": media_id, "segment_index": segment_id}
-
                 files = {"media": chunk}
 
                 res = requests.post(url=self.upload_url, data=data, files=files, auth=auth)
@@ -387,6 +386,7 @@ class HTTPClient:
         text: str,
         *,
         file: Optional[File] = None,
+        custom_profile: Optional[CustomProfile] = None,
         quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
     ) -> Optional[NoReturn]:
@@ -400,11 +400,19 @@ class HTTPClient:
             }
         }
 
+        if file and (not isinstance(file, File)):
+            raise PytweetException("'file' argument must be an instance of pytweet.File")
+
+        if custom_profile and (not isinstance(custom_profile, CustomProfile)):
+            raise PytweetException("'custom_profile' argument must be an instance of pytweet.CustomProfile")
+
         if quick_reply and (not isinstance(quick_reply, QuickReply)):
-            raise PytweetException("'quick_reply' is not an instance of pytweet.QuickReply")
+            raise PytweetException("'quick_reply' must be an instance of pytweet.QuickReply")
+
+        if cta and (not isinstance(cta, CTA)):
+            raise PytweetException("'cta' argument must be an instance of pytweet.CTA")
 
         message_data = data["event"]["message_create"]["message_data"]
-
         message_data["text"] = str(text)
 
         if file:
@@ -416,6 +424,9 @@ class HTTPClient:
             message_data["attachment"]["type"] = "media"
             message_data["attachment"]["media"] = {}
             message_data["attachment"]["media"]["id"] = str(media_id)
+
+        if custom_profile:
+            message_data["custom_profile_id"] = str(custom_profile.id)
 
         if quick_reply:
             message_data["quick_reply"] = {
@@ -491,7 +502,7 @@ class HTTPClient:
 
         if geo:
             if not isinstance(geo, Geo) and not isinstance(geo, str):
-                raise TypeError("'geo' is not an instance of Geo or str")
+                raise TypeError("'geo' must be an instance of pytweet.Geo or str")
 
             payload["geo"] = {}
             payload["geo"]["place_id"] = geo.id if isinstance(geo, Geo) else geo

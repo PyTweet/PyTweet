@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
-from .attachments import CTA, QuickReply, File
+from .attachments import CTA, QuickReply, File, CustomProfile
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import time_parse_todt
@@ -59,6 +59,7 @@ class User:
         text: str,
         *,
         file: Optional[File] = None,
+        custom_profile: Optional[CustomProfile] = None,
         quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
     ) -> DirectMessage:
@@ -70,6 +71,8 @@ class User:
             The text that will be send to that user.
         file: Optional[:class:`File`]
             Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
+        custom_profile: Optional[:class:`custom_profile`]
+            The custom profile attachment.
         quick_reply: Optional[:class:`QuickReply`]
             The QuickReply attachment that will be send to a user.
         cta: Optional[:class:`CTA`]
@@ -83,7 +86,7 @@ class User:
 
         .. versionadded:: 1.1.0
         """
-        return self.http_client.send_message(self.id, text, file=file, quick_reply=quick_reply, cta=cta)
+        return self.http_client.send_message(self.id, text, file=file, custom_profile=custom_profile, quick_reply=quick_reply, cta=cta)
 
     def follow(self) -> RelationFollow:
         """Make a Request to follow a User.
