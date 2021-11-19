@@ -312,7 +312,7 @@ class WelcomeMessage(Message):
 
     @property
     def created_at(self) -> datetime.datetime:
-        """:class:`dateitme.datetime`: Returns the welcome message created date.
+        """:class:`datetime.datetime`: Returns the welcome message created date.
 
         .. versionadded:: 1.3.5
         """
