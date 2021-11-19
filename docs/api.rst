@@ -20,8 +20,17 @@ Version Related Info
 
     Get the version of the module (e.g ``1.0.0`` or ``1.0.0a``) this is based on :pep:`440`.
 
+
+Classes 
+---------------------------
+
+These are all the **public** classes of pytweet.
+
+Clients
+----------------
+
 Client
--------
+~~~~~~~
 
 .. attributetable:: Client
 
@@ -29,25 +38,40 @@ Client
     :members:
 
 
-Commonly used Classes 
--------
+Users
+----------------
 
-There a lot of commonly used classes that is used frequently when using PyTweet, and here they are.
+User
+~~~~~~~
 
 .. attributetable:: User
 
 .. autoclass:: User
     :members:
 
+UserPublicMetrics
+~~~~~~~
+
 .. attributetable:: UserPublicMetrics
 
 .. autoclass:: UserPublicMetrics
     :members:
 
+Tweets 
+----------------
+
+Tweet
+~~~~~~~
+
 .. attributetable:: Tweet
 
 .. autoclass:: Tweet
     :members:
+
+
+
+TweetPublicMetrics
+~~~~~~~
 
 .. attributetable:: TweetPublicMetrics
 
@@ -55,55 +79,140 @@ There a lot of commonly used classes that is used frequently when using PyTweet,
 .. autoclass:: TweetPublicMetrics
     :members:
 
+Messages
+----------------
+
+
+Message
+~~~~~~~
+
 .. attributetable:: Message
 
 .. autoclass:: Message
     :members:
+
+DirectMessage
+~~~~~~~
 
 .. attributetable:: DirectMessage
 
 .. autoclass:: DirectMessage
     :members:
 
+Media
+----------------
+
 .. attributetable:: Media
 
 .. autoclass:: Media
     :members:
+
+
+Polls
+----------------
+
+Poll
+~~~~~~~
 
 .. attributetable:: Poll
 
 .. autoclass:: Poll
     :members:
 
-.. attributetable:: PollOptions
 
-.. autoclass:: PollOptions
+PollOption
+~~~~~~~
+
+
+.. attributetable:: Poll
+
+.. autoclass:: Poll
     :members:
+
+Relations
+----------------
+
+RelationFollow
+~~~~~~~
+
 
 .. attributetable:: RelationFollow
 
 .. autoclass:: RelationFollow
     :members:
 
+RelationLike
+~~~~~~~
+
 .. attributetable:: RelationLike
 
 .. autoclass:: RelationLike
     :members:
+
+
+RelationRetweet
+~~~~~~~
 
 .. attributetable:: RelationRetweet
 
 .. autoclass:: RelationRetweet
     :members:
 
+
+Embeds
+----------------
+
+Embed
+~~~~~~~
+
 .. attributetable:: Embed
 
 .. autoclass:: Embed
     :members:
 
+
+EmbedsImages
+~~~~~~~
+
 .. attributetable:: EmbedsImages
 
 
 .. autoclass:: EmbedsImages
+    :members:
+
+CTA
+----------------
+
+CTA
+~~~~~~~
+
+.. attributetable:: CTA
+
+.. autoclass:: CTA
+    :members:
+
+
+QuickReply
+----------------
+
+QuickReply
+~~~~~~~
+
+.. attributetable:: QuickReply
+
+.. autoclass:: QuickReply
+    :members:
+
+
+Geo
+----------------
+
+Geo
+~~~~~~~
+
+.. attributetable:: Geo
+
+.. autoclass:: Geo
     :members:
 
 
