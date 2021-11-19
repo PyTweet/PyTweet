@@ -9,7 +9,7 @@ from typing import Any, Dict, List, NoReturn, Optional, Union
 from .enums import ButtonType
 from .utils import time_parse_todt
 
-__all__ = ("PollOptions", "Poll", "QuickReply", "Geo", "CTA", "Button", "Option")
+__all__ = ("PollOption", "Poll", "QuickReply", "Geo", "CTA", "Button", "Option")
 
 
 @dataclass
@@ -26,9 +26,17 @@ class Option:
     description: str
     metadata: str
 
+
+@dataclass
+class PollOption:
+    label: str
+    position: int = 0
+    votes: int = 0
+
+
 class File:
     """Represent a File attachment for messages.
-    
+
     Parameters
     ------------
     path_to_filename: :class:`str`
@@ -36,6 +44,7 @@ class File:
     dm_only: :class:`bool`
         Indicates if the file is use in dm only. Default to False.
     """
+
     def __init__(self, path_to_filename: str, *, dm_only: bool = False):
         self.__path = path_to_filename
         self._total_bytes = os.path.getsize(self.path)
@@ -48,7 +57,7 @@ class File:
     @property
     def path(self) -> str:
         """:class:`str`: Returns the file's path.
-        
+
         .. versionadded:: 1.3.5
         """
         return self.__path
@@ -56,15 +65,15 @@ class File:
     @property
     def mimetype(self) -> str:
         """:class:`str`: Returns the file's mimetype.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._mimetype
-    
+
     @property
     def filename(self) -> str:
         """:class:`str`: Returns the file's basename.
-        
+
         .. versionadded:: 1.3.5
         """
         return os.path.basename(self.path)
@@ -72,7 +81,7 @@ class File:
     @property
     def total_bytes(self) -> int:
         """:class:`int`: Returns an integer value that represents the size of the specified path in bytes.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._total_bytes
@@ -80,7 +89,7 @@ class File:
     @property
     def media_category(self) -> str:
         """:class:`str`: Returns the file's media category. e.g If its more tweet messages it can be TWEET_IMAGE if its in direct messages it will be dm_image.
-        
+
         .. versionadded:: 1.3.5
         """
         startpoint = "TWEET_"
@@ -90,96 +99,6 @@ class File:
             return startpoint + "GIF" if not self.dm_only else "dm_gif"
         elif "video" in self.mimetype:
             return startpoint + "VIDEO" if not self.dm_only else "dm_video"
-
-
-@dataclass(repr=False, eq=False)
-class PollOptions:
-    options: Dict[str, Any]
-
-    """Represent the Poll Options, The minimum options in a poll is 2 and maximum is 4.
-
-    .. describe:: x == y
-        Check if one PollOption position is equal to another.
-
-
-    .. describe:: x != y
-        Check if one PollOption position is not equal to another.
-
-
-    .. describe:: x > y
-        Check if one PollOption position is higher then to another.
-
-
-    .. describe:: x < y
-        Check if one PollOption position is less then to another.
-
-
-    .. describe:: x >= y
-        Check if one PollOption position is higher then equal to another.
-
-
-    .. describe:: x <= y
-        Check if one PollOption position is less then equal to another.
-
-    .. versionadded:: 1.1.0
-    """
-
-    def __repr__(self) -> str:
-        return "PollOption(position={0.position} label={0.label} votes={0.votes})".format(self)
-
-    def __eq__(self, other: PollOptions) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
-            raise ValueError("== operation cannot be done with one of the element not a valid PollOptions object")
-        return self.position == other.position
-
-    def __ne__(self, other: PollOptions) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
-            raise ValueError("!= operation cannot be done with one of the element not a valid PollOptions object")
-        return self.position != other.position
-
-    def __lt__(self, other: PollOptions) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
-            raise ValueError("< operation cannot be done with one of the element not a valid PollOptions object")
-        return self.position < other.position
-
-    def __gt__(self, other: PollOptions) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
-            raise ValueError("> operation cannot be done with one of the element not a valid PollOptions object")
-        return self.position > other.position
-
-    def __le__(self, other: PollOptions) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
-            raise ValueError("<= operation cannot be done with one of the element not a valid PollOptions object")
-        return self.position <= other.position
-
-    def __ge__(self, other: PollOptions) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
-            raise ValueError(">= operation cannot be done with one of the element not a valid PollOptions object")
-        return self.position >= other.position
-
-    @property
-    def position(self) -> Optional[int]:
-        """Optional[:class:`int`]: The option's position.
-
-        .. versionadded:: 1.1.0
-        """
-        return self.options.get("position")
-
-    @property
-    def label(self) -> Optional[str]:
-        """Optional[:class:`str`]: The option's label.
-
-        .. versionadded:: 1.1.0
-        """
-        return self.options.get("label")
-
-    @property
-    def votes(self) -> int:
-        """Optional[:class:`int`]: The option's votes.
-
-        .. versionadded:: 1.1.0
-        """
-        return self.options.get("votes", 0)
 
 
 class Poll:
@@ -240,36 +159,20 @@ class Poll:
     def __len__(self) -> int:
         return len(self.options)
 
-    def add_option(self, label: str) -> Poll:
+    def add_option(self, *, label: str, position: int = 0, votes: int = 0) -> Poll:
         """Add option to your Poll instance.
 
+        .. note::
+            For attaching a poll object you should use the label argument and only label as the api only need labels to make poll.
+
         Parameters
         ------------
         label: :class:`str`
             The option's label.
-
-        Returns
-        ---------
-        :class:`Poll`
-            This method return your :class:`Poll` instance.
-
-        .. versionadded 1.3.5
-        """
-
-        self._options.append({"label": label})
-        return self
-
-    def add_option_FromRequest(self, position: int, label: str, votes: int) -> Poll:
-        """Add option from a request, this differ from add_option. This one has votes argument use to specified how many votes that an option has. You should be using the add_option rather then this since this function is only use when a request return votes
-
-        Parameters
-        ------------
         position: :class:`int`
-            The option's position, maximum position is 4.
-        label: :class:`str`
-            The option's label.
+            The option's position.
         votes: :class:`int`
-            The option votes
+            The option's votes.
 
         Returns
         ---------
@@ -279,10 +182,7 @@ class Poll:
 
         .. versionadded 1.3.5
         """
-
-        if position > 4:
-            return
-        self._options.append({"position": position, "label": label, "votes": votes})
+        self._options.append({"position": position or 0, "label": label, "votes": votes or 0})
         return self
 
     @property
@@ -294,12 +194,12 @@ class Poll:
         return int(self._id) if self._id else None
 
     @property
-    def options(self) -> List[PollOptions]:
-        """List[:class:`PollOptions`]: Return a list of :class:`PollOptions`.
+    def options(self) -> List[PollOption]:
+        """List[:class:`PollOption`]: Return a list of :class:`PollOption`.
 
         .. versionadded:: 1.1.0
         """
-        return [PollOptions(option) for option in self._options]
+        return [PollOption(**option) for option in self._options]
 
     @property
     def voting_status(self) -> bool:
@@ -386,7 +286,7 @@ class QuickReply:
     @property
     def raw_options(self) -> List[Dict]:
         """List[Dict]: Returns the raw options.
-        
+
         .. versionadded:: 1.2.0
         """
         return self._raw_options
@@ -394,7 +294,7 @@ class QuickReply:
     @property
     def options(self) -> List[Option]:
         """List[:class:`Option`]: Returns a list of pre-made Option objects.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._options
@@ -428,7 +328,7 @@ class Geo:
     @property
     def name(self) -> str:
         """:class:`str`: Returns place's name.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("name")
@@ -436,7 +336,7 @@ class Geo:
     @property
     def id(self) -> str:
         """:class:`str`: Returns place's unique id.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("id")
@@ -444,7 +344,7 @@ class Geo:
     @property
     def fullname(self) -> str:
         """:class:`str`: Returns place's fullname.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("full_name")
@@ -452,7 +352,7 @@ class Geo:
     @property
     def type(self) -> str:
         """:class:`str`: Returns place's type.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("place_type")
@@ -460,7 +360,7 @@ class Geo:
     @property
     def country(self) -> str:
         """:class:`str`: Returns the country where the place is in.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("country")
@@ -468,7 +368,7 @@ class Geo:
     @property
     def country_code(self) -> str:
         """:class:`str`: Returns the country's code where the location is in.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("country_code")
@@ -476,7 +376,7 @@ class Geo:
     @property
     def centroid(self) -> str:
         """:class:`str`: Returns the place's centroid.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._payload.get("centroid")
@@ -484,7 +384,7 @@ class Geo:
     @property
     def bounding_box_type(self) -> str:
         """:class:`str`: Returns the place's bounding box type.
-        
+
         .. versionadded:: 1.3.5
         """
         if self._bounding_box:
@@ -494,7 +394,7 @@ class Geo:
     @property
     def coordinates(self) -> List[str]:
         """List[:class:`str`]: Returns a list of coordinates where the place's located.
-        
+
         .. versionadded:: 1.3.5
         """
         if self._bounding_box:
@@ -544,7 +444,7 @@ class CTA:
     @property
     def buttons(self) -> List[Button]:
         """List[:class:`Button`]: Returns a list of pre-made buttons object.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._buttons
@@ -552,7 +452,7 @@ class CTA:
     @property
     def raw_buttons(self) -> List[Dict]:
         """List[dict]: Returns the list of dictionaries filled with raw buttons.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._raw_buttons

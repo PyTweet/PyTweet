@@ -6,6 +6,7 @@ from .utils import time_parse_todt
 
 __all__ = ("Space",)
 
+
 class Space:
     def __init__(self, data: Dict[str, Any]):
         self.original_payload = data

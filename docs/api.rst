@@ -120,6 +120,7 @@ Poll
     :members:
 
 
+
 PollOption
 ~~~~~~~
 
@@ -128,6 +129,7 @@ PollOption
 
 .. autoclass:: PollOption
     :members:
+
 
 Relations
 ----------------

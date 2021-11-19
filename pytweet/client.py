@@ -215,7 +215,7 @@ class Client:
             reply_setting=reply_setting,
             reply_tweet=reply_tweet,
             exclude_reply_users=exclude_reply_users,
-            super_followers_only=super_followers_only
+            super_followers_only=super_followers_only,
         )
         return res
 
@@ -270,7 +270,7 @@ class Client:
         return WelcomeMessage(
             name,
             text=text,
-            welcome_message_id=id,
+            id=id,
             timestamp=timestamp,
             http_client=self.http,
         )
@@ -303,7 +303,7 @@ class Client:
         id = data.get("id")
         timestamp = data.get("created_timestamp")
         text = message_data.get("text")
-        return WelcomeMessage(text=text, welcome_message_id=id, timestamp=timestamp, http_client=self.http)
+        return WelcomeMessage(text=text, id=id, timestamp=timestamp, http_client=self.http)
 
     def fetch_welcome_message_rules(self, welcome_message_rules_id: Union[str, int]) -> WelcomeMessageRule:
         """A method for fetching a welcome message rules.
@@ -332,7 +332,7 @@ class Client:
         id = data.get("id")
         timestamp = data.get("created_timestamp")
         welcome_message_id = data.get("welcome_message_id")
-        return WelcomeMessageRule(id, welcome_message_id, timestamp, http_client=self)
+        return WelcomeMessageRule(id, welcome_message_id, timestamp, http_client=self.http)
 
     def fetch_space(self, space_id: Union[str, int]) -> Space:
         """A method for fetching a space.

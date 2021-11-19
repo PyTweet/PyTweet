@@ -54,7 +54,14 @@ class User:
             raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
-    def send(self, text: str, *, file: Optional[File] = None, quick_reply: Optional[QuickReply] = None, cta: Optional[CTA] = None) -> DirectMessage:
+    def send(
+        self,
+        text: str,
+        *,
+        file: Optional[File] = None,
+        quick_reply: Optional[QuickReply] = None,
+        cta: Optional[CTA] = None,
+    ) -> DirectMessage:
         """Send a message to the user.
 
         Parameters
@@ -76,13 +83,7 @@ class User:
 
         .. versionadded:: 1.1.0
         """
-        return self.http_client.send_message(
-            self.id,
-            text,
-            file=file,
-            quick_reply=quick_reply,
-            cta=cta
-        )
+        return self.http_client.send_message(self.id, text, file=file, quick_reply=quick_reply, cta=cta)
 
     def follow(self) -> RelationFollow:
         """Make a Request to follow a User.
@@ -232,7 +233,7 @@ class User:
     @property
     def name(self) -> str:
         """:class:`str`: Return the user's name.
-        
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("name")
@@ -240,7 +241,7 @@ class User:
     @property
     def username(self) -> str:
         """:class:`str`: Return the user's username, this usually start with '@' follow by their username.
-        
+
         .. versionadded: 1.0.0
         """
         return "@" + self._payload.get("username")
@@ -248,7 +249,7 @@ class User:
     @property
     def id(self) -> int:
         """:class:`int`: Return the user's id.
-        
+
         .. versionadded: 1.0.0
         """
         return int(self._payload.get("id"))
@@ -256,7 +257,7 @@ class User:
     @property
     def bio(self) -> str:
         """:class:`str`: Return the user's bio.
-        
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("description")
@@ -264,7 +265,7 @@ class User:
     @property
     def description(self) -> str:
         """:class:`str`: an alias to User.bio
-        
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("description")
@@ -272,7 +273,7 @@ class User:
     @property
     def profile_link(self) -> str:
         """:class:`str`: Return the user's profile link
-        
+
         .. versionadded: 1.0.0
         """
         return f"https://twitter.com/{self.username.replace('@', '', 1)}"
@@ -280,7 +281,7 @@ class User:
     @property
     def link(self) -> str:
         """:class:`str`: Return url where the user put links, return an empty string if there isn't a url
-        
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("url")
@@ -288,7 +289,7 @@ class User:
     @property
     def verified(self) -> bool:
         """:class:`bool`: Return True if the user is verified account, else False.
-        
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("verified")
@@ -296,7 +297,7 @@ class User:
     @property
     def protected(self) -> bool:
         """:class:`bool`: Return True if the user is protected, else False.
-        
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("protected")
@@ -304,7 +305,7 @@ class User:
     @property
     def avatar_url(self) -> Optional[str]:
         """Optional[:class:`str`]: Return the user profile image.
-        
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("profile_image_url")
@@ -312,7 +313,7 @@ class User:
     @property
     def location(self) -> Optional[str]:
         """:class:`str`: Return the user's location
-        
+
         .. versionadded: 1.0.0
         """
         return self._payload.get("location")
@@ -320,7 +321,7 @@ class User:
     @property
     def created_at(self) -> datetime.datetime:
         """:class:`datetime.datetime`: Return datetime.datetime object with the user's account date.
-        
+
         .. versionadded: 1.0.0
         """
         return time_parse_todt(self._payload.get("created_at"))
@@ -328,7 +329,7 @@ class User:
     @property
     def pinned_tweet_id(self) -> Optional[int]:
         """Optional[:class:`int`]: Returns the user's pinned tweet id.
-        
+
         .. versionadded: 1.1.3
         """
         id = self._payload.get("pinned_tweet_id")
@@ -337,7 +338,7 @@ class User:
     @property
     def followers(self) -> Union[List[User], List]:
         """List[:class:`User`]: Returns a list of users who are followers of the specified user ID. Maximum users is 100 users.
-        
+
         .. versionadded: 1.1.0
         """
         return self._payload.get("followers")
@@ -345,7 +346,7 @@ class User:
     @property
     def following(self) -> Union[List[User], List]:
         """List[:class:`User`]`: Returns a list of users that's followed by the specified user ID. Maximum users is 100 users.
-        
+
         .. versionadded: 1.1.0
         """
         return self._payload.get("following")
@@ -353,7 +354,7 @@ class User:
     @property
     def follower_count(self) -> int:
         """:class:`int`: Return total of followers that a user has.
-        
+
         .. versionadded: 1.1.0
         """
         return self._metrics.follower_count
@@ -361,7 +362,7 @@ class User:
     @property
     def following_count(self) -> int:
         """:class:`int`: Return total of following that a user has.
-        
+
         .. versionadded: 1.1.0
         """
         return self._metrics.following_count
@@ -369,7 +370,7 @@ class User:
     @property
     def tweet_count(self) -> int:
         """:class:`int`: Return total of tweet that a user has.
-        
+
         .. versionadded: 1.1.0
         """
         return self._metrics.tweet_count
@@ -377,7 +378,7 @@ class User:
     @property
     def listed_count(self) -> int:
         """:class:`int`: Return total of listed that a user has.
-        
+
         .. versionadded: 1.1.0
         """
         return self._metrics.listed_count
