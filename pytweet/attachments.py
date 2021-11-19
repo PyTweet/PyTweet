@@ -8,8 +8,9 @@ from typing import Any, Dict, List, NoReturn, Optional, Union
 
 from .enums import ButtonType
 from .utils import time_parse_todt
+from .entities import Media
 
-__all__ = ("PollOption", "Poll", "QuickReply", "Geo", "CTA", "Button", "Option")
+__all__ = ("PollOption", "Poll", "QuickReply", "Geo", "CTA", "Button", "Option", "File")
 
 
 @dataclass
@@ -32,74 +33,6 @@ class PollOption:
     label: str
     position: int = 0
     votes: int = 0
-
-
-class File:
-    """Represent a File attachment for messages.
-
-    Parameters
-    ------------
-    path_to_filename: :class:`str`
-        The file's path.
-    dm_only: :class:`bool`
-        Indicates if the file is use in dm only. Default to False.
-    """
-
-    def __init__(self, path_to_filename: str, *, dm_only: bool = False):
-        self.__path = path_to_filename
-        self._total_bytes = os.path.getsize(self.path)
-        self._mimetype = mimetypes.MimeTypes().guess_type(self.path)[0]
-        self.dm_only = dm_only
-
-    def __repr__(self) -> str:
-        return "File(filename={0.filename})".format(self)
-
-    @property
-    def path(self) -> str:
-        """:class:`str`: Returns the file's path.
-
-        .. versionadded:: 1.3.5
-        """
-        return self.__path
-
-    @property
-    def mimetype(self) -> str:
-        """:class:`str`: Returns the file's mimetype.
-
-        .. versionadded:: 1.3.5
-        """
-        return self._mimetype
-
-    @property
-    def filename(self) -> str:
-        """:class:`str`: Returns the file's basename.
-
-        .. versionadded:: 1.3.5
-        """
-        return os.path.basename(self.path)
-
-    @property
-    def total_bytes(self) -> int:
-        """:class:`int`: Returns an integer value that represents the size of the specified path in bytes.
-
-        .. versionadded:: 1.3.5
-        """
-        return self._total_bytes
-
-    @property
-    def media_category(self) -> str:
-        """:class:`str`: Returns the file's media category. e.g If its more tweet messages it can be TWEET_IMAGE if its in direct messages it will be dm_image.
-
-        .. versionadded:: 1.3.5
-        """
-        startpoint = "TWEET_"
-        if "image" in self.mimetype and not "gif" in self.mimetype:
-            return startpoint + "IMAGE" if not self.dm_only else "dm_image"
-        elif "gif" in self.mimetype:
-            return startpoint + "GIF" if not self.dm_only else "dm_gif"
-        elif "video" in self.mimetype:
-            return startpoint + "VIDEO" if not self.dm_only else "dm_video"
-
 
 class Poll:
     """Represent a Poll attachment in a tweet.
@@ -456,3 +389,127 @@ class CTA:
         .. versionadded:: 1.3.5
         """
         return self._raw_buttons
+
+class File:
+    """Represent a File attachment for messages.
+
+    Parameters
+    ------------
+    path_to_filename: :class:`str`
+        The file's path.
+    dm_only: :class:`bool`
+        Indicates if the file is use in dm only. Default to False.
+    """
+
+    def __init__(self, path_to_filename: str, *, dm_only: bool = False):
+        self.__path = path_to_filename
+        self._total_bytes = os.path.getsize(self.path)
+        self._mimetype = mimetypes.MimeTypes().guess_type(self.path)[0]
+        self.dm_only = dm_only
+
+    def __repr__(self) -> str:
+        return "File(filename={0.filename})".format(self)
+
+    @property
+    def path(self) -> str:
+        """:class:`str`: Returns the file's path.
+
+        .. versionadded:: 1.3.5
+        """
+        return self.__path
+
+    @property
+    def mimetype(self) -> str:
+        """:class:`str`: Returns the file's mimetype.
+
+        .. versionadded:: 1.3.5
+        """
+        return self._mimetype
+
+    @property
+    def filename(self) -> str:
+        """:class:`str`: Returns the file's basename.
+
+        .. versionadded:: 1.3.5
+        """
+        return os.path.basename(self.path)
+
+    @property
+    def total_bytes(self) -> int:
+        """:class:`int`: Returns an integer value that represents the size of the specified path in bytes.
+
+        .. versionadded:: 1.3.5
+        """
+        return self._total_bytes
+
+    @property
+    def media_category(self) -> str:
+        """:class:`str`: Returns the file's media category. e.g If its more tweet messages it can be TWEET_IMAGE if its in direct messages it will be dm_image.
+
+        .. versionadded:: 1.3.5
+        """
+        startpoint = "TWEET_"
+        if "image" in self.mimetype and not "gif" in self.mimetype:
+            return startpoint + "IMAGE" if not self.dm_only else "dm_image"
+        elif "gif" in self.mimetype:
+            return startpoint + "GIF" if not self.dm_only else "dm_gif"
+        elif "video" in self.mimetype:
+            return startpoint + "VIDEO" if not self.dm_only else "dm_video"
+
+class CustomProfile:
+    """Represent a CustomProfile attachments that allow a Direct Message author to present a different identity than that of the Twitter account being used.
+    
+    Parameters
+    ------------
+    name: :class:`str`
+        The author's custom name.
+    id: Union[:class:`str`, :class:`int`]
+        The custom profile unique id.
+    timestamp: Union[:class:`str`, :class:`int`]
+        The CustomProfile's created timestamp.
+    media: Dict[:class:`str`, Any]
+        The media object returned.
+
+    .. versionadded:: 1.3.5
+    """
+    def __init__(self, name: str, id: Union[str, int], timestamp: Union[str, int], media: Dict[str, Any]):
+        self._name = name
+        self._id = id
+        self._timestamp = timestamp
+        self._media = Media(media)
+
+    def __repr__(self) -> str:
+        return "CustomProfile(name={0.name} id={0.id} media_id={0.media_id})".format(self)
+
+    @property
+    def name(self) -> str:
+        """:class:`str`: The author's custom name.
+        
+        .. versionadded:: 1.3.5
+        """
+        return self._name
+
+    @property
+    def id(self) -> int:
+        """:class:`int`: The custom profile unique ID.
+        
+        .. versionadded:: 1.3.5
+        """
+        return int(self._id)
+
+    @property
+    def created_at(self) -> datetime.datetime:
+        """:class:`datetime.datetime`: Returns a datetime.datetime object with the CustomProfile created time.
+
+        .. versionadded:: 1.3.5
+        """
+        timestamp = str(self._timestamp)[:10]
+        return datetime.datetime.fromtimestamp(int(timestamp))
+
+    @property
+    def media(self) -> Media:
+        """:class:`Media`: Returns the media object. 
+
+        .. versionadded:: 1.3.5
+        """
+        return self._media
