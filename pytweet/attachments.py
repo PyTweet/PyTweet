@@ -75,7 +75,7 @@ class File:
         
         .. versionadded:: 1.3.5
         """
-        return os.path.getsize(self.path)
+        return self._total_bytes
 
     @property
     def media_category(self) -> str:
