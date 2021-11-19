@@ -278,7 +278,7 @@ class Tweet(Message):
         return self.id != other.id
 
     def like(self) -> Optional[RelationLike]:
-        """A Method for liking a tweet.
+        """Like the tweet.
 
         Returns
         ---------
@@ -294,7 +294,7 @@ class Tweet(Message):
         return RelationLike(res)
 
     def unlike(self) -> Optional[RelationLike]:
-        """A Method for unliking a tweet.
+        """Unlike the tweet.
 
         Returns
         ---------
@@ -311,7 +311,7 @@ class Tweet(Message):
         return RelationLike(res)
 
     def retweet(self) -> RelationRetweet:
-        """A Method for retweet a tweet.
+        """Retweet the tweet.
 
         Returns
         ---------
@@ -329,7 +329,7 @@ class Tweet(Message):
         return RelationRetweet(res)
 
     def unretweet(self) -> RelationRetweet:
-        """A Method for unretweet a tweet.
+        """Unretweet the tweet.
 
         Returns
         ---------
@@ -346,10 +346,10 @@ class Tweet(Message):
         return RelationRetweet(res)
 
     def delete(self) -> None:
-        """Make a DELETE Request to delete a tweet through the tweet_id.
+        """Delete the client's tweet.
 
         .. note::
-            This function is almost complete! though you can still use and open an issue in github if it cause an error.
+            You can only delete the client's tweet.
 
         .. versionadded:: 1.2.0
         """
@@ -369,6 +369,7 @@ class Tweet(Message):
         text: str
             The reply's main text.
 
+
         .. versionadded:: 1.2.5
         """
         self.http_client.request(
@@ -383,12 +384,13 @@ class Tweet(Message):
         )
 
     def hide(self):
-        """Make a PUT Request to hide a specific reply tweet.
+        """Hide a reply tweet.
 
         Parameters
         ------------
         tweet_id: Union[str, int]
             The tweet's id that you wish to hide to.
+
 
         .. versionadded:: 1.2.5
         """
@@ -396,7 +398,7 @@ class Tweet(Message):
         return RelationHide(res)
 
     def unhide(self):
-        """Make a PUT Request to unhide a specific reply tweet.
+        """Unhide a hide reply.
 
         Parameters
         ------------
@@ -407,6 +409,7 @@ class Tweet(Message):
         ---------
         :class:`RelationHide`
             This method returns a :class:`RelationHide` object.
+
 
         .. versionadded:: 1.2.5
         """
