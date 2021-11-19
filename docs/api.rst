@@ -114,9 +114,9 @@ Polls
 Poll
 ~~~~~~~
 
-.. attributetable:: PollOption
+.. attributetable:: Poll
 
-.. autoclass:: PollOption
+.. autoclass:: Poll
     :members:
 
 
@@ -124,9 +124,9 @@ PollOption
 ~~~~~~~
 
 
-.. attributetable:: Poll
+.. attributetable:: PollOption
 
-.. autoclass:: Poll
+.. autoclass:: PollOption
     :members:
 
 Relations
