@@ -75,9 +75,9 @@ There a lot of commonly used classes that is used frequently when using PyTweet,
 .. autoclass:: Poll
     :members:
 
-.. attributetable:: PollOptions
+.. attributetable:: PollOption
 
-.. autoclass:: PollOptions
+.. autoclass:: PollOption
     :members:
 
 .. attributetable:: RelationFollow
