@@ -91,7 +91,11 @@ class File:
         elif "video" in self.mimetype:
             return startpoint + "VIDEO" if not self.dm_only else "dm_video"
 
+
+@dataclass(repr=False, eq=False)
 class PollOptions:
+    options: Dict[str, Any]
+
     """Represent the Poll Options, The minimum options in a poll is 2 and maximum is 4.
 
     .. describe:: x == y
@@ -119,9 +123,6 @@ class PollOptions:
 
     .. versionadded:: 1.1.0
     """
-
-    def __init__(self, options: Dict[str, Any]):
-        self.options = options
 
     def __repr__(self) -> str:
         return "PollOption(position={0.position} label={0.label} votes={0.votes})".format(self)
@@ -306,7 +307,7 @@ class Poll:
 
         .. versionadded:: 1.1.0
         """
-        return True if self._voting_status == "open" else False
+        return self._voting_status == "open"
 
     @property
     def duration_inSeconds(self) -> int:
