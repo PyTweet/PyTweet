@@ -1,6 +1,7 @@
 from typing import List, Optional, Union
 
-from .attachments import Geo, Poll, QuickReply, File
+from .attachments import Geo, Poll, QuickReply, File, CustomProfile
+from .errors import PytweetException
 from .enums import ReplySetting, SpaceState
 from .http import HTTPClient
 from .message import DirectMessage, WelcomeMessage, WelcomeMessageRule, Message
@@ -373,6 +374,62 @@ class Client:
         Space = self.http.fetch_space_bytitle(title, state)
         return Space
 
+    def search_geo(
+        self,
+        query: str,
+        *,
+        lat: Optional[int] = None,
+        long: Optional[int] = None,
+        ip: Optional[Union[str, int]] = None,
+        granularity: str = "neighborhood",
+        max_results: Optional[Union[str, int]] = None,
+    ) -> Geo:
+        """Search a location with the given arguments.
+
+        Parameters
+        ------------
+        query: :class:`str`
+            Free-form text to match against while executing a geo-based query, best suited for finding nearby locations by name. Remember to URL encode the query.
+        lat: :class:`int`
+            The latitude to search around. This parameter will be ignored unless it is inside the range -90.0 to +90.0 (North is positive) inclusive. It will also be ignored if there isn't a corresponding long parameter.
+        long: :class:`int`
+            The longitude to search around. The valid ranges for longitude are -180.0 to +180.0 (East is positive) inclusive. This parameter will be ignored if outside that range, if it is not a number, if geo_enabled is turned off, or if there is not a corresponding lat parameter.
+        ip: Union[:class:`str`, :class:`int`]
+            An IP address. Used when attempting to fix geolocation based off of the user's IP address.
+        granularity: :class:`str`
+            This is the minimal granularity of place types to return and must be one of: neighborhood ,ity ,admin or country. If no granularity is provided for the request neighborhood is assumed. Setting this to city, for example, will find places which have a type of city, admin or country
+        max_results: Optional[Union[:class:`str`, :class:`int`]]
+            A hint as to the number of results to return. This does not guarantee that the number of results returned will equal max_results, but instead informs how many "nearby" results to return. Ideally, only pass in the number of places you intend to display to the user here
+
+        Returns
+        ---------
+        :class:`Geo`
+            This method return a :class:`Geo` object.
+
+
+        .. versionadded:: 1.5.3
+        """
+
+        if query:
+            query = query.replace(" ", "%20")
+
+        data = self.http.request(
+            "GET",
+            "1.1",
+            "/geo/search.json",
+            params={
+                "query": query,
+                "lat": lat,
+                "long": long,
+                "ip": ip,
+                "granularity": granularity,
+                "max_results": max_results,
+            },
+            auth=True,
+        )
+
+        return [Geo(data) for data in data.get("result").get("places")]
+
     def get_message(self, event_id: Union[str, int] = None) -> Optional[DirectMessage]:
         """Get a direct message through the client message cache. Returns None if the message is not in the cache.
 
@@ -429,58 +486,46 @@ class Client:
 
         return self.http.message_cache.get(tweet_id)
 
-    def search_geo(
-        self,
-        query: str,
-        *,
-        lat: Optional[int] = None,
-        long: Optional[int] = None,
-        ip: Optional[Union[str, int]] = None,
-        granularity: str = "neighborhood",
-        max_results: Optional[Union[str, int]] = None,
-    ) -> Geo:
-        """Search a location with the given arguments.
-
+    def create_custom_profile(self, name: str, file: File) -> CustomProfile:
+        """Create a custom profile
+        
         Parameters
         ------------
-        query: :class:`str`
-            Free-form text to match against while executing a geo-based query, best suited for finding nearby locations by name. Remember to URL encode the query.
-        lat: :class:`int`
-            The latitude to search around. This parameter will be ignored unless it is inside the range -90.0 to +90.0 (North is positive) inclusive. It will also be ignored if there isn't a corresponding long parameter.
-        long: :class:`int`
-            The longitude to search around. The valid ranges for longitude are -180.0 to +180.0 (East is positive) inclusive. This parameter will be ignored if outside that range, if it is not a number, if geo_enabled is turned off, or if there is not a corresponding lat parameter.
-        ip: Union[:class:`str`, :class:`int`]
-            An IP address. Used when attempting to fix geolocation based off of the user's IP address.
-        granularity: :class:`str`
-            This is the minimal granularity of place types to return and must be one of: neighborhood ,ity ,admin or country. If no granularity is provided for the request neighborhood is assumed. Setting this to city, for example, will find places which have a type of city, admin or country
-        max_results: Optional[Union[:class:`str`, :class:`int`]]
-            A hint as to the number of results to return. This does not guarantee that the number of results returned will equal max_results, but instead informs how many "nearby" results to return. Ideally, only pass in the number of places you intend to display to the user here
+        name: :class:`str`
+            The author's custom name.
+        file: :class:`File`
+            The media file that's associate with the profile.
 
         Returns
         ---------
-        :class:`Geo`
-            This method return a :class:`Geo` object.
-
-
-        .. versionadded:: 1.5.3
+        :class:`CustomProfile`
+            This method returns a :class:`CustomProfile` object.
         """
+        if not isinstance(file, File):
+            raise PytweetException("'file' argument must be an instance of pytweet.File")
 
-        if query:
-            query = query.replace(" ", "%20")
+        media_id = self.http.upload(file, "INIT")
+        self.http.upload(file, "APPEND", media_id=media_id)
+        self.http.upload(file, "FINALIZE", media_id=media_id)
 
-        data = self.http.request(
-            "GET",
+        data = {
+            "custom_profile": {
+                "name": name,
+                "avatar": {
+                    "media": {
+                    "id": media_id
+                    }
+                }
+            }
+        }
+
+        res = self.http.request(
+            "POST",
             "1.1",
-            "/geo/search.json",
-            params={
-                "query": query,
-                "lat": lat,
-                "long": long,
-                "ip": ip,
-                "granularity": granularity,
-                "max_results": max_results,
-            },
-            auth=True,
+            "/custom_profiles/new.json",
+            json=data,
+            auth=True
         )
+        data = res.get("custom_profile")
 
-        return [Geo(data) for data in data.get("result").get("places")]
+        return CustomProfile(data.get("name"), data.get("id"), data.get("created_timestamp"), data.get("avatar"))
