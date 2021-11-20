@@ -21,9 +21,10 @@ class Message:
     ------------
     text: Optional[:class:`str`]
         The messages's text.
-
     id: Union[:class:`str`, :class:`int`]
         The messages's unique ID.
+    type: :class:`int`.
+        The message's type in int form, it will get form to MessageTypeEnum.
 
     .. versionadded:: 1.2.0
     """
@@ -335,7 +336,7 @@ class WelcomeMessageRule(Message):
 
     Parameters
     ------------
-    welcome_message_rule_id: Union[:class:`str`, :class:`int`]
+    id: Union[:class:`str`, :class:`int`]
         The welcome message rule unique id.
     welcome_message_id: Union[:class:`str`, :class:`int`]
         The welcome message unique id.
@@ -349,19 +350,19 @@ class WelcomeMessageRule(Message):
 
     def __init__(
         self,
-        welcome_message_rule_id: Union[str, int],
+        id: Union[str, int],
         welcome_message_id: Union[str, int],
         timestamp: Union[str, int],
         *,
         http_client: HTTPClient,
     ):
-        super().__init__(id=welcome_message_rule_id, type=3)
+        super().__init__(None, id=id, type=3)
         self._welcome_message_id = welcome_message_id
         self._timestamp = timestamp
         self.http_client = http_client
 
     def __repr__(self) -> str:
-        return "WelcomeMessageRule(id= {0.id} welcome_message_id= {0.} created_at= {0.created_at})".format(self)
+        return "WelcomeMessageRule(id={0.id} welcome_message_id={0.welcome_message_id} created_at={0.created_at})".format(self)
 
     def delete(self):
         """Delete the Welcome Message Rule.
