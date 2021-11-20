@@ -28,10 +28,11 @@ class OauthSession(OAuth1Session):
         """
         return OAuth1(
             self.consumer_key,
-            client_secret=self.consumer_key_secret,
-            resource_owner_key=self.access_token,
-            resource_owner_secret=self.access_token_secret,
-            decoding=None,
+            client_secret = self.consumer_key_secret,
+            resource_owner_key = self.access_token,
+            resource_owner_secret = self.access_token_secret,
+            callback_uri = self.callback,
+            decoding = None,
         )
 
     def set_access_token(self, key: str, secret: str) -> None:
