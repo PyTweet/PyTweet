@@ -175,6 +175,7 @@ class Tweet(Message):
 
     .. versionadded:: 1.0.0
     """
+
     if TYPE_CHECKING:
         _payload: Dict[Any, Any]
         original_payload: Dict[str, Any]
@@ -250,7 +251,9 @@ class Tweet(Message):
         .. versionadded:: 1.2.0
         """
         my_id: Union[int, str] = self.http_client.access_token.partition("-")[0]
-        res: dict = self.http_client.request("POST", "2", f"/users/{my_id}/retweets", json={"tweet_id": str(self.id)}, auth=True)
+        res: dict = self.http_client.request(
+            "POST", "2", f"/users/{my_id}/retweets", json={"tweet_id": str(self.id)}, auth=True
+        )
 
         return RelationRetweet(res)
 

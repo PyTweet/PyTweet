@@ -27,6 +27,7 @@ class Message:
 
     .. versionadded:: 1.2.0
     """
+
     if TYPE_CHECKING:
         _text: Optional[str]
         _id: Union[str, int]
