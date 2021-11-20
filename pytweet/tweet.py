@@ -176,6 +176,11 @@ class Tweet(Message):
     .. versionadded:: 1.0.0
     """
 
+    if TYPE_CHECKING:
+        _payload: Dict[Any, Any]
+        original_payload: Dict[str, Any]
+        _includes: Any
+
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
         self.original_payload = data
         self._payload = data.get("data") or None
@@ -245,10 +250,10 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.0
         """
-        my_id = self.http_client.access_token.partition("-")[0]
-
-        payload = {"tweet_id": str(self.id)}
-        res = self.http_client.request("POST", "2", f"/users/{my_id}/retweets", json=payload, auth=True)
+        my_id: Union[int, str] = self.http_client.access_token.partition("-")[0]
+        res: dict = self.http_client.request(
+            "POST", "2", f"/users/{my_id}/retweets", json={"tweet_id": str(self.id)}, auth=True
+        )
 
         return RelationRetweet(res)
 
@@ -307,7 +312,7 @@ class Tweet(Message):
             auth=True,
         )
 
-    def hide(self):
+    def hide(self) -> None:
         """Hide a reply tweet.
 
         Parameters
@@ -318,10 +323,10 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        res = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
+        res: dict = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
         return RelationHide(res)
 
-    def unhide(self):
+    def unhide(self) -> None:
         """Unhide a hide reply.
 
         Parameters
@@ -337,11 +342,11 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        res = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
+        res: dict = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
         return RelationHide(res)
 
     @property
-    def author(self) -> User:
+    def author(self) -> Optional[User]:
         """Optional[:class:`User`]: Return a user (object) who posted the tweet.
 
         .. versionadded: 1.0.0
@@ -351,7 +356,7 @@ class Tweet(Message):
         return None
 
     @property
-    def retweetes(self) -> Union[List[User], list]:
+    def retweetes(self) -> Optional[Union[List[User], list]]:
         """Optional[List[:class:`User`, :class:`list`], :class:`int`]: Return a list of users that's retweeted the tweet's id. Maximum users is 100. Return empty list if no one retweeted.
 
         .. versionadded: 1.0.0
@@ -359,7 +364,7 @@ class Tweet(Message):
         return self._payload.get("retweetes")
 
     @property
-    def likes(self) -> Union[List[User], list]:
+    def likes(self) -> Optional[Union[List[User], list]]:
         """Optional[List[:class:`User`], :class:`list`]: Return a list of users that liked the tweet's id. Maximum users is 100. Return empty list if no one liked.
 
         .. versionadded: 1.0.0
@@ -527,3 +532,5 @@ class Tweet(Message):
         .. versionadded: 1.1.0
         """
         return self.tweet_metrics.quote_count
+
+    possible_sensitive = sensitive
