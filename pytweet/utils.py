@@ -35,7 +35,7 @@ def compose_tweet(text: Optional[str] = None) -> str:
     ------------
     text: :class:`str`
         The pre-populated text in the tweet. If none specified the user has to write their own message.
-    
+
 
     Returns
     ---------
@@ -46,7 +46,13 @@ def compose_tweet(text: Optional[str] = None) -> str:
     """
     if text:
         text = text.replace(" ", "%20")
-    return "https://twitter.com/intent/tweet" if not text else f"https://twitter.com/intent/tweet" + f"?text={text}" if text else f"https://twitter.com/intent/tweet"
+    return (
+        "https://twitter.com/intent/tweet"
+        if not text
+        else f"https://twitter.com/intent/tweet" + f"?text={text}"
+        if text
+        else f"https://twitter.com/intent/tweet"
+    )
 
 
 def compose_user_action(user_id: str, action: str, text: str = None):
@@ -60,11 +66,11 @@ def compose_user_action(user_id: str, action: str, text: str = None):
         The action you are going to perform to the user.
     text: :class:`str`
         The pre-populated text for the dm action.
-    
+
 
     Returns
     ---------
-    :class:`str` 
+    :class:`str`
 
 
     .. versionadded: 1.3.5
@@ -73,7 +79,13 @@ def compose_user_action(user_id: str, action: str, text: str = None):
         return TypeError("Action must be either 'like' or 'dm'")
     if text:
         text = text.replace(" ", "%20")
-    return f"https://twitter.com/intent/user?user_id={user_id}" if action.lower() == "like" else f"https://twitter.com/messages/compose?recipient_id={user_id}" + f"?text={text}" if text else f"https://twitter.com/messages/compose?recipient_id={user_id}"
+    return (
+        f"https://twitter.com/intent/user?user_id={user_id}"
+        if action.lower() == "like"
+        else f"https://twitter.com/messages/compose?recipient_id={user_id}" + f"?text={text}"
+        if text
+        else f"https://twitter.com/messages/compose?recipient_id={user_id}"
+    )
 
 
 def compose_tweet_action(tweet_id: Union[str, int], action: str = None):

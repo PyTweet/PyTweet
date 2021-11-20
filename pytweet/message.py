@@ -362,7 +362,11 @@ class WelcomeMessageRule(Message):
         self.http_client = http_client
 
     def __repr__(self) -> str:
-        return "WelcomeMessageRule(id={0.id} welcome_message_id={0.welcome_message_id} created_at={0.created_at})".format(self)
+        return (
+            "WelcomeMessageRule(id={0.id} welcome_message_id={0.welcome_message_id} created_at={0.created_at})".format(
+                self
+            )
+        )
 
     def delete(self):
         """Delete the Welcome Message Rule.
