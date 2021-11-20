@@ -23,7 +23,7 @@ def core(args):
         show_version()
     else:
         print(
-            "Hi Thank you for using pytweet! You can do can do `python3 -m pytweet --version` for version info!\n\nDocs: https://py-tweet.readthedocs.io/ \nGithub: https://github.com/TheFarGG/PyTweet/"
+            "Hi Thank you for using pytweet! You can do can do `python3 -m pytweet --version` for version info!\n\nDocs: https://py-tweet.readthedocs.io/ \nGithub: https://github.com/PyTweet/PyTweet/"
         )
 
 
