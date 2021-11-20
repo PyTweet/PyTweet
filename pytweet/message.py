@@ -27,6 +27,10 @@ class Message:
 
     .. versionadded:: 1.2.0
     """
+    if TYPE_CHECKING:
+        _text: Optional[str]
+        _id: Union[str, int]
+        _type: int
 
     def __init__(self, text: Optional[str], id: Union[str, int], type: int):
         self._text = text
@@ -34,7 +38,7 @@ class Message:
         self._type = type
 
     def __repr__(self) -> str:
-        return "Message(text: {0.text} id: {0.id})".format(self)
+        return "Message(text={0.text} id={0.id})".format(self)
 
     def __str__(self) -> str:
         return self.text
@@ -94,7 +98,7 @@ class DirectMessage(Message):
         except KeyError:
             pass
 
-    def mark_read(self):
+    def mark_read(self) -> None:
         """Mark the DirectMessage as read, it also mark other messages before the DirectMessage was sent as read.
 
         .. versionadded:: 1.3.5
@@ -124,8 +128,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.2.0
         """
-        user = self.message_create.get("target").get("recipient")
-        return user
+        return self.message_create.get("target").get("recipient")
 
     @property
     def created_at(self) -> datetime.datetime:
@@ -243,9 +246,9 @@ class WelcomeMessage(Message):
         except Exception as e:
             raise e
 
-        data = {"welcome_message_rule": {"welcome_message_id": str(self.id)}}
+        data: Dict[str, Union[int, Dict[str, int]]] = {"welcome_message_rule": {"welcome_message_id": str(self.id)}}
 
-        res = self.http_client.request(
+        res: dict = self.http_client.request(
             "POST",
             "1.1",
             "/direct_messages/welcome_messages/rules/new.json",
@@ -253,7 +256,7 @@ class WelcomeMessage(Message):
             auth=True,
         )
 
-        args = [v for k, v in res.get("welcome_message_rule").items()]
+        args: list = [v for k, v in res.get("welcome_message_rule").items()]
         return WelcomeMessageRule(args[0], args[2], args[1], http_client=self.http_client)
 
     def update(self, text: str = None, *, quick_reply: QuickReply = None) -> WelcomeMessage:
