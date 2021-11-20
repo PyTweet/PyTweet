@@ -112,7 +112,7 @@ class HTTPClient:
             f'/users/{user_id}/tweets',
             params={"tweet.fields": 'created_at', 'max_results': max_results},
         )
-        return Tweet(res)
+        return [Tweet(r) for r in res]
 
 
     def request(
