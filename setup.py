@@ -32,7 +32,7 @@ classifiers = [
 setup(
     name="PyTweet",
     author="TheGenocide & TheFarGG",
-    maintainer=', '.join(('TheFarGG', 'TheGenocide')),
+    maintainer=", ".join(("TheFarGG", "TheGenocide")),
     url="https://github.com/PyTweet/PyTweet/",
     version=version,
     packages=["pytweet"],
@@ -49,5 +49,5 @@ setup(
     extras_require={"docs": ["sphinx>=4.0.2"]},
     keywords="PyTweet, pytweet, twitter, tweet.py twitter.py",
     python_requires=">=3.7.0",
-    classifiers=classifiers
+    classifiers=classifiers,
 )

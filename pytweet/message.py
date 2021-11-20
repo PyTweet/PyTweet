@@ -228,9 +228,7 @@ class WelcomeMessage(Message):
         self.http_client = http_client
 
     def __repr__(self) -> str:
-        return "WelcomeMessage(text={0.text} id={0.id})".format(
-            self
-        )
+        return "WelcomeMessage(text={0.text} id={0.id})".format(self)
 
     def __str__(self) -> str:
         return self.text

@@ -18,15 +18,15 @@ client = pytweet.Client(
     access_token_secret="Your access_token_secret here",
 )  # if you dont have one make an application in https://apps.twitter.com
 
-try: #1
-    user=client.fetch_user_by_name("SomeoneUserName") #2
-    user.send(f"Hello World from {client.user}") #3
+try:  # 1
+    user = client.fetch_user_by_name("SomeoneUserName")  # 2
+    user.send(f"Hello World from {client.user}")  # 3
 except Exception as e:
-    if isinstance(e, pytweet.errors.Forbidden):#4
+    if isinstance(e, pytweet.errors.Forbidden):  # 4
         print("Cannot interact with that user! Return HTTP code 403: Forbidden!")
 
     else:
         raise e
 
 else:
-    print(f"Sent messages to {user.username}") #5
+    print(f"Sent messages to {user.username}")  # 5

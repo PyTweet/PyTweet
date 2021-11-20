@@ -70,9 +70,7 @@ master_doc = "index"
 version = ""
 try:
     with open("../pytweet/__init__.py") as f:
-        version = re.search(
-            r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE
-        ).group(1)
+        version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
 except Exception:
     pass
 
@@ -110,9 +108,7 @@ pygments_style = "friendly"
 # Output file base name for HTML help builder.
 htmlhelp_basename = "pytweet.pydoc"
 
-html_context = {
-    "discord_invite": "https://discord.gg/XHBhg6A4jJ"
-}
+html_context = {"discord_invite": "https://discord.gg/XHBhg6A4jJ"}
 
 
 # Output is processed with HTML5 writer. Default is False.
