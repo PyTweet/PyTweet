@@ -1,9 +1,11 @@
 from typing import Any, Dict, Optional
 
+
 class Media:
     def __init__(self, data: Dict[str, Any]):
         for k, v in data.item():
             setattr(self, k, v)
+
 
 class Hashtags:
     def __init__(self, data=Dict[str, Any]):

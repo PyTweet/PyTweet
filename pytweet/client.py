@@ -488,7 +488,7 @@ class Client:
 
     def create_custom_profile(self, name: str, file: File) -> CustomProfile:
         """Create a custom profile
-        
+
         Parameters
         ------------
         name: :class:`str`
@@ -508,24 +508,9 @@ class Client:
         self.http.upload(file, "APPEND", media_id=media_id)
         self.http.upload(file, "FINALIZE", media_id=media_id)
 
-        data = {
-            "custom_profile": {
-                "name": name,
-                "avatar": {
-                    "media": {
-                    "id": media_id
-                    }
-                }
-            }
-        }
+        data = {"custom_profile": {"name": name, "avatar": {"media": {"id": media_id}}}}
 
-        res = self.http.request(
-            "POST",
-            "1.1",
-            "/custom_profiles/new.json",
-            json=data,
-            auth=True
-        )
+        res = self.http.request("POST", "1.1", "/custom_profiles/new.json", json=data, auth=True)
         data = res.get("custom_profile")
 
         return CustomProfile(data.get("name"), data.get("id"), data.get("created_timestamp"), data.get("avatar"))

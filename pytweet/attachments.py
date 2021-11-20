@@ -34,6 +34,7 @@ class PollOption:
     position: int = 0
     votes: int = 0
 
+
 class Poll:
     """Represent a Poll attachment in a tweet.
 
@@ -390,6 +391,7 @@ class CTA:
         """
         return self._raw_buttons
 
+
 class File:
     """Represent a File attachment for messages.
 
@@ -456,9 +458,10 @@ class File:
         elif "video" in self.mimetype:
             return startpoint + "VIDEO" if not self.dm_only else "dm_video"
 
+
 class CustomProfile:
     """Represent a CustomProfile attachments that allow a Direct Message author to present a different identity than that of the Twitter account being used.
-    
+
     Parameters
     ------------
     name: :class:`str`
@@ -472,6 +475,7 @@ class CustomProfile:
 
     .. versionadded:: 1.3.5
     """
+
     def __init__(self, name: str, id: Union[str, int], timestamp: Union[str, int], media: Dict[str, Any]):
         self._name = name
         self._id = id
@@ -484,7 +488,7 @@ class CustomProfile:
     @property
     def name(self) -> str:
         """:class:`str`: The author's custom name.
-        
+
         .. versionadded:: 1.3.5
         """
         return self._name
@@ -492,7 +496,7 @@ class CustomProfile:
     @property
     def id(self) -> int:
         """:class:`int`: The custom profile unique ID.
-        
+
         .. versionadded:: 1.3.5
         """
         return int(self._id)
@@ -508,7 +512,7 @@ class CustomProfile:
 
     @property
     def media(self) -> Media:
-        """:class:`Media`: Returns the media object. 
+        """:class:`Media`: Returns the media object.
 
         .. versionadded:: 1.3.5
         """

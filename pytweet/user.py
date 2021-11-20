@@ -86,7 +86,9 @@ class User:
 
         .. versionadded:: 1.1.0
         """
-        return self.http_client.send_message(self.id, text, file=file, custom_profile=custom_profile, quick_reply=quick_reply, cta=cta)
+        return self.http_client.send_message(
+            self.id, text, file=file, custom_profile=custom_profile, quick_reply=quick_reply, cta=cta
+        )
 
     def follow(self) -> RelationFollow:
         """Make a Request to follow a User.

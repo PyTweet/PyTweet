@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 
 __all__ = ("EmbedsImages", "Embed", "Tweet")
 
+
 class EmbedsImages:
     """Represent the tweets embed images.
 
