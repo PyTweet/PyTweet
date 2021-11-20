@@ -103,6 +103,17 @@ class HTTPClient:
         self.upload_url = "https://upload.twitter.com/1.1/media/upload.json"
         self.message_cache = {}
         self.tweet_cache = {}
+    
+
+    def fetch_timelines(self, max_results: int, user_id: int):
+        res = self.request(
+            'GET',
+            '2',
+            f'/users/{user_id}/tweets',
+            params={"tweet.fields": 'created_at', 'max_results': max_results},
+        )
+        return Tweet(res)
+
 
     def request(
         self,
