@@ -71,7 +71,6 @@ class Poll:
         self._duration = duration
         self._options = []
         self._raw_options = []
-        
 
     def __repr__(self) -> str:
         return "Poll(id={0.id} voting_status={0.voting_status} duration={0.duration})".format(self)
