@@ -470,15 +470,14 @@ class Tweet(Message):
             if self._includes.get("polls"):
                 data = self._includes.get("polls")[0]
                 poll = Poll(
-                    data.get("id"),
-                    data.get("voting_status"),
                     data.get("duration_minutes"),
-                    data.get("end_datetime"),
+                    id=data.get("id"),
+                    voting_status=data.get("voting_status"),
+                    end_date=data.get("end_datetime"),
                 )
                 for option in data.get("options"):
                     poll.add_option(**option)
                 return poll
-
         return None
 
     @property

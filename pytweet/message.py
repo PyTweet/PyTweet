@@ -15,7 +15,7 @@ __all__ = ("Message", "DirectMessage", "WelcomeMessage", "WelcomeMessageRule")
 
 
 class Message:
-    """Represents the base Message of all Message types in Twitter, this include DirrectMessage & Tweet
+    """Represents the base Message of all Message types in Twitter.
 
     Parameters
     ------------
@@ -25,6 +25,7 @@ class Message:
         The messages's unique ID.
     type: :class:`int`.
         The message's type in int form, it will get form to MessageTypeEnum.
+
 
     .. versionadded:: 1.2.0
     """
@@ -78,7 +79,7 @@ class DirectMessage(Message):
         self.timestamp = round(datetime.datetime.utcnow().timestamp())
 
     def __repr__(self) -> str:
-        return "Message(text:{0.text} id:{0.id} author: {0.author})".format(self)
+        return "DirectMessage(text:{0.text} id:{0.id} author: {0.author})".format(self)
 
     def __str__(self) -> str:
         return self.text
@@ -215,8 +216,9 @@ class WelcomeMessage(Message):
     http_client: :class:`HTTPClient`
         The http client that make the request.
 
+
     .. versionadded:: 1.3.5
-    """  # TODO: Refactor welcome_message_id to id.
+    """
 
     def __init__(
         self,
@@ -281,6 +283,12 @@ class WelcomeMessage(Message):
             The message's :class:`QuickReply` attachments.
         cta: Optional[:class:`CTA`]
             The message's :class:`CTA` attachment.
+
+        Returns
+        ---------
+        :class:`WelcomeMessage`
+            Returns your :class:`WelcomeMessage` instance.
+
 
         .. versionadded:: 1.3.5
         """
@@ -370,6 +378,7 @@ class WelcomeMessageRule(Message):
         The welcome message rule created timestamp.
     http_client: :class:`HTTPClient`
         The http client that make the request.
+
 
     .. versionadded:: 1.3.5
     """

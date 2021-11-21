@@ -51,31 +51,27 @@ class Poll:
 
     Parameters
     ------------
-    id: Optional[:class:`int`]
-        The poll's unique ID.
-    voting_status: Optional[Union[:class:`str`, :class:`int`]]
-        The poll's voting status.
-    duration: Optional[Union[:class:`str`, :class:`int`]]
+    duration: :class:`int`
         The poll duration in minutes.
-    end_date: Optional[Union[:class:`str`, :class:`int`]]
+    id: Optional[Union[:class:`str`, :class:`int`]]
+        The poll's unique ID.
+    voting_status: Optional[:class:`str`]
+        The poll's voting status.
+    end_date: Optional[:class:`str`]
         The poll's end date.
 
 
     .. versionadded:: 1.1.0
     """
 
-    def __init__(
-        self,
-        id: Optional[int] = None,
-        voting_status: Optional[str] = None,
-        duration: Optional[Union[str, int]] = 20,
-        end_date: Optional[Union[str, int]] = None,
-    ):
-        self._id = id
-        self._voting_status = voting_status
+    def __init__(self, duration: int, **kwargs):
+        self._id: Optional[Union[str, int]] = kwargs.get("id", None)
+        self._voting_status: Optional[str] = kwargs.get("voting_status", None)
+        self._end_date = kwargs.get("end_date", None)
         self._duration = duration
-        self._end_date = end_date
         self._options = []
+        self._raw_options = []
+        
 
     def __repr__(self) -> str:
         return "Poll(id={0.id} voting_status={0.voting_status} duration={0.duration})".format(self)
@@ -93,7 +89,7 @@ class Poll:
     def __len__(self) -> int:
         return len(self.options)
 
-    def add_option(self, *, label: str, position: int = 0, votes: int = 0) -> Poll:
+    def add_option(self, *, label: str, **kwargs) -> Poll:
         """Add option to your Poll instance.
 
         .. note::
@@ -103,10 +99,6 @@ class Poll:
         ------------
         label: :class:`str`
             The option's label.
-        position: :class:`int`
-            The option's position.
-        votes: :class:`int`
-            The option's votes.
 
         Returns
         ---------
@@ -116,7 +108,10 @@ class Poll:
 
         .. versionadded 1.3.5
         """
-        self._options.append({"position": position or 0, "label": label, "votes": votes or 0})
+        data = {"position": kwargs.get("position") or 0, "label": label, "votes": kwargs.get("votes") or 0}
+        self._options.append(PollOption(**data))
+        self._raw_options.append(data)
+
         return self
 
     @property
@@ -133,7 +128,15 @@ class Poll:
 
         .. versionadded:: 1.1.0
         """
-        return [PollOption(**option) for option in self._options]
+        return self._options
+
+    @property
+    def raw_options(self) -> List[dict]:
+        """List[:class:`dict`]: Return a list of raw poll option.
+
+        .. versionadded:: 1.3.5
+        """
+        return self._raw_options
 
     @property
     def voting_status(self) -> bool:
@@ -187,7 +190,7 @@ class QuickReply:
     def __init__(self, type: str = "options"):
         self.type = type if type == "options" else "options"
         self._options: List[Option] = []
-        self._raw_options: List[Dict] = []
+        self._raw_options: List[dict] = []
 
     def add_option(
         self, *, label: str, description: Optional[str] = None, metadata: Optional[str] = None
@@ -218,20 +221,20 @@ class QuickReply:
         return self
 
     @property
-    def raw_options(self) -> List[Dict]:
-        """List[Dict]: Returns the raw options.
-
-        .. versionadded:: 1.2.0
-        """
-        return self._raw_options
-
-    @property
     def options(self) -> List[Option]:
         """List[:class:`Option`]: Returns a list of pre-made Option objects.
 
         .. versionadded:: 1.3.5
         """
         return self._options
+
+    @property
+    def raw_options(self) -> List[Dict]:
+        """List[Dict]: Returns the raw options.
+
+        .. versionadded:: 1.2.0
+        """
+        return self._raw_options
 
 
 class Geo:
