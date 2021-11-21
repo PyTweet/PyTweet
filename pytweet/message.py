@@ -216,7 +216,7 @@ class WelcomeMessage(Message):
         The http client that make the request.
 
     .. versionadded:: 1.3.5
-    """ #TODO: Refactor welcome_message_id to id.
+    """  # TODO: Refactor welcome_message_id to id.
 
     def __init__(
         self,
@@ -261,7 +261,14 @@ class WelcomeMessage(Message):
         args: list = [v for k, v in res.get("welcome_message_rule").items()]
         return WelcomeMessageRule(args[0], args[2], args[1], http_client=self.http_client)
 
-    def update(self, text: str = None, *, file: Optional[File] = None, quick_reply: Optional[QuickReply] = None, cta: Optional[CTA] = None) -> WelcomeMessage:
+    def update(
+        self,
+        text: str = None,
+        *,
+        file: Optional[File] = None,
+        quick_reply: Optional[QuickReply] = None,
+        cta: Optional[CTA] = None,
+    ) -> WelcomeMessage:
         """Updates the Welcome Message, you dont need to use set_rule again since this update your default welcome message.
 
         Parameters
@@ -277,13 +284,9 @@ class WelcomeMessage(Message):
 
         .. versionadded:: 1.3.5
         """
-        data = {
-            "message_data": {
-
-            }
-        }
+        data = {"message_data": {}}
         message_data = data["message_data"]
-        
+
         message_data["text"] = str(text)
 
         if file:
