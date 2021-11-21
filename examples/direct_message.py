@@ -21,7 +21,7 @@ except Exception as e:
 else:
     print(f"Sent messages to {user.username}")
 
-#You could also send a message to a tweet's author.
+# You could also send a message to a tweet's author.
 
 try:
     tweet = client.fetch_tweet("Tweet ID here")

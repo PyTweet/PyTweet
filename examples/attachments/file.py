@@ -11,8 +11,8 @@ client = pytweet.Client(
     access_token_secret="Your access_token_secret here",
 )  # if you dont have one make an application in https://apps.twitter.com
 
-file = pytweet.File("path/to/file", dm_only = False) 
-#if its True dm_only enables the file to be send in user dm only. Default to False.
+file = pytweet.File("path/to/file", dm_only=False)
+# if its True dm_only enables the file to be send in user dm only. Default to False.
 
 msg = client.tweet(f"Just setting up a bot to send a file.", file=file)
 print(f"Posted tweet! https://twitter.com/{client.account.username}/status/{msg.id}")

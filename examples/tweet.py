@@ -12,4 +12,4 @@ client = pytweet.Client(
 )  # if you dont have one make an application in https://apps.twitter.com
 
 client.tweet("Just setting up my bot with #PyTweet!")
-#You could also mention a user using @Username, put hashtags using #Hashtags and url thats going to be embedded to your tweet, checkout attachments folder for more examples!
+# You could also mention a user using @Username, put hashtags using #Hashtags and url thats going to be embedded to your tweet, checkout attachments folder for more examples!
