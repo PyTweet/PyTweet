@@ -98,6 +98,10 @@ class Poll:
         ------------
         label: :class:`str`
             The option's label.
+        position: :class:`int`
+            The option's position.
+        votes: :class:`int`
+            The option's votes.
 
         Returns
         ---------
@@ -110,7 +114,6 @@ class Poll:
         data = {"position": kwargs.get("position") or 0, "label": label, "votes": kwargs.get("votes") or 0}
         self._options.append(PollOption(**data))
         self._raw_options.append(data)
-
         return self
 
     @property
@@ -144,14 +147,6 @@ class Poll:
         .. versionadded:: 1.1.0
         """
         return self._voting_status == "open"
-
-    @property
-    def duration_inSeconds(self) -> int:
-        """:class:`int`: Return the poll duration in seconds.
-
-        .. versionadded:: 1.1.0
-        """
-        return int(self._duration) * 60 if self._duration else None
 
     @property
     def duration(self) -> int:
