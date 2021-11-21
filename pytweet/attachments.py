@@ -19,6 +19,19 @@ class Button:
     type: Union[ButtonType, str]
     url: str
     tco_url: Optional[str] = None
+    """Represent a Button object. Button are attachment that you can attach via :class:`CTA`
+
+    label: :class:`str`
+        The button's main label.
+    type: Union[:class:`ButtonType`, :class:`str`]
+        The button's type. 
+    url: :class:`str`
+        A url that specified where to take you when you click the button, e.g you can take a user to someone's dm, a tweet, etc.
+    tco_url: :class:`str`
+        The url in tco style.
+
+    .. versionadded:: 1.3.5
+    """
 
 
 @dataclass
@@ -26,6 +39,17 @@ class Option:
     label: str
     description: str
     metadata: str
+    """Represent an Option object. You can create an Option using :class:`QuickReply.add_option`
+
+    label: :class:`str`
+        The option's label. Label text is returned as the user's message response, Must be less then 36 characters.
+    description: :class:`str`
+        The option's description. Description text displayed under label text. All options must have this property defined if property is present in any option. Text is auto-wrapped and will display on a max of two lines and supports n for controlling line breaks, Must be less then 72 characters.
+    metadata: :class:`str`
+        The option's metadata. Metadata that will be sent back in the webhook request, must be less then 1000 characters.
+
+    .. versionadded:: 1.3.5
+    """
 
 
 @dataclass
@@ -33,6 +57,17 @@ class PollOption:
     label: str
     position: int = 0
     votes: int = 0
+    """Represent an Option for :class:`Poll`
+
+    label: :class:`str`
+        The PollOption's label.
+    position: :class:`int`
+        The PollOption's position.
+    votes: :class:`int`
+        The PollOption's votes.
+
+    .. versionadded 1.3.5
+    """
 
 
 class Poll:
@@ -193,11 +228,11 @@ class QuickReply:
 
         Parameters
         ------------
-        label: str
+        label: :class:`str`
             The option's label. Label text is returned as the user's message response, Must be less then 36 characters.
-        description: str
+        description: :class:`str`
             The option's description. Description text displayed under label text. All options must have this property defined if property is present in any option. Text is auto-wrapped and will display on a max of two lines and supports n for controlling line breaks, Must be less then 72 characters.
-        metadata: str
+        metadata: :class:`str`
             The option's metadata. Metadata that will be sent back in the webhook request, must be less then 1000 characters.
 
         Returns
@@ -364,6 +399,9 @@ class CTA:
         ---------
         :class:`CTA`
             Returns your :class:`CTA` instance.
+
+
+        .. versionadded:: 1.3.5
         """
         self._raw_buttons.append(
             {"type": type.value if isinstance(type, ButtonType) else type, "label": label, "url": url}
