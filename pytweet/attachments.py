@@ -43,13 +43,6 @@ class PollOption:
     votes: int = 0
     """Represent an Option for :class:`Poll`
 
-    label: :class:`str`
-        The PollOption's label.
-    position: :class:`int`
-        The PollOption's position.
-    votes: :class:`int`
-        The PollOption's votes.
-
     .. versionadded 1.3.5
     """
 
