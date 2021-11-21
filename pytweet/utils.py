@@ -75,13 +75,13 @@ def compose_user_action(user_id: str, action: str, text: str = None):
 
     .. versionadded: 1.3.5
     """
-    if action.lower() not in ("like", "dm"):
+    if action.lower() not in ("follow", "dm"):
         return TypeError("Action must be either 'like' or 'dm'")
     if text:
         text = text.replace(" ", "%20")
     return (
         f"https://twitter.com/intent/user?user_id={user_id}"
-        if action.lower() == "like"
+        if action.lower() == "follow"
         else f"https://twitter.com/messages/compose?recipient_id={user_id}" + f"?text={text}"
         if text
         else f"https://twitter.com/messages/compose?recipient_id={user_id}"
