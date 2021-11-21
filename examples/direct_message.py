@@ -1,12 +1,6 @@
 """
 In this example i'm going to make a very simple code
 to send messages to other user through DM
-Code Explanations:
-1. Wrap the code in try-except block to make it easier to catch errors.
-2. Fetch the user with fetch_user_by_name method.
-3. Send a message to that user using the send method.
-4. If it cause error and if the error is pytweet.errors.Forbidden it'll print the error. Other then pytweet.errors.Forbidden, it'll raise the errors. 
-5. If it didnt cause any errors, it'll print success message.
 """
 import pytweet
 
@@ -18,15 +12,22 @@ client = pytweet.Client(
     access_token_secret="Your access_token_secret here",
 )  # if you dont have one make an application in https://apps.twitter.com
 
-try:  # 1
-    user = client.fetch_user_by_name("SomeoneUserName")  # 2
-    user.send(f"Hello World from {client.user}")  # 3
+try:
+    user = client.fetch_user_by_name("SomeoneUserName")
+    user.send(f"Hello World from {client.user}")
 except Exception as e:
-    if isinstance(e, pytweet.errors.Forbidden):  # 4
-        print("Cannot interact with that user! Return HTTP code 403: Forbidden!")
-
-    else:
-        raise e
+    raise e
 
 else:
-    print(f"Sent messages to {user.username}")  # 5
+    print(f"Sent messages to {user.username}")
+
+#You could also send a message to a tweet's author.
+
+try:
+    tweet = client.fetch_tweet("Tweet ID here")
+    tweet.author.send(f"Hello World from {client.user}")
+except Exception as e:
+    raise e
+
+else:
+    print(f"Sent messages to {tweet.author.send}")
