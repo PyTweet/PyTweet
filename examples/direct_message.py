@@ -14,7 +14,7 @@ client = pytweet.Client(
 
 try:
     user = client.fetch_user_by_name("SomeoneUserName")
-    user.send(f"Hello World from {client.user}")
+    user.send(f"Hello World from {client.account}")
 except Exception as e:
     raise e
 
@@ -25,7 +25,7 @@ else:
 
 try:
     tweet = client.fetch_tweet("Tweet ID here")
-    tweet.author.send(f"Hello World from {client.user}")
+    tweet.author.send(f"Hello World from {client.account}")
 except Exception as e:
     raise e
 
