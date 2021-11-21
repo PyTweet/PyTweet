@@ -15,25 +15,25 @@ __all__ = ("PollOption", "Poll", "QuickReply", "Geo", "CTA", "Button", "Option",
 
 @dataclass
 class Button:
-    label: str
-    type: Union[ButtonType, str]
-    url: str
-    tco_url: Optional[str] = None
     """Represent a Button object. Button are attachment that you can attach via :class:`CTA`
 
     .. versionadded:: 1.3.5
     """
+    label: str
+    type: Union[ButtonType, str]
+    url: str
+    tco_url: Optional[str] = None
 
 
 @dataclass
 class Option:
-    label: str
-    description: str
-    metadata: str
     """Represent an Option object. You can create an Option using :class:`QuickReply.add_option`
 
     .. versionadded:: 1.3.5
     """
+    label: str
+    description: str
+    metadata: str
 
 
 @dataclass
