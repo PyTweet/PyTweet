@@ -22,4 +22,4 @@ print(tweet.text, tweet.id, tweet.author.username)
 
 space = client.fetch_space_by_title("Your Title Here")
 print(space.state, space.id, space.host_id)
-# Returns the spacce's state, id, and host's id. You can use fetch_user method to get the User object.
+# Returns the space's state, id, and host's id. You can use fetch_user method to get the User object.
