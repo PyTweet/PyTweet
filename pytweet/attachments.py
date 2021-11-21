@@ -19,6 +19,7 @@ class Button:
 
     .. versionadded:: 1.3.5
     """
+
     label: str
     type: Union[ButtonType, str]
     url: str
@@ -31,6 +32,7 @@ class Option:
 
     .. versionadded:: 1.3.5
     """
+
     label: str
     description: str
     metadata: str
