@@ -79,7 +79,7 @@ class DirectMessage(Message):
         self.timestamp = round(datetime.datetime.utcnow().timestamp())
 
     def __repr__(self) -> str:
-        return "DirectMessage(text:{0.text} id:{0.id} author: {0.author})".format(self)
+        return "DirectMessage(text={0.text} id={0.id} author={0.recipient})".format(self)
 
     def __str__(self) -> str:
         return self.text
