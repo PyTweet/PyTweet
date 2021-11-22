@@ -160,7 +160,7 @@ class HTTPClient:
         return response
 
     def upload(self, file: File, command: str, *, media_id=None):
-        assert command in ["INIT", "APPEND", "FINALIZE", "STATUS"]
+        assert command.upper() in ("INIT", "APPEND", "FINALIZE", "STATUS")
         auth = OauthSession(self.consumer_key, self.consumer_key_secret)
         auth.set_access_token(self.access_token, self.access_token_secret)
         auth = auth.oauth1
