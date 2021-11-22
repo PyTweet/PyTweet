@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from .attachments import QuickReply, CTA
+from .attachments import QuickReply, CTA, File
 from .entities import Hashtags, Symbols, Urls, UserMentions
 from .enums import MessageEventTypeEnum, MessageTypeEnum
 from .user import User
@@ -15,15 +15,17 @@ __all__ = ("Message", "DirectMessage", "WelcomeMessage", "WelcomeMessageRule")
 
 
 class Message:
-    """Represents the base Message of all Message types in Twitter, this include DirrectMessage & Tweet
+    """Represents the base Message of all Message types in Twitter.
 
     Parameters
     ------------
     text: Optional[:class:`str`]
         The messages's text.
-
     id: Union[:class:`str`, :class:`int`]
         The messages's unique ID.
+    type: :class:`int`.
+        The message's type in int form, it will get form to MessageTypeEnum.
+
 
     .. versionadded:: 1.2.0
     """
@@ -77,7 +79,7 @@ class DirectMessage(Message):
         self.timestamp = round(datetime.datetime.utcnow().timestamp())
 
     def __repr__(self) -> str:
-        return "Message(text:{0.text} id:{0.id} author: {0.author})".format(self)
+        return "DirectMessage(text={0.text} id={0.id} recipient={0.recipient})".format(self)
 
     def __str__(self) -> str:
         return self.text
@@ -207,12 +209,13 @@ class WelcomeMessage(Message):
         A human readable name for the Welcome Message.
     text: :class:`str`
         The welcome message main text.
-    welcome_message_id: Union[:class:`str`, :class:`int`]
+    id: Union[:class:`str`, :class:`int`]
         The welcome message unique id.
     timestamp: Optional[:class:`str`]
         The welcome message timestamp.
     http_client: :class:`HTTPClient`
         The http client that make the request.
+
 
     .. versionadded:: 1.3.5
     """
@@ -237,7 +240,7 @@ class WelcomeMessage(Message):
     def __str__(self) -> str:
         return self.text
 
-    def set_rules(self) -> WelcomeMessageRule:
+    def set_rule(self) -> WelcomeMessageRule:
         """Set a new Welcome Message Rule that determines which Welcome Message will be shown in a given conversation. Returns the created rule if successful.
 
         .. versionadded:: 1.3.5
@@ -260,32 +263,64 @@ class WelcomeMessage(Message):
         args: list = [v for k, v in res.get("welcome_message_rule").items()]
         return WelcomeMessageRule(args[0], args[2], args[1], http_client=self.http_client)
 
-    def update(self, text: str = None, *, quick_reply: QuickReply = None) -> WelcomeMessage:
+    def update(
+        self,
+        text: str = None,
+        *,
+        file: Optional[File] = None,
+        quick_reply: Optional[QuickReply] = None,
+        cta: Optional[CTA] = None,
+    ) -> WelcomeMessage:
         """Updates the Welcome Message, you dont need to use set_rule again since this update your default welcome message.
 
         Parameters
         -----------
         text: :class:`str`
             The welcome message main text
+        file: Optional[:class:`File`]:
+            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
+        quick_reply: Optional[:class:`QuickReply`]
+            The message's :class:`QuickReply` attachments.
+        cta: Optional[:class:`CTA`]
+            The message's :class:`CTA` attachment.
+
+        Returns
+        ---------
+        :class:`WelcomeMessage`
+            Returns your :class:`WelcomeMessage` instance.
+
 
         .. versionadded:: 1.3.5
         """
         data = {"message_data": {}}
+        message_data = data["message_data"]
 
-        data["message_data"]["text"] = str(text)
+        message_data["text"] = str(text)
+
+        if file:
+            media_id = self.http_client.upload(file, "INIT")
+            self.http_client.upload(file, "APPEND", media_id=media_id)
+            self.http_client.upload(file, "FINALIZE", media_id=media_id)
+            message_data["attachment"] = {}
+            message_data["attachment"]["type"] = "media"
+            message_data["attachment"]["media"] = {}
+            message_data["attachment"]["media"]["id"] = str(media_id)
 
         if quick_reply:
-            data["message_data"]["quick_reply"] = {
+            message_data["quick_reply"] = {
                 "type": quick_reply.type,
                 "options": quick_reply.raw_options,
             }
+
+        if cta:
+            message_data["ctas"] = cta.raw_buttons
 
         res = self.http_client.request(
             "PUT",
             "1.1",
             "/direct_messages/welcome_messages/update.json",
             params={"id": str(self.id)},
-            json=data,
+            json=message_data,
             auth=True,
         )
 
@@ -335,7 +370,7 @@ class WelcomeMessageRule(Message):
 
     Parameters
     ------------
-    welcome_message_rule_id: Union[:class:`str`, :class:`int`]
+    id: Union[:class:`str`, :class:`int`]
         The welcome message rule unique id.
     welcome_message_id: Union[:class:`str`, :class:`int`]
         The welcome message unique id.
@@ -344,24 +379,29 @@ class WelcomeMessageRule(Message):
     http_client: :class:`HTTPClient`
         The http client that make the request.
 
+
     .. versionadded:: 1.3.5
     """
 
     def __init__(
         self,
-        welcome_message_rule_id: Union[str, int],
+        id: Union[str, int],
         welcome_message_id: Union[str, int],
         timestamp: Union[str, int],
         *,
         http_client: HTTPClient,
     ):
-        super().__init__(id=welcome_message_rule_id, type=3)
+        super().__init__(None, id=id, type=3)
         self._welcome_message_id = welcome_message_id
         self._timestamp = timestamp
         self.http_client = http_client
 
     def __repr__(self) -> str:
-        return "WelcomeMessageRule(id= {0.id} welcome_message_id= {0.} created_at= {0.created_at})".format(self)
+        return (
+            "WelcomeMessageRule(id={0.id} welcome_message_id={0.welcome_message_id} created_at={0.created_at})".format(
+                self
+            )
+        )
 
     def delete(self):
         """Delete the Welcome Message Rule.

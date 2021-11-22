@@ -15,6 +15,11 @@ __all__ = ("PollOption", "Poll", "QuickReply", "Geo", "CTA", "Button", "Option",
 
 @dataclass
 class Button:
+    """Represent a Button object. Button are attachment that you can attach via :class:`CTA`
+
+    .. versionadded:: 1.3.5
+    """
+
     label: str
     type: Union[ButtonType, str]
     url: str
@@ -23,6 +28,11 @@ class Button:
 
 @dataclass
 class Option:
+    """Represent an Option object. You can create an Option using :class:`QuickReply.add_option`
+
+    .. versionadded:: 1.3.5
+    """
+
     label: str
     description: str
     metadata: str
@@ -33,6 +43,10 @@ class PollOption:
     label: str
     position: int = 0
     votes: int = 0
+    """Represent an Option for :class:`Poll`
+
+    .. versionadded 1.3.5
+    """
 
 
 class Poll:
@@ -51,31 +65,26 @@ class Poll:
 
     Parameters
     ------------
-    id: Optional[:class:`int`]
-        The poll's unique ID.
-    voting_status: Optional[Union[:class:`str`, :class:`int`]]
-        The poll's voting status.
-    duration: Optional[Union[:class:`str`, :class:`int`]]
+    duration: :class:`int`
         The poll duration in minutes.
-    end_date: Optional[Union[:class:`str`, :class:`int`]]
+    id: Optional[Union[:class:`str`, :class:`int`]]
+        The poll's unique ID.
+    voting_status: Optional[:class:`str`]
+        The poll's voting status.
+    end_date: Optional[:class:`str`]
         The poll's end date.
 
 
     .. versionadded:: 1.1.0
     """
 
-    def __init__(
-        self,
-        id: Optional[int] = None,
-        voting_status: Optional[str] = None,
-        duration: Optional[Union[str, int]] = 20,
-        end_date: Optional[Union[str, int]] = None,
-    ):
-        self._id = id
-        self._voting_status = voting_status
+    def __init__(self, duration: int, **kwargs):
+        self._id: Optional[Union[str, int]] = kwargs.get("id", None)
+        self._voting_status: Optional[str] = kwargs.get("voting_status", None)
+        self._end_date = kwargs.get("end_date", None)
         self._duration = duration
-        self._end_date = end_date
         self._options = []
+        self._raw_options = []
 
     def __repr__(self) -> str:
         return "Poll(id={0.id} voting_status={0.voting_status} duration={0.duration})".format(self)
@@ -93,7 +102,7 @@ class Poll:
     def __len__(self) -> int:
         return len(self.options)
 
-    def add_option(self, *, label: str, position: int = 0, votes: int = 0) -> Poll:
+    def add_option(self, *, label: str, **kwargs) -> Poll:
         """Add option to your Poll instance.
 
         .. note::
@@ -116,7 +125,9 @@ class Poll:
 
         .. versionadded 1.3.5
         """
-        self._options.append({"position": position or 0, "label": label, "votes": votes or 0})
+        data = {"position": kwargs.get("position") or 0, "label": label, "votes": kwargs.get("votes") or 0}
+        self._options.append(PollOption(**data))
+        self._raw_options.append(data)
         return self
 
     @property
@@ -133,7 +144,15 @@ class Poll:
 
         .. versionadded:: 1.1.0
         """
-        return [PollOption(**option) for option in self._options]
+        return self._options
+
+    @property
+    def raw_options(self) -> List[dict]:
+        """List[:class:`dict`]: Return a list of raw poll option.
+
+        .. versionadded:: 1.3.5
+        """
+        return self._raw_options
 
     @property
     def voting_status(self) -> bool:
@@ -142,14 +161,6 @@ class Poll:
         .. versionadded:: 1.1.0
         """
         return self._voting_status == "open"
-
-    @property
-    def duration_inSeconds(self) -> int:
-        """:class:`int`: Return the poll duration in seconds.
-
-        .. versionadded:: 1.1.0
-        """
-        return int(self._duration) * 60 if self._duration else None
 
     @property
     def duration(self) -> int:
@@ -187,7 +198,7 @@ class QuickReply:
     def __init__(self, type: str = "options"):
         self.type = type if type == "options" else "options"
         self._options: List[Option] = []
-        self._raw_options: List[Dict] = []
+        self._raw_options: List[dict] = []
 
     def add_option(
         self, *, label: str, description: Optional[str] = None, metadata: Optional[str] = None
@@ -196,11 +207,11 @@ class QuickReply:
 
         Parameters
         ------------
-        label: str
+        label: :class:`str`
             The option's label. Label text is returned as the user's message response, Must be less then 36 characters.
-        description: str
+        description: :class:`str`
             The option's description. Description text displayed under label text. All options must have this property defined if property is present in any option. Text is auto-wrapped and will display on a max of two lines and supports n for controlling line breaks, Must be less then 72 characters.
-        metadata: str
+        metadata: :class:`str`
             The option's metadata. Metadata that will be sent back in the webhook request, must be less then 1000 characters.
 
         Returns
@@ -218,20 +229,20 @@ class QuickReply:
         return self
 
     @property
-    def raw_options(self) -> List[Dict]:
-        """List[Dict]: Returns the raw options.
-
-        .. versionadded:: 1.2.0
-        """
-        return self._raw_options
-
-    @property
     def options(self) -> List[Option]:
         """List[:class:`Option`]: Returns a list of pre-made Option objects.
 
         .. versionadded:: 1.3.5
         """
         return self._options
+
+    @property
+    def raw_options(self) -> List[Dict]:
+        """List[Dict]: Returns the raw options.
+
+        .. versionadded:: 1.2.0
+        """
+        return self._raw_options
 
 
 class Geo:
@@ -367,6 +378,9 @@ class CTA:
         ---------
         :class:`CTA`
             Returns your :class:`CTA` instance.
+
+
+        .. versionadded:: 1.3.5
         """
         self._raw_buttons.append(
             {"type": type.value if isinstance(type, ButtonType) else type, "label": label, "url": url}

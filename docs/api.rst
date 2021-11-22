@@ -178,14 +178,20 @@ File
 Button
 ~~~~~~~
 
-
 .. attributetable:: Button
+
+.. autoclass:: Button
+    :members:
+
 
 Option
 ~~~~~~~
 
-
 .. attributetable:: Option
+
+.. autoclass:: Option
+    :members:
+
 
 Relations
 ----------------

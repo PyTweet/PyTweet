@@ -1,6 +1,6 @@
 from typing import List, Optional, Union
 
-from .attachments import Geo, Poll, QuickReply, File, CustomProfile
+from .attachments import Geo, Poll, QuickReply, File, CustomProfile, CTA
 from .errors import PytweetException
 from .enums import ReplySetting, SpaceState
 from .http import HTTPClient
@@ -221,18 +221,28 @@ class Client:
         return res
 
     def create_welcome_message(
-        self, name: str = None, text: str = None, *, quick_reply: QuickReply = None
+        self,
+        name: Optional[str] = None,
+        text: Optional[str] = None,
+        *,
+        file: Optional[File] = None,
+        quick_reply: Optional[QuickReply] = None,
+        cta: Optional[CTA] = None,
     ) -> WelcomeMessage:
         """Create a welcome message which you can set with :class:`WelcomeMessage.set_rule()`.
 
         Parameters
         ------------
-        name: :class:`str`
+        name: Optional[:class:`str`]
             A human readable name for the Welcome Message
-        text: :class:`str`
+        text: Optional[:class:`str`]
             The welcome message's text. Please do not make this empty if you don't want the text to be blank.
-        quick_reply: :class:`QuickReply`
-            The message QuickReply attachments.
+        file: Optional[:class:`File`]:
+            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
+        quick_reply: Optional[:class:`QuickReply`]
+            The message's :class:`QuickReply` attachments.
+        cta: Optional[:class:`CTA`]
+            The message's :class:`CTA` attachment.
 
         Returns
         ---------
@@ -243,16 +253,28 @@ class Client:
         .. versionadded:: 1.3.5
         """
         data = {"welcome_message": {"message_data": {}}}
-
         message_data = data["welcome_message"]["message_data"]
+
         data["welcome_message"]["name"] = str(name)
         message_data["text"] = str(text)
+
+        if file:
+            media_id = self.http.upload(file, "INIT")
+            self.http.upload(file, "APPEND", media_id=media_id)
+            self.http.upload(file, "FINALIZE", media_id=media_id)
+            message_data["attachment"] = {}
+            message_data["attachment"]["type"] = "media"
+            message_data["attachment"]["media"] = {}
+            message_data["attachment"]["media"]["id"] = str(media_id)
 
         if quick_reply:
             message_data["quick_reply"] = {
                 "type": quick_reply.type,
                 "options": quick_reply.raw_options,
             }
+
+        if cta:
+            message_data["ctas"] = cta.raw_buttons
 
         res = self.http.request(
             "POST",

@@ -54,7 +54,7 @@ client = pytweet.Client(
 #### After that we use functions to get info from twitter api
 
 ```py
-user = client.get_user_by_username("TheGenocides")
+user = client.get_user_by_name("TheGenocides")
 print(user.name, user.username, user.id)
 # Return The user's name, username, and id
 

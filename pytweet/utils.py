@@ -5,7 +5,12 @@ from dateutil import parser
 
 
 def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
-    """:class:`datetime.datetime`: Parse time return from twitter to datetime object!
+    """Parse time return from twitter to datetime object!
+
+    Returns
+    ---------
+    :class:`datetime.datetime`
+
 
     .. versionadded: 1.1.3
     """
@@ -23,36 +28,80 @@ def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
     )
 
 
-def compose_tweet() -> str:
-    """:class:`str`: Make a link that lets you compose a tweet
-
-    .. versionadded: 1.3.5
-    """
-    return "https://twitter.com/intent/tweet"
-
-
-def showcase_user(username: str):
-    """:class:`str`: Make a link that lets you showcase user.
+def compose_tweet(text: Optional[str] = None) -> str:
+    """Make a link that let's you compose a tweet
 
     Parameters
     ------------
-    username: :class:`str`
-        The user's username.
+    text: :class:`str`
+        The pre-populated text in the tweet. If none specified the user has to write their own message.
+
+
+    Returns
+    ---------
+    :class:`str`
+
 
     .. versionadded: 1.3.5
     """
-    return f"https://twitter.com/{username}"
+    if text:
+        text = text.replace(" ", "%20")
+    return (
+        "https://twitter.com/intent/tweet"
+        if not text
+        else f"https://twitter.com/intent/tweet" + f"?text={text}"
+        if text
+        else f"https://twitter.com/intent/tweet"
+    )
 
 
-def compose_tweet_action(tweet_id: Union[str, int], action: str):
-    """:class:`str`: Make a link that lets you interact a tweet with certain actions.
+def compose_user_action(user_id: str, action: str, text: str = None):
+    """Make a link that let's you interact with a user with certain actions.
+
+    Parameters
+    ------------
+    user_id: :class:`str`
+        The user's id.
+    action: :class:`str`
+        The action you are going to perform to the user.
+    text: :class:`str`
+        The pre-populated text for the dm action.
+
+
+    Returns
+    ---------
+    :class:`str`
+
+
+    .. versionadded: 1.3.5
+    """
+    if action.lower() not in ("follow", "dm"):
+        return TypeError("Action must be either 'like' or 'dm'")
+    if text:
+        text = text.replace(" ", "%20")
+    return (
+        f"https://twitter.com/intent/user?user_id={user_id}"
+        if action.lower() == "follow"
+        else f"https://twitter.com/messages/compose?recipient_id={user_id}" + f"?text={text}"
+        if text
+        else f"https://twitter.com/messages/compose?recipient_id={user_id}"
+    )
+
+
+def compose_tweet_action(tweet_id: Union[str, int], action: str = None):
+    """Make a link that let's you interact with a tweet with certain actions.
 
     Parameters
     ------------
     tweet_id: Union[:class:`str`, :class:`int`]
         The tweet id you want to compose.
-    action: str
-        The action of a link.
+    action: :class:`str`
+        The action that's going to get perform when you click the link.
+
+    Returns
+    ---------
+    :class:`str`
+
 
     .. versionadded: 1.3.5
     """
