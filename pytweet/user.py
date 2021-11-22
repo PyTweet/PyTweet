@@ -54,7 +54,6 @@ class User:
             raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
-
     def send(
         self,
         text: str,
