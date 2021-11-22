@@ -104,15 +104,6 @@ class HTTPClient:
         self.message_cache = {}
         self.tweet_cache = {}
 
-    def fetch_timelines(self, max_results: int, user_id: int):
-        res = self.request(
-            "GET",
-            "2",
-            f"/users/{user_id}/tweets",
-            params={"tweet.fields": "created_at", "max_results": max_results},
-        )
-        return [Tweet(r) for r in res]
-
     def request(
         self,
         method: str,

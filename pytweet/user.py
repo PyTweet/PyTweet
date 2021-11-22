@@ -54,8 +54,6 @@ class User:
             raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
-    def fetch_timelines(self, max_results: int):
-        return self.http_client.fetch_timelines(max_results=max_results, user_id=self.id)
 
     def send(
         self,
