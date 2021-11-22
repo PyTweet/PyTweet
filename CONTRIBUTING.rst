@@ -62,7 +62,7 @@ If you want to see what changes black will make, you can do:
 Commit Messages
 ==================
 
-We use semantic commit messages. All commits must follow this, `Click here to find out how to write them. <https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716>`
+We use semantic commit messages. All commits must follow this, `Click here to find out how to write them. <https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716>`_
 
 Testing
 ==================
