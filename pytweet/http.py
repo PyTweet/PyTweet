@@ -202,13 +202,9 @@ class HTTPClient:
                 raise ValueError("'media_id' is None! Please specified it.")
 
             while bytes_sent < file.total_bytes:
-                chunk = open_file.read(4 * 1024 * 1024)
-                data = {"command": "APPEND", "media_id": media_id, "segment_index": segment_id}
-                files = {"media": chunk}
-
-                res = requests.post(url=self.upload_url, data=data, files=files, auth=auth)
+                res = requests.post(url=self.upload_url, data={"command": "APPEND", "media_id": media_id, "segment_index": segment_id}, files={"media": open_file.read(4 * 1024 * 1024)}, auth=auth)
                 bytes_sent = open_file.tell()
-                segment_id = segment_id + 1
+                segment_id += 1
 
         elif command.upper() == "FINALIZE":
             data = {"command": "FINALIZE", "media_id": media_id}
