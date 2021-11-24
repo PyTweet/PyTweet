@@ -215,7 +215,7 @@ class Client:
 
         .. versionadded:: 1.1.0
         """
-        res = self.http.post_tweet(
+        return self.http.post_tweet(
             text,
             file=file,
             poll=poll,
@@ -227,7 +227,7 @@ class Client:
             exclude_reply_users=exclude_reply_users,
             super_followers_only=super_followers_only,
         )
-        return res
+
 
     def create_welcome_message(
         self,
