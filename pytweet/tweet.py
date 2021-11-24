@@ -345,6 +345,38 @@ class Tweet(Message):
         res: dict = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
         return RelationHide(res)
 
+    def fetch_retweeters(self):
+        res = self.http_client.request(
+            "GET",
+            "2",
+            f"/tweets/{self.id}/retweeted_by",
+            params={
+                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
+            },
+        )
+
+        try:
+            res["data"]
+            return [User(user, http_client=self) for user in res["data"]]
+        except (KeyError, TypeError):
+            return []
+
+    def fetch_liking_users(self):
+        res = self.http_client.request(
+            "GET",
+            "2",
+            f"/tweets/{self.id}/liking_users",
+            params={
+                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
+            },
+        )
+
+        try:
+            res["data"]
+            return [User(user, http_client=self) for user in res["data"]]
+        except (KeyError, TypeError):
+            return []
+
     @property
     def author(self) -> Optional[User]:
         """Optional[:class:`User`]: Return a user (object) who posted the tweet.
