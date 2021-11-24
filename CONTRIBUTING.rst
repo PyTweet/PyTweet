@@ -58,6 +58,12 @@ If you want to see what changes black will make, you can do:
     black --diff setup.py pytweet --line-length 120
 
 
+
+Commit Messages
+==================
+
+We use semantic commit messages. All commits must follow this, `Click here to find out how to write them. <https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716>`_
+
 Testing
 ==================
 
