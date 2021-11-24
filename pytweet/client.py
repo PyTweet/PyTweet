@@ -47,15 +47,15 @@ class Client:
         consumer_key_secret: Optional[str] = None,
         access_token: Optional[str] = None,
         access_token_secret: Optional[str] = None,
-        stream: Optional[Stream] = None
+        stream: Optional[Stream] = None,
     ) -> None:
         self.http = HTTPClient(
             bearer_token,
-            consumer_key = consumer_key,
-            consumer_key_secret = consumer_key_secret,
-            access_token = access_token,
-            access_token_secret = access_token_secret,
-            stream = stream
+            consumer_key=consumer_key,
+            consumer_key_secret=consumer_key_secret,
+            access_token=access_token,
+            access_token_secret=access_token_secret,
+            stream=stream,
         )
 
     def __repr__(self) -> str:
@@ -550,7 +550,7 @@ class Client:
         """Stream realtime."""
         if not self.http.stream:
             raise TypeError("'stream' argument is missing in client!")
-        
+
         try:
             self.http.stream.start()
         except KeyboardInterrupt:

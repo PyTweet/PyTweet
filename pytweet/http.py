@@ -74,7 +74,7 @@ class HTTPClient:
         consumer_key_secret: Optional[str],
         access_token: Optional[str],
         access_token_secret: Optional[str],
-        stream: Optional[Stream] = None
+        stream: Optional[Stream] = None,
     ) -> Union[None, NoReturn]:
         self.credentials: Dict[str, Optional[str]] = {
             "bearer_token": bearer_token,
@@ -150,7 +150,7 @@ class HTTPClient:
         response = res(url, headers=headers, params=params, json=json, auth=auth)
         check_error(response)
         res = None
-        
+
         try:
             res = response.json()
         except j.decoder.JSONDecodeError:
