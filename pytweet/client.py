@@ -402,8 +402,11 @@ class Client:
 
         .. versionadded:: 1.3.5
         """
-        Space = self.http.fetch_space_bytitle(title, state)
-        return Space
+        if state == SpaceState.live or state == SpaceState.scheduled:
+            return self.http.fetch_space_bytitle(title, state)
+        else:
+            raise TypeError("Unknown state: %s" % state)
+
 
     def search_geo(
         self,
