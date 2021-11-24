@@ -221,7 +221,12 @@ class HTTPClient:
                 raise ValueError("'media_id' is None! Please specified it.")
 
             while bytes_sent < file.total_bytes:
-                res = requests.post(url=self.upload_url, data={"command": "APPEND", "media_id": media_id, "segment_index": segment_id}, files={"media": open_file.read(4 * 1024 * 1024)}, auth=auth)
+                res = requests.post(
+                    url=self.upload_url,
+                    data={"command": "APPEND", "media_id": media_id, "segment_index": segment_id},
+                    files={"media": open_file.read(4 * 1024 * 1024)},
+                    auth=auth,
+                )
                 bytes_sent = open_file.tell()
                 segment_id += 1
 
@@ -281,7 +286,6 @@ class HTTPClient:
             },
             auth=True,
         )
-
 
         return Tweet(res, http_client=self)
 

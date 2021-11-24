@@ -244,7 +244,7 @@ class User:
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
             },
         )
-        return [User(data, http_client = self.http_client) for data in followers["data"]]
+        return [User(data, http_client=self.http_client) for data in followers["data"]]
 
     def fetch_following(self):
         following = self.http_client.request(
@@ -255,7 +255,7 @@ class User:
                 "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
             },
         )
-        return [User(data, http_client = self.http_client) for data in following["data"]]
+        return [User(data, http_client=self.http_client) for data in following["data"]]
 
     def fetch_pinned_tweet(self) -> Optional[Any]:
         """Returns the user's pinned tweet.
