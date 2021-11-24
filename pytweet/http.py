@@ -464,5 +464,4 @@ class HTTPClient:
 
         res = self.request("POST", "2", "/tweets", json=payload, auth=True)
         data = res.get("data")
-        tweet = Message(data.get("text"), data.get("id"), 1)
-        return tweet
+        return Message(data.get("text"), data.get("id"), 1)

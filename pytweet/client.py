@@ -215,7 +215,7 @@ class Client:
 
         .. versionadded:: 1.1.0
         """
-        res = self.http.post_tweet(
+        return self.http.post_tweet(
             text,
             file=file,
             poll=poll,
@@ -227,7 +227,6 @@ class Client:
             exclude_reply_users=exclude_reply_users,
             super_followers_only=super_followers_only,
         )
-        return res
 
     def create_welcome_message(
         self,
@@ -402,7 +401,10 @@ class Client:
 
         .. versionadded:: 1.3.5
         """
-        return self.http.fetch_space_bytitle(title, state)
+        if state == SpaceState.live or state == SpaceState.scheduled:
+            return self.http.fetch_space_bytitle(title, state)
+        else:
+            raise TypeError(f"Unknown state passed: {state}")
 
     def search_geo(
         self,
