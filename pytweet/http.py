@@ -143,6 +143,9 @@ class HTTPClient:
             raise TypeError("Method isn't recognizable")
 
         if auth:
+            for k, v in self.credentials.items():
+                if v is None:
+                    raise PytweetException(f"{k} is a required credentials that is missing!")
             auth = OauthSession(self.consumer_key, self.consumer_key_secret)
             auth.set_access_token(self.access_token, self.access_token_secret)
             auth = auth.oauth1
@@ -208,8 +211,7 @@ class HTTPClient:
             }
             res = requests.post(self.upload_url, data=data, auth=auth)
             check_error(res)
-            media_id = res.json()["media_id"]
-            return media_id
+            return res.json()["media_id"]
 
         elif command.upper() == "APPEND":
             segment_id = 0
@@ -219,22 +221,14 @@ class HTTPClient:
                 raise ValueError("'media_id' is None! Please specified it.")
 
             while bytes_sent < file.total_bytes:
-                chunk = open_file.read(4 * 1024 * 1024)
-                data = {"command": "APPEND", "media_id": media_id, "segment_index": segment_id}
-                files = {"media": chunk}
-
-                res = requests.post(url=self.upload_url, data=data, files=files, auth=auth)
+                res = requests.post(url=self.upload_url, data={"command": "APPEND", "media_id": media_id, "segment_index": segment_id}, files={"media": open_file.read(4 * 1024 * 1024)}, auth=auth)
                 bytes_sent = open_file.tell()
-                segment_id = segment_id + 1
+                segment_id += 1
 
         elif command.upper() == "FINALIZE":
-            data = {"command": "FINALIZE", "media_id": media_id}
-
-            res = requests.post(url=self.upload_url, data=data, auth=auth)
+            res = requests.post(url=self.upload_url, data={"command": "FINALIZE", "media_id": media_id}, auth=auth)
             check_error(res)
-
-            processing_info = res.json().get("processing_info", None)
-            CheckStatus(processing_info, media_id)
+            CheckStatus(res.json().get("processing_info", None), media_id)
 
     def fetch_user(self, user_id: Union[str, int]) -> User:
         try:
@@ -251,41 +245,6 @@ class HTTPClient:
                 "user.fields": "created_at,description,entities,id,location,name,profile_image_url,protected,public_metrics,url,username,verified,withheld,pinned_tweet_id"
             },
             is_json=True,
-        )
-
-        followers = self.request(
-            "GET",
-            "2",
-            f"/users/{user_id}/followers",
-            headers={"Authorization": f"Bearer {self.bearer_token}"},
-            params={
-                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
-            },
-        )
-
-        following = self.request(
-            "GET",
-            "2",
-            f"/users/{user_id}/following",
-            headers={"Authorization": f"Bearer {self.bearer_token}"},
-            params={
-                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
-            },
-        )
-
-        data["data"].update(
-            {
-                "followers": [User(follower, http_client=self) for follower in followers["data"]]
-                if followers != []
-                else []
-            }
-        )
-        data["data"].update(
-            {
-                "following": [User(following, http_client=self) for following in following["data"]]
-                if following != []
-                else []
-            }
         )
 
         return User(data, http_client=self)
@@ -305,21 +264,13 @@ class HTTPClient:
             is_json=True,
         )
 
-        user_payload = self.fetch_user(int(data["data"].get("id")))
-        data["data"].update({"followers": user_payload.followers})
-        data["data"].update({"following": user_payload.following})
-
         return User(data, http_client=self)
 
     def fetch_tweet(self, tweet_id: Union[str, int]) -> Tweet:
-        if not any([v for v in self.credentials.values()]):
-            return None
-
         res = self.request(
             "GET",
             "2",
             f"/tweets/{tweet_id}",
-            headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
                 "tweet.fields": "attachments,author_id,context_annotations,conversation_id,created_at,geo,entities,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,reply_settings,source,text,withheld",
                 "user.fields": "created_at,description,id,location,name,profile_image_url,protected,public_metrics,url,username,verified,withheld",
@@ -331,45 +282,6 @@ class HTTPClient:
             auth=True,
         )
 
-        res2 = self.request(
-            "GET",
-            "2",
-            f"/tweets/{tweet_id}/retweeted_by",
-            headers={"Authorization": f"Bearer {self.bearer_token}"},
-            params={
-                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
-            },
-        )
-
-        res3 = self.request(
-            "GET",
-            "2",
-            f"/tweets/{tweet_id}/liking_users",
-            headers={"Authorization": f"Bearer {self.bearer_token}"},
-            params={
-                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
-            },
-        )
-
-        user_id = res["includes"]["users"][0].get("id")
-        user = self.fetch_user(int(user_id))
-
-        res["includes"]["users"][0].update({"followers": user.followers})
-        res["includes"]["users"][0].update({"following": user.following})
-
-        try:
-            res2["data"]
-
-            res["data"].update({"retweetes": [User(user, http_client=self) for user in res2["data"]]})
-        except (KeyError, TypeError):
-            res["data"].update({"retweetes": []})
-
-        try:
-            res3["data"]
-
-            res["data"].update({"likes": [User(user, http_client=self) for user in res3["data"]]})
-        except (KeyError, TypeError):
-            res["data"].update({"likes": []})
 
         return Tweet(res, http_client=self)
 
@@ -499,7 +411,7 @@ class HTTPClient:
         reply_tweet: Optional[Union[str, int]] = None,
         exclude_reply_users: Optional[List[Union[str, int]]] = None,
         super_followers_only: Optional[bool] = None,
-    ) -> Message | int:
+    ) -> Optional[Message]:
         payload = {}
         if text:
             payload["text"] = text

@@ -402,8 +402,7 @@ class Client:
 
         .. versionadded:: 1.3.5
         """
-        Space = self.http.fetch_space_bytitle(title, state)
-        return Space
+        return self.http.fetch_space_bytitle(title, state)
 
     def search_geo(
         self,
