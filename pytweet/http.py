@@ -15,6 +15,7 @@ from .message import DirectMessage, Message
 from .space import Space
 from .tweet import Tweet
 from .user import User
+from .stream import Stream
 
 _log = logging.getLogger(__name__)
 
@@ -73,6 +74,7 @@ class HTTPClient:
         consumer_key_secret: Optional[str],
         access_token: Optional[str],
         access_token_secret: Optional[str],
+        stream: Optional[Stream] = None,
     ) -> Union[None, NoReturn]:
         self.credentials: Dict[str, Optional[str]] = {
             "bearer_token": bearer_token,
@@ -99,10 +101,22 @@ class HTTPClient:
         self.consumer_key_secret: Optional[str] = consumer_key_secret
         self.access_token: Optional[str] = access_token
         self.access_token_secret: Optional[str] = access_token_secret
+        self.stream = stream
         self.base_url = "https://api.twitter.com/"
         self.upload_url = "https://upload.twitter.com/1.1/media/upload.json"
         self.message_cache = {}
         self.tweet_cache = {}
+        self.events = {}
+        if self.stream:
+            self.stream.http_client = self
+
+    def dispatch(self, event_name, *args):
+        try:
+            event = self.events[event_name]
+        except KeyError:
+            return
+        else:
+            event(*args)
 
     def request(
         self,
@@ -143,8 +157,11 @@ class HTTPClient:
             return
 
         if "meta" in res.keys():
-            if res["meta"]["result_count"] == 0:
-                return []
+            try:
+                if res["meta"]["result_count"] == 0:
+                    return []
+            except KeyError:
+                pass
 
         if is_json:
             return res
@@ -478,7 +495,7 @@ class HTTPClient:
         reply_tweet: Optional[Union[str, int]] = None,
         exclude_reply_users: Optional[List[Union[str, int]]] = None,
         super_followers_only: Optional[bool] = None,
-    ) -> Union[NoReturn, Any]:
+    ) -> Message | int:
         payload = {}
         if text:
             payload["text"] = text

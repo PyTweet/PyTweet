@@ -1,4 +1,5 @@
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Callable
+from asyncio import iscoroutinefunction
 
 from .attachments import Geo, Poll, QuickReply, File, CustomProfile, CTA
 from .errors import PytweetException
@@ -8,6 +9,7 @@ from .message import DirectMessage, WelcomeMessage, WelcomeMessageRule, Message
 from .space import Space
 from .tweet import Tweet
 from .user import User
+from .stream import Stream
 
 __all__ = ("Client",)
 
@@ -45,6 +47,7 @@ class Client:
         consumer_key_secret: Optional[str] = None,
         access_token: Optional[str] = None,
         access_token_secret: Optional[str] = None,
+        stream: Optional[Stream] = None,
     ) -> None:
         self.http = HTTPClient(
             bearer_token,
@@ -52,6 +55,7 @@ class Client:
             consumer_key_secret=consumer_key_secret,
             access_token=access_token,
             access_token_secret=access_token_secret,
+            stream=stream,
         )
 
     def __repr__(self) -> str:
@@ -68,6 +72,11 @@ class Client:
             self._set_account_user()
             return getattr(self, "_account_user", None)
         return attr
+
+    def event(self, func: Callable):
+        if iscoroutinefunction(func):
+            raise TypeError("Event must be a synchronous function!")
+        self.http.events[func.__name__[3:]] = func
 
     def _set_account_user(self) -> None:
         if not self.http.access_token:
@@ -536,3 +545,13 @@ class Client:
         data = res.get("custom_profile")
 
         return CustomProfile(data.get("name"), data.get("id"), data.get("created_timestamp"), data.get("avatar"))
+
+    def stream(self) -> None:
+        """Stream realtime."""
+        if not self.http.stream:
+            raise TypeError("'stream' argument is missing in client!")
+
+        try:
+            self.http.stream.start()
+        except KeyboardInterrupt:
+            print("\nKeyboardInterrupt: Exit stream.")
