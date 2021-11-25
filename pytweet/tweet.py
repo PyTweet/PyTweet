@@ -356,7 +356,6 @@ class Tweet(Message):
         )
 
         try:
-            res["data"]
             return [User(user, http_client=self) for user in res["data"]]
         except (KeyError, TypeError):
             return []
@@ -372,10 +371,23 @@ class Tweet(Message):
         )
 
         try:
-            res["data"]
             return [User(user, http_client=self) for user in res["data"]]
         except (KeyError, TypeError):
             return []
+
+    def fetch_replied_user(self) -> Optional[User]:
+        """Optional[:class:`User`]: Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
+
+        .. versionadded:: 1.1.3
+        """
+        return (
+            self.http_client.fetch_user(
+                int(self._payload.get("in_reply_to_user_id")),
+                http_client=self.http_client,
+            )
+            if self._payload.get("in_reply_to_user_id")
+            else None
+        )
 
     @property
     def author(self) -> Optional[User]:
@@ -383,7 +395,7 @@ class Tweet(Message):
 
         .. versionadded: 1.0.0
         """
-        if self._includes:
+        if self._includes and self._includes.get("users"):
             return User(self._includes.get("users")[0], http_client=self.http_client)
         return None
 
@@ -423,7 +435,7 @@ class Tweet(Message):
     def reply_setting(self) -> ReplySetting:
         """:class:`ReplySetting`: Return a :class:`ReplySetting` object with the tweet's reply setting. If everyone can reply, this method return ReplySetting.everyone.
 
-        .. versionadded: 1.0.0
+        .. versionadded: 1.3.5
         """
         return ReplySetting(self._payload.get("reply_settings"))
 
@@ -450,21 +462,6 @@ class Tweet(Message):
         .. versionadded: 1.1.0
         """
         return f"https://twitter.com/{self.author.username.split('@', 1)[1]}/status/{self.id}"
-
-    @property
-    def reply_to(self) -> Optional[User]:
-        """Optional[:class:`User`]: Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
-
-        .. versionadded:: 1.1.3
-        """
-        return (
-            self.http_client.fetch_user(
-                int(self._payload.get("in_reply_to_user_id")),
-                http_client=self.http_client,
-            )
-            if self._payload.get("in_reply_to_user_id")
-            else None
-        )
 
     @property
     def mentions(self) -> Optional[List[str]]:
