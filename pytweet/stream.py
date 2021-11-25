@@ -106,7 +106,7 @@ class Stream:
 
     def close(self) -> None:
         if self.is_close():
-            PytweetException("Attemp to close a stream that's already closed!")
+            PytweetException("Attempt to close a stream that's already closed!")
 
         _log.debug("Closing connection!")
         self.connection.close()
@@ -116,7 +116,7 @@ class Stream:
         errors = 0
         try:
             if not self.raw_rules:
-                _log.warn("Attemp to stream without rules, This would not return anything!")
+                _log.warn("Attempt to stream without rules, This would not return anything!")
 
             self.clear()
             self.set_rules()
