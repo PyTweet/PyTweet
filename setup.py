@@ -28,7 +28,6 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
 ]
 
-
 setup(
     name="PyTweet",
     author="TheGenocide & TheFarGG",
