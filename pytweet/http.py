@@ -16,6 +16,7 @@ from .space import Space
 from .tweet import Tweet
 from .user import User
 from .stream import Stream
+from .expansions import TWEET_EXPANSION, USER_FIELD, TWEET_FIELD, SPACE_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD
 
 _log = logging.getLogger(__name__)
 
@@ -109,6 +110,7 @@ class HTTPClient:
         self.events = {}
         if self.stream:
             self.stream.http_client = self
+            self.stream.connection.http_client = self
 
     def dispatch(self, event_name, *args):
         try:
@@ -263,7 +265,7 @@ class HTTPClient:
             f"/users/by/username/{username}",
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
-                "user.fields": "created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
+                "user.fields": USER_FIELD
             },
             is_json=True,
         )
@@ -276,12 +278,12 @@ class HTTPClient:
             "2",
             f"/tweets/{tweet_id}",
             params={
-                "tweet.fields": "attachments,author_id,context_annotations,conversation_id,created_at,geo,entities,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,reply_settings,source,text,withheld",
-                "user.fields": "created_at,description,id,location,name,profile_image_url,protected,public_metrics,url,username,verified,withheld",
-                "expansions": "attachments.poll_ids,attachments.media_keys,author_id,geo.place_id,in_reply_to_user_id,referenced_tweets.id,entities.mentions.username,referenced_tweets.id.author_id",
-                "media.fields": "duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width",
-                "place.fields": "contained_within,country,country_code,full_name,geo,id,name,place_type",
-                "poll.fields": "duration_minutes,end_datetime,id,options,voting_status",
+                "tweet.fields": TWEET_FIELD,
+                "user.fields": USER_FIELD,
+                "expansions": TWEET_EXPANSION,
+                "media.fields": MEDIA_FIELD,
+                "place.fields": PLACE_FIELD,
+                "poll.fields": POLL_FIELD,
             },
             auth=True,
         )
@@ -294,7 +296,7 @@ class HTTPClient:
             "2",
             f"/spaces/{str(space_id)}",
             params={
-                "space.fields": "host_ids,created_at,creator_id,id,lang,invited_user_ids,participant_count,speaker_ids,started_at,state,title,updated_at,scheduled_start,is_ticketed"
+                "space.fields": SPACE_FIELD
             },
         )
         return Space(res)
@@ -307,7 +309,7 @@ class HTTPClient:
             params={
                 "query": title,
                 "state": state.value,
-                "space.fields": "host_ids,created_at,creator_id,id,lang,invited_user_ids,participant_count,speaker_ids,started_at,state,title,updated_at,scheduled_start,is_ticketed",
+                "space.fields": SPACE_FIELD,
             },
         )
         return Space(res)
