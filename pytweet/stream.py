@@ -8,7 +8,7 @@ from typing import Optional, Any, List, TYPE_CHECKING
 from dataclasses import dataclass
 from .tweet import Tweet
 from .errors import PytweetException, ConnectionException
-from .expansions import TWEET_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, USER_FIELD
+from .expansions import TWEET_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, USER_FIELD, TWEET_EXPANSION
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -110,7 +110,7 @@ class StreamConnection:
                     headers={"Authorization": f"Bearer {self.http_client.bearer_token}"},
                     params={
                         "backfill_minutes": int(self.backfill_minutes),
-                        "expansions": TWEET_FIELD,
+                        "expansions": TWEET_EXPANSION,
                         "media.fields": MEDIA_FIELD,
                         "place.fields": PLACE_FIELD,
                         "poll.fields": POLL_FIELD,
