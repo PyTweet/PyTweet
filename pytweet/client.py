@@ -547,12 +547,12 @@ class Client:
 
         return CustomProfile(data.get("name"), data.get("id"), data.get("created_timestamp"), data.get("avatar"))
 
-    def stream(self) -> None:
+    def stream(self, tries: int = 15) -> None:
         """Stream realtime."""
         if not self.http.stream:
             raise TypeError("'stream' argument is missing in client!")
 
         try:
-            self.http.stream.start()
+            self.http.stream.start(tries)
         except KeyboardInterrupt:
             print("\nKeyboardInterrupt: Exit stream.")
