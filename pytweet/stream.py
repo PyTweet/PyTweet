@@ -18,12 +18,13 @@ _log = logging.getLogger(__name__)
 #     j = data.json()
 #     if "errors" in j.keys():
 #         raise ConnectionException(connection, None)
-        
+
 
 @dataclass
 class StreamRule:
     value: str
     tag: Optional[str] = None
+
 
 class Stream:
     def __init__(self, backfill_minutes: int = 0):
@@ -116,7 +117,7 @@ class Stream:
         try:
             if not self.raw_rules:
                 _log.warn("Attemp to stream without rules, This would not return anything!")
-            
+
             self.clear()
             self.set_rules()
             response = requests.get(
@@ -139,14 +140,14 @@ class Stream:
             for response_line in response.iter_lines():
                 if response_line:
                     json_data = json.loads(response_line.decode("UTF-8"))
-                    #TODO Detech if the data has errors.
+                    # TODO Detech if the data has errors.
                     tweet = Tweet(json_data, http_client=self.http_client)
                     self.http_client.dispatch("stream", tweet, self)
-                    
+
         except Exception as e:
             if isinstance(e, AttributeError):
                 return
-            
+
             elif isinstance(e, requests.exceptions.RequestException):
                 errors += 1
                 if errors >= tries:
@@ -159,5 +160,5 @@ class Stream:
 
             else:
                 raise e
-                    
+
         _log.info("Streaming connection has been closed!")

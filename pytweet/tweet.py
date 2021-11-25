@@ -316,13 +316,13 @@ class Tweet(Message):
 
     def hide(self) -> RelationHide:
         """Hide a reply tweet.
-        
+
         Returns
         ---------
         :class:`RelationHide`
             This method returns a :class:`RelationHide` object.
 
-            
+
         .. versionadded:: 1.2.5
         """
         res: dict = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
