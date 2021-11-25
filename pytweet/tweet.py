@@ -211,7 +211,9 @@ class Tweet(Message):
 
         Returns
         ---------
-        Returns a :class:`RelationLike` object.
+        Optional[:class:`RelationLike`]
+            This method returns a :class:`RelationLike` object.
+
 
         .. versionadded:: 1.2.0
         """
@@ -228,7 +230,7 @@ class Tweet(Message):
         Returns
         ---------
         :class:`RelationLike`
-            Returns a :class:`RelationLike` object.
+            This method returns a :class:`RelationLike` object.
 
 
         .. versionadded:: 1.2.0
@@ -245,7 +247,7 @@ class Tweet(Message):
         Returns
         ---------
         :class:`RelationRetweet`
-            Returns a :class:`RelationRetweet` object.
+            This method returns a :class:`RelationRetweet` object.
 
 
         .. versionadded:: 1.2.0
@@ -263,7 +265,7 @@ class Tweet(Message):
         Returns
         ---------
         :class:`RelationRetweet`
-            Returns a :class:`RelationRetweet` object.
+            This method returns a :class:`RelationRetweet` object.
 
 
         .. versionadded:: 1.2.0
@@ -296,7 +298,7 @@ class Tweet(Message):
         Parameters
         ------------
         text: str
-            The reply's main text.
+            The reply tweet's main text.
 
 
         .. versionadded:: 1.2.5
@@ -312,27 +314,22 @@ class Tweet(Message):
             auth=True,
         )
 
-    def hide(self) -> None:
+    def hide(self) -> RelationHide:
         """Hide a reply tweet.
+        
+        Returns
+        ---------
+        :class:`RelationHide`
+            This method returns a :class:`RelationHide` object.
 
-        Parameters
-        ------------
-        tweet_id: Union[str, int]
-            The tweet's id that you wish to hide to.
-
-
+            
         .. versionadded:: 1.2.5
         """
         res: dict = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
         return RelationHide(res)
 
-    def unhide(self) -> None:
+    def unhide(self) -> RelationHide:
         """Unhide a hide reply.
-
-        Parameters
-        ------------
-        tweet_id: Union[str, int]
-            The tweet's id that you wish to unhide.
 
         Returns
         ---------
@@ -346,6 +343,15 @@ class Tweet(Message):
         return RelationHide(res)
 
     def fetch_retweeters(self):
+        """Return users that retweeted the tweet.
+
+        Returns
+        ---------
+        Optional[List[:class:`User`], List]
+            This method returns a list of :class:`User` objects
+
+        .. versionadded:: 1.1.3
+        """
         res = self.http_client.request(
             "GET",
             "2",
@@ -360,7 +366,16 @@ class Tweet(Message):
         except (KeyError, TypeError):
             return []
 
-    def fetch_liking_users(self):
+    def fetch_liking_users(self) -> Optional[List[User], List]:
+        """Return users that liked the tweet.
+
+        Returns
+        ---------
+        Optional[List[:class:`User`], List]
+            This method returns a list of :class:`User` objects
+
+        .. versionadded:: 1.1.3
+        """
         res = self.http_client.request(
             "GET",
             "2",
@@ -376,7 +391,12 @@ class Tweet(Message):
             return []
 
     def fetch_replied_user(self) -> Optional[User]:
-        """Optional[:class:`User`]: Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
+        """Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
+
+        Returns
+        ---------
+        Optional[:class:`User`]
+            This method returns a :class:`User` object or :class:`NoneType`
 
         .. versionadded:: 1.1.3
         """
