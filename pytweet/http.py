@@ -132,9 +132,8 @@ class HTTPClient:
     ) -> Union[str, Dict[Any, Any], NoReturn]:
         url = self.base_url + version + path
         user_agent = "Py-Tweet (https://github.com/TheFarGG/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
-
-        if headers == {} and "Authorization" not in headers.keys():
-            headers = {"Authorization": f"Bearer {self.bearer_token}"}
+        if "Authorization" not in list(headers.keys()):
+            headers["Authorization"] = f"Bearer {self.bearer_token}"
 
         headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
 
