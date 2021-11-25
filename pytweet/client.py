@@ -29,6 +29,8 @@ class Client:
         The Access Token of the app.
     access_token_secret: Optional[:class:`str`]
         The Access Token Secret of the app.
+    stream: Optional[Stream]
+        The client's stream. Must be an instance of :class:`Stream`.
 
     Attributes
     ------------
@@ -547,12 +549,12 @@ class Client:
 
         return CustomProfile(data.get("name"), data.get("id"), data.get("created_timestamp"), data.get("avatar"))
 
-    def stream(self, tries: int = 15) -> None:
+    def stream(self) -> None:
         """Stream realtime."""
         if not self.http.stream:
             raise TypeError("'stream' argument is missing in client!")
 
         try:
-            self.http.stream.start(tries)
+            self.http.stream.connect()
         except KeyboardInterrupt:
             print("\nKeyboardInterrupt: Exit stream.")
