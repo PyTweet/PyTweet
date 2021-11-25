@@ -228,6 +228,7 @@ class HTTPClient:
                     files={"media": open_file.read(4 * 1024 * 1024)},
                     auth=auth,
                 )
+
                 bytes_sent = open_file.tell()
                 segment_id += 1
 

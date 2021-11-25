@@ -2,7 +2,7 @@ from typing import List, Optional, Union, Callable
 from asyncio import iscoroutinefunction
 
 from .attachments import Geo, Poll, QuickReply, File, CustomProfile, CTA
-from .errors import PytweetException
+from .errors import PytweetException, UnKnownSpaceState
 from .enums import ReplySetting, SpaceState
 from .http import HTTPClient
 from .message import DirectMessage, WelcomeMessage, WelcomeMessageRule, Message
@@ -230,6 +230,7 @@ class Client:
             super_followers_only=super_followers_only,
         )
 
+
     def create_welcome_message(
         self,
         name: Optional[str] = None,
@@ -406,7 +407,7 @@ class Client:
         if state == SpaceState.live or state == SpaceState.scheduled:
             return self.http.fetch_space_bytitle(title, state)
         else:
-            raise TypeError(f"Unknown state passed: {state}")
+            raise UnKnownSpaceState(given_state=state)
 
     def search_geo(
         self,
