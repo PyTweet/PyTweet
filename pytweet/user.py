@@ -235,6 +235,41 @@ class User:
             params={"user_id": str(self.id), "perform_block": block},
         )
 
+    def fetch_followers(self):
+        followers = self.http_client.request(
+            "GET",
+            "2",
+            f"/users/{self.id}/followers",
+            params={
+                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
+            },
+        )
+        return [User(data, http_client=self.http_client) for data in followers["data"]]
+
+    def fetch_following(self):
+        following = self.http_client.request(
+            "GET",
+            "2",
+            f"/users/{self.id}/following",
+            params={
+                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
+            },
+        )
+        return [User(data, http_client=self.http_client) for data in following["data"]]
+
+    def fetch_pinned_tweet(self) -> Optional[Any]:
+        """Returns the user's pinned tweet.
+
+        Returns
+        ---------
+        Optional[:class:`int`]
+            This method returns a :class:`Tweet` object.
+
+        .. versionadded: 1.1.3
+        """
+        id = self._payload.get("pinned_tweet_id")
+        return self.http_client.fetch_tweet(int(id)) if id else None
+
     @property
     def name(self) -> str:
         """:class:`str`: Return the user's name.
@@ -330,31 +365,6 @@ class User:
         .. versionadded: 1.0.0
         """
         return time_parse_todt(self._payload.get("created_at"))
-
-    @property
-    def pinned_tweet_id(self) -> Optional[int]:
-        """Optional[:class:`int`]: Returns the user's pinned tweet id.
-
-        .. versionadded: 1.1.3
-        """
-        id = self._payload.get("pinned_tweet_id")
-        return int(id) if id else None
-
-    @property
-    def followers(self) -> Union[List[User], List]:
-        """List[:class:`User`]: Returns a list of users who are followers of the specified user ID. Maximum users is 100 users.
-
-        .. versionadded: 1.1.0
-        """
-        return self._payload.get("followers")
-
-    @property
-    def following(self) -> Union[List[User], List]:
-        """List[:class:`User`]`: Returns a list of users that's followed by the specified user ID. Maximum users is 100 users.
-
-        .. versionadded: 1.1.0
-        """
-        return self._payload.get("following")
 
     @property
     def follower_count(self) -> int:
