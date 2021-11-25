@@ -160,3 +160,21 @@ class NotFoundError(APIException):
         msg = response.json().get("errors")[0].get("message") if not message else message
         detail = response.json().get("errors")[0].get("detail")
         super().__init__(response, msg if msg else detail if detail else "Not Found!")
+
+class ConnectionException(HTTPException):
+    def __init__(
+        self, 
+        response: Optional[requests.models.Response] = None,
+        message: Optional[str] = None
+    ):
+        print(10)
+        json = response.json()  
+        if "errors" in json and not message:
+            msg = response.json().get("errors")[0].get("message") if not message else message
+            detail = response.json().get("errors")[0].get("detail")
+            
+        else:
+            msg = None
+            detail = json.get("detail")
+
+        super().__init__(response, msg if msg else detail)
