@@ -161,9 +161,11 @@ class NotFoundError(APIException):
         detail = response.json().get("errors")[0].get("detail")
         super().__init__(response, msg if msg else detail if detail else "Not Found!")
 
+
 class UnKnownSpaceState(APIException):
     def __init__(self, given_state):
         super().__init__(message="Unknown state passed: %s" % given_state)
+
 
 class ConnectionException(HTTPException):
     def __init__(self, response: Optional[requests.models.Response] = None, message: Optional[str] = None):
