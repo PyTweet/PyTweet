@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
 _log = logging.getLogger(__name__)
 
+
 def _check_for_errors(data, session):
     if "errors" in data.keys():
         raise ConnectionException(session, None)
@@ -23,11 +24,13 @@ def _check_for_errors(data, session):
 @dataclass
 class StreamRule:
     """Represent a stream rule.
-    
+
     .. versionadded:: 1.3.5
     """
+
     value: str
     tag: Optional[str] = None
+
 
 class StreamConnection:
     """Represent the twitter api stream connection. This will handle the stream connection.
@@ -46,7 +49,10 @@ class StreamConnection:
 
     .. versionadded:: 1.3.5
     """
-    def __init__(self, url: str, backfill_minutes: int = 0, connect_attempts: int = 0, http_client: Optional[HTTPClient] = None):
+
+    def __init__(
+        self, url: str, backfill_minutes: int = 0, connect_attempts: int = 0, http_client: Optional[HTTPClient] = None
+    ):
         self.url = url
         self.backfill_minutes = backfill_minutes
         self.connect_attempts = connect_attempts
@@ -56,32 +62,32 @@ class StreamConnection:
 
     @property
     def closed(self) -> Optional[bool]:
-        """"Optional[:class:`bool`]: Returns True if the connection is closed, else False.
-        
+        """ "Optional[:class:`bool`]: Returns True if the connection is closed, else False.
+
         .. versionadded:: 1.3.5
         """
         return self.session is None
 
     def is_close(self) -> Optional[bool]:
-        """"An alias to :class:`StreamConnection.closed`.
+        """ "An alias to :class:`StreamConnection.closed`.
 
         Returns
         ---------
         Optional[:class:`bool`]:
             This method returns a :class:`bool` object.
-        
+
         .. versionadded:: 1.3.5
         """
         return self.closed
 
     def close(self) -> None:
-        """"Close the stream connection.
+        """ "Close the stream connection.
 
         Returns
         ---------
         :class:`NoneType`:
             This method returns None.
-        
+
 
         .. versionadded:: 1.3.5
         """
@@ -91,10 +97,10 @@ class StreamConnection:
         _log.info("Closing connection!")
         self.session.close()
         self.session = None
-    
+
     def connect(self) -> Optional[Any]:
-        """"Connect to the current stream connection.
-        
+        """ "Connect to the current stream connection.
+
         .. versionadded:: 1.3.5
         """
         while True:
@@ -144,6 +150,7 @@ class StreamConnection:
 
         _log.info("Streaming connection has been closed!")
 
+
 class Stream:
     """Represent a stream object that stream over twitter for tweets.
 
@@ -157,18 +164,21 @@ class Stream:
 
     .. versionadded:: 1.3.5
     """
+
     def __init__(self, backfill_minutes: int = 0, connect_attempts: int = 15):
         self.backfill_minutes = backfill_minutes
         self.raw_rules: Optional[list] = []
         self.http_client: Optional[HTTPClient] = None
         self.connect_attempts = connect_attempts
         self.sample = False
-        self.connection: StreamConnection = StreamConnection("https://api.twitter.com/2/tweets/search/stream", self.backfill_minutes, connect_attempts, self.http_client)
+        self.connection: StreamConnection = StreamConnection(
+            "https://api.twitter.com/2/tweets/search/stream", self.backfill_minutes, connect_attempts, self.http_client
+        )
 
     @classmethod
     def SampleStream(cls, backfill_minutes: int = 0, connect_attempts: int = 15):
         """A class method that change the stream connection to a sample one, this would mean you dont have to set any stream rules. This would not recommended because it can make the progress of tweet cap much faster, if its out of limit you would not be able to stream.
-        
+
         Parameters
         ------------
         backfill_minutes: :class:`int`
@@ -181,19 +191,24 @@ class Stream:
         :class:`Stream`
             This classmethod returns your :class:`Stream` instance.
 
-        
-        .. versionadded:: 1.3.5    
+
+        .. versionadded:: 1.3.5
         """
         self = cls(backfill_minutes, connect_attempts)
         self.http_client: Optional[HTTPClient] = None
         self.sample = True
-        self.connection: StreamConnection = StreamConnection("https://api.twitter.com/2/tweets/sample/stream", self.backfill_minutes, self.connect_attempts, self.http_client)
+        self.connection: StreamConnection = StreamConnection(
+            "https://api.twitter.com/2/tweets/sample/stream",
+            self.backfill_minutes,
+            self.connect_attempts,
+            self.http_client,
+        )
         return self
 
     @property
     def rules(self) -> Optional[dict]:
         """:class:`dict`: Returns the stream's rules, if its a sample stream it would returns None.
-        
+
         .. versionadded:: 1.3.5
         """
         if self.sample:
@@ -213,9 +228,9 @@ class Stream:
 
         Returns
         ---------
-        :class:`Stream`: 
+        :class:`Stream`:
             Returns the stream's rules, if its a sample stream it would returns None.
-        
+
 
         .. versionadded:: 1.3.5
         """
@@ -235,8 +250,8 @@ class Stream:
         ---------
         :class:`NoneType`:
             This method returns None.
-        
-        
+
+
         .. versionadded:: 1.3.5
         """
         if self.sample:
@@ -261,8 +276,8 @@ class Stream:
         ---------
         Optional[List[:class:`StreamRule`]]
             This method returns a :class:`list` of :class:`StreamRule` objects.
-        
-        
+
+
         .. versionadded:: 1.3.5
         """
         if self.sample:
@@ -283,7 +298,7 @@ class Stream:
         ---------
         :class:`NoneType`:
             This method returns None.
-        
+
 
         .. versionadded:: 1.3.5
         """
@@ -299,7 +314,7 @@ class Stream:
         ---------
         :class:`NoneType`:
             This method returns None.
-        
+
 
         .. versionadded:: 1.3.5
         """

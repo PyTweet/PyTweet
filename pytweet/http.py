@@ -264,9 +264,7 @@ class HTTPClient:
             "2",
             f"/users/by/username/{username}",
             headers={"Authorization": f"Bearer {self.bearer_token}"},
-            params={
-                "user.fields": USER_FIELD
-            },
+            params={"user.fields": USER_FIELD},
             is_json=True,
         )
 
@@ -295,9 +293,7 @@ class HTTPClient:
             "GET",
             "2",
             f"/spaces/{str(space_id)}",
-            params={
-                "space.fields": SPACE_FIELD
-            },
+            params={"space.fields": SPACE_FIELD},
         )
         return Space(res)
 
