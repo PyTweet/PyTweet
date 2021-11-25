@@ -160,3 +160,8 @@ class NotFoundError(APIException):
         msg = response.json().get("errors")[0].get("message") if not message else message
         detail = response.json().get("errors")[0].get("detail")
         super().__init__(response, msg if msg else detail if detail else "Not Found!")
+
+
+class UnKnownSpaceState(APIException):
+    def __init__(self, given_state):
+        super().__init__(message="Unknown state passed: %s" % given_state)
