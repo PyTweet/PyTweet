@@ -388,22 +388,6 @@ class Tweet(Message):
         return None
 
     @property
-    def retweetes(self) -> Optional[Union[List[User], list]]:
-        """Optional[List[:class:`User`, :class:`list`], :class:`int`]: Return a list of users that's retweeted the tweet's id. Maximum users is 100. Return empty list if no one retweeted.
-
-        .. versionadded: 1.0.0
-        """
-        return self._payload.get("retweetes")
-
-    @property
-    def likes(self) -> Optional[Union[List[User], list]]:
-        """Optional[List[:class:`User`], :class:`list`]: Return a list of users that liked the tweet's id. Maximum users is 100. Return empty list if no one liked.
-
-        .. versionadded: 1.0.0
-        """
-        return self._payload.get("likes")
-
-    @property
     def sensitive(self) -> bool:
         """:class`bool`: Return True if the tweet is possible sensitive to some users, else False
 
