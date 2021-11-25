@@ -16,6 +16,7 @@ from .client import *
 from .entities import *
 from .enums import *
 from .errors import *
+from .expansions import *
 from .http import *
 from .message import *
 from .metrics import *
