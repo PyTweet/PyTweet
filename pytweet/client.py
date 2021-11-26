@@ -86,7 +86,7 @@ class Client:
 
         self._account_user = self.fetch_user(self.http.access_token.partition("-")[0])
 
-    def fetch_user(self, user_id: Union[str, int] = None) -> User:
+    def fetch_user(self, user_id: Union[str, int] = None) -> Optional[User]:
         """A method for fetching the user with the user's id.
 
         .. warning::
@@ -107,7 +107,7 @@ class Client:
         """
         return self.http.fetch_user(user_id)
 
-    def fetch_user_by_name(self, username: str) -> User:
+    def fetch_user_by_name(self, username: str) -> Optional[User]:
         """A method for fetching the user with the user's username.
 
         .. warning::
