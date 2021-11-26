@@ -42,7 +42,7 @@ class StreamConnection:
         The url where the stream connect to.
     backfill_minutes: :class:`int`
         This feature will deliver duplicate Tweets, meaning that if you were disconnected for 90 seconds, and you requested two minutes of backfill, you will receive 30 seconds worth of duplicate Tweets. Due to this, you should make sure your system is tolerant of duplicate data. This feature is currently only available to the Academic Research product track.
-    connect_attempts: :class:`int`
+    reconnect_attempts: :class:`int`
         Decide how many attempts for a reconnect to perform, if the client reconnected more then this argument, it would break the loop.
     http_client: Optional[:class:`HTTPClient`]
         Represent the HTTPClient that make the request.
@@ -52,11 +52,11 @@ class StreamConnection:
     """
 
     def __init__(
-        self, url: str, backfill_minutes: int = 0, connect_attempts: int = 0, http_client: Optional[HTTPClient] = None
+        self, url: str, backfill_minutes: int = 0, reconnect_attempts: int = 0, http_client: Optional[HTTPClient] = None
     ):
         self.url = url
         self.backfill_minutes = backfill_minutes
-        self.connect_attempts = connect_attempts
+        self.reconnect_attempts = reconnect_attempts
         self.http_client = http_client
         self.session: Optional[Any] = None
         self.errors = 0
@@ -137,7 +137,7 @@ class StreamConnection:
 
                 elif isinstance(e, requests.exceptions.RequestException):
                     self.errors += 1
-                    if self.errors >= self.connect_attempts:
+                    if self.errors >= self.reconnect_attempts:
                         _log.error("Too many errors caught during streaming, closing stream!")
                         self.close()
                         break
@@ -159,32 +159,32 @@ class Stream:
     ------------
     backfill_minutes: :class:`int`
         This feature will deliver duplicate Tweets, meaning that if you were disconnected for 90 seconds, and you requested two minutes of backfill, you will receive 30 seconds worth of duplicate Tweets. Due to this, you should make sure your system is tolerant of duplicate data. This feature is currently only available to the Academic Research product track.
-    connect_attempts: :class:`int`
+    reconnect_attempts: :class:`int`
         Decide how many attempts for a reconnect to perform, if the client reconnected more then this argument, it would break the loop.
 
 
     .. versionadded:: 1.3.5
     """
 
-    def __init__(self, backfill_minutes: int = 0, connect_attempts: int = 15):
+    def __init__(self, backfill_minutes: int = 0, reconnect_attempts: int = 15):
         self.backfill_minutes = backfill_minutes
         self.raw_rules: Optional[list] = []
         self.http_client: Optional[HTTPClient] = None
-        self.connect_attempts = connect_attempts
+        self.reconnect_attempts = reconnect_attempts
         self.sample = False
         self.connection: StreamConnection = StreamConnection(
-            "https://api.twitter.com/2/tweets/search/stream", self.backfill_minutes, connect_attempts, self.http_client
+            "https://api.twitter.com/2/tweets/search/stream", self.backfill_minutes, reconnect_attempts, self.http_client
         )
 
     @classmethod
-    def SampleStream(cls, backfill_minutes: int = 0, connect_attempts: int = 15):
+    def SampleStream(cls, backfill_minutes: int = 0, reconnect_attempts: int = 15):
         """A class method that change the stream connection to a sample one, this would mean you dont have to set any stream rules. This would not recommended because it can make the progress of tweet cap much faster, if its out of limit you would not be able to stream.
 
         Parameters
         ------------
         backfill_minutes: :class:`int`
             This feature will deliver duplicate Tweets, meaning that if you were disconnected for 90 seconds, and you requested two minutes of backfill, you will receive 30 seconds worth of duplicate Tweets. Due to this, you should make sure your system is tolerant of duplicate data. This feature is currently only available to the Academic Research product track.
-        connect_attempts: :class:`int`
+        reconnect_attempts: :class:`int`
             Decide how many attempts for a reconnect to perform, if the client reconnected more then this argument, it would break the loop.
 
         Returns
@@ -195,13 +195,13 @@ class Stream:
 
         .. versionadded:: 1.3.5
         """
-        self = cls(backfill_minutes, connect_attempts)
+        self = cls(backfill_minutes, reconnect_attempts)
         self.http_client: Optional[HTTPClient] = None
         self.sample = True
         self.connection: StreamConnection = StreamConnection(
             "https://api.twitter.com/2/tweets/sample/stream",
             self.backfill_minutes,
-            self.connect_attempts,
+            self.reconnect_attempts,
             self.http_client,
         )
         return self
