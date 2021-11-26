@@ -289,7 +289,6 @@ class Stream:
             "/tweets/search/stream/rules",
         )
 
-        print(res)
         return [StreamRule(**data) for data in res["data"]]
 
     def set_rules(self) -> None:
