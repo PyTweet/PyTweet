@@ -258,9 +258,7 @@ class HTTPClient:
             "2",
             f"/users/{user_id}",
             headers={"Authorization": f"Bearer {self.bearer_token}"},
-            params={
-                "user.fields": USER_FIELD
-            },
+            params={"user.fields": USER_FIELD},
             is_json=True,
         )
 

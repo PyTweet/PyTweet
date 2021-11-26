@@ -11,6 +11,7 @@ from .user import User
 from .utils import time_parse_todt
 from .entities import Media
 from .enums import ReplySetting
+from .expansions import USER_FIELD
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -183,7 +184,7 @@ class Tweet(Message):
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
         self.original_payload = data
-        self._payload = data.get("data") or None
+        self._payload = data.get("data") or data
         self._includes = self.original_payload.get("includes")
         self.tweet_metrics: TweetPublicMetrics = TweetPublicMetrics(self._payload)
 
@@ -359,9 +360,7 @@ class Tweet(Message):
             "GET",
             "2",
             f"/tweets/{self.id}/retweeted_by",
-            params={
-                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
-            },
+            params={"user.fields": USER_FIELD},
         )
 
         try:
@@ -383,9 +382,7 @@ class Tweet(Message):
             "GET",
             "2",
             f"/tweets/{self.id}/liking_users",
-            params={
-                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
-            },
+            params={"user.fields": USER_FIELD},
         )
 
         try:

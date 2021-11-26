@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from .http import HTTPClient
     from .message import DirectMessage
 
+
 class User:
     """Represent a user in Twitter.
     User is an identity in twitter, its very interactive. Can send message, post a tweet, and even send messages to other user through Dms.
@@ -248,9 +249,7 @@ class User:
             "GET",
             "2",
             f"/users/{self.id}/followers",
-            params={
-                "user.fields": USER_FIELD
-            },
+            params={"user.fields": USER_FIELD},
         )
         return [User(data, http_client=self.http_client) for data in followers["data"]]
 
@@ -267,9 +266,7 @@ class User:
             "GET",
             "2",
             f"/users/{self.id}/following",
-            params={
-                "user.fields": USER_FIELD
-            },
+            params={"user.fields": USER_FIELD},
         )
         return [User(data, http_client=self.http_client) for data in following["data"]]
 
@@ -288,15 +285,15 @@ class User:
         return self.http_client.fetch_tweet(int(id)) if id else None
 
     def fetch_timelines(
-        self, 
-        max_results: int = 10, 
+        self,
+        max_results: int = 10,
         *,
-        start_time: Optional[datetime.datetime] = None, 
-        end_time: Optional[datetime.datetime] = None, 
-        since_id: Optional[Union[str, int]] = None, 
-        until_id: Optional[Union[str, int]] = None, 
-        mentioned: bool = False, 
-        exclude: Optional[str] = None
+        start_time: Optional[datetime.datetime] = None,
+        end_time: Optional[datetime.datetime] = None,
+        since_id: Optional[Union[str, int]] = None,
+        until_id: Optional[Union[str, int]] = None,
+        mentioned: bool = False,
+        exclude: Optional[str] = None,
     ) -> List[object, list]:
         """Fetch the user timelines, this can be timelines where the user got mention or a normal tweet timelines.
 
@@ -316,7 +313,7 @@ class User:
             Indicates if only mentioned timelines return if set to True, else it will returns a normal tweet timelines. Default to False.
         exclude: :class:`str`
             Specified which tweet type should not be returns, you can set it to:'retweets,replies' or 'retweets' or 'replies'.
-        
+
         Returns
         ---------
         :class:`Tweet`
@@ -325,7 +322,12 @@ class User:
 
         .. versionadded:: 1.3.5
         """
-        if not isinstance(start_time, datetime.datetime) and start_time or not isinstance(end_time, datetime.datetime) and end_time:
+        if (
+            not isinstance(start_time, datetime.datetime)
+            and start_time
+            or not isinstance(end_time, datetime.datetime)
+            and end_time
+        ):
             raise ValueError("start_time or end_time must be a datetime object!")
 
         params = {
@@ -334,7 +336,6 @@ class User:
             "place.fields": PLACE_FIELD,
             "poll.fields": POLL_FIELD,
             "tweet.fields": TWEET_FIELD,
-
         }
         params["max_results"] = max_results
         if start_time:
@@ -347,12 +348,9 @@ class User:
             params["until_id"] = str(until_id)
         if exclude:
             params["exclude"] = exclude
-        
+
         res = self.http_client.request(
-            "GET",
-            "2",
-            f"/users/{self.id}/tweets" if not mentioned else f"/users/{self.id}/mentions",
-            params=params
+            "GET", "2", f"/users/{self.id}/tweets" if not mentioned else f"/users/{self.id}/mentions", params=params
         )
 
         try:
@@ -360,8 +358,6 @@ class User:
             return [Tweet(data) for data in res["data"]]
         except TypeError:
             return []
-
-
 
     @property
     def name(self) -> str:
