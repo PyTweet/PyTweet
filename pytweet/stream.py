@@ -128,6 +128,7 @@ class StreamConnection:
                         json_data = json.loads(response_line.decode("UTF-8"))
                         _check_for_errors(json_data, self.session)
                         tweet = Tweet(json_data, http_client=self.http_client)
+                        self.http_client.tweet_cache[tweet.id] = tweet
                         self.http_client.dispatch("stream", tweet, self)
 
             except Exception as e:
