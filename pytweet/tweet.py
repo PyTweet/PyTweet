@@ -303,7 +303,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        self.http_client.request(
+        tweet = self.http_client.request(
             "POST",
             "1.1",
             f"/statuses/update.json",

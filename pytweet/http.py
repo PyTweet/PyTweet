@@ -48,7 +48,6 @@ def check_error(response: requests.models.Response) -> NoReturn:
         raise Unauthorized(response)
 
     elif code == 403:
-        print(response.text)
         raise Forbidden(response)
 
     elif code == 404:
