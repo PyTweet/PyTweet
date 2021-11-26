@@ -5,6 +5,7 @@ import logging
 import sys
 import time
 import requests
+import pytweet
 from typing import Any, Dict, List, NoReturn, Optional, Union
 
 from .attachments import CTA, Geo, Poll, QuickReply, File, CustomProfile
@@ -114,6 +115,12 @@ class HTTPClient:
         if self.stream:
             self.stream.http_client = self
             self.stream.connection.http_client = self
+
+    def build_object(self, obj: str) -> Any:
+        real_obj = getattr(pytweet, obj, None)
+        if real_obj:
+            return real_obj
+        return None
 
     def dispatch(self, event_name, *args):
         try:
@@ -252,7 +259,7 @@ class HTTPClient:
             f"/users/{user_id}",
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             params={
-                "user.fields": "created_at,description,entities,id,location,name,profile_image_url,protected,public_metrics,url,username,verified,withheld,pinned_tweet_id"
+                "user.fields": USER_FIELD
             },
             is_json=True,
         )
