@@ -33,7 +33,7 @@ class RelationFollow(Relations):
         super().__init__(1 if self.following else 0)
 
     def __repr__(self) -> str:
-        return "RelationFollow(type: {0.type} following: {0.following} pending: {0.pending})".format(self)
+        return "RelationFollow(type={0.type} following={0.following} pending={0.pending})".format(self)
 
     @property
     def pending(self) -> bool:
@@ -64,7 +64,7 @@ class RelationLike(Relations):
         super().__init__(2 if self.liked else None)
 
     def __repr__(self) -> str:
-        return "RelationFollow(liked: {0.liked})".format(self)
+        return "RelationFollow(liked={0.liked})".format(self)
 
     @property
     def liked(self) -> bool:
@@ -87,7 +87,7 @@ class RelationRetweet(Relations):
         super().__init__(3 if self.retweeted else None)
 
     def __repr__(self) -> str:
-        return "RelationRetweet(liked: {0.retweeted})".format(self)
+        return "RelationRetweet(liked={0.retweeted})".format(self)
 
     @property
     def retweeted(self) -> bool:
@@ -110,7 +110,7 @@ class RelationHide(Relations):
         super().__init__(4 if self.hidden else None)
 
     def __repr__(self) -> str:
-        return "RelationHide(hidden: {0.hidden})".format(self)
+        return "RelationHide(hidden={0.hidden})".format(self)
 
     @property
     def hidden(self) -> bool:
