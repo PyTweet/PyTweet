@@ -293,7 +293,10 @@ class Tweet(Message):
             pass
 
     def reply(self, text: str) -> None:
-        """Post a tweet to reply a specific tweet present by the tweet_id parameter.
+        """Post a tweet to reply a specific tweet present by the tweet's id.
+
+        .. note::
+            Note that if the tweet is a retweet you cannot reply to the tweet, it might not raise error but it will post the tweet has a normal tweet and it will ping the :class:`Tweet.author`.
 
         Parameters
         ------------
@@ -312,7 +315,7 @@ class Tweet(Message):
                 "in_reply_to_status_id": str(self.id),
             },
             auth=True,
-        )
+        ) #TODO Returns the tweet in Tweet object
 
     def hide(self) -> RelationHide:
         """Hide a reply tweet.

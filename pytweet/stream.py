@@ -4,7 +4,7 @@ import requests
 import json
 import logging
 import time
-from typing import Optional, Any, List, TYPE_CHECKING
+from typing import Optional, Union, Any, List, TYPE_CHECKING
 from dataclasses import dataclass
 from .tweet import Tweet
 from .errors import PytweetException, ConnectionException
@@ -30,6 +30,7 @@ class StreamRule:
 
     value: str
     tag: Optional[str] = None
+    id: Optional[Union[str, int]] = None
 
 
 class StreamConnection:
@@ -216,7 +217,7 @@ class Stream:
         return [StreamRule(**data) for data in self.raw_rules]
 
     def add_rule(self, value: str, tag: Optional[str] = None) -> Optional[Stream]:
-        """Add a rule to your stream to match with tweets that the stream return.
+        """Add a rule to your stream to match with tweets that the stream return. You can use an operator to do this, check https://developer.twitter.com/en/docs/twitter-api/tweets/search/integrate/build-a-query for more information about the operator.
 
         Parameters
         ------------
@@ -288,7 +289,8 @@ class Stream:
             "/tweets/search/stream/rules",
         )
 
-        return [StreamRule(*data) for data in res]
+        print(res)
+        return [StreamRule(**data) for data in res["data"]]
 
     def set_rules(self) -> None:
         """Create and set rules to your stream.
