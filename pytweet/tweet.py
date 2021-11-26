@@ -315,7 +315,7 @@ class Tweet(Message):
                 "in_reply_to_status_id": str(self.id),
             },
             auth=True,
-        ) #TODO Returns the tweet in Tweet object
+        )  # TODO Returns the tweet in Tweet object
 
     def hide(self) -> RelationHide:
         """Hide a reply tweet.
