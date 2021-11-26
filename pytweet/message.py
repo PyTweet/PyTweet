@@ -48,14 +48,26 @@ class Message:
 
     @property
     def text(self) -> str:
+        """:class:`str`: Returns the message's text.
+        
+        .. versionadded:: 1.3.5
+        """
         return self._text
 
     @property
     def id(self) -> int:
+        """:class:`int`: Returns the message's id.
+        
+        .. versionadded:: 1.3.5
+        """
         return int(self._id)
 
     @property
     def type(self) -> MessageTypeEnum:
+        """:class:`MessageTypeEnum`: Returns the message's type.
+        
+        .. versionadded:: 1.3.5
+        """
         return MessageTypeEnum(self._type)
 
 
