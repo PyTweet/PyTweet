@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, NoReturn, Optional, List, Union
 
 from .attachments import CTA, QuickReply, File, CustomProfile
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import time_parse_todt
+from .expansions import USER_FIELD, TWEET_EXPANSION, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_FIELD
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -132,7 +133,7 @@ class User:
 
         .. versionadded:: 1.1.0
         """
-        my_id = self.http_clientaccess_token.partition("-")[0]
+        my_id = self.http_client.access_token.partition("-")[0]
         res = self.http_client.request("DELETE", "2", f"/users/{my_id}/following/{self.id}", auth=True)
         return RelationFollow(res)
 
@@ -235,24 +236,40 @@ class User:
             params={"user_id": str(self.id), "perform_block": block},
         )
 
-    def fetch_followers(self):
+    def fetch_followers(self) -> Optional[List[User]]:
+        """Fetch the user's followers.
+
+        .. note::
+            This method will only returns 100 users unless you have an academic research access. Then it can returns more then 100 users.
+
+
+        .. versionadded:: 1.3.5
+        """
         followers = self.http_client.request(
             "GET",
             "2",
             f"/users/{self.id}/followers",
             params={
-                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
+                "user.fields": USER_FIELD
             },
         )
         return [User(data, http_client=self.http_client) for data in followers["data"]]
 
-    def fetch_following(self):
+    def fetch_following(self) -> Optional[List[User]]:
+        """Fetch the user's following.
+
+        .. note::
+            This method will only returns 100 users unless you have an academic research access. Then it can returns more then 100 users.
+
+
+        .. versionadded:: 1.3.5
+        """
         following = self.http_client.request(
             "GET",
             "2",
             f"/users/{self.id}/following",
             params={
-                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
+                "user.fields": USER_FIELD
             },
         )
         return [User(data, http_client=self.http_client) for data in following["data"]]
@@ -265,10 +282,42 @@ class User:
         Optional[:class:`int`]
             This method returns a :class:`Tweet` object.
 
+
         .. versionadded: 1.1.3
         """
         id = self._payload.get("pinned_tweet_id")
         return self.http_client.fetch_tweet(int(id)) if id else None
+
+    def fetch_timelines(self, max_results: int = 10, *,start_time: datetime.datetime = None, end_time: datetime.datetime = None, mention: bool = False, exclude: str = None):
+        if not isinstance(start_time, datetime.datetime) or not isinstance(end_time, datetime.datetime):
+            raise ValueError("start_time or end_time must be a datetime object!")
+
+        params = {
+            "expansions": TWEET_EXPANSION,
+            "media.fields": MEDIA_FIELD,
+            "place.fields": PLACE_FIELD,
+            "poll.fields": POLL_FIELD,
+            "tweet.fields": TWEET_FIELD,
+
+        }
+        params["max_results"] = max_results
+        if exclude:
+            params["exclude"] = exclude
+        if start_time:
+            params["start_time"] = start_time.isoformat()
+        if end_time:
+            params["end_time"] = end_time.isoformat()
+        
+        res = self.http_client.request(
+            "GET",
+            "2",
+            f"/users/{self.id}/tweets" if not mention else f"/users/{self.id}/mentions",
+            params=params
+        )
+
+        
+        
+
 
     @property
     def name(self) -> str:
