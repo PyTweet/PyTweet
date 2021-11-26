@@ -20,31 +20,27 @@ class OauthSession(OAuth1Session):
         self.callback: Any = callback
 
     @classmethod
-    def with_oauth_flow(cls, client, *,callback: str = "https://twitter.com", auth_access_type: str = "write", force_login: bool = False, screen_name: Optional[str] = None):
+    def with_oauth_flow(
+        cls,
+        client,
+        *,
+        callback: str = "https://twitter.com",
+        auth_access_type: str = "write",
+        force_login: bool = False,
+        screen_name: Optional[str] = None
+    ):
         """Authorize a user using the 3 legged oauth flow classmethod!
 
         .. warning::
-            This classmethod is not finished yet! 
-        
+            This classmethod is not finished yet!
+
         """
         return 0
-        request_tokens = client.http.request(
-            "POST",
-            "",
-            "oauth/request_token",
-            auth=True
-        )
+        request_tokens = client.http.request("POST", "", "oauth/request_token", auth=True)
         oauth_token, oauth_token_secret, oauth_callback_confirmed = request_tokens.split("&")
         params = {"oauth_token": oauth_token}
 
-
-        res = client.http.request(
-            "GET",
-            "",
-            "oauth/authorize",
-            params=params,
-            auth=True
-        )
+        res = client.http.request("GET", "", "oauth/authorize", params=params, auth=True)
 
     @property
     def oauth1(self) -> OAuth1:
