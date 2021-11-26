@@ -247,37 +247,47 @@ class HTTPClient:
             check_error(res)
             CheckStatus(res.json().get("processing_info", None), media_id)
 
-    def fetch_user(self, user_id: Union[str, int]) -> User:
+    def fetch_user(self, user_id: Union[str, int]) -> Optional[User]:
         try:
             int(user_id)
         except ValueError:
             raise ValueError("user_id must be an int, or a string of digits!")
 
-        data = self.request(
-            "GET",
-            "2",
-            f"/users/{user_id}",
-            headers={"Authorization": f"Bearer {self.bearer_token}"},
-            params={"user.fields": USER_FIELD},
-            is_json=True,
-        )
+        try:
 
-        return User(data, http_client=self)
+            data = self.request(
+                "GET",
+                "2",
+                f"/users/{user_id}",
+                headers={"Authorization": f"Bearer {self.bearer_token}"},
+                params={"user.fields": USER_FIELD},
+                is_json=True,
+            )
+            
+            return User(data, http_client=self)
 
-    def fetch_user_byname(self, username: str) -> User:
+        except NotFoundError:
+            return None
+
+    def fetch_user_byname(self, username: str) -> Optional[User]:
         if "@" in username:
             username = username.replace("@", "", 1)
 
-        data = self.request(
-            "GET",
-            "2",
-            f"/users/by/username/{username}",
-            headers={"Authorization": f"Bearer {self.bearer_token}"},
-            params={"user.fields": USER_FIELD},
-            is_json=True,
-        )
+        try:
 
-        return User(data, http_client=self)
+            data = self.request(
+                "GET",
+                "2",
+                f"/users/by/username/{username}",
+                headers={"Authorization": f"Bearer {self.bearer_token}"},
+                params={"user.fields": USER_FIELD},
+                is_json=True,
+            )
+
+            return User(data, http_client=self)
+
+        except NotFoundError:
+            return None
 
     def fetch_tweet(self, tweet_id: Union[str, int]) -> Tweet:
         res = self.request(
