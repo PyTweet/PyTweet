@@ -13,7 +13,6 @@ if TYPE_CHECKING:
     from .http import HTTPClient
     from .message import DirectMessage
 
-
 class User:
     """Represent a user in Twitter.
     User is an identity in twitter, its very interactive. Can send message, post a tweet, and even send messages to other user through Dms.
@@ -33,10 +32,10 @@ class User:
     .. versionadded: 1.0.0
     """
 
-    def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
+    def __init__(self, data: Dict[str, Any], http_client: Optional[HTTPClient] = None) -> None:
         self.original_payload: Dict[str, Any] = data
         self._payload: Dict[Any, Any] = self.original_payload.get("data") or self.original_payload
-        self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
+        self.http_client = http_client
         self._metrics = UserPublicMetrics(self._payload) or self.original_payload
 
     def __str__(self) -> str:
@@ -288,8 +287,45 @@ class User:
         id = self._payload.get("pinned_tweet_id")
         return self.http_client.fetch_tweet(int(id)) if id else None
 
-    def fetch_timelines(self, max_results: int = 10, *,start_time: datetime.datetime = None, end_time: datetime.datetime = None, mention: bool = False, exclude: str = None):
-        if not isinstance(start_time, datetime.datetime) or not isinstance(end_time, datetime.datetime):
+    def fetch_timelines(
+        self, 
+        max_results: int = 10, 
+        *,
+        start_time: Optional[datetime.datetime] = None, 
+        end_time: Optional[datetime.datetime] = None, 
+        since_id: Optional[Union[str, int]] = None, 
+        until_id: Optional[Union[str, int]] = None, 
+        mentioned: bool = False, 
+        exclude: Optional[str] = None
+    ) -> List[object, list]:
+        """Fetch the user timelines, this can be timelines where the user got mention or a normal tweet timelines.
+
+        Parameters
+        ------------
+        max_results: :class:`int`
+            Specified how many tweets should be return.
+        start_time: Optional[:class:`datetime.datetime`]:
+            This will make sure the tweets created datetime is after that specific time.
+        end_time: Optional[:class:`datetime.datetime`]:
+            This will make sure the tweets created datetime is before that specific time.
+        since_id: Optional[Union[:class:`str`, :class:`int`]]
+            Returns results with a Tweet ID greater than (that is, more recent than) the specified 'since' Tweet ID. Only the 3200 most recent Tweets are available. The result will exclude the since_id. If the limit of Tweets has occurred since the since_id, the since_id will be forced to the oldest ID available.
+        until_id: Optional[Union[:class:`str`, :class:`int`]]
+            Returns results with a Tweet ID less less than (that is, older than) the specified 'until' Tweet ID. Only the 3200 most recent Tweets are available. The result will exclude the until_id. If the limit of Tweets has occurred since the until_id, the until_id will be forced to the most recent ID available.
+        mentioned: :class:`bool`
+            Indicates if only mentioned timelines return if set to True, else it will returns a normal tweet timelines. Default to False.
+        exclude: :class:`str`
+            Specified which tweet type should not be returns, you can set it to:'retweets,replies' or 'retweets' or 'replies'.
+        
+        Returns
+        ---------
+        :class:`Tweet`
+            This method returns a list of :class:`Tweet` objects or an empty list if none founded.
+
+
+        .. versionadded:: 1.3.5
+        """
+        if not isinstance(start_time, datetime.datetime) and start_time or not isinstance(end_time, datetime.datetime) and end_time:
             raise ValueError("start_time or end_time must be a datetime object!")
 
         params = {
@@ -301,22 +337,30 @@ class User:
 
         }
         params["max_results"] = max_results
-        if exclude:
-            params["exclude"] = exclude
         if start_time:
             params["start_time"] = start_time.isoformat()
         if end_time:
             params["end_time"] = end_time.isoformat()
+        if since_id:
+            params["since_id"] = str(since_id)
+        if until_id:
+            params["until_id"] = str(until_id)
+        if exclude:
+            params["exclude"] = exclude
         
         res = self.http_client.request(
             "GET",
             "2",
-            f"/users/{self.id}/tweets" if not mention else f"/users/{self.id}/mentions",
+            f"/users/{self.id}/tweets" if not mentioned else f"/users/{self.id}/mentions",
             params=params
         )
 
-        
-        
+        try:
+            Tweet = self.http_client.build_object("Tweet")
+            return [Tweet(data) for data in res["data"]]
+        except TypeError:
+            return []
+
 
 
     @property
@@ -409,7 +453,7 @@ class User:
 
     @property
     def created_at(self) -> datetime.datetime:
-        """:class:`datetime.datetime`: Return datetime.datetime object with the user's account date.
+        """Optional[:class:`datetime.datetime`]: Return datetime.datetime object with the user's account date.
 
         .. versionadded: 1.0.0
         """
