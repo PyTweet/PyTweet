@@ -24,16 +24,19 @@ _log = logging.getLogger(__name__)
 def check_error(response: requests.models.Response) -> NoReturn:
     code = response.status_code
     if code == 200:
-        res = response.json()
-        if "errors" in res.keys():
-            try:
-                if res["errors"][0]["detail"].startswith("Could not find"):
-                    raise NotFoundError(response)
+        try:
+            res = response.json()
+            if "errors" in res.keys():
+                try:
+                    if res["errors"][0]["detail"].startswith("Could not find"):
+                        raise NotFoundError(response)
 
-                else:
-                    raise PytweetException(response, res["errors"][0]["detail"])
-            except KeyError:
-                raise PytweetException(res)
+                    else:
+                        raise PytweetException(response, res["errors"][0]["detail"])
+                except KeyError:
+                    raise PytweetException(res)
+        except j.decoder.JSONDecodeError:
+            return
 
     elif code in (201, 202, 204):
         pass
@@ -45,6 +48,7 @@ def check_error(response: requests.models.Response) -> NoReturn:
         raise Unauthorized(response)
 
     elif code == 403:
+        print(response.text)
         raise Forbidden(response)
 
     elif code == 404:
@@ -158,7 +162,7 @@ class HTTPClient:
         try:
             res = response.json()
         except j.decoder.JSONDecodeError:
-            return
+            return response.text
 
         if "meta" in res.keys():
             try:
