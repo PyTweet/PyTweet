@@ -130,7 +130,6 @@ class StreamConnection:
                         self.http_client.dispatch("stream", tweet, self)
 
             except Exception as e:
-                raise e
                 if isinstance(e, AttributeError):
                     break
 
