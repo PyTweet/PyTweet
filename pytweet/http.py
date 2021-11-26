@@ -263,7 +263,7 @@ class HTTPClient:
                 params={"user.fields": USER_FIELD},
                 is_json=True,
             )
-            
+
             return User(data, http_client=self)
 
         except NotFoundError:

@@ -173,7 +173,10 @@ class Stream:
         self.reconnect_attempts = reconnect_attempts
         self.sample = False
         self.connection: StreamConnection = StreamConnection(
-            "https://api.twitter.com/2/tweets/search/stream", self.backfill_minutes, reconnect_attempts, self.http_client
+            "https://api.twitter.com/2/tweets/search/stream",
+            self.backfill_minutes,
+            reconnect_attempts,
+            self.http_client,
         )
 
     @classmethod
