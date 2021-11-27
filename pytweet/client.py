@@ -65,7 +65,7 @@ class Client:
 
     @property
     def account(self) -> Optional[User]:
-        """:class:`Optional[User]`: Returns the client's account information. The callback is a User object.
+        """Optional[:class:`User`]: Returns the client's account information. The callback is a User object.
 
         .. versionadded:: 1.2.0
         """
@@ -75,7 +75,23 @@ class Client:
             return getattr(self, "_account_user", None)
         return attr
 
-    def event(self, func: Callable):
+    def event(self, func: Callable) -> None:
+        """
+        A decorator for making an event, the event will be register in the client's internal cache.
+
+        Parameters
+        ------------
+        func: :class:`typing.Callable`
+            The function that execute when the event is trigger. The event must be a synchronous function. You must also put the right event name in the function's name, See event reference for full events name.
+
+
+        .. seealso::
+            Event Reference
+                See the `Event Reference`.
+
+        
+        .. versionadded:: 1.3.5
+        """
         if iscoroutinefunction(func):
             raise TypeError("Event must be a synchronous function!")
         self.http.events[func.__name__[3:]] = func
