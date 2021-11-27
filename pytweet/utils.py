@@ -2,6 +2,7 @@ import datetime
 from typing import Any, Optional, Union
 from dateutil import parser
 
+
 def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
     """Parse time return from twitter to datetime object!
 

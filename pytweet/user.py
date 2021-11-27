@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from .http import HTTPClient
     from .message import DirectMessage
 
+
 class User:
     """Represent a user in Twitter.
     User is an identity in twitter, its very interactive. Can send message, post a tweet, and even send messages to other user through Dms.
@@ -337,7 +338,7 @@ class User:
             "poll.fields": POLL_FIELD,
             "tweet.fields": TWEET_FIELD,
         }
-        
+
         params["max_results"] = max_results
         if start_time:
             params["start_time"] = start_time.isoformat()
