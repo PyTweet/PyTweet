@@ -40,13 +40,13 @@ class Option:
 
 @dataclass
 class PollOption:
-    label: str
-    position: int = 0
-    votes: int = 0
     """Represent an Option for :class:`Poll`
 
     .. versionadded 1.3.5
     """
+    label: str
+    position: int = 0
+    votes: int = 0
 
 
 class Poll:
@@ -90,12 +90,12 @@ class Poll:
         return "Poll(id={0.id} voting_status={0.voting_status} duration={0.duration})".format(self)
 
     def __eq__(self, other: Poll) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
+        if not isinstance(other, Poll):
             raise ValueError("== operation cannot be done with one of the element not a valid Poll object")
         return self.id == other.id
 
     def __ne__(self, other: Poll) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
+        if not isinstance(other, Poll):
             raise ValueError("!= operation cannot be done with one of the element not a valid Poll object")
         return self.id != other.id
 
@@ -263,7 +263,7 @@ class Geo:
         self._bounding_box = self._payload.get("bounding_box")
 
     def __repr__(self) -> str:
-        return "Geo(name:{0.name} fullname:{0.fullname} country:{0.country} country_code:{0.country_code} id:{0.id})".format(
+        return "Geo(name={0.name} fullname={0.fullname} country={0.country} country_code={0.country_code} id={0.id})".format(
             self
         )
 
