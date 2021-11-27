@@ -121,6 +121,7 @@ class StreamConnection:
                     stream=True,
                 )
                 _log.info("Client connected to stream!")
+                self.http_client.dispatch("stream_connect", self)
                 self.session = response
 
                 for response_line in response.iter_lines():
@@ -140,6 +141,7 @@ class StreamConnection:
                     if self.errors >= self.reconnect_attempts:
                         _log.error("Too many errors caught during streaming, closing stream!")
                         self.close()
+                        self.http_client.dispatch("stream_disconnect", self)
                         break
 
                     _log.info(f"An error caught during streaming session: {e}")
@@ -293,10 +295,18 @@ class Stream:
             "/tweets/search/stream/rules",
         )
 
-        return [StreamRule(**data) for data in res["data"]]
+        try:
+            return [StreamRule(**data) for data in res["data"]]
+        except TypeError:
+            return res
 
-    def set_rules(self) -> None:
+    def set_rules(self, dry_run: Optional[bool]) -> None:
         """Create and set rules to your stream.
+
+        Parameters
+        ------------
+        dry_run: Optional[:class:`bool`]
+            Indicates if you want to debug your rule's operator syntax.
 
         Returns
         ---------
@@ -309,11 +319,26 @@ class Stream:
         if self.sample:
             return None
 
+        if dry_run:
+            try:
+                self.http_client.request("POST", "2", "/tweets/search/stream/rules", params={"dry_run": dry_run}, json={"add": self.raw_rules})
+            except PytweetException as e:
+                raise e
+            else:
+                self.http_client.request("POST", "2", "/tweets/search/stream/rules", json={"add": self.raw_rules})
+                return
+                
         self.http_client.request("POST", "2", "/tweets/search/stream/rules", json={"add": self.raw_rules})
 
-    def connect(self) -> None:
+
+    def connect(self, *,dry_run: Optional[bool] = None) -> None:
         """Connect with the stream connection.
 
+        Parameters
+        ------------
+        dry_run: :class:`bool`
+            Indicates if you want to debug your rule's operator syntax. Default to None.
+    
         Returns
         ---------
         :class:`NoneType`:
@@ -323,5 +348,5 @@ class Stream:
         .. versionadded:: 1.3.5
         """
         self.clear()
-        self.set_rules()
+        self.set_rules(dry_run)
         self.connection.connect()
