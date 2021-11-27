@@ -1,8 +1,14 @@
 import datetime
+import pytweet
 from typing import Any, Optional, Union
 
 from dateutil import parser
 
+def build_object(obj: str) -> Any:
+    real_obj = getattr(pytweet, obj, None)
+    if real_obj:
+        return real_obj
+    return None
 
 def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
     """Parse time return from twitter to datetime object!
@@ -76,7 +82,7 @@ def compose_user_action(user_id: str, action: str, text: str = None):
     .. versionadded: 1.3.5
     """
     if action.lower() not in ("follow", "dm"):
-        return TypeError("Action must be either 'like' or 'dm'")
+        return TypeError("Action must be either 'follow' or 'dm'")
     if text:
         text = text.replace(" ", "%20")
     return (

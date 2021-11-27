@@ -28,15 +28,22 @@ def check_error(response: requests.models.Response) -> NoReturn:
         try:
             res = response.json()
             if "errors" in res.keys():
-                try:
-                    if res["errors"][0]["detail"].startswith("Could not find"):
-                        raise NotFoundError(response)
+                if res.get("errors"):
+                    if "detail" in res.get("errors")[0].keys():
+                        detail = res["errors"][0]["detail"]
+                        if detail.startswith("Could not find"):
+                            raise NotFoundError(response)
+                    elif "details" in res.get("errors")[0].keys():
+                        detail = res["errors"][0]["details"][0]
+                        if detail.startswith("Cannot parse rule"):
+                            _log.warning(f"Invalid stream rule! Rules Info: 'created': {res['summary'].get('created')}, 'not_created': {res['summary'].get('not_created')}, 'valid': {res['summary'].get('valid')}, 'invalid': {res['summary'].get('invalid')}")
+                            raise SyntaxError(detail)
 
-                    else:
-                        raise PytweetException(response, res["errors"][0]["detail"])
-                except KeyError:
-                    raise PytweetException(res)
-        except j.decoder.JSONDecodeError:
+                else:
+                    raise PytweetException(response, res["errors"][0]["detail"])
+        except (j.decoder.JSONDecodeError, KeyError) as e:
+            if isinstance(e, KeyError):
+                raise PytweetException(res)
             return
 
     elif code in (201, 202, 204):
@@ -115,12 +122,6 @@ class HTTPClient:
         if self.stream:
             self.stream.http_client = self
             self.stream.connection.http_client = self
-
-    def build_object(self, obj: str) -> Any:
-        real_obj = getattr(pytweet, obj, None)
-        if real_obj:
-            return real_obj
-        return None
 
     def dispatch(self, event_name, *args):
         try:
