@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from .http import HTTPClient
     from .message import DirectMessage
 
-Tweet = build_object("Tweet")
+TW = build_object("Tweet")
 
 
 class User:
@@ -296,7 +296,7 @@ class User:
         until_id: Optional[Union[str, int]] = None,
         mentioned: bool = False,
         exclude: Optional[str] = None,
-    ) -> Union[List[Tweet], List]:
+    ) -> Union[List[TW], List]:
         """Fetch the user timelines, this can be timelines where the user got mention or a normal tweet timelines.
 
         Parameters
@@ -339,6 +339,7 @@ class User:
             "poll.fields": POLL_FIELD,
             "tweet.fields": TWEET_FIELD,
         }
+        
         params["max_results"] = max_results
         if start_time:
             params["start_time"] = start_time.isoformat()
@@ -356,9 +357,9 @@ class User:
         )
 
         try:
-            return [Tweet(data) for data in res["data"]]
-        except TypeError:
-            return []
+            return [TW(data) for data in res["data"]]
+        except TypeError as e:
+            return res
 
     @property
     def name(self) -> str:
