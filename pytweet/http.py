@@ -5,7 +5,6 @@ import logging
 import sys
 import time
 import requests
-import pytweet
 from typing import Any, Dict, List, NoReturn, Optional, Union
 
 from .attachments import CTA, Geo, Poll, QuickReply, File, CustomProfile
@@ -37,7 +36,7 @@ def check_error(response: requests.models.Response) -> NoReturn:
                         detail = res["errors"][0]["details"][0]
                         if detail.startswith("Cannot parse rule"):
                             _log.warning(
-                                f"Invalid stream rule! Rules Info: 'created': {res['summary'].get('created')}, 'not_created': {res['summary'].get('not_created')}, 'valid': {res['summary'].get('valid')}, 'invalid': {res['summary'].get('invalid')}"
+                                f"Invalid stream rule! Rules Info: 'created': {res['meta']['summary'].get('created')}, 'not_created': {res['meta']['summary'].get('not_created')}, 'valid': {res['meta']['summary'].get('valid')}, 'invalid': {res['meta']['summary'].get('invalid')}"
                             )
                             raise SyntaxError(detail)
 
