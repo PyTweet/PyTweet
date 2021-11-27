@@ -36,7 +36,9 @@ def check_error(response: requests.models.Response) -> NoReturn:
                     elif "details" in res.get("errors")[0].keys():
                         detail = res["errors"][0]["details"][0]
                         if detail.startswith("Cannot parse rule"):
-                            _log.warning(f"Invalid stream rule! Rules Info: 'created': {res['summary'].get('created')}, 'not_created': {res['summary'].get('not_created')}, 'valid': {res['summary'].get('valid')}, 'invalid': {res['summary'].get('invalid')}")
+                            _log.warning(
+                                f"Invalid stream rule! Rules Info: 'created': {res['summary'].get('created')}, 'not_created': {res['summary'].get('not_created')}, 'valid': {res['summary'].get('valid')}, 'invalid': {res['summary'].get('invalid')}"
+                            )
                             raise SyntaxError(detail)
 
                 else:

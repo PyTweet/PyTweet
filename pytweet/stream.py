@@ -321,24 +321,29 @@ class Stream:
 
         if dry_run:
             try:
-                self.http_client.request("POST", "2", "/tweets/search/stream/rules", params={"dry_run": dry_run}, json={"add": self.raw_rules})
+                self.http_client.request(
+                    "POST",
+                    "2",
+                    "/tweets/search/stream/rules",
+                    params={"dry_run": dry_run},
+                    json={"add": self.raw_rules},
+                )
             except PytweetException as e:
                 raise e
             else:
                 self.http_client.request("POST", "2", "/tweets/search/stream/rules", json={"add": self.raw_rules})
                 return
-                
+
         self.http_client.request("POST", "2", "/tweets/search/stream/rules", json={"add": self.raw_rules})
 
-
-    def connect(self, *,dry_run: Optional[bool] = None) -> None:
+    def connect(self, *, dry_run: Optional[bool] = None) -> None:
         """Connect with the stream connection.
 
         Parameters
         ------------
         dry_run: :class:`bool`
             Indicates if you want to debug your rule's operator syntax. Default to None.
-    
+
         Returns
         ---------
         :class:`NoneType`:

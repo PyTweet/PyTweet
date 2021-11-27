@@ -6,12 +6,14 @@ from typing import TYPE_CHECKING, Any, Dict, NoReturn, Optional, List, Union
 from .attachments import CTA, QuickReply, File, CustomProfile
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
-from .utils import time_parse_todt
+from .utils import time_parse_todt, build_object
 from .expansions import USER_FIELD, TWEET_EXPANSION, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_FIELD
 
 if TYPE_CHECKING:
     from .http import HTTPClient
     from .message import DirectMessage
+
+Tweet = build_object("Tweet")
 
 
 class User:
@@ -46,12 +48,12 @@ class User:
         return "User(name={0.name} username={0.username} id={0.id})".format(self)
 
     def __eq__(self, other: User) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
+        if not isinstance(other, User):
             raise ValueError("== operation cannot be done with one of the element not a valid User object")
         return self.id == other.id
 
     def __ne__(self, other: User) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
+        if not isinstance(other, User):
             raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
@@ -294,7 +296,7 @@ class User:
         until_id: Optional[Union[str, int]] = None,
         mentioned: bool = False,
         exclude: Optional[str] = None,
-    ) -> List[object, list]:
+    ) -> Union[List[Tweet], List]:
         """Fetch the user timelines, this can be timelines where the user got mention or a normal tweet timelines.
 
         Parameters
@@ -316,7 +318,7 @@ class User:
 
         Returns
         ---------
-        :class:`Tweet`
+        Union[List[:class:`Tweet`], List]
             This method returns a list of :class:`Tweet` objects or an empty list if none founded.
 
 
@@ -354,7 +356,6 @@ class User:
         )
 
         try:
-            Tweet = self.http_client.build_object("Tweet")
             return [Tweet(data) for data in res["data"]]
         except TypeError:
             return []

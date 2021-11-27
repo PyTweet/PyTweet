@@ -44,6 +44,7 @@ class PollOption:
 
     .. versionadded 1.3.5
     """
+
     label: str
     position: int = 0
     votes: int = 0

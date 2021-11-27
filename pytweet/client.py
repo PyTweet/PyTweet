@@ -551,20 +551,20 @@ class Client:
 
     def stream(self, *, dry_run: bool = False) -> None:
         """Stream realtime in twitter! Make sure to put stream kwarg in client. If you want the tweet data make sure to make an `on_stream` event. example:
-        
+
         .. code-block:: py
 
             @client.event
             def on_stream(tweet, connection):
                 ... #Do what you want with tweet and connection you got.
 
-        
+
         Parameters
         ------------
         dry_run: :class:`bool`
             Indicates if you want to debug your rule's operator syntax.
 
-        
+
         .. versionadded:: 1.3.5
         """
         if not self.http.stream:

@@ -198,12 +198,12 @@ class Tweet(Message):
         return self.text
 
     def __eq__(self, other: Tweet) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
+        if not isinstance(other, Tweet):
             raise ValueError("== operation cannot be done with one of the element not a valid Tweet object")
         return self.id == other.id
 
     def __ne__(self, other: Tweet) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
+        if not isinstance(other, Tweet):
             raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 

@@ -4,11 +4,13 @@ from typing import Any, Optional, Union
 
 from dateutil import parser
 
+
 def build_object(obj: str) -> Any:
     real_obj = getattr(pytweet, obj, None)
     if real_obj:
         return real_obj
     return None
+
 
 def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
     """Parse time return from twitter to datetime object!
