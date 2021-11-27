@@ -89,7 +89,7 @@ class Client:
             Event Reference
                 See the `Event Reference`.
 
-        
+
         .. versionadded:: 1.3.5
         """
         if iscoroutinefunction(func):
