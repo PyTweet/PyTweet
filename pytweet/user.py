@@ -6,15 +6,12 @@ from typing import TYPE_CHECKING, Any, Dict, NoReturn, Optional, List, Union
 from .attachments import CTA, QuickReply, File, CustomProfile
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
-from .utils import time_parse_todt, build_object
+from .utils import time_parse_todt
 from .expansions import USER_FIELD, TWEET_EXPANSION, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_FIELD
 
 if TYPE_CHECKING:
     from .http import HTTPClient
     from .message import DirectMessage
-
-TW = build_object("Tweet")
-
 
 class User:
     """Represent a user in Twitter.
@@ -296,7 +293,7 @@ class User:
         until_id: Optional[Union[str, int]] = None,
         mentioned: bool = False,
         exclude: Optional[str] = None,
-    ) -> Union[List[TW], List]:
+    ) -> Union[List[object], List]:
         """Fetch the user timelines, this can be timelines where the user got mention or a normal tweet timelines.
 
         Parameters
@@ -334,6 +331,7 @@ class User:
 
         params = {
             "expansions": TWEET_EXPANSION,
+            "user.fields": USER_FIELD,
             "media.fields": MEDIA_FIELD,
             "place.fields": PLACE_FIELD,
             "poll.fields": POLL_FIELD,
@@ -356,9 +354,10 @@ class User:
             "GET", "2", f"/users/{self.id}/tweets" if not mentioned else f"/users/{self.id}/mentions", params=params
         )
 
+        Tweet = self.http_client.build_object("Tweet")
         try:
-            return [TW(data) for data in res["data"]]
-        except TypeError as e:
+            return [Tweet(data) for data in res["data"]]
+        except TypeError:
             return res
 
     @property
