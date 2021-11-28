@@ -127,7 +127,6 @@ class HTTPClient:
 
     def build_object(self, obj: str) -> Any:
         real_obj = getattr(pytweet, obj)
-        print(real_obj)
         if real_obj:
             return real_obj
         return None
