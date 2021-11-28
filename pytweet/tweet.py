@@ -11,6 +11,7 @@ from .user import User
 from .utils import time_parse_todt
 from .entities import Media
 from .enums import ReplySetting
+from .expansions import USER_FIELD
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -183,7 +184,7 @@ class Tweet(Message):
 
     def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
         self.original_payload = data
-        self._payload = data.get("data") or None
+        self._payload = data.get("data") or data
         self._includes = self.original_payload.get("includes")
         self.tweet_metrics: TweetPublicMetrics = TweetPublicMetrics(self._payload)
 
@@ -197,12 +198,12 @@ class Tweet(Message):
         return self.text
 
     def __eq__(self, other: Tweet) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
+        if not isinstance(other, Tweet):
             raise ValueError("== operation cannot be done with one of the element not a valid Tweet object")
         return self.id == other.id
 
     def __ne__(self, other: Tweet) -> Union[bool, NoReturn]:
-        if not isinstance(other, self):
+        if not isinstance(other, Tweet):
             raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
@@ -293,7 +294,10 @@ class Tweet(Message):
             pass
 
     def reply(self, text: str) -> None:
-        """Post a tweet to reply a specific tweet present by the tweet_id parameter.
+        """Post a tweet to reply a specific tweet present by the tweet's id.
+
+        .. note::
+            Note that if the tweet is a retweet you cannot reply to the tweet, it might not raise error but it will post the tweet has a normal tweet and it will ping the :class:`Tweet.author`.
 
         Parameters
         ------------
@@ -303,7 +307,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        self.http_client.request(
+        tweet = self.http_client.request(
             "POST",
             "1.1",
             f"/statuses/update.json",
@@ -312,7 +316,7 @@ class Tweet(Message):
                 "in_reply_to_status_id": str(self.id),
             },
             auth=True,
-        )
+        )  # TODO Returns the tweet in Tweet object
 
     def hide(self) -> RelationHide:
         """Hide a reply tweet.
@@ -356,9 +360,7 @@ class Tweet(Message):
             "GET",
             "2",
             f"/tweets/{self.id}/retweeted_by",
-            params={
-                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
-            },
+            params={"user.fields": USER_FIELD},
         )
 
         try:
@@ -380,9 +382,7 @@ class Tweet(Message):
             "GET",
             "2",
             f"/tweets/{self.id}/liking_users",
-            params={
-                "user.fields": "created_at,description,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
-            },
+            params={"user.fields": USER_FIELD},
         )
 
         try:

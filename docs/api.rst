@@ -202,6 +202,38 @@ Option
     :members:
 
 
+Streaming
+---------------------
+
+These following object are not meant to be create as an instance rather its for knowledge of what you can do with them.
+
+Stream
+~~~~~~~
+
+.. attributetable:: Stream
+
+.. autoclass:: Stream
+    :members:
+
+
+StreamConnection
+~~~~~~~
+
+.. attributetable:: StreamConnection
+
+.. autoclass:: StreamConnection
+    :members:
+
+
+StreamRule
+~~~~~~~
+
+
+.. attributetable:: StreamRule
+
+.. autoclass:: StreamRule
+    :members:
+
 Relations
 ----------------
 
@@ -253,6 +285,57 @@ EmbedsImages
 .. autoclass:: EmbedsImages
     :members:
 
+
+Events Reference
+---------------------
+IDK LMFAO
+
+.. data:: on_stream_connect
+
+    `on_stream_connect` is an event trigger when the client succesfuly connect to stream, this might trigger multiple times as a reconnect logic would trigger this event too.
+
+    .. code-block:: python
+
+        @client.event
+        def on_stream_connect(connection):
+            . . . #do what you want with stream connection.
+
+    Parameters
+    ------------
+    connection: :class:`StreamConnection`
+        The stream's connection represent with :class:`StreamConnection`.
+
+.. data:: on_stream_disconnect
+
+    `on_stream_disconnect` is an event trigger when the client disconnect from stream.
+
+    .. code-block:: python
+
+        @client.event
+        def on_stream_disconnect(connection):
+            ... #do what you want with stream connection.
+
+    Parameters
+    ------------
+    connection: :class:`StreamConnection`
+        The :class:`StreamConnection` of the stream. 
+
+.. data:: on_stream
+
+    `on_stream` is an event trigger when a stream return a tweet data.
+
+    .. code-block:: python
+
+        @client.event
+        def on_stream(tweet, connection):
+            . . . #do what you want with the tweet and stream connection.
+
+    Parameters
+    ------------
+    tweet: :class:`Tweet`
+        The data that's going to be returns from the stream.
+    connection: :class:`StreamConnection`
+        The :class:`StreamConnection` of the stream.
 
 Enums 
 --------------

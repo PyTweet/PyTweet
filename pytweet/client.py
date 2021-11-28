@@ -29,6 +29,8 @@ class Client:
         The Access Token of the app.
     access_token_secret: Optional[:class:`str`]
         The Access Token Secret of the app.
+    stream: Optional[Stream]
+        The client's stream. Must be an instance of :class:`Stream`.
 
     Attributes
     ------------
@@ -63,7 +65,7 @@ class Client:
 
     @property
     def account(self) -> Optional[User]:
-        """:class:`Optional[User]`: Returns the client's account information. The callback is a User object.
+        """Optional[:class:`User`]: Returns the client's account information. The callback is a User object.
 
         .. versionadded:: 1.2.0
         """
@@ -73,7 +75,23 @@ class Client:
             return getattr(self, "_account_user", None)
         return attr
 
-    def event(self, func: Callable):
+    def event(self, func: Callable) -> None:
+        """
+        A decorator for making an event, the event will be register in the client's internal cache.
+
+        Parameters
+        ------------
+        func: :class:`typing.Callable`
+            The function that execute when the event is trigger. The event must be a synchronous function. You must also put the right event name in the function's name, See event reference for full events name.
+
+
+        .. seealso::
+            Event Reference
+                See the `Event Reference`.
+
+
+        .. versionadded:: 1.3.5
+        """
         if iscoroutinefunction(func):
             raise TypeError("Event must be a synchronous function!")
         self.http.events[func.__name__[3:]] = func
@@ -84,7 +102,7 @@ class Client:
 
         self._account_user = self.fetch_user(self.http.access_token.partition("-")[0])
 
-    def fetch_user(self, user_id: Union[str, int] = None) -> User:
+    def fetch_user(self, user_id: Union[str, int] = None) -> Optional[User]:
         """A method for fetching the user with the user's id.
 
         .. warning::
@@ -105,7 +123,7 @@ class Client:
         """
         return self.http.fetch_user(user_id)
 
-    def fetch_user_by_name(self, username: str) -> User:
+    def fetch_user_by_name(self, username: str) -> Optional[User]:
         """A method for fetching the user with the user's username.
 
         .. warning::
@@ -227,7 +245,6 @@ class Client:
             exclude_reply_users=exclude_reply_users,
             super_followers_only=super_followers_only,
         )
-
 
     def create_welcome_message(
         self,
@@ -548,12 +565,28 @@ class Client:
 
         return CustomProfile(data.get("name"), data.get("id"), data.get("created_timestamp"), data.get("avatar"))
 
-    def stream(self, tries: int = 15) -> None:
-        """Stream realtime."""
+    def stream(self, *, dry_run: bool = False) -> None:
+        """Stream realtime in twitter! Make sure to put stream kwarg in client. If you want the tweet data make sure to make an `on_stream` event. example:
+
+        .. code-block:: py
+
+            @client.event
+            def on_stream(tweet, connection):
+                ... #Do what you want with tweet and connection you got.
+
+
+        Parameters
+        ------------
+        dry_run: :class:`bool`
+            Indicates if you want to debug your rule's operator syntax.
+
+
+        .. versionadded:: 1.3.5
+        """
         if not self.http.stream:
             raise TypeError("'stream' argument is missing in client!")
 
         try:
-            self.http.stream.start(tries)
+            self.http.stream.connect(dry_run=dry_run)
         except KeyboardInterrupt:
             print("\nKeyboardInterrupt: Exit stream.")

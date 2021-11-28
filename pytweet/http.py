@@ -5,6 +5,7 @@ import logging
 import sys
 import time
 import requests
+import pytweet
 from typing import Any, Dict, List, NoReturn, Optional, Union
 
 from .attachments import CTA, Geo, Poll, QuickReply, File, CustomProfile
@@ -16,6 +17,7 @@ from .space import Space
 from .tweet import Tweet
 from .user import User
 from .stream import Stream
+from .expansions import TWEET_EXPANSION, USER_FIELD, TWEET_FIELD, SPACE_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD
 
 _log = logging.getLogger(__name__)
 
@@ -23,16 +25,28 @@ _log = logging.getLogger(__name__)
 def check_error(response: requests.models.Response) -> NoReturn:
     code = response.status_code
     if code == 200:
-        res = response.json()
-        if "errors" in res.keys():
-            try:
-                if res["errors"][0]["detail"].startswith("Could not find"):
-                    raise NotFoundError(response)
+        try:
+            res = response.json()
+            if "errors" in res.keys():
+                if res.get("errors"):
+                    if "detail" in res.get("errors")[0].keys():
+                        detail = res["errors"][0]["detail"]
+                        if detail.startswith("Could not find"):
+                            raise NotFoundError(response)
+                    elif "details" in res.get("errors")[0].keys():
+                        detail = res["errors"][0]["details"][0]
+                        if detail.startswith("Cannot parse rule"):
+                            _log.warning(
+                                f"Invalid stream rule! Rules Info: 'created': {res['meta']['summary'].get('created')}, 'not_created': {res['meta']['summary'].get('not_created')}, 'valid': {res['meta']['summary'].get('valid')}, 'invalid': {res['meta']['summary'].get('invalid')}"
+                            )
+                            raise SyntaxError(detail)
 
                 else:
                     raise PytweetException(response, res["errors"][0]["detail"])
-            except KeyError:
+        except (j.decoder.JSONDecodeError, KeyError) as e:
+            if isinstance(e, KeyError):
                 raise PytweetException(res)
+            return
 
     elif code in (201, 202, 204):
         pass
@@ -109,6 +123,13 @@ class HTTPClient:
         self.events = {}
         if self.stream:
             self.stream.http_client = self
+            self.stream.connection.http_client = self
+
+    def build_object(self, obj: str) -> Any:
+        real_obj = getattr(pytweet, obj)
+        if real_obj:
+            return real_obj
+        return None
 
     def dispatch(self, event_name, *args):
         try:
@@ -156,7 +177,7 @@ class HTTPClient:
         try:
             res = response.json()
         except j.decoder.JSONDecodeError:
-            return
+            return response.text
 
         if "meta" in res.keys():
             try:
@@ -235,41 +256,47 @@ class HTTPClient:
             check_error(res)
             CheckStatus(res.json().get("processing_info", None), media_id)
 
-    def fetch_user(self, user_id: Union[str, int]) -> User:
+    def fetch_user(self, user_id: Union[str, int]) -> Optional[User]:
         try:
             int(user_id)
         except ValueError:
             raise ValueError("user_id must be an int, or a string of digits!")
 
-        data = self.request(
-            "GET",
-            "2",
-            f"/users/{user_id}",
-            headers={"Authorization": f"Bearer {self.bearer_token}"},
-            params={
-                "user.fields": "created_at,description,entities,id,location,name,profile_image_url,protected,public_metrics,url,username,verified,withheld,pinned_tweet_id"
-            },
-            is_json=True,
-        )
+        try:
 
-        return User(data, http_client=self)
+            data = self.request(
+                "GET",
+                "2",
+                f"/users/{user_id}",
+                headers={"Authorization": f"Bearer {self.bearer_token}"},
+                params={"user.fields": USER_FIELD},
+                is_json=True,
+            )
 
-    def fetch_user_byname(self, username: str) -> User:
+            return User(data, http_client=self)
+
+        except NotFoundError:
+            return None
+
+    def fetch_user_byname(self, username: str) -> Optional[User]:
         if "@" in username:
             username = username.replace("@", "", 1)
 
-        data = self.request(
-            "GET",
-            "2",
-            f"/users/by/username/{username}",
-            headers={"Authorization": f"Bearer {self.bearer_token}"},
-            params={
-                "user.fields": "created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
-            },
-            is_json=True,
-        )
+        try:
 
-        return User(data, http_client=self)
+            data = self.request(
+                "GET",
+                "2",
+                f"/users/by/username/{username}",
+                headers={"Authorization": f"Bearer {self.bearer_token}"},
+                params={"user.fields": USER_FIELD},
+                is_json=True,
+            )
+
+            return User(data, http_client=self)
+
+        except NotFoundError:
+            return None
 
     def fetch_tweet(self, tweet_id: Union[str, int]) -> Tweet:
         res = self.request(
@@ -277,12 +304,12 @@ class HTTPClient:
             "2",
             f"/tweets/{tweet_id}",
             params={
-                "tweet.fields": "attachments,author_id,context_annotations,conversation_id,created_at,geo,entities,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,reply_settings,source,text,withheld",
-                "user.fields": "created_at,description,id,location,name,profile_image_url,protected,public_metrics,url,username,verified,withheld",
-                "expansions": "attachments.poll_ids,attachments.media_keys,author_id,geo.place_id,in_reply_to_user_id,referenced_tweets.id,entities.mentions.username,referenced_tweets.id.author_id",
-                "media.fields": "duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width",
-                "place.fields": "contained_within,country,country_code,full_name,geo,id,name,place_type",
-                "poll.fields": "duration_minutes,end_datetime,id,options,voting_status",
+                "tweet.fields": TWEET_FIELD,
+                "user.fields": USER_FIELD,
+                "expansions": TWEET_EXPANSION,
+                "media.fields": MEDIA_FIELD,
+                "place.fields": PLACE_FIELD,
+                "poll.fields": POLL_FIELD,
             },
             auth=True,
         )
@@ -294,9 +321,7 @@ class HTTPClient:
             "GET",
             "2",
             f"/spaces/{str(space_id)}",
-            params={
-                "space.fields": "host_ids,created_at,creator_id,id,lang,invited_user_ids,participant_count,speaker_ids,started_at,state,title,updated_at,scheduled_start,is_ticketed"
-            },
+            params={"space.fields": SPACE_FIELD},
         )
         return Space(res)
 
@@ -308,7 +333,7 @@ class HTTPClient:
             params={
                 "query": title,
                 "state": state.value,
-                "space.fields": "host_ids,created_at,creator_id,id,lang,invited_user_ids,participant_count,speaker_ids,started_at,state,title,updated_at,scheduled_start,is_ticketed",
+                "space.fields": SPACE_FIELD,
             },
         )
         return Space(res)
