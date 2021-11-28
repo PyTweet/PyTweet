@@ -18,15 +18,19 @@ class User:
     """Represent a user in Twitter.
     User is an identity in twitter, its very interactive. Can send message, post a tweet, and even send messages to other user through Dms.
 
+
     .. describe:: x == y
+
         Check if one user id is equal to another.
 
 
     .. describe:: x != y
+
         Check if one user id is not equal to another.
 
 
     .. describe:: str(x)
+
         Get the user's name.
 
 
