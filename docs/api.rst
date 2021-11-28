@@ -286,56 +286,43 @@ EmbedsImages
     :members:
 
 
-Events Reference
+Event Reference
 ---------------------
-IDK LMFAO
+This section shows events listened to by :class:`Client`
 
-.. data:: on_stream_connect
+You can register an event using :meth:`Client.event`
+
+Example:
+
+.. code-block:: python
+
+  @client.event
+  def on_stream_connect(connection):
+   print(connection)
+
+
+.. function:: on_stream_connect(connection)
 
     `on_stream_connect` is an event trigger when the client succesfuly connect to stream, this might trigger multiple times as a reconnect logic would trigger this event too.
 
-    .. code-block:: python
+    :param connection: The Stream connection.
+    :type connection: :class:`StreamConnection`
 
-        @client.event
-        def on_stream_connect(connection):
-            . . . #do what you want with stream connection.
-
-    Parameters
-    ------------
-    connection: :class:`StreamConnection`
-        The stream's connection represent with :class:`StreamConnection`.
-
-.. data:: on_stream_disconnect
+.. function:: on_stream_disconnect(connection)
 
     `on_stream_disconnect` is an event trigger when the client disconnect from stream.
 
-    .. code-block:: python
+    :param connection: The Stream connection.
+    :type connection: :class:`StreamConnection` 
 
-        @client.event
-        def on_stream_disconnect(connection):
-            ... #do what you want with stream connection.
-
-    Parameters
-    ------------
-    connection: :class:`StreamConnection`
-        The :class:`StreamConnection` of the stream. 
-
-.. data:: on_stream
+.. function:: on_stream(tweet, connection)
 
     `on_stream` is an event trigger when a stream return a tweet data.
 
-    .. code-block:: python
-
-        @client.event
-        def on_stream(tweet, connection):
-            . . . #do what you want with the tweet and stream connection.
-
-    Parameters
-    ------------
-    tweet: :class:`Tweet`
-        The data that's going to be returns from the stream.
-    connection: :class:`StreamConnection`
-        The :class:`StreamConnection` of the stream.
+    :param tweet: The data that’s going to be returns from the stream.
+    :param connection: The stream connection
+    :type tweet: :class:`Tweet`
+    :type connection: :class:`StreamConnection`
 
 Enums 
 --------------
