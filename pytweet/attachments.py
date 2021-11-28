@@ -477,17 +477,6 @@ class File:
 class CustomProfile:
     """Represent a CustomProfile attachments that allow a Direct Message author to present a different identity than that of the Twitter account being used.
 
-    Parameters
-    ------------
-    name: :class:`str`
-        The author's custom name.
-    id: Union[:class:`str`, :class:`int`]
-        The custom profile unique id.
-    timestamp: Union[:class:`str`, :class:`int`]
-        The CustomProfile's created timestamp.
-    media: Dict[:class:`str`, Any]
-        The media object returned.
-
     .. versionadded:: 1.3.5
     """
 
