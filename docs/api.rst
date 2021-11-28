@@ -341,41 +341,50 @@ All these enums are a subclass of :class:`enum.Enum`
 .. class:: SpaceState
 
     .. attribute:: live
+
         indicates the space is live
     
 
     .. attribute:: scheduled
+
         indicates the space is scheduled
     
 
 .. class:: ReplySetting
 
     .. attribute:: everyone
+
         Everyone can reply.
     
 
     .. attribute:: mention_users
+
         Only users who are mentioned in the tweet can reply.
     
 
     .. attribute:: following
+
         Only people who are following the author of the tweet can reply.
 
 .. class:: MessageTypeEnum
 
     .. attribute:: DIRECT_MESSAGE
+
         A direct message in twitter.
     
 
     .. attribute:: MESSAGE_TWEET
+
         A public tweet.
     
 
     .. attribute:: MESSAGE_WELCOME_MESSAGE
+
         A welcome message in a direct message.
     
 
     .. attribute:: MESSAGE_WELCOME_MESSAGE_RULE
+
         A welcome message rule in a direct message.
 
 
