@@ -1,4 +1,6 @@
-from typing import Optional, Tuple, Any
+from __future__ import annotations
+
+from typing import Optional, Tuple, Any, Type
 from requests_oauthlib import OAuth1, OAuth1Session
 
 __all__ = ("OauthSession",)
@@ -29,14 +31,18 @@ class OauthSession(OAuth1Session):
         self.callback: Any = callback
 
     @classmethod
-    def with_oauth_flow(cls, client, *, callback: str = "https://twitter.com"):
-        """Authorize a user using the 3 legged oauth flow classmethod! This let's your application to do an action on behalf of a user. This will give you 2 new methods, `generate_oauth_url` for generating an oauth url so a user can authorize and `post_oauth_token` posting oauth token and verifier for getting a pair of access token and secret.
+    def with_oauth_flow(cls: Type[OauthSession], client, *, callback: str = "https://twitter.com") -> OauthSession:
+        """Authorize a user using the 3 legged oauth flow classmethod! This let's your application to do an action on behalf of a user. This will give you 2 new methods, :meth:`OauthSession.generate_oauth_url` for generating an oauth url so a user can authorize and `post_oauth_token` posting oauth token and verifier for getting a pair of access token and secret.
 
         .. note::
             There are 3 steps for using 3 legged oauth flow:
-            1. Use generate_oauth_url method and generate an oauth link.
-            2. Click that link and press the authorize button, you should get redirect to the callback-url with an oauth token and verifier appended in that url, e.g `http://twitter.com/home` will be `http://twitter.com/home?oauth_token=xxxxxxxxxxxxxxxxxx?oauth_verifier=xxxxxxxxxxxxxxxxxx`, copy the oauth token & verifier and use it in the next step.
-            3. Use post_oauth_token method with the oauth token and verifier. It should return a pair of access token & secret, it also return the screen name and user id. Now use those access token & secret in access_token & access_token_secret arguments in pytweet.Client, and now you can use the client to do certain action!
+
+            * Use :meth:`OauthSession.generate_oauth_url`
+            method and generate an oauth link.
+
+            * Click that link and press the authorize button, you should get redirect to the callback-url with an oauth token and verifier appended in that url, e.g `http://twitter.com/home` will be `http://twitter.com/home?oauth_token=xxxxxxxxxxxxxxxxxx?oauth_verifier=xxxxxxxxxxxxxxxxxx`, copy the oauth token & verifier and use it in the next step.
+
+            * Use post_oauth_token method with the oauth token and verifier. It should return a pair of access token & secret, it also return the screen name and user id. Now use those access token & secret in access_token & access_token_secret arguments in pytweet.Client, and now you can use the client to do certain action!
 
         """
         self = cls(None, None, callback)
@@ -48,7 +54,7 @@ class OauthSession(OAuth1Session):
             Parameters
             ------------
             auth_access_type: :class:`str`
-                Must be either read, write, direct_messages. read for reading twitter info only, write will have the same as read and also write a post, follow & unfollow a user and direct_messages is for read & write and sending & deleting direct_messages.
+                Must be either read, write, direct_messages. read for reading twitter info only, write will have the same as read and also write permission this includes but not limited to post & delete a :class:`Tweet`, and direct_messages is for read & write and sending & deleting :class:`DirectMessages`.
 
             Returns
             ---------
@@ -58,7 +64,8 @@ class OauthSession(OAuth1Session):
             
             .. versionadded:: 1.3.5
             """
-            assert auth_access_type in ["read", "write", "direct_messages"]
+            auth_access_type = auth_access_type.lower()
+            assert auth_access_type in ("read", "write", "direct_messages")
             request_tokens = client.http.request(
                 "POST",
                 "",
@@ -91,8 +98,8 @@ class OauthSession(OAuth1Session):
             res = client.http.request(
                 "POST", "", "oauth/access_token", params={"oauth_token": oauth_token, "oauth_verifier": oauth_verifier}
             )
-            oauth_token, oauth_token_secret, user_id, screen_name = res.split("&")
-            return oauth_token, oauth_token_secret, user_id, screen_name
+
+            return tuple(res.split("&"))
 
         self.post_access_token = post_oauth_token
         self.generate_oauth_url = generate_oauth_url
@@ -122,3 +129,5 @@ class OauthSession(OAuth1Session):
         """Set a the consumer key and secret"""
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
+
+            
