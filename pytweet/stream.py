@@ -4,7 +4,7 @@ import requests
 import json
 import logging
 import time
-from typing import Optional, Union, Any, List, TYPE_CHECKING
+from typing import Optional, Type, Union, Any, List, TYPE_CHECKING
 from dataclasses import dataclass
 from .tweet import Tweet
 from .errors import PytweetException, ConnectionException
@@ -55,9 +55,9 @@ class StreamConnection:
         self, url: str, backfill_minutes: int = 0, reconnect_attempts: int = 0, http_client: Optional[HTTPClient] = None
     ):
         self.url = url
-        self.backfill_minutes = backfill_minutes
-        self.reconnect_attempts = reconnect_attempts
-        self.http_client = http_client
+        self.backfill_minutes: int = backfill_minutes
+        self.reconnect_attempts: int = reconnect_attempts
+        self.http_client: Optional[HTTPClient] = http_client
         self.session: Optional[Any] = None
         self.errors = 0
 
@@ -182,7 +182,7 @@ class Stream:
         )
 
     @classmethod
-    def SampleStream(cls, backfill_minutes: int = 0, reconnect_attempts: int = 15):
+    def sample_stream(cls: Type[Stream], backfill_minutes: int = 0, reconnect_attempts: int = 15) -> Stream:
         """A class method that change the stream connection to a sample one, this would mean you dont have to set any stream rules. This would not recommended because it can make the progress of tweet cap much faster, if its out of limit you would not be able to stream.
 
         Parameters
@@ -201,9 +201,9 @@ class Stream:
         .. versionadded:: 1.3.5
         """
         self = cls(backfill_minutes, reconnect_attempts)
-        self.http_client: Optional[HTTPClient] = None
+        self.http_client = None
         self.sample = True
-        self.connection: StreamConnection = StreamConnection(
+        self.connection = StreamConnection(
             "https://api.twitter.com/2/tweets/sample/stream",
             self.backfill_minutes,
             self.reconnect_attempts,
