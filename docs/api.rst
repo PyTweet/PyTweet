@@ -108,6 +108,15 @@ Attachments
 
 These following object are not meant to be create as an instance rather its for knowledge of what you can do with them.
 
+CustomProfile
+~~~~~~~
+
+.. attributetable:: CustomProfile
+
+.. autoclass:: CustomProfile
+    :members:
+
+
 Media
 ~~~~~~~
 
@@ -368,6 +377,21 @@ All these enums are a subclass of :class:`enum.Enum`
 
     .. attribute:: MESSAGE_WELCOME_MESSAGE_RULE
         A welcome message rule in a direct message.
+
+
+Oauth
+-------------
+
+Oauth is a way to authenticate a twitter user account. You can do this with the 3 legged authentication via :meth:`OauthSession.with_oauth_flow`. This also required in every request you've made for identification!
+
+OauthSession
+~~~~~~~
+
+.. attributetable:: OauthSession
+
+
+.. autoclass:: OauthSession
+    :members:
 
 
 Errors
