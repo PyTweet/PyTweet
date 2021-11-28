@@ -138,15 +138,15 @@ class StreamConnection:
 
                 elif isinstance(e, requests.exceptions.RequestException):
                     self.errors += 1
-                    if self.errors >= self.reconnect_attempts:
+                    if self.errors > self.reconnect_attempts:
                         _log.error("Too many errors caught during streaming, closing stream!")
                         self.close()
                         self.http_client.dispatch("stream_disconnect", self)
                         break
 
-                    _log.info(f"An error caught during streaming session: {e}")
-                    _log.info(f"Reconnecting to stream after sleeping")
-                    time.sleep(5)
+                    _log.warning(f"An error caught during streaming session: {e}")
+                    _log.info(f"Reconnecting to stream after sleeping for 5.0 seconds")
+                    time.sleep(5.0)
 
                 else:
                     raise e
@@ -300,12 +300,12 @@ class Stream:
         except TypeError:
             return res
 
-    def set_rules(self, dry_run: Optional[bool]) -> None:
+    def set_rules(self, dry_run: bool) -> None:
         """Create and set rules to your stream.
 
         Parameters
         ------------
-        dry_run: Optional[:class:`bool`]
+        dry_run: :class:`bool`
             Indicates if you want to debug your rule's operator syntax.
 
         Returns
@@ -336,7 +336,7 @@ class Stream:
 
         self.http_client.request("POST", "2", "/tweets/search/stream/rules", json={"add": self.raw_rules})
 
-    def connect(self, *, dry_run: Optional[bool] = None) -> None:
+    def connect(self, *, dry_run: bool = False) -> None:
         """Connect with the stream connection.
 
         Parameters
