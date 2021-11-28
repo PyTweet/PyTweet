@@ -36,17 +36,6 @@ class StreamRule:
 class StreamConnection:
     """Represent the twitter api stream connection. This will handle the stream connection.
 
-    Parameters
-    ------------
-    url: :class:`str`
-        The url where the stream connect to.
-    backfill_minutes: :class:`int`
-        This feature will deliver duplicate Tweets, meaning that if you were disconnected for 90 seconds, and you requested two minutes of backfill, you will receive 30 seconds worth of duplicate Tweets. Due to this, you should make sure your system is tolerant of duplicate data. This feature is currently only available to the Academic Research product track.
-    reconnect_attempts: :class:`int`
-        Decide how many attempts for a reconnect to perform, if the client reconnected more then this argument, it would break the loop.
-    http_client: Optional[:class:`HTTPClient`]
-        Represent the HTTPClient that make the request.
-
 
     .. versionadded:: 1.3.5
     """
