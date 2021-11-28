@@ -10,6 +10,8 @@ class OauthSession(OAuth1Session):
     """
     The OauthSession, this usually is uses for POST requests and requests that need Oauth1 Authorization.
 
+    Parameters
+    ------------
     consumer_key: Optional[:class:`str`]
         The application's consumer key.
     consumer_secret: Optional[:class:`str`]
