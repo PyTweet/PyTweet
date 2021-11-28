@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Optional, Tuple, Any
 from requests_oauthlib import OAuth1, OAuth1Session
 
 __all__ = ("OauthSession",)
@@ -7,6 +7,14 @@ __all__ = ("OauthSession",)
 class OauthSession(OAuth1Session):
     """
     The OauthSession, this usually is uses for POST requests and requests that need Oauth1 Authorization.
+
+    consumer_key: Optional[:class:`str`]
+        The application's consumer key.
+    consumer_secret: Optional[:class:`str`]
+        The application's consumer secret.
+    callback: Optional[:class:`str`]
+        The callbacl url, the user will get redirect to the callback url after they authorize. Default to None.
+ 
 
     .. versionadded:: 1.2.0
     """
@@ -34,8 +42,23 @@ class OauthSession(OAuth1Session):
         self = cls(None, None, callback)
         self.is_with_oauth_flow = True
 
-        def generate_oauth_url(auth_access_type: str = "write"):
-            assert auth_access_type in ["read", "write"]
+        def generate_oauth_url(auth_access_type: str = "write") -> Optional[str]:
+            """Generate a url with an access type.
+            
+            Parameters
+            ------------
+            auth_access_type: :class:`str`
+                Must be either read, write, direct_messages. read for reading twitter info only, write will have the same as read and also write a post, follow & unfollow a user and direct_messages is for read & write and sending & deleting direct_messages.
+
+            Returns
+            ---------
+            :class:`str`
+                Returns an oauth url.
+
+            
+            .. versionadded:: 1.3.5
+            """
+            assert auth_access_type in ["read", "write", "direct_messages"]
             request_tokens = client.http.request(
                 "POST",
                 "",
@@ -47,7 +70,24 @@ class OauthSession(OAuth1Session):
             url = "https://api.twitter.com/oauth/authorize" + f"?{oauth_token}"
             return url
 
-        def post_oauth_token(oauth_token: str, oauth_verifier: str):
+        def post_oauth_token(oauth_token: str, oauth_verifier: str) -> Optional[Tuple[str]]:
+            """Post the oauth token & verifier, this method will returns a pair of access token & secret.
+            
+            Parameters
+            ------------
+            oauth_token: :class:`str`
+                The Oauth token.
+            oauth_verifier: :class:`str`
+                The Oauth verifier.
+
+            Returns
+            ---------
+            :class:`tuple`
+                Returns a :class:`tuple` object with the credentials in.
+
+            
+            .. versionadded:: 1.3.5
+            """
             res = client.http.request(
                 "POST", "", "oauth/access_token", params={"oauth_token": oauth_token, "oauth_verifier": oauth_verifier}
             )
@@ -72,9 +112,6 @@ class OauthSession(OAuth1Session):
             callback_uri=self.callback,
             decoding=None,
         )
-
-    def init(self):
-        super().__init__(self.consumer_key, client_secret=self.consumer_secret, callback_uri=self.callback)
 
     def set_access_token(self, key: str, secret: str) -> None:
         """Set the access token's key and secret."""
