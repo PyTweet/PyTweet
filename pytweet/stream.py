@@ -59,7 +59,8 @@ class StreamConnection:
         self.reconnect_attempts: int = reconnect_attempts
         self.http_client: Optional[HTTPClient] = http_client
         self.session: Optional[Any] = None
-        self.errors = 0
+        self.error_counter: int = 0
+        self.errors: List[Exception] = []
 
     @property
     def closed(self) -> Optional[bool]:
@@ -137,8 +138,9 @@ class StreamConnection:
                     break
 
                 elif isinstance(e, requests.exceptions.RequestException):
-                    self.errors += 1
-                    if self.errors > self.reconnect_attempts:
+                    self.error_counter += 1
+                    self.errors.append(e)
+                    if self.error_counter > self.reconnect_attempts:
                         _log.error("Too many errors caught during streaming, closing stream!")
                         self.close()
                         self.http_client.dispatch("stream_disconnect", self)
