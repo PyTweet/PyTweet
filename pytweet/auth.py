@@ -54,7 +54,7 @@ class OauthSession(OAuth1Session):
 
         .. versionadded:: 1.3.5
         """
-        client.http.request("POST", "1.1", "oauth/invalidate_token", auth=True)
+        client.http.request("POST", "1.1", "/oauth/invalidate_token", auth=True)
 
     @classmethod
     def with_oauth_flow(cls: Type[OauthSession], client, *, callback: str = "https://twitter.com") -> OauthSession:
