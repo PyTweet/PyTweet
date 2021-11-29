@@ -21,7 +21,7 @@ class OauthSession(OAuth1Session):
         The application's consumer secret.
     callback: Optional[:class:`str`]
         The callbacl url, the user will get redirect to the callback url after they authorize. Default to None.
- 
+
 
     .. versionadded:: 1.2.0
     """
@@ -41,7 +41,7 @@ class OauthSession(OAuth1Session):
 
         .. warning::
             This staticmethod will invalidate your access token and access token secret that you passed in your :meth:`Client` argument.
-        
+
         Parameters
         ------------
         access_token: :class:`str`
@@ -52,14 +52,9 @@ class OauthSession(OAuth1Session):
             An instance of your :meth:`Client`, note that this staticmethod will invalidate the access token and access token secret in this :meth:`Client`.
 
 
-        .. versionadded:: 1.3.5 
+        .. versionadded:: 1.3.5
         """
-        client.http.request(
-            "POST",
-            "1.1",
-            "oauth/invalidate_token",
-            auth=True
-        )
+        client.http.request("POST", "1.1", "oauth/invalidate_token", auth=True)
 
     @classmethod
     def with_oauth_flow(cls: Type[OauthSession], client, *, callback: str = "https://twitter.com") -> OauthSession:
@@ -81,7 +76,7 @@ class OauthSession(OAuth1Session):
 
         def generate_oauth_url(auth_access_type: str = "write") -> Optional[str]:
             """Generate a url with an access type.
-            
+
             Parameters
             ------------
             auth_access_type: :class:`str`
@@ -92,7 +87,7 @@ class OauthSession(OAuth1Session):
             :class:`str`
                 Returns an oauth url.
 
-            
+
             .. versionadded:: 1.3.5
             """
             auth_access_type = auth_access_type.lower()
@@ -110,7 +105,7 @@ class OauthSession(OAuth1Session):
 
         def post_oauth_token(oauth_token: str, oauth_verifier: str) -> Optional[Tuple[str]]:
             """Post the oauth token & verifier, this method will returns a pair of access token & secret.
-            
+
             Parameters
             ------------
             oauth_token: :class:`str`
@@ -123,7 +118,7 @@ class OauthSession(OAuth1Session):
             :class:`tuple`
                 Returns a :class:`tuple` object with the credentials in.
 
-            
+
             .. versionadded:: 1.3.5
             """
             res = client.http.request(
@@ -160,5 +155,3 @@ class OauthSession(OAuth1Session):
         """Set a the consumer key and secret"""
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
-
-            
