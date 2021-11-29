@@ -272,7 +272,11 @@ class User:
             f"/users/{self.id}/following",
             params={"user.fields": USER_FIELD},
         )
-        return [User(data, http_client=self.http_client) for data in following["data"]]
+
+        try:
+            return [User(data, http_client=self.http_client) for data in following["data"]]
+        except TypeError:
+            return following
 
     def fetch_pinned_tweet(self) -> Optional[Any]:
         """Returns the user's pinned tweet.

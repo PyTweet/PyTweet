@@ -299,22 +299,27 @@ class HTTPClient:
             return None
 
     def fetch_tweet(self, tweet_id: Union[str, int]) -> Tweet:
-        res = self.request(
-            "GET",
-            "2",
-            f"/tweets/{tweet_id}",
-            params={
-                "tweet.fields": TWEET_FIELD,
-                "user.fields": USER_FIELD,
-                "expansions": TWEET_EXPANSION,
-                "media.fields": MEDIA_FIELD,
-                "place.fields": PLACE_FIELD,
-                "poll.fields": POLL_FIELD,
-            },
-            auth=True,
-        )
+        try:
+            
+            res = self.request(
+                "GET",
+                "2",
+                f"/tweets/{tweet_id}",
+                params={
+                    "tweet.fields": TWEET_FIELD,
+                    "user.fields": USER_FIELD,
+                    "expansions": TWEET_EXPANSION,
+                    "media.fields": MEDIA_FIELD,
+                    "place.fields": PLACE_FIELD,
+                    "poll.fields": POLL_FIELD,
+                },
+                auth=True,
+            )
 
-        return Tweet(res, http_client=self)
+            return Tweet(res, http_client=self)
+
+        except NotFoundError:
+            return None
 
     def fetch_space(self, space_id: str) -> Space:
         res = self.request(
