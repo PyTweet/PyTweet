@@ -300,7 +300,7 @@ class HTTPClient:
 
     def fetch_tweet(self, tweet_id: Union[str, int]) -> Tweet:
         try:
-            
+
             res = self.request(
                 "GET",
                 "2",
