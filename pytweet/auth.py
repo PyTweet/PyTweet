@@ -36,7 +36,7 @@ class OauthSession(OAuth1Session):
         self.callback: Any = callback
 
     @staticmethod
-    def invalidate_access_token(cls: Type[OauthSession], client: Client):
+    def invalidate_access_token(client: Client) -> None:
         """A staticmethod to invalidate a pair of access token and access token secret!
 
         .. warning::
