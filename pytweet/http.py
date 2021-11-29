@@ -121,8 +121,6 @@ class HTTPClient:
         self.message_cache = {}
         self.tweet_cache = {}
         self.events = {}
-        self.oauth_session = OauthSession(self.consumer_key, self.consumer_key_secret)
-
         if self.stream:
             self.stream.http_client = self
             self.stream.connection.http_client = self
@@ -167,9 +165,10 @@ class HTTPClient:
         if auth:
             for k, v in self.credentials.items():
                 if v is None:
-                    raise Unauthorized(f"Request is Unauthorized: {k} is a required credentials that is missing!")
-            self.oauth_session.set_access_token(self.access_token, self.access_token_secret)
-            auth = self.oauth_session.oauth1
+                    raise PytweetException(f"{k} is a required credentials that is missing!")
+            auth = OauthSession(self.consumer_key, self.consumer_key_secret)
+            auth.set_access_token(self.access_token, self.access_token_secret)
+            auth = auth.oauth1
 
         response = res(url, headers=headers, params=params, json=json, auth=auth)
         check_error(response)
@@ -193,8 +192,9 @@ class HTTPClient:
 
     def upload(self, file: File, command: str, *, media_id=None):
         assert command.upper() in ("INIT", "APPEND", "FINALIZE", "STATUS")
-        self.oauth_session.set_access_token(self.access_token, self.access_token_secret)
-        auth = self.oauth_session.oauth1
+        auth = OauthSession(self.consumer_key, self.consumer_key_secret)
+        auth.set_access_token(self.access_token, self.access_token_secret)
+        auth = auth.oauth1
 
         def CheckStatus(processing_info, media_id):
             if not processing_info:

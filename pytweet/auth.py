@@ -57,7 +57,7 @@ class OauthSession(OAuth1Session):
         client.http.request("POST", "1.1", "/oauth/invalidate_token", auth=True)
 
     @classmethod
-    def with_oauth_flow(client, *, callback: str = "https://twitter.com") -> OauthSession:
+    def with_oauth_flow(cls: Type[OauthSession], client, *, callback: str = "https://twitter.com") -> OauthSession:
         """Authorize a user using the 3 legged oauth flow classmethod! This let's your application to do an action on behalf of a user. This will give you 2 new methods, :meth:`OauthSession.generate_oauth_url` for generating an oauth url so a user can authorize and `post_oauth_token` posting oauth token and verifier for getting a pair of access token and secret.
 
         .. note::
