@@ -1,7 +1,10 @@
 from __future__ import annotations
 
-from typing import Optional, Tuple, Any, Type
+from typing import Optional, Tuple, Any, Type, TYPE_CHECKING
 from requests_oauthlib import OAuth1, OAuth1Session
+
+if TYPE_CHECKING:
+    from .client import Client
 
 __all__ = ("OauthSession",)
 
@@ -31,6 +34,32 @@ class OauthSession(OAuth1Session):
         self.access_token: str = None
         self.access_token_secret: str = None
         self.callback: Any = callback
+
+    @staticmethod
+    def invalidate_access_token(cls: Type[OauthSession], client: Client):
+        """A staticmethod to invalidate a pair of access token and access token secret!
+
+        .. warning::
+            This staticmethod will invalidate your access token and access token secret that you passed in your :meth:`Client` argument.
+        
+        Parameters
+        ------------
+        access_token: :class:`str`
+            The oauth1 access token to be invalidate.
+        access_token_secret: :class:`str`
+            The oauth1 access token secret to be invalidate.
+        client: :class:`Client`
+            An instance of your :meth:`Client`, note that this staticmethod will invalidate the access token and access token secret in this :meth:`Client`.
+
+
+        .. versionadded:: 1.3.5 
+        """
+        client.http.request(
+            "POST",
+            "1.1",
+            "oauth/invalidate_token",
+            auth=True
+        )
 
     @classmethod
     def with_oauth_flow(cls: Type[OauthSession], client, *, callback: str = "https://twitter.com") -> OauthSession:
