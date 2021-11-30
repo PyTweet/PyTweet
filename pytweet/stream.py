@@ -108,9 +108,7 @@ class StreamConnection:
             try:
                 response = requests.get(
                     self.url,
-                    headers={
-                        "Authorization": f"Bearer {self.http_client.bearer_token}"
-                    },
+                    headers={"Authorization": f"Bearer {self.http_client.bearer_token}"},
                     params={
                         "backfill_minutes": int(self.backfill_minutes),
                         "expansions": TWEET_EXPANSION,
@@ -141,9 +139,7 @@ class StreamConnection:
                 elif isinstance(e, requests.exceptions.RequestException):
                     self.errors += 1
                     if self.errors > self.reconnect_attempts:
-                        _log.error(
-                            "Too many errors caught during streaming, closing stream!"
-                        )
+                        _log.error("Too many errors caught during streaming, closing stream!")
                         self.close()
                         self.http_client.dispatch("stream_disconnect", self)
                         break
@@ -186,9 +182,7 @@ class Stream:
         )
 
     @classmethod
-    def sample_stream(
-        cls: Type[Stream], backfill_minutes: int = 0, reconnect_attempts: int = 15
-    ) -> Stream:
+    def sample_stream(cls: Type[Stream], backfill_minutes: int = 0, reconnect_attempts: int = 15) -> Stream:
         """A class method that change the stream connection to a sample one, this would mean you dont have to set any stream rules. This would not recommended because it can make the progress of tweet cap much faster, if its out of limit you would not be able to stream.
 
         Parameters
@@ -278,12 +272,8 @@ class Stream:
             return
 
         if rules.get("data"):
-            data = {
-                "delete": {"ids": [str(rule.get("id")) for rule in rules.get("data")]}
-            }
-            rules = self.http_client.request(
-                "POST", "2", "/tweets/search/stream/rules", json=data
-            )
+            data = {"delete": {"ids": [str(rule.get("id")) for rule in rules.get("data")]}}
+            rules = self.http_client.request("POST", "2", "/tweets/search/stream/rules", json=data)
 
     def fetch_rules(self) -> Optional[List[StreamRule]]:
         """Fetch the stream's rules.
@@ -349,9 +339,7 @@ class Stream:
                 )
                 return
 
-        self.http_client.request(
-            "POST", "2", "/tweets/search/stream/rules", json={"add": self.raw_rules}
-        )
+        self.http_client.request("POST", "2", "/tweets/search/stream/rules", json={"add": self.raw_rules})
 
     def connect(self, *, dry_run: bool = False) -> None:
         """Connect with the stream connection.

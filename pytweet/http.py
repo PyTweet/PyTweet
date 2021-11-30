@@ -120,15 +120,11 @@ class HTTPClient:
         if not access_token:
             _log.warning("Access token is missing this is recommended to have")
         if not access_token_secret:
-            _log.warning(
-                "Access token secret is missing this is required if you have passed in the access_toke param."
-            )
+            _log.warning("Access token secret is missing this is required if you have passed in the access_toke param.")
 
         for k, v in self.credentials.items():
             if not isinstance(v, str) and not isinstance(v, type(None)):
-                raise Unauthorized(
-                    None, f"Wrong authorization passed for credential: {k}."
-                )
+                raise Unauthorized(None, f"Wrong authorization passed for credential: {k}.")
 
         self.bearer_token: Optional[str] = bearer_token
         self.consumer_key: Optional[str] = consumer_key
@@ -176,9 +172,7 @@ class HTTPClient:
         if "Authorization" not in list(headers.keys()):
             headers["Authorization"] = f"Bearer {self.bearer_token}"
 
-        headers["User-Agent"] = user_agent.format(
-            sys.version_info, requests.__version__
-        )
+        headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
 
         res = getattr(requests, method.lower(), None)
         if not res:
@@ -187,9 +181,7 @@ class HTTPClient:
         if auth:
             for k, v in self.credentials.items():
                 if v is None:
-                    raise PytweetException(
-                        f"{k} is a required credentials that is missing!"
-                    )
+                    raise PytweetException(f"{k} is a required credentials that is missing!")
             auth = OauthSession(self.consumer_key, self.consumer_key_secret)
             auth.set_access_token(self.access_token, self.access_token_secret)
             auth = auth.oauth1
@@ -362,9 +354,7 @@ class HTTPClient:
         )
         return Space(res)
 
-    def fetch_space_bytitle(
-        self, title: str, state: SpaceState = SpaceState.live
-    ) -> Space:
+    def fetch_space_bytitle(self, title: str, state: SpaceState = SpaceState.live) -> Space:
         res = self.request(
             "GET",
             "2",
@@ -398,19 +388,13 @@ class HTTPClient:
         }
 
         if file and (not isinstance(file, File)):
-            raise PytweetException(
-                "'file' argument must be an instance of pytweet.File"
-            )
+            raise PytweetException("'file' argument must be an instance of pytweet.File")
 
         if custom_profile and (not isinstance(custom_profile, CustomProfile)):
-            raise PytweetException(
-                "'custom_profile' argument must be an instance of pytweet.CustomProfile"
-            )
+            raise PytweetException("'custom_profile' argument must be an instance of pytweet.CustomProfile")
 
         if quick_reply and (not isinstance(quick_reply, QuickReply)):
-            raise PytweetException(
-                "'quick_reply' must be an instance of pytweet.QuickReply"
-            )
+            raise PytweetException("'quick_reply' must be an instance of pytweet.QuickReply")
 
         if cta and (not isinstance(cta, CTA)):
             raise PytweetException("'cta' argument must be an instance of pytweet.CTA")
@@ -461,13 +445,9 @@ class HTTPClient:
         try:
             event_id = str(event_id)
         except ValueError:
-            raise ValueError(
-                "event_id must be an integer or a :class:`str`ing of digits."
-            )
+            raise ValueError("event_id must be an integer or a :class:`str`ing of digits.")
 
-        res = self.request(
-            "GET", "1.1", f"/direct_messages/events/show.json?id={event_id}", auth=True
-        )
+        res = self.request("GET", "1.1", f"/direct_messages/events/show.json?id={event_id}", auth=True)
 
         message_create = res.get("event").get("message_create")
         user_id = message_create.get("target").get("recipient_id")
@@ -522,9 +502,7 @@ class HTTPClient:
 
         if reply_setting:
             payload["reply_settings"] = (
-                reply_setting.value
-                if isinstance(reply_setting, ReplySetting)
-                else reply_setting
+                reply_setting.value if isinstance(reply_setting, ReplySetting) else reply_setting
             )
 
         if reply_tweet or exclude_reply_users:
@@ -534,14 +512,10 @@ class HTTPClient:
 
             if exclude_reply_users:
                 if "reply" in payload.keys():
-                    payload["reply"]["exclude_reply_user_ids"] = [
-                        str(id) for id in exclude_reply_users
-                    ]
+                    payload["reply"]["exclude_reply_user_ids"] = [str(id) for id in exclude_reply_users]
                 else:
                     payload["reply"] = {}
-                    payload["reply"]["exclude_reply_user_ids"] = [
-                        str(id) for id in exclude_reply_users
-                    ]
+                    payload["reply"]["exclude_reply_user_ids"] = [str(id) for id in exclude_reply_users]
 
         if super_followers_only:
             payload["for_super_followers_only"] = True

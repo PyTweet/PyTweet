@@ -29,9 +29,7 @@ class EmbedsImages:
         self._payload = data
 
     def __repr__(self) -> str:
-        return "EmbedsImages(url={0.url} width={0.width} height={0.height})".format(
-            self
-        )
+        return "EmbedsImages(url={0.url} width={0.width} height={0.height})".format(self)
 
     def __str__(self) -> str:
         return self.url
@@ -71,9 +69,7 @@ class Embed:
         self._payload = data
 
     def __repr__(self) -> str:
-        return "Embed(title={0.title} description={0.description} url={0.url})".format(
-            self
-        )
+        return "Embed(title={0.title} description={0.description} url={0.url})".format(self)
 
     def __str__(self) -> str:
         return self.url
@@ -203,16 +199,12 @@ class Tweet(Message):
 
     def __eq__(self, other: Tweet) -> Union[bool, NoReturn]:
         if not isinstance(other, Tweet):
-            raise ValueError(
-                "== operation cannot be done with one of the element not a valid Tweet object"
-            )
+            raise ValueError("== operation cannot be done with one of the element not a valid Tweet object")
         return self.id == other.id
 
     def __ne__(self, other: Tweet) -> Union[bool, NoReturn]:
         if not isinstance(other, Tweet):
-            raise ValueError(
-                "!= operation cannot be done with one of the element not a valid User object"
-            )
+            raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
     def like(self) -> Optional[RelationLike]:
@@ -229,9 +221,7 @@ class Tweet(Message):
         my_id = self.http_client.access_token.partition("-")[0]
 
         payload = {"tweet_id": str(self.id)}
-        res = self.http_client.request(
-            "POST", "2", f"/users/{my_id}/likes", json=payload, auth=True
-        )
+        res = self.http_client.request("POST", "2", f"/users/{my_id}/likes", json=payload, auth=True)
 
         return RelationLike(res)
 
@@ -248,9 +238,7 @@ class Tweet(Message):
         """
         my_id = self.http_client.access_token.partition("-")[0]
 
-        res = self.http_client.request(
-            "DELETE", "2", f"/users/{my_id}/likes/{self.id}", auth=True
-        )
+        res = self.http_client.request("DELETE", "2", f"/users/{my_id}/likes/{self.id}", auth=True)
 
         return RelationLike(res)
 
@@ -289,9 +277,7 @@ class Tweet(Message):
         """
         my_id = self.http_client.access_token.partition("-")[0]
 
-        res = self.http_client.request(
-            "DELETE", "2", f"/users/{my_id}/retweets/{self.id}", auth=True
-        )
+        res = self.http_client.request("DELETE", "2", f"/users/{my_id}/retweets/{self.id}", auth=True)
 
         return RelationRetweet(res)
 
@@ -347,9 +333,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        res: dict = self.http_client.request(
-            "PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True
-        )
+        res: dict = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
         return RelationHide(res)
 
     def unhide(self) -> RelationHide:
@@ -363,9 +347,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        res: dict = self.http_client.request(
-            "PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True
-        )
+        res: dict = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
         return RelationHide(res)
 
     def fetch_retweeters(self):

@@ -44,13 +44,9 @@ class User:
     .. versionadded: 1.0.0
     """
 
-    def __init__(
-        self, data: Dict[str, Any], http_client: Optional[HTTPClient] = None
-    ) -> None:
+    def __init__(self, data: Dict[str, Any], http_client: Optional[HTTPClient] = None) -> None:
         self.original_payload: Dict[str, Any] = data
-        self._payload: Dict[Any, Any] = (
-            self.original_payload.get("data") or self.original_payload
-        )
+        self._payload: Dict[Any, Any] = self.original_payload.get("data") or self.original_payload
         self.http_client = http_client
         self._metrics = UserPublicMetrics(self._payload) or self.original_payload
 
@@ -62,16 +58,12 @@ class User:
 
     def __eq__(self, other: User) -> Union[bool, NoReturn]:
         if not isinstance(other, User):
-            raise ValueError(
-                "== operation cannot be done with one of the element not a valid User object"
-            )
+            raise ValueError("== operation cannot be done with one of the element not a valid User object")
         return self.id == other.id
 
     def __ne__(self, other: User) -> Union[bool, NoReturn]:
         if not isinstance(other, User):
-            raise ValueError(
-                "!= operation cannot be done with one of the element not a valid User object"
-            )
+            raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
 
     def send(
@@ -158,9 +150,7 @@ class User:
         .. versionadded:: 1.1.0
         """
         my_id = self.http_client.access_token.partition("-")[0]
-        res = self.http_client.request(
-            "DELETE", "2", f"/users/{my_id}/following/{self.id}", auth=True
-        )
+        res = self.http_client.request("DELETE", "2", f"/users/{my_id}/following/{self.id}", auth=True)
         return RelationFollow(res)
 
     def block(self) -> None:
@@ -195,9 +185,7 @@ class User:
         .. versionadded:: 1.2.0
         """
         my_id = self.http_client.access_token.partition("-")[0]
-        self.http_client.request(
-            "DELETE", "2", f"/users/{my_id}/blocking/{self.id}", auth=True
-        )
+        self.http_client.request("DELETE", "2", f"/users/{my_id}/blocking/{self.id}", auth=True)
 
     def mute(self) -> None:
         """Make a POST Request to mute a User.
@@ -231,9 +219,7 @@ class User:
         .. versionadded:: 1.2.5
         """
         my_id = self.http_client.access_token.partition("-")[0]
-        self.http_client.request(
-            "DELETE", "2", f"/users/{my_id}/muting/{self.id}", auth=True
-        )
+        self.http_client.request("DELETE", "2", f"/users/{my_id}/muting/{self.id}", auth=True)
 
     def trigger_typing(self):
         """Indicates that the client is typing in a user Dm.
@@ -300,9 +286,7 @@ class User:
         )
 
         try:
-            return [
-                User(data, http_client=self.http_client) for data in following["data"]
-            ]
+            return [User(data, http_client=self.http_client) for data in following["data"]]
         except TypeError:
             return following
 
@@ -390,9 +374,7 @@ class User:
         res = self.http_client.request(
             "GET",
             "2",
-            f"/users/{self.id}/tweets"
-            if not mentioned
-            else f"/users/{self.id}/mentions",
+            f"/users/{self.id}/tweets" if not mentioned else f"/users/{self.id}/mentions",
             params=params,
         )
 

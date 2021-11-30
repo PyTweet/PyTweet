@@ -9,9 +9,7 @@ class Media:
         self._url = self._payload.get("url")
         self._media_key = self._payload.get("media_key")
         self._type = self._payload.get("type")
-        self._width, self._height = self._payload.get("width"), self._payload.get(
-            "_height"
-        )
+        self._width, self._height = self._payload.get("width"), self._payload.get("_height")
 
     @property
     def url(self) -> str:

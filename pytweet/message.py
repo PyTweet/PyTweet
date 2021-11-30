@@ -91,9 +91,7 @@ class DirectMessage(Message):
         self.timestamp = round(datetime.datetime.utcnow().timestamp())
 
     def __repr__(self) -> str:
-        return "DirectMessage(text={0.text} id={0.id} recipient={0.recipient})".format(
-            self
-        )
+        return "DirectMessage(text={0.text} id={0.id} recipient={0.recipient})".format(self)
 
     def __str__(self) -> str:
         return self.text
@@ -264,9 +262,7 @@ class WelcomeMessage(Message):
         except Exception as e:
             raise e
 
-        data: Dict[str, Union[int, Dict[str, int]]] = {
-            "welcome_message_rule": {"welcome_message_id": str(self.id)}
-        }
+        data: Dict[str, Union[int, Dict[str, int]]] = {"welcome_message_rule": {"welcome_message_id": str(self.id)}}
 
         res: dict = self.http_client.request(
             "POST",
@@ -277,9 +273,7 @@ class WelcomeMessage(Message):
         )
 
         args: list = [v for k, v in res.get("welcome_message_rule").items()]
-        return WelcomeMessageRule(
-            args[0], args[2], args[1], http_client=self.http_client
-        )
+        return WelcomeMessageRule(args[0], args[2], args[1], http_client=self.http_client)
 
     def update(
         self,
@@ -415,8 +409,10 @@ class WelcomeMessageRule(Message):
         self.http_client = http_client
 
     def __repr__(self) -> str:
-        return "WelcomeMessageRule(id={0.id} welcome_message_id={0.welcome_message_id} created_at={0.created_at})".format(
-            self
+        return (
+            "WelcomeMessageRule(id={0.id} welcome_message_id={0.welcome_message_id} created_at={0.created_at})".format(
+                self
+            )
         )
 
     def delete(self):

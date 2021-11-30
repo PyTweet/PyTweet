@@ -88,22 +88,16 @@ class Poll:
         self._raw_options = []
 
     def __repr__(self) -> str:
-        return "Poll(id={0.id} voting_status={0.voting_status} duration={0.duration})".format(
-            self
-        )
+        return "Poll(id={0.id} voting_status={0.voting_status} duration={0.duration})".format(self)
 
     def __eq__(self, other: Poll) -> Union[bool, NoReturn]:
         if not isinstance(other, Poll):
-            raise ValueError(
-                "== operation cannot be done with one of the element not a valid Poll object"
-            )
+            raise ValueError("== operation cannot be done with one of the element not a valid Poll object")
         return self.id == other.id
 
     def __ne__(self, other: Poll) -> Union[bool, NoReturn]:
         if not isinstance(other, Poll):
-            raise ValueError(
-                "!= operation cannot be done with one of the element not a valid Poll object"
-            )
+            raise ValueError("!= operation cannot be done with one of the element not a valid Poll object")
         return self.id != other.id
 
     def __len__(self) -> int:
@@ -212,11 +206,7 @@ class QuickReply:
         self._raw_options: List[dict] = []
 
     def add_option(
-        self,
-        *,
-        label: str,
-        description: Optional[str] = None,
-        metadata: Optional[str] = None
+        self, *, label: str, description: Optional[str] = None, metadata: Optional[str] = None
     ) -> QuickReply:
         """Method for adding an option in your quick reply instance.
 
@@ -238,12 +228,8 @@ class QuickReply:
         .. versionadded:: 1.2.0
         """
 
-        self._raw_options.append(
-            {"label": label, "description": description, "metadata": metadata}
-        )
-        self._options.append(
-            Option(label=label, description=description, metadata=metadata)
-        )
+        self._raw_options.append({"label": label, "description": description, "metadata": metadata})
+        self._options.append(Option(label=label, description=description, metadata=metadata))
 
         return self
 
@@ -378,12 +364,7 @@ class CTA:
         self._raw_buttons = []
 
     def add_button(
-        self,
-        *,
-        label: str,
-        url: str,
-        type: Union[ButtonType, str] = ButtonType.web_url,
-        tco_url: Optional[str] = None
+        self, *, label: str, url: str, type: Union[ButtonType, str] = ButtonType.web_url, tco_url: Optional[str] = None
     ) -> CTA:
         """Add a button in your CTA instance.
 
@@ -520,9 +501,7 @@ class CustomProfile:
         self._media = Media(media)
 
     def __repr__(self) -> str:
-        return "CustomProfile(name={0.name} id={0.id} media_id={0.media_id})".format(
-            self
-        )
+        return "CustomProfile(name={0.name} id={0.id} media_id={0.media_id})".format(self)
 
     @property
     def name(self) -> str:

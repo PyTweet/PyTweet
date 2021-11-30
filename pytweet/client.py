@@ -324,9 +324,7 @@ class Client:
             http_client=self.http,
         )
 
-    def fetch_welcome_message(
-        self, welcome_message_id: Union[str, int]
-    ) -> WelcomeMessage:
+    def fetch_welcome_message(self, welcome_message_id: Union[str, int]) -> WelcomeMessage:
         """Fetches the welcome message with the given welcome message ID argument.
 
         Parameters
@@ -354,13 +352,9 @@ class Client:
         id = data.get("id")
         timestamp = data.get("created_timestamp")
         text = message_data.get("text")
-        return WelcomeMessage(
-            text=text, id=id, timestamp=timestamp, http_client=self.http
-        )
+        return WelcomeMessage(text=text, id=id, timestamp=timestamp, http_client=self.http)
 
-    def fetch_welcome_message_rules(
-        self, welcome_message_rules_id: Union[str, int]
-    ) -> WelcomeMessageRule:
+    def fetch_welcome_message_rules(self, welcome_message_rules_id: Union[str, int]) -> WelcomeMessageRule:
         """A method for fetching a welcome message rules.
 
         Parameters
@@ -387,9 +381,7 @@ class Client:
         id = data.get("id")
         timestamp = data.get("created_timestamp")
         welcome_message_id = data.get("welcome_message_id")
-        return WelcomeMessageRule(
-            id, welcome_message_id, timestamp, http_client=self.http
-        )
+        return WelcomeMessageRule(id, welcome_message_id, timestamp, http_client=self.http)
 
     def fetch_space(self, space_id: Union[str, int]) -> Space:
         """A method for fetching a space.
@@ -409,9 +401,7 @@ class Client:
         """
         return self.http.fetch_space(space_id)
 
-    def fetch_space_by_title(
-        self, title: str, state: SpaceState = SpaceState.live
-    ) -> Space:
+    def fetch_space_by_title(self, title: str, state: SpaceState = SpaceState.live) -> Space:
         """Fetch a space using its title.
 
         Parameters
@@ -512,9 +502,7 @@ class Client:
         try:
             event_id = int(event_id)
         except ValueError:
-            raise ValueError(
-                "Event id must be an integer or a :class:`str`ing of digits."
-            )
+            raise ValueError("Event id must be an integer or a :class:`str`ing of digits.")
 
         return self.http.message_cache.get(event_id)
 
@@ -564,9 +552,7 @@ class Client:
             This method returns a :class:`CustomProfile` object.
         """
         if not isinstance(file, File):
-            raise PytweetException(
-                "'file' argument must be an instance of pytweet.File"
-            )
+            raise PytweetException("'file' argument must be an instance of pytweet.File")
 
         media_id = self.http.upload(file, "INIT")
         self.http.upload(file, "APPEND", media_id=media_id)
@@ -574,9 +560,7 @@ class Client:
 
         data = {"custom_profile": {"name": name, "avatar": {"media": {"id": media_id}}}}
 
-        res = self.http.request(
-            "POST", "1.1", "/custom_profiles/new.json", json=data, auth=True
-        )
+        res = self.http.request("POST", "1.1", "/custom_profiles/new.json", json=data, auth=True)
         data = res.get("custom_profile")
 
         return CustomProfile(
