@@ -26,8 +26,12 @@ class OauthSession(OAuth1Session):
     .. versionadded:: 1.2.0
     """
 
-    def __init__(self, consumer_key: Optional[str], consumer_secret: Optional[str], callback=None) -> None:
-        super().__init__(consumer_key, client_secret=consumer_secret, callback_uri=callback)
+    def __init__(
+        self, consumer_key: Optional[str], consumer_secret: Optional[str], callback=None
+    ) -> None:
+        super().__init__(
+            consumer_key, client_secret=consumer_secret, callback_uri=callback
+        )
         self.is_with_oauth_flow = False
         self.consumer_key = consumer_key
         self.consumer_key_secret = consumer_secret
@@ -57,7 +61,9 @@ class OauthSession(OAuth1Session):
         client.http.request("POST", "1.1", "/oauth/invalidate_token", auth=True)
 
     @classmethod
-    def with_oauth_flow(cls: Type[OauthSession], client, *, callback: str = "https://twitter.com") -> OauthSession:
+    def with_oauth_flow(
+        cls: Type[OauthSession], client, *, callback: str = "https://twitter.com"
+    ) -> OauthSession:
         """Authorize a user using the 3 legged oauth flow classmethod! This let's your application to do an action on behalf of a user. This will give you 2 new methods, :meth:`OauthSession.generate_oauth_url` for generating an oauth url so a user can authorize and `post_oauth_token` posting oauth token and verifier for getting a pair of access token and secret.
 
         .. note::
@@ -96,14 +102,23 @@ class OauthSession(OAuth1Session):
                 "POST",
                 "",
                 "oauth/request_token",
-                params={"oauth_callback": callback, "x_auth_access_type": auth_access_type},
+                params={
+                    "oauth_callback": callback,
+                    "x_auth_access_type": auth_access_type,
+                },
                 auth=True,
             )
-            oauth_token, oauth_token_secret, oauth_callback_confirmed = request_tokens.split("&")
+            (
+                oauth_token,
+                oauth_token_secret,
+                oauth_callback_confirmed,
+            ) = request_tokens.split("&")
             url = "https://api.twitter.com/oauth/authorize" + f"?{oauth_token}"
             return url
 
-        def post_oauth_token(oauth_token: str, oauth_verifier: str) -> Optional[Tuple[str]]:
+        def post_oauth_token(
+            oauth_token: str, oauth_verifier: str
+        ) -> Optional[Tuple[str]]:
             """Post the oauth token & verifier, this method will returns a pair of access token & secret.
 
             Parameters
@@ -122,7 +137,10 @@ class OauthSession(OAuth1Session):
             .. versionadded:: 1.3.5
             """
             res = client.http.request(
-                "POST", "", "oauth/access_token", params={"oauth_token": oauth_token, "oauth_verifier": oauth_verifier}
+                "POST",
+                "",
+                "oauth/access_token",
+                params={"oauth_token": oauth_token, "oauth_verifier": oauth_verifier},
             )
 
             return tuple(res.split("&"))

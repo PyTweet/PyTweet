@@ -81,7 +81,8 @@ def compose_user_action(user_id: str, action: str, text: str = None):
     return (
         f"https://twitter.com/intent/user?user_id={user_id}"
         if action.lower() == "follow"
-        else f"https://twitter.com/messages/compose?recipient_id={user_id}" + f"?text={text}"
+        else f"https://twitter.com/messages/compose?recipient_id={user_id}"
+        + f"?text={text}"
         if text
         else f"https://twitter.com/messages/compose?recipient_id={user_id}"
     )

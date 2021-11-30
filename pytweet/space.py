@@ -103,7 +103,11 @@ class Space:
 
         .. versionadded:: 1.3.5
         """
-        return time_parse_todt(self._payload.get("started_at")) if self._payload.get("started_at") else None
+        return (
+            time_parse_todt(self._payload.get("started_at"))
+            if self._payload.get("started_at")
+            else None
+        )
 
     @property
     def updated_at(self) -> Optional[datetime.datetime]:
