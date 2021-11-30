@@ -367,7 +367,10 @@ class User:
         try:
             return [Tweet(data) for data in res["data"]]
         except TypeError:
-            return res
+            return []
+
+        except KeyError:
+            return []
 
     @property
     def name(self) -> str:
@@ -442,7 +445,7 @@ class User:
         return self._payload.get("protected")
 
     @property
-    def avatar_url(self) -> Optional[str]:
+    def profile_url(self) -> Optional[str]:
         """Optional[:class:`str`]: Return the user profile image.
 
         .. versionadded: 1.0.0
