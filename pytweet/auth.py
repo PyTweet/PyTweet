@@ -127,7 +127,7 @@ class OauthSession(OAuth1Session):
 
             return tuple(res.split("&"))
 
-        self.post_access_token = post_oauth_token
+        self.post_oauth_token = post_oauth_token
         self.generate_oauth_url = generate_oauth_url
         return self
 
