@@ -20,7 +20,7 @@ class OauthSession(OAuth1Session):
     consumer_secret: Optional[:class:`str`]
         The application's consumer secret.
     callback: Optional[:class:`str`]
-        The callbacl url, the user will get redirect to the callback url after they authorize. Default to None.
+        The callback url, the user will get redirect to the callback url after they authorize. Default to None.
 
 
     .. versionadded:: 1.2.0

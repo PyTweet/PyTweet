@@ -399,7 +399,7 @@ class User:
 
         .. versionadded: 1.0.0
         """
-        return self._payload.get("description")
+        return self._payload.get("description", "")
 
     @property
     def description(self) -> str:
@@ -423,7 +423,7 @@ class User:
 
         .. versionadded: 1.0.0
         """
-        return self._payload.get("url")
+        return self._payload.get("url", "")
 
     @property
     def verified(self) -> bool:
@@ -447,7 +447,7 @@ class User:
 
         .. versionadded: 1.0.0
         """
-        return self._payload.get("profile_image_url")
+        return self._payload.get("profile_image_url", "")
 
     @property
     def location(self) -> Optional[str]:
@@ -455,7 +455,7 @@ class User:
 
         .. versionadded: 1.0.0
         """
-        return self._payload.get("location")
+        return self._payload.get("location", "")
 
     @property
     def created_at(self) -> datetime.datetime:
