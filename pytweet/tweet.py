@@ -163,14 +163,17 @@ class Tweet(Message):
     A Tweet is any message posted to Twitter which may contain photos, videos, links, and text.
 
     .. describe:: x == y
+
         Check if one tweet id is equal to another.
 
 
     .. describe:: x != y
+
         Check if one tweet id is not equal to another.
 
 
     .. describe:: str(x)
+
         Get the Tweet's text.
 
 
