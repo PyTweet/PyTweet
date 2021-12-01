@@ -70,9 +70,7 @@ master_doc = "index"
 version = ""
 try:
     with open("../pytweet/__init__.py") as f:
-        version = re.search(
-            r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE
-        ).group(1)
+        version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
 except Exception:
     pass
 

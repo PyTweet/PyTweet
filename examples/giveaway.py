@@ -28,9 +28,7 @@ def giveaway():
         return print("This user doesnt have a followers!")
 
     seconds = 60 * 3
-    print(
-        f"Giveaway! there's a total of {len(followers)} users participate! Please wait for {seconds} seconds!"
-    )
+    print(f"Giveaway! there's a total of {len(followers)} users participate! Please wait for {seconds} seconds!")
 
     time.sleep(seconds)  # 3
     winner = random.choice(followers)  # 4
