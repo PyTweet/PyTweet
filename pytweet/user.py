@@ -365,11 +365,8 @@ class User:
 
         Tweet = self.http_client.build_object("Tweet")
         try:
-            return [Tweet(data) for data in res["data"]]
-        except TypeError:
-            return []
-
-        except KeyError:
+            return [Tweet(data, http_client=self.http_client) for data in res["data"]]
+        except (TypeError, KeyError):
             return []
 
     @property
@@ -443,6 +440,14 @@ class User:
         .. versionadded: 1.0.0
         """
         return self._payload.get("protected")
+
+    @property
+    def private(self) -> bool:
+        """:class:`bool`: An alias to :class:`User.protected`.
+
+        .. versionadded: 1.3.5
+        """
+        return self.protected
 
     @property
     def profile_url(self) -> Optional[str]:
