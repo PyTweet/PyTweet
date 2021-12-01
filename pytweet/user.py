@@ -7,7 +7,14 @@ from .attachments import CTA, QuickReply, File, CustomProfile
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import time_parse_todt
-from .expansions import USER_FIELD, TWEET_EXPANSION, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_FIELD
+from .expansions import (
+    USER_FIELD,
+    TWEET_EXPANSION,
+    MEDIA_FIELD,
+    PLACE_FIELD,
+    POLL_FIELD,
+    TWEET_FIELD,
+)
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -92,7 +99,12 @@ class User:
         .. versionadded:: 1.1.0
         """
         return self.http_client.send_message(
-            self.id, text, file=file, custom_profile=custom_profile, quick_reply=quick_reply, cta=cta
+            self.id,
+            text,
+            file=file,
+            custom_profile=custom_profile,
+            quick_reply=quick_reply,
+            cta=cta,
         )
 
     def follow(self) -> RelationFollow:
@@ -360,7 +372,10 @@ class User:
             params["exclude"] = exclude
 
         res = self.http_client.request(
-            "GET", "2", f"/users/{self.id}/tweets" if not mentioned else f"/users/{self.id}/mentions", params=params
+            "GET",
+            "2",
+            f"/users/{self.id}/tweets" if not mentioned else f"/users/{self.id}/mentions",
+            params=params,
         )
 
         Tweet = self.http_client.build_object("Tweet")

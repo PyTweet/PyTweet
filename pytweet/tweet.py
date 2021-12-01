@@ -258,7 +258,11 @@ class Tweet(Message):
         """
         my_id: Union[int, str] = self.http_client.access_token.partition("-")[0]
         res: dict = self.http_client.request(
-            "POST", "2", f"/users/{my_id}/retweets", json={"tweet_id": str(self.id)}, auth=True
+            "POST",
+            "2",
+            f"/users/{my_id}/retweets",
+            json={"tweet_id": str(self.id)},
+            auth=True,
         )
 
         return RelationRetweet(res)

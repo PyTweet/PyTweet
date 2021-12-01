@@ -11,13 +11,29 @@ from typing import Any, Dict, List, NoReturn, Optional, Union
 from .attachments import CTA, Geo, Poll, QuickReply, File, CustomProfile
 from .auth import OauthSession
 from .enums import ReplySetting, SpaceState
-from .errors import BadRequests, Forbidden, NotFound, NotFoundError, PytweetException, TooManyRequests, Unauthorized
+from .errors import (
+    BadRequests,
+    Forbidden,
+    NotFound,
+    NotFoundError,
+    PytweetException,
+    TooManyRequests,
+    Unauthorized,
+)
 from .message import DirectMessage, Message
 from .space import Space
 from .tweet import Tweet
 from .user import User
 from .stream import Stream
-from .expansions import TWEET_EXPANSION, USER_FIELD, TWEET_FIELD, SPACE_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD
+from .expansions import (
+    TWEET_EXPANSION,
+    USER_FIELD,
+    TWEET_FIELD,
+    SPACE_FIELD,
+    MEDIA_FIELD,
+    PLACE_FIELD,
+    POLL_FIELD,
+)
 
 _log = logging.getLogger(__name__)
 
@@ -243,7 +259,11 @@ class HTTPClient:
             while bytes_sent < file.total_bytes:
                 res = requests.post(
                     url=self.upload_url,
-                    data={"command": "APPEND", "media_id": media_id, "segment_index": segment_id},
+                    data={
+                        "command": "APPEND",
+                        "media_id": media_id,
+                        "segment_index": segment_id,
+                    },
                     files={"media": open_file.read(4 * 1024 * 1024)},
                     auth=auth,
                 )
@@ -252,7 +272,11 @@ class HTTPClient:
                 segment_id += 1
 
         elif command.upper() == "FINALIZE":
-            res = requests.post(url=self.upload_url, data={"command": "FINALIZE", "media_id": media_id}, auth=auth)
+            res = requests.post(
+                url=self.upload_url,
+                data={"command": "FINALIZE", "media_id": media_id},
+                auth=auth,
+            )
             check_error(res)
             CheckStatus(res.json().get("processing_info", None), media_id)
 

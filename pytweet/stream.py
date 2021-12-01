@@ -8,7 +8,14 @@ from typing import Optional, Type, Union, Any, List, TYPE_CHECKING
 from dataclasses import dataclass
 from .tweet import Tweet
 from .errors import PytweetException, ConnectionException
-from .expansions import TWEET_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, USER_FIELD, TWEET_EXPANSION
+from .expansions import (
+    TWEET_FIELD,
+    MEDIA_FIELD,
+    PLACE_FIELD,
+    POLL_FIELD,
+    USER_FIELD,
+    TWEET_EXPANSION,
+)
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -41,7 +48,11 @@ class StreamConnection:
     """
 
     def __init__(
-        self, url: str, backfill_minutes: int = 0, reconnect_attempts: int = 0, http_client: Optional[HTTPClient] = None
+        self,
+        url: str,
+        backfill_minutes: int = 0,
+        reconnect_attempts: int = 0,
+        http_client: Optional[HTTPClient] = None,
     ):
         self.url = url
         self.backfill_minutes: int = backfill_minutes
@@ -320,7 +331,12 @@ class Stream:
             except PytweetException as e:
                 raise e
             else:
-                self.http_client.request("POST", "2", "/tweets/search/stream/rules", json={"add": self.raw_rules})
+                self.http_client.request(
+                    "POST",
+                    "2",
+                    "/tweets/search/stream/rules",
+                    json={"add": self.raw_rules},
+                )
                 return
 
         self.http_client.request("POST", "2", "/tweets/search/stream/rules", json={"add": self.raw_rules})

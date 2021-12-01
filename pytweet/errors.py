@@ -168,7 +168,11 @@ class UnKnownSpaceState(APIException):
 
 
 class ConnectionException(HTTPException):
-    def __init__(self, response: Optional[requests.models.Response] = None, message: Optional[str] = None):
+    def __init__(
+        self,
+        response: Optional[requests.models.Response] = None,
+        message: Optional[str] = None,
+    ):
         json = response.json()
         if "errors" in json and not message:
             msg = response.json().get("errors")[0].get("message") if not message else message

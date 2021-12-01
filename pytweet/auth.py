@@ -96,10 +96,17 @@ class OauthSession(OAuth1Session):
                 "POST",
                 "",
                 "oauth/request_token",
-                params={"oauth_callback": callback, "x_auth_access_type": auth_access_type},
+                params={
+                    "oauth_callback": callback,
+                    "x_auth_access_type": auth_access_type,
+                },
                 auth=True,
             )
-            oauth_token, oauth_token_secret, oauth_callback_confirmed = request_tokens.split("&")
+            (
+                oauth_token,
+                oauth_token_secret,
+                oauth_callback_confirmed,
+            ) = request_tokens.split("&")
             url = "https://api.twitter.com/oauth/authorize" + f"?{oauth_token}"
             return url
 
@@ -122,7 +129,10 @@ class OauthSession(OAuth1Session):
             .. versionadded:: 1.3.5
             """
             res = client.http.request(
-                "POST", "", "oauth/access_token", params={"oauth_token": oauth_token, "oauth_verifier": oauth_verifier}
+                "POST",
+                "",
+                "oauth/access_token",
+                params={"oauth_token": oauth_token, "oauth_verifier": oauth_verifier},
             )
 
             return tuple(res.split("&"))

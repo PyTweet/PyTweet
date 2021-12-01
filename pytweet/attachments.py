@@ -126,7 +126,11 @@ class Poll:
 
         .. versionadded 1.3.5
         """
-        data = {"position": kwargs.get("position") or 0, "label": label, "votes": kwargs.get("votes") or 0}
+        data = {
+            "position": kwargs.get("position") or 0,
+            "label": label,
+            "votes": kwargs.get("votes") or 0,
+        }
         self._options.append(PollOption(**data))
         self._raw_options.append(data)
         return self
@@ -384,7 +388,11 @@ class CTA:
         .. versionadded:: 1.3.5
         """
         self._raw_buttons.append(
-            {"type": type.value if isinstance(type, ButtonType) else type, "label": label, "url": url}
+            {
+                "type": type.value if isinstance(type, ButtonType) else type,
+                "label": label,
+                "url": url,
+            }
         )
 
         self._buttons.append(Button(label, type, url, tco_url))
@@ -480,7 +488,13 @@ class CustomProfile:
     .. versionadded:: 1.3.5
     """
 
-    def __init__(self, name: str, id: Union[str, int], timestamp: Union[str, int], media: Dict[str, Any]):
+    def __init__(
+        self,
+        name: str,
+        id: Union[str, int],
+        timestamp: Union[str, int],
+        media: Dict[str, Any],
+    ):
         self._name = name
         self._id = id
         self._timestamp = timestamp

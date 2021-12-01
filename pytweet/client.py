@@ -563,7 +563,12 @@ class Client:
         res = self.http.request("POST", "1.1", "/custom_profiles/new.json", json=data, auth=True)
         data = res.get("custom_profile")
 
-        return CustomProfile(data.get("name"), data.get("id"), data.get("created_timestamp"), data.get("avatar"))
+        return CustomProfile(
+            data.get("name"),
+            data.get("id"),
+            data.get("created_timestamp"),
+            data.get("avatar"),
+        )
 
     def stream(self, *, dry_run: bool = False) -> None:
         """Stream realtime in twitter! Make sure to put stream kwarg in client. If you want the tweet data make sure to make an `on_stream` event. example:
