@@ -37,3 +37,9 @@ class ReplySetting(Enum):
     everyone = "everyone"
     mention_users = "mentionedUsers"
     following = "following"
+
+
+class MediaType(Enum):
+    photo = "photo"
+    video = "video"
+    gif = "gif"
