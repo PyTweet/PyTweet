@@ -1,5 +1,5 @@
 from typing import Any, Dict, Tuple, Optional
-from enums import MediaType
+from .enums import MediaType
 
 
 class Media:
