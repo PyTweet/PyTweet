@@ -11,17 +11,17 @@ class Media:
         self._preview_image_url = self._payload.get("preview_image_url")
         self._media_key = self._payload.get("media_key")
         self._type = MediaType(self._payload.get("type"))
-        self._width, self._height = self._payload.get("width"), self._payload.get("_height")
+        self._width, self._height = self._payload.get("width"), self._payload.get("height")
 
     @property
     def url(self) -> str:
-        """:class:`str`: Returns the image's url, this method is only available if the media type is :meth:`MediaType.photo`. If the media type is :meth:`MediaType.video` consider using :meth:`Media.preview_image_url`."""
+        """:class:`str`: Returns the image's url, this method is only available if the media type is :class:`MediaType.photo`. If the media type is :class:`MediaType.video` consider using :class:`Media.preview_image_url`."""
         return self._url
 
     @property
     def preview_image_url(self) -> str:
-        """:class:`str`: Returns the video's preview image url, This is only available when the media type is a :meth:`MediaType.video` which is for video only."""
-        return self._url
+        """:class:`str`: Returns the video's preview image url, This is only available when the media type is a :class:`MediaType.video` which is for video only."""
+        return self._preview_image_url
 
     @property
     def media_key(self) -> str:
@@ -34,14 +34,20 @@ class Media:
         return self._type
 
     @property
-    def width(self) -> int:
-        """:class:`str`: Returns the image's width"""
-        return int(self._width)
+    def width(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the image's width"""
+        try:
+            return int(self._width)
+        except (ValueError, TypeError):
+            return self._width
 
     @property
-    def height(self) -> int:
-        """:class:`str`: Returns the image's height"""
-        return int(self._height)
+    def height(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the image's height"""
+        try:
+            return int(self._height)
+        except (ValueError, TypeError):
+            return self._height
 
 
 class Hashtags:
