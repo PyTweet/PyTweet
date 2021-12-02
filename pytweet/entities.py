@@ -1,5 +1,5 @@
 from typing import Any, Dict, Tuple, Optional
-
+from enums import MediaType
 
 class Media:
     """Represent media in a message."""
@@ -7,13 +7,19 @@ class Media:
     def __init__(self, data: Dict[str, Any]):
         self._payload = data
         self._url = self._payload.get("url")
+        self._preview_image_url = self._payload.get("preview_image_url")
         self._media_key = self._payload.get("media_key")
-        self._type = self._payload.get("type")
+        self._type = MediaType(self._payload.get("type"))
         self._width, self._height = self._payload.get("width"), self._payload.get("_height")
 
     @property
     def url(self) -> str:
-        """:class:`str`: Returns the image's url"""
+        """:class:`str`: Returns the image's url, this method is only available if the media type is :meth:`MediaType.photo`. If the media type is :meth:`MediaType.video` consider using :meth:`Media.preview_image_url`."""
+        return self._url
+
+    @property
+    def preview_image_url(self) -> str:
+        """:class:`str`: Returns the video's preview image url, This is only available when the media type is a :meth:`MediaType.video` which is for video only."""
         return self._url
 
     @property
@@ -22,8 +28,8 @@ class Media:
         return self._media_key
 
     @property
-    def type(self) -> str:
-        """:class:`str`: Returns the image's type"""
+    def type(self) -> MediaType:
+        """:class:`str`: Returns the image's type in a :meth:`MediaType` object."""
         return self._type
 
     @property
