@@ -427,7 +427,7 @@ class Tweet(Message):
         return None
 
     @property
-    def sensitive(self) -> bool:
+    def possibly_sensitive(self) -> bool:
         """:class`bool`: Return True if the tweet is possible sensitive to some users, else False
 
         .. versionadded: 1.0.0
@@ -476,7 +476,7 @@ class Tweet(Message):
 
     @property
     def conversation_id(self) -> int:
-        """:class:`int`: Return the tweet's conversation's id.
+        """:class:`int`: All replied are bind to an id named conversation id. An alias to :meth:`Tweet.id`, this set as an alias due to the api return it in the tweet data.
 
         .. versionadded: 1.0.0
         """
@@ -484,7 +484,7 @@ class Tweet(Message):
 
     @property
     def link(self) -> str:
-        """:class:`str`: Return the tweet's link.
+        """:class:`str`: Get the tweet's link.
 
         .. versionadded: 1.1.0
         """
@@ -572,4 +572,4 @@ class Tweet(Message):
         """
         return self.tweet_metrics.quote_count
 
-    possible_sensitive = sensitive
+    sensitive = possibly_sensitive

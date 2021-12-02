@@ -572,18 +572,11 @@ class Client:
 
     def register_webhook_url(self, url: str, env_label: str):
         return 0
-        
+
         json = self.http.request(
-            "POST",
-            "1.1",
-            f"/account_activity/all/{env_label}/webhooks.json",
-            auth=True,
-            params = {
-                "url": url
-            }
+            "POST", "1.1", f"/account_activity/all/{env_label}/webhooks.json", auth=True, params={"url": url}
         )
         return json
-
 
     def stream(self, *, dry_run: bool = False) -> None:
         """Stream realtime in twitter! Make sure to put stream kwarg in client. If you want the tweet data make sure to make an `on_stream` event. example:

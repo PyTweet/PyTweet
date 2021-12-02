@@ -1,6 +1,7 @@
 from typing import Any, Dict, Tuple, Optional
 from enums import MediaType
 
+
 class Media:
     """Represent media in a message."""
 

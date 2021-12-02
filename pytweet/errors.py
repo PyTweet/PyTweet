@@ -18,7 +18,7 @@ class PytweetException(Exception):
 
 
 class APIException(PytweetException):
-    """:class:`PytweetException`: Raise When an error is incurred during a request with HTTP Status code 200.
+    """:class:`PytweetException`: Raised when an error is incurred during a request with HTTP Status code 200.
 
     .. versionadded:: 1.2.0
     """
@@ -30,11 +30,11 @@ class APIException(PytweetException):
     ):
         self.res = response
         self.message = message
-        super().__init__(f"API Return an Exception: {self.message}")
+        super().__init__(f"API returned an Exception: {self.message}")
 
 
 class HTTPException(PytweetException):
-    """:class:`PytweetException`: A custom error that will be raise when ever a request return HTTP status code above 200.
+    """:class:`PytweetException`: A custom error that will be raised whenever a request returns an HTTP status code above 200.
 
     .. versionadded:: 1.2.0
     """
@@ -47,7 +47,7 @@ class HTTPException(PytweetException):
         self.res = response
         self.json = response.json() if response else None
         self.message = message
-        super().__init__(f"Request Return an Exception (status code: {self.res.status_code}): {self.message}")
+        super().__init__(f"Request returned an Exception (status code: {self.res.status_code}): {self.message}")
 
     @property
     def status_code(self) -> Optional[int]:
@@ -74,7 +74,7 @@ class BadRequests(HTTPException):
 
 
 class Unauthorized(HTTPException):
-    """:class:`HTTPException`: Raised when the Credentials you passed is invalid and a request return status code: 401
+    """:class:`HTTPException`: Raised when the credentials you passed are invalid and a request returns status code: 401
 
     .. versionadded:: 1.0.0
     """
@@ -91,12 +91,12 @@ class Unauthorized(HTTPException):
 
         super().__init__(
             response,
-            msg if msg else detail if detail else "Unauthorize to do that action!",
+            msg if msg else detail if detail else "Unauthorized to do that action!",
         )
 
 
 class Forbidden(HTTPException):
-    """:class:`HTTPException`: Raised when a request return status code: 403.
+    """:class:`HTTPException`: Raised when a request returns status code: 403.
 
     .. versionadded:: 1.2.0
     """
@@ -122,7 +122,7 @@ class Forbidden(HTTPException):
 
 
 class NotFound(HTTPException):
-    """:class:`HTTPException`: Raised when a request return status code: 404.
+    """:class:`HTTPException`: Raised when a request returns status code: 404.
 
     .. versionadded:: 1.2.0
     """
@@ -147,7 +147,7 @@ class TooManyRequests(HTTPException):
 
 
 class NotFoundError(APIException):
-    """:class:`APIException`: This error is usually returns when trying to find specific Tweet, User that does not exist.
+    """:class:`APIException`: This error is usually raised when trying to find specific Tweet or User that does not exist.
 
     .. versionadded:: 1.0.0
     """
