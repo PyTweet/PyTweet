@@ -272,9 +272,6 @@ class Geo:
             self
         )
 
-    def __str__(self) -> str:
-        return self.name
-
     @property
     def name(self) -> str:
         """:class:`str`: Returns place's name.

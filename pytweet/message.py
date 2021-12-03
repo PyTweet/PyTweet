@@ -43,9 +43,6 @@ class Message:
     def __repr__(self) -> str:
         return "Message(text={0.text} id={0.id})".format(self)
 
-    def __str__(self) -> str:
-        return self.text
-
     @property
     def text(self) -> str:
         """:class:`str`: Returns the message's text.
@@ -92,9 +89,6 @@ class DirectMessage(Message):
 
     def __repr__(self) -> str:
         return "DirectMessage(text={0.text} id={0.id} recipient={0.recipient})".format(self)
-
-    def __str__(self) -> str:
-        return self.text
 
     def delete(self) -> None:
         """Make a Request to delete the DirectMessage.
