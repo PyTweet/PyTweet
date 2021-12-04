@@ -61,6 +61,14 @@ Tweet
 .. autoclass:: Tweet
     :members:
 
+Space
+~~~~~~~
+
+.. attributetable:: Space
+
+.. autoclass:: Space
+    :members:
+
 
 Messages
 ---------------------
@@ -124,15 +132,6 @@ Media
 .. attributetable:: Media
 
 .. autoclass:: Media
-    :members:
-
-
-Space
-~~~~~~~
-
-.. attributetable:: Space
-
-.. autoclass:: Space
     :members:
 
 
