@@ -28,7 +28,7 @@ from .user import *
 from .utils import *
 
 __title__ = "PyTweet"
-__version__ = "1.3.6"
+__version__ = "1.3.7"
 __author__ = "TheFarGG & TheGenocides"
 __license__ = "MIT"
 __copyright__ = "Copyright 2021 TheFarGG & TheGenocides"
