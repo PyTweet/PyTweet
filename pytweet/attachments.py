@@ -167,7 +167,7 @@ class Poll:
         .. versionchanged:: 1.3.7
         """
         return self._voting_status
-    
+
     @property
     def is_open(self) -> bool:
         """:class:`bool`: Return True if the poll is still open for voting, if it's closed it will returns False.
@@ -176,7 +176,7 @@ class Poll:
         """
 
         return self.voting_status == "open"
-    
+
     @property
     def is_closed(self) -> bool:
         """:class:`bool`: Returns False if the poll is still open for voting, if it's closed it returns True.
@@ -185,7 +185,6 @@ class Poll:
         """
 
         return not self.is_open
-
 
     @property
     def duration(self) -> int:
