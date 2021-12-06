@@ -1,5 +1,10 @@
+from __future__ import annotations
+
+import logging
 from typing import List, Optional, Union, Callable
 from asyncio import iscoroutinefunction
+from flask import Flask, request
+from http import HTTPStatus
 
 from .attachments import Geo, Poll, QuickReply, File, CustomProfile, CTA
 from .errors import PytweetException, UnKnownSpaceState
@@ -570,14 +575,6 @@ class Client:
             data.get("avatar"),
         )
 
-    def register_webhook_url(self, url: str, env_label: str):
-        return 0
-
-        json = self.http.request(
-            "POST", "1.1", f"/account_activity/all/{env_label}/webhooks.json", auth=True, params={"url": url}
-        )
-        return json
-
     def stream(self, *, dry_run: bool = False) -> None:
         """Stream realtime in twitter! Make sure to put stream kwarg in client. If you want the tweet data make sure to make an `on_stream` event. example:
 
@@ -603,3 +600,78 @@ class Client:
             self.http.stream.connect(dry_run=dry_run)
         except KeyboardInterrupt:
             print("\nKeyboardInterrupt: Exit stream.")
+
+    def register_webhook(self, url: str, env_label: str):
+        """Register your WebHook with your WebApp's url that you develop. Before this, you need to develop, deploy and host a WebApp that will receive Twitter webhook events. You also need to perform a Twitter Challenge Response Check (CRC) GET request and responds with a properly formatted JSON response. 
+        
+        Parameters
+        ------------
+        url: :class:`str`
+            Your WebApp url that you want to register as the WebHook url. Twitter will send account events to this url as an http post request.
+        env_label: :class:`str`
+            This is the type of environment that you set in your Dev environments page. For example, if you use the 'prod' environment name then this argument must be 'prod'
+
+        """
+        res = self.http.request(
+            "POST", "1.1", f"/account_activity/all/{env_label}/webhooks.json", auth=True, params={"url": url}
+        )
+        return res #TODO Return a class object rather then the json itself.
+        #TODO Make delete & update webhook url.
+
+    def add_my_subscription(self, env_label: str):
+        """Add a new user subscription to the webhook, which is the client itself.
+
+        .. note::
+            Before using this method you have to register your WebHook url which is where Twitter will send account events via :meth:`Client.register_webhook`
+        
+        Parameters
+        ------------
+        env_label: :class:`str`
+            This is the type of environment that you set in your Dev environments page. For example, if you use the 'prod' environment name then this argument must be 'prod'
+
+        """
+        self.http.request(
+            "POST", "1.1", f"/account_activity/all/{env_label}/subscriptions.json", auth=True
+        )
+
+    def get_all_subscriptions(self, env_label: str):
+        """Returns a list of the current All Activity type subscriptions user id.
+        
+        Parameters
+        ------------
+        env_label: :class:`str`
+            This is the type of environment that you set in your Dev environments page. For example, if you use the 'prod' environment name then this argument must be 'prod'
+
+
+        """
+        res = self.http.request(
+            "GET",
+            "1.1",
+            f"/account_activity/all/{env_label}/subscriptions/list.json"
+        )
+
+        return [int(subscription.get("user_id")) for subscription in res.get("subscriptions")]
+
+
+    def listen(self, app: Flask, **kwargs):
+        disable_log: bool = kwargs.pop("disable_log", False)
+        
+        if disable_log:
+            app.logger.disabled = True
+            log = logging.getLogger('werkzeug')
+            log.disabled = True
+            
+        try:
+            @app.route('/webhook/twitter', methods=["POST", "GET"])
+            def webhook_receive():
+                if request.method == "GET":
+                    return ('', HTTPStatus.OK)
+
+                json_data = request.get_json()
+                
+                self.http.handle_events(json_data)
+                return ('', HTTPStatus.OK)
+
+            app.run(**kwargs)
+        except KeyboardInterrupt:
+            print("\nKeyboardInterrupt: Finish listening.")
