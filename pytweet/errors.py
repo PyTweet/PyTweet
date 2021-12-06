@@ -18,7 +18,7 @@ class PytweetException(Exception):
 
 
 class APIException(PytweetException):
-    """:class:`PytweetException`: Raised when an error is incurred during a request with HTTP Status code 200.
+    """:class:`PytweetException`: raises when an error is incurred during a request with HTTP Status code 200.
 
     .. versionadded:: 1.2.0
     """
@@ -34,7 +34,7 @@ class APIException(PytweetException):
 
 
 class HTTPException(PytweetException):
-    """:class:`PytweetException`: A custom error that will be raised whenever a request returns an HTTP status code above 200.
+    """:class:`PytweetException`: A custom error that will be raises whenever a request returns an HTTP status code above 200.
 
     .. versionadded:: 1.2.0
     """
@@ -58,7 +58,7 @@ class HTTPException(PytweetException):
 
 
 class BadRequests(HTTPException):
-    """:class:`HTTPException`: Raised when a request return status code: 400.
+    """This class inherits :class:`HTTPException`. raises when a request return status code: 400.
 
     .. versionadded:: 1.2.0
     """
@@ -74,7 +74,7 @@ class BadRequests(HTTPException):
 
 
 class Unauthorized(HTTPException):
-    """:class:`HTTPException`: Raised when the credentials you passed are invalid and a request returns status code: 401
+    """This class inherits :class:`HTTPException`. raises when the credentials you passed are invalid and a request returns status code: 401
 
     .. versionadded:: 1.0.0
     """
@@ -96,7 +96,7 @@ class Unauthorized(HTTPException):
 
 
 class Forbidden(HTTPException):
-    """:class:`HTTPException`: Raised when a request returns status code: 403.
+    """This class inherits :class:`HTTPException`. raises when a request returns status code: 403.
 
     .. versionadded:: 1.2.0
     """
@@ -122,7 +122,7 @@ class Forbidden(HTTPException):
 
 
 class NotFound(HTTPException):
-    """:class:`HTTPException`: Raised when a request returns status code: 404.
+    """This class inherits :class:`HTTPException`. raises when a request returns status code: 404.
 
     .. versionadded:: 1.2.0
     """
@@ -138,36 +138,18 @@ class NotFound(HTTPException):
 
 
 class TooManyRequests(HTTPException):
-    """:class:`HTTPException`: Raised when ratelimit exceeded and a request return status code: 429
+    """This class inherits :class:`HTTPException`. raises when ratelimit exceeded and a request return status code: 429
 
     .. versionadded:: 1.1.0
     """
 
     pass
 
-
-class NotFoundError(APIException):
-    """:class:`APIException`: This error is usually raised when trying to find specific Tweet or User that does not exist.
-
-    .. versionadded:: 1.0.0
-    """
-
-    def __init__(
-        self,
-        response: Optional[requests.models.Response] = None,
-        message: Optional[str] = None,
-    ):
-        msg = response.json().get("errors")[0].get("message") if not message else message
-        detail = response.json().get("errors")[0].get("detail")
-        super().__init__(response, msg if msg else detail if detail else "Not Found!")
-
-
-class UnKnownSpaceState(APIException):
-    def __init__(self, given_state):
-        super().__init__(message="Unknown state passed: %s" % given_state)
-
-
 class ConnectionException(HTTPException):
+    """This error class inherits :class:`HTTPException`. This error is raises when a stream connection throw an error.
+
+    .. versionadded:: 1.3.5
+    """
     def __init__(
         self,
         response: Optional[requests.models.Response] = None,
@@ -183,3 +165,41 @@ class ConnectionException(HTTPException):
             detail = json.get("detail")
 
         super().__init__(response, msg if msg else detail)
+
+
+class Conflict(HTTPException):
+    """This error class inherits :class:`HTTPException`. This error is raises when a request return 409 status code.
+
+    """
+    def __init__(
+        self,
+        response: Optional[requests.models.Response] = None,
+        message: Optional[str] = None,
+    ):
+        msg = response.json().get("errors")[0].get("message") if not message else message
+        detail = response.json().get("errors")[0].get("detail")
+        super().__init__(response, msg if msg else detail if detail else "Not Found!")
+
+class NotFoundError(APIException):
+    """This error class inherits :class:`APIException`. This error is usually raises when trying to find specific Tweet or User that does not exist.
+
+    .. versionadded:: 1.0.0
+    """
+
+    def __init__(
+        self,
+        response: Optional[requests.models.Response] = None,
+        message: Optional[str] = None,
+    ):
+        msg = response.json().get("errors")[0].get("message") if not message else message
+        detail = response.json().get("errors")[0].get("detail")
+        super().__init__(response, msg if msg else detail if detail else "Not Found!")
+
+
+class UnKnownSpaceState(APIException):
+    """This error class inherits :class:`APIException`. This error is raises when a user specified an invalid space state.
+
+    .. versionadded:: 1.3.7
+    """
+    def __init__(self, given_state):
+        super().__init__(message="Unknown state passed: %s" % given_state)
