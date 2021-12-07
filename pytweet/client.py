@@ -657,7 +657,7 @@ class Client:
 
         return [int(subscription.get("user_id")) for subscription in res.get("subscriptions")]
 
-    def reply_crc(self, url: str, env_label: str, webhook_id: Union[str, int]):
+    def reply_crc(self, env_label: str, webhook_id: Union[str, int]):
         self.http.request(
             "PUT",
             "1.1",
