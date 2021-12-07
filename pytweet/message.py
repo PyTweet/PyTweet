@@ -11,7 +11,7 @@ from .user import User
 if TYPE_CHECKING:
     from .http import HTTPClient
 
-__all__ = ("Message", "DirectMessage", "WelcomeMessage", "WelcomeMessageRule")
+__all__ = ("Message", "DirectMessage", "DMChannel", "WelcomeMessage", "WelcomeMessageRule")
 
 
 class Message:
@@ -67,6 +67,14 @@ class Message:
         """
         return MessageTypeEnum(self._type)
 
+class DMChannel:
+    """Represents a Direct Message Channel in Twitter where user can send direct message.
+
+    """
+    def __init__(self, data: Dict[str, Any]):
+        self._payload = data
+
+    
 
 class DirectMessage(Message):
     """Represents a Direct Message in Twitter.
@@ -133,11 +141,19 @@ class DirectMessage(Message):
 
     @property
     def recipient(self) -> User:
-        """:class:`User`: Returns the recipient that received the message.
+        """:class:`User`: Returns the user that received the direct message.
 
         .. versionadded:: 1.2.0
         """
-        return self.message_create.get("target").get("recipient")
+        return self.message_create.get("target", {}).get("recipient")
+
+    @property
+    def author(self) -> User:
+        """:class:`User`: Returns the user that sent the direct message.
+
+
+        """
+        return self.message_create.get("target", {}).get("sender", None)
 
     @property
     def created_at(self) -> datetime.datetime:
@@ -204,7 +220,6 @@ class DirectMessage(Message):
                 attachment.add_button(**button)
             return attachment
         return None
-
 
 class WelcomeMessage(Message):
     """Represent a Welcome Message in a Direct Message.
