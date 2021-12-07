@@ -637,7 +637,7 @@ class Client:
             "POST", "1.1", f"/account_activity/all/{env_label}/subscriptions.json", auth=True
         )
 
-    def get_all_subscriptions(self, env_label: str):
+    def get_all_subscriptions(self, env_label: str) -> List[int]:
         """Returns a list of the current All Activity type subscriptions user id.
         
         Parameters
@@ -645,7 +645,13 @@ class Client:
         env_label: :class:`str`
             This is the type of environment that you set in your Dev environments page. For example, if you use the 'prod' environment name then this argument must be 'prod'
 
+        Returns
+        ---------
+        List[:class:`int`]:
+            This method returns a list of :class:`int` object.
 
+        
+        .. versionadded:: 1.5.0
         """
         res = self.http.request(
             "GET",
@@ -683,7 +689,7 @@ class Client:
 
 
     def listen(self, app: Flask, path: str, **kwargs):
-        disable_log: bool = kwargs.pop("disable_log", False)
+        disabled_log: bool = kwargs.pop("disabled_log", False)
         environments = self.fetch_all_environments()
         self.webhook_uri_path = None
         for env in environments:
@@ -699,7 +705,7 @@ class Client:
         if not self.webhook_uri_path:
             raise PytweetException(f"Invalid uri path passed: {path}")
 
-        if disable_log:
+        if disabled_log:
             app.logger.disabled = True
             log = logging.getLogger('werkzeug')
             log.disabled = True
