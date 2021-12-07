@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import json as j
+from json.decoder import JSONDecodeError
 import logging
 import sys
 import time
@@ -60,7 +60,7 @@ def check_error(response: requests.models.Response) -> NoReturn:
 
                 else:
                     raise PytweetException(response, res["errors"][0]["detail"])
-        except (j.decoder.JSONDecodeError, KeyError) as e:
+        except (JSONDecodeError, KeyError) as e:
             if isinstance(e, KeyError):
                 raise PytweetException(res)
             return
@@ -96,7 +96,7 @@ def check_error(response: requests.models.Response) -> NoReturn:
         )
 
 
-RequestModel: Union[Dict[str, Any], Any] = Any
+RequestModel = Dict[str, Any]
 
 
 class HTTPClient:
@@ -129,7 +129,8 @@ class HTTPClient:
         for k, v in self.credentials.items():
             if not isinstance(v, str) and not isinstance(v, type(None)):
                 raise Unauthorized(None, f"Wrong authorization passed for credential: {k}.")
-
+        
+        self.__session = requests.Session()
         self.bearer_token: Optional[str] = bearer_token
         self.consumer_key: Optional[str] = consumer_key
         self.consumer_key_secret: Optional[str] = consumer_key_secret
@@ -168,30 +169,32 @@ class HTTPClient:
     ) -> Union[str, Dict[Any, Any], NoReturn]:
         url = self.base_url + version + path
         user_agent = "Py-Tweet (https://github.com/TheFarGG/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
-        if "Authorization" not in list(headers.keys()):
+        if "Authorization" not in headers.keys():
             headers["Authorization"] = f"Bearer {self.bearer_token}"
 
         headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
 
-        res = getattr(requests, method.lower(), None)
-        if not res:
-            raise TypeError("Method isn't recognizable")
-
         if auth:
             for k, v in self.credentials.items():
                 if v is None:
-                    raise PytweetException(f"{k} is a required credentials that is missing!")
+                    raise PytweetException(f"{k} is a required credential for this action.")
             auth = OauthSession(self.consumer_key, self.consumer_key_secret)
             auth.set_access_token(self.access_token, self.access_token_secret)
             auth = auth.oauth1
 
-        response = res(url, headers=headers, params=params, json=json, auth=auth)
+        response = self.__session.request(
+            method.upper(),
+            url, 
+            headers=headers, 
+            params=params, 
+            json=json, 
+            auth=auth,
+        )
         check_error(response)
-        res = None
 
         try:
             res = response.json()
-        except j.decoder.JSONDecodeError:
+        except JSONDecodeError:
             return response.text
 
         if "meta" in res.keys():
@@ -373,6 +376,9 @@ class HTTPClient:
         
         elif "follow_events" in keys:
             self.event_parser.parse_user_follow(payload)
+
+        elif "direct_message_indicate_typing_events" in keys:
+            self.event_parser.parse_direct_message_typing(payload)
 
     def send_message(
         self,
