@@ -657,11 +657,19 @@ class Client:
 
         return [int(subscription.get("user_id")) for subscription in res.get("subscriptions")]
 
-    def reply_crc(self, env_label: str, webhook_id: Union[str, int]):
+    def respond_crc(self):
+        _log.info("Attempts to responds a CRC!")
+        env = getattr(self, "environment", None)
+        webhook = getattr(self, "webhook", None)
+
+        if not env or not webhook:
+            _log.warn("CRC Failed: client is not listening! use Client().listen at the very end of your file!")
+            return None
+
         self.http.request(
             "PUT",
             "1.1",
-            f"/account_activity/all/{env_label}/webhooks/{webhook_id}.json",
+            f"/account_activity/all/{env.label}/webhooks/{webhook.id}.json",
             auth=True
         )
 
@@ -686,6 +694,7 @@ class Client:
                     path = '/' + '/'.join(path[3:])
                     self.webhook_uri_path = path
                     self.webhook = webhook
+                    self.environment = env
                     break
 
         if not self.webhook_uri_path:
