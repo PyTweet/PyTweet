@@ -1,6 +1,6 @@
 from typing import Dict, Any
 from .message import DirectMessage
-from .events import UserFollowActionEvent, UserUnfollowActionEvent
+from .events import UserFollowActionEvent, UserUnfollowActionEvent, DirectMessageTypingEvent
 from .user import User
 
 class PayloadParser:
@@ -40,7 +40,7 @@ class EventParser:
         event_payload["event"]["message_create"]["target"]["recipient"] = recipient
         event_payload["event"]["message_create"]["target"]["sender"] = sender
 
-        direct_message = DirectMessage(event_payload, http_client=self.http_client)
+        direct_message = DirectMessage(event_payload, http_client=self.http_client) #TODO Log the target and source in cache
         self.http_client.message_cache[direct_message.id] = direct_message
         self.http_client.dispatch("direct_message", direct_message)
 
@@ -54,8 +54,23 @@ class EventParser:
         event_payload["target"] = target
         event_payload["source"] = source
         if action_type == "follow":
-            action = UserFollowActionEvent(follow_payload, http_client=self.http_client) #TODO Log the target and source in cache
+            action = UserFollowActionEvent(follow_payload) #TODO Log the target and source in cache
             self.http_client.dispatch("user_follow", action)
         elif action_type == "unfollow":
-            action = UserUnfollowActionEvent(follow_payload, http_client=self.http_client)
+            action = UserUnfollowActionEvent(follow_payload)
             self.http_client.dispatch("user_unfollow", action)
+
+    def parse_direct_message_typing(self, typing_payload: Dict[str, Any]):
+        event_payload = typing_payload.get("direct_message_indicate_typing_events")[0]
+        users = typing_payload.get("users")
+
+        recipient_id = event_payload.get("target").get("recipient_id")
+        sender_id = event_payload.get("sender_id")
+        recipient = User(self.payload_parser.parse_user_payload(users.get(recipient_id)), http_client=self.http_client)
+        sender = User(self.payload_parser.parse_user_payload(users.get(sender_id)), http_client=self.http_client)
+
+        event_payload["target"]["recipient"] = recipient
+        event_payload["target"]["sender"] = sender
+
+        payload = DirectMessageTypingEvent(event_payload)
+        self.http_client.dispatch("typing", payload)
