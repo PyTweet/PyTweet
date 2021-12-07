@@ -1,10 +1,6 @@
 from __future__ import annotations
 
 import logging
-import hmac
-import hashlib
-import base64
-import json
 from typing import List, Optional, Union, Callable
 from asyncio import iscoroutinefunction
 from flask import Flask, request
@@ -70,6 +66,7 @@ class Client:
             access_token_secret=access_token_secret,
             stream=stream,
         )
+        self._account_user: Optional[User] = None # set in account property.
 
     def __repr__(self) -> str:
         return "Client(bearer_token=SECRET consumer_key=SECRET consumer_key_secret=SECRET access_token=SECRET access_token_secret=SECRET)"
@@ -80,11 +77,12 @@ class Client:
 
         .. versionadded:: 1.2.0
         """
-        attr = getattr(self, "_account_user", None)
-        if not attr:
+
+        account_user = self._account_user
+        if account_user is None:
             self._set_account_user()
-            return getattr(self, "_account_user", None)
-        return attr
+            return self._account_user # The account_user does not change when the function is called. That is why we are returning this.
+        return account_user
 
     def _set_account_user(self) -> None:
         if not self.http.access_token:
@@ -672,6 +670,7 @@ class Client:
             f"/account_activity/all/{env.label}/webhooks/{webhook.id}.json",
             auth=True
         )
+        _log.info("Successfully responded to CRC!")
 
     def fetch_all_environments(self):
         res = self.http.request(
@@ -706,32 +705,14 @@ class Client:
             log.disabled = True
             
         try:
-            @app.route(self.webhook_uri_path, methods=["POST"])
+            @app.route(self.webhook_uri_path, methods=["POST", "GET"])
             def webhook_receive():
                 if request.method == "GET":
-                    return ('', HTTPStatus.OK)
+                    self.respond_crc()
 
                 json_data = request.get_json()
                 self.http.handle_events(json_data)
-                return ('', HTTPStatus.OK)
-
-            @app.route(self.webhook_uri_path, methods=["GET"]) 
-            def webhook_challenge():
-                _log.info("CRC token detect! Preparing to make CRC challenge!")
-                crc = request.args['crc_token']
-  
-                validation = hmac.new(
-                    key=bytes(self.http.consumer_key_secret, 'UTF-8'),
-                    msg=bytes(crc, 'UTF-8'),
-                    digestmod = hashlib.sha256
-                )
-                digested = base64.b64encode(validation.digest())
-                
-                response = {
-                    'response_token': 'sha256=' + format(str(digested)[2:-1])
-                }
-
-                return json.dumps(response)   
+                return ('', HTTPStatus.OK)     
 
             app.run(**kwargs)
         except KeyboardInterrupt:
