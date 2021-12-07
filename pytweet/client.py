@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 import logging
+import hmac
+import hashlib
+import base64
+import json
 from typing import List, Optional, Union, Callable
 from asyncio import iscoroutinefunction
 from flask import Flask, request
@@ -15,9 +19,11 @@ from .space import Space
 from .tweet import Tweet
 from .user import User
 from .stream import Stream
+from .webhook import Environment, Webhook
 
 __all__ = ("Client",)
 
+_log = logging.getLogger(__name__) 
 
 class Client:
     """Represent a client that connected to Twitter!
@@ -80,6 +86,12 @@ class Client:
             return getattr(self, "_account_user", None)
         return attr
 
+    def _set_account_user(self) -> None:
+        if not self.http.access_token:
+            return None
+
+        self._account_user = self.fetch_user(self.http.access_token.partition("-")[0])
+
     def event(self, func: Callable) -> None:
         """
         A decorator for making an event, the event will be register in the client's internal cache.
@@ -100,12 +112,6 @@ class Client:
         if iscoroutinefunction(func):
             raise TypeError("Event must be a synchronous function!")
         self.http.events[func.__name__[3:]] = func
-
-    def _set_account_user(self) -> None:
-        if not self.http.access_token:
-            return None
-
-        self._account_user = self.fetch_user(self.http.access_token.partition("-")[0])
 
     def fetch_user(self, user_id: Union[str, int] = None) -> Optional[User]:
         """A method for fetching the user with the user's id.
@@ -615,8 +621,7 @@ class Client:
         res = self.http.request(
             "POST", "1.1", f"/account_activity/all/{env_label}/webhooks.json", auth=True, params={"url": url}
         )
-        return res #TODO Return a class object rather then the json itself.
-        #TODO Make delete & update webhook url.
+        return Webhook(res)
 
     def add_my_subscription(self, env_label: str):
         """Add a new user subscription to the webhook, which is the client itself.
@@ -652,25 +657,72 @@ class Client:
 
         return [int(subscription.get("user_id")) for subscription in res.get("subscriptions")]
 
+    def reply_crc(self, url: str, env_label: str, webhook_id: Union[str, int]):
+        self.http.request(
+            "PUT",
+            "1.1",
+            f"/account_activity/all/{env_label}/webhooks/{webhook_id}.json",
+            auth=True
+        )
 
-    def listen(self, app: Flask, **kwargs):
-        disable_log: bool = kwargs.pop("disable_log", False)
+    def fetch_all_environments(self):
+        res = self.http.request(
+            "GET",
+            "1.1",
+            "/account_activity/all/webhooks.json"
+        )
         
+        return [Environment(data) for data in res.get("environments")]
+
+
+    def listen(self, app: Flask, path: str, **kwargs):
+        disable_log: bool = kwargs.pop("disable_log", False)
+        environments = self.fetch_all_environments()
+        self.webhook_uri_path = None
+        for env in environments:
+            for webhook in env.webhooks:
+                if path in webhook.url:
+                    path = webhook.url.split("/")
+                    path = '/' + '/'.join(path[3:])
+                    self.webhook_uri_path = path
+                    self.webhook = webhook
+                    break
+
+        if not self.webhook_uri_path:
+            raise PytweetException(f"Invalid uri path passed: {path}")
+
         if disable_log:
             app.logger.disabled = True
             log = logging.getLogger('werkzeug')
             log.disabled = True
             
         try:
-            @app.route('/webhook/twitter', methods=["POST", "GET"])
+            @app.route(self.webhook_uri_path, methods=["POST"])
             def webhook_receive():
                 if request.method == "GET":
                     return ('', HTTPStatus.OK)
 
                 json_data = request.get_json()
-                
                 self.http.handle_events(json_data)
                 return ('', HTTPStatus.OK)
+
+            @app.route(self.webhook_uri_path, methods=["GET"]) 
+            def webhook_challenge():
+                _log.info("CRC token detect! Preparing to make CRC challenge!")
+                crc = request.args['crc_token']
+  
+                validation = hmac.new(
+                    key=bytes(self.http.consumer_key_secret, 'UTF-8'),
+                    msg=bytes(crc, 'UTF-8'),
+                    digestmod = hashlib.sha256
+                )
+                digested = base64.b64encode(validation.digest())
+                
+                response = {
+                    'response_token': 'sha256=' + format(str(digested)[2:-1])
+                }
+
+                return json.dumps(response)   
 
             app.run(**kwargs)
         except KeyboardInterrupt:
