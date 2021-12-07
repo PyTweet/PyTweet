@@ -367,12 +367,12 @@ class HTTPClient:
         return Space(res)
 
     def handle_events(self, payload: Dict[str, Any]):
-        event_name = list(payload.keys())[1]
-        if event_name == "direct_message_events":
+        keys = list(payload.keys())
+        if "direct_message_events" in keys:
             self.event_parser.parse_direct_message_create(payload)
         
-        elif event_name == "direct_message_indicate_typing_events":
-            self.event_parser.parse_direct_message_read(payload)
+        elif "follow_events" in keys:
+            self.event_parser.parse_user_follow(payload)
 
     def send_message(
         self,
