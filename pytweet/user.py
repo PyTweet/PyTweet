@@ -429,8 +429,8 @@ class User:
         return self._payload.get("description")
 
     @property
-    def profile_link(self) -> str:
-        """:class:`str`: Return the user's profile link
+    def profile_url(self) -> str:
+        """:class:`str`: Return the user's profile url.
 
         .. versionadded: 1.0.0
         """
