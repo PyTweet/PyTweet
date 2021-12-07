@@ -15,6 +15,7 @@ from .expansions import (
     POLL_FIELD,
     TWEET_FIELD,
 )
+from .utils import build_object 
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -378,7 +379,10 @@ class User:
             params=params,
         )
 
-        Tweet = self.http_client.build_object("Tweet")
+        Tweet = build_object("Tweet")
+        if not Tweet:
+            return None
+
         try:
             return [Tweet(data, http_client=self.http_client) for data in res["data"]]
         except (TypeError, KeyError):
@@ -433,6 +437,14 @@ class User:
         return f"https://twitter.com/{self.username.replace('@', '', 1)}"
 
     @property
+    def profile_image_url(self) -> Optional[str]:
+        """Optional[:class:`str`]: Return the user profile image.
+
+        .. versionadded: 1.0.0
+        """
+        return self._payload.get("profile_image_url", "")
+
+    @property
     def link(self) -> str:
         """:class:`str`: Return url where the user put links, return an empty string if there isn't a url
 
@@ -465,14 +477,6 @@ class User:
         return self.protected
 
     @property
-    def profile_url(self) -> Optional[str]:
-        """Optional[:class:`str`]: Return the user profile image.
-
-        .. versionadded: 1.0.0
-        """
-        return self._payload.get("profile_image_url", "")
-
-    @property
     def location(self) -> Optional[str]:
         """:class:`str`: Return the user's location
 
@@ -486,6 +490,8 @@ class User:
 
         .. versionadded: 1.0.0
         """
+        if isinstance(self._payload.get("created_at"), str):
+            return datetime.datetime.fromtimestamp(int(self._payload.get("created_at")[:7]))
         return time_parse_todt(self._payload.get("created_at"))
 
     @property
