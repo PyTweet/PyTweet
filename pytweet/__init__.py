@@ -16,16 +16,19 @@ from .client import *
 from .entities import *
 from .enums import *
 from .errors import *
+from .events import *
 from .expansions import *
 from .http import *
 from .message import *
 from .metrics import *
+from .parsers import *
 from .relations import *
 from .space import *
 from .stream import *
 from .tweet import *
 from .user import *
 from .utils import *
+from .webhook import *
 
 __title__ = "PyTweet"
 __version__ = "1.3.7"
