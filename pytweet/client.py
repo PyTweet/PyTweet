@@ -627,7 +627,7 @@ class Client:
         """Add a new user subscription to the webhook, which is the client itself.
 
         .. note::
-            Before using this method you have to register your WebHook url which is where Twitter will send account events via :meth:`Client.register_webhook`
+            Before using this method you have to register your WebHook url via :meth:`Client.register_webhook`. WebHook url is where Twitter will send account events.
         
         Parameters
         ------------
