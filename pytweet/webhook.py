@@ -28,7 +28,7 @@ class Environment:
     
     @property
     def name(self) -> str:
-        return self._payload("environment_name")
+        return self._payload.get("environment_name")
 
     @property
     def label(self) -> str:
