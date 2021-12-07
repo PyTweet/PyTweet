@@ -151,7 +151,7 @@ class DirectMessage(Message):
     def author(self) -> User:
         """:class:`User`: Returns the user that sent the direct message.
 
-
+        .. versionadded:: 1.5.0
         """
         return self.message_create.get("target", {}).get("sender", None)
 
@@ -161,7 +161,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.2.0
         """
-        return datetime.datetime.fromtimestamp(self.timestamp)
+        return datetime.datetime.fromtimestamp(int(self._payload.get("created_at")[:7]))
 
     @property
     def hashtags(self) -> Optional[List[Hashtags]]:
