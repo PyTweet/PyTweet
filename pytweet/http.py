@@ -5,9 +5,9 @@ import logging
 import sys
 import time
 import requests
-import pytweet
 from typing import Any, Dict, List, NoReturn, Optional, Union
 
+from .parsers import EventParser
 from .attachments import CTA, Geo, Poll, QuickReply, File, CustomProfile
 from .auth import OauthSession
 from .enums import ReplySetting, SpaceState
@@ -15,6 +15,7 @@ from .errors import (
     BadRequests,
     Forbidden,
     NotFound,
+    Conflict,
     NotFoundError,
     PytweetException,
     TooManyRequests,
@@ -79,6 +80,9 @@ def check_error(response: requests.models.Response) -> NoReturn:
     elif code == 404:
         raise NotFound(response)
 
+    elif code == 409:
+        raise Conflict(response)
+
     elif code == 429:
         text = response.text
         __check = response.headers["x-rate-limit-reset"]
@@ -132,6 +136,7 @@ class HTTPClient:
         self.access_token: Optional[str] = access_token
         self.access_token_secret: Optional[str] = access_token_secret
         self.stream = stream
+        self.event_parser = EventParser(self)
         self.base_url = "https://api.twitter.com/"
         self.upload_url = "https://upload.twitter.com/1.1/media/upload.json"
         self.message_cache = {}
@@ -141,13 +146,7 @@ class HTTPClient:
             self.stream.http_client = self
             self.stream.connection.http_client = self
 
-    def build_object(self, obj: str) -> Any:
-        real_obj = getattr(pytweet, obj)
-        if real_obj:
-            return real_obj
-        return None
-
-    def dispatch(self, event_name, *args):
+    def dispatch(self, event_name: str, *args: Any):
         try:
             event = self.events[event_name]
         except KeyError:
@@ -366,6 +365,14 @@ class HTTPClient:
             },
         )
         return Space(res)
+
+    def handle_events(self, payload: Dict[str, Any]):
+        event_name = list(payload.keys())[1]
+        if event_name == "direct_message_events":
+            self.event_parser.parse_direct_message_create(payload)
+        
+        elif event_name == "direct_message_indicate_typing_events":
+            self.event_parser.parse_direct_message_read(payload)
 
     def send_message(
         self,
