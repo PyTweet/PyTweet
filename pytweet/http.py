@@ -164,10 +164,17 @@ class HTTPClient:
         headers: RequestModel = {},
         params: RequestModel = {},
         json: RequestModel = {},
+        data: RequestModel = {},
+        files: RequestModel = {},
         auth: bool = False,
         is_json: bool = True,
+        use_base_url: bool = True,
     ) -> Union[str, Dict[Any, Any], NoReturn]:
-        url = self.base_url + version + path
+        if use_base_url:
+          url = self.base_url + version + path
+        else:
+            url = path
+
         user_agent = "Py-Tweet (https://github.com/TheFarGG/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
         if "Authorization" not in headers.keys():
             headers["Authorization"] = f"Bearer {self.bearer_token}"
@@ -181,21 +188,33 @@ class HTTPClient:
             auth = OauthSession(self.consumer_key, self.consumer_key_secret)
             auth.set_access_token(self.access_token, self.access_token_secret)
             auth = auth.oauth1
+        
+        if data:
+            json = None
+        if json:
+            data = None
 
         response = self.__session.request(
             method.upper(),
             url, 
             headers=headers, 
-            params=params, 
-            json=json, 
+            params=params,
+            data=data,
+            json=json,
+            files=files,
             auth=auth,
         )
         check_error(response)
+        res = None
 
-        try:
-            res = response.json()
-        except JSONDecodeError:
+        if is_json:
+            try:
+                res = response.json()
+            except JSONDecodeError:
+                return response.text
+        else:
             return response.text
+
 
         if "meta" in res.keys():
             try:
@@ -204,9 +223,7 @@ class HTTPClient:
             except KeyError:
                 pass
 
-        if is_json:
-            return res
-        return response
+        return res
 
     def upload(self, file: File, command: str, *, media_id=None):
         assert command.upper() in ("INIT", "APPEND", "FINALIZE", "STATUS")
@@ -233,10 +250,16 @@ class HTTPClient:
             time.sleep(seconds)
             params = {"command": "STATUS", "media_id": media_id}
 
-            res = requests.get(url=self.upload_url, params=params, auth=auth)
-            check_error(res)
+            res = self.request(
+            'GET', 
+            version=None, 
+            path=self.base_url, 
+            params=params, 
+            auth=True,
+            use_base_url=False,
+        )
 
-            processing_info = res.json().get("processing_info", None)
+            processing_info = res.get("processing_info", None)
             CheckStatus(processing_info, media_id)
 
         if command.upper() == "INIT":
@@ -247,9 +270,16 @@ class HTTPClient:
                 "media_category": file.media_category,
                 "shared": file.dm_only,
             }
-            res = requests.post(self.upload_url, data=data, auth=auth)
-            check_error(res)
-            return res.json()["media_id"]
+            res = self.request(
+                'POST', 
+                version=None, 
+                path=self.upload_url, 
+                data=data, 
+                auth=True,
+                use_base_url=False,
+            )
+
+            return res["media_id"]
 
         elif command.upper() == "APPEND":
             segment_id = 0
@@ -259,28 +289,34 @@ class HTTPClient:
                 raise ValueError("'media_id' is None! Please specified it.")
 
             while bytes_sent < file.total_bytes:
-                res = requests.post(
-                    url=self.upload_url,
+                res = self.request(
+                    'POST',
+                    version=None,
+                    path=self.upload_url,
                     data={
                         "command": "APPEND",
                         "media_id": media_id,
                         "segment_index": segment_id,
                     },
                     files={"media": open_file.read(4 * 1024 * 1024)},
-                    auth=auth,
+                    auth=True,
+                    use_base_url=False,
                 )
 
                 bytes_sent = open_file.tell()
                 segment_id += 1
 
         elif command.upper() == "FINALIZE":
-            res = requests.post(
-                url=self.upload_url,
+            res = self.request(
+                'POST',
+                version=None,
+                path=self.upload_url,
                 data={"command": "FINALIZE", "media_id": media_id},
-                auth=auth,
+                auth=True,
+                use_base_url=False,
             )
-            check_error(res)
-            CheckStatus(res.json().get("processing_info", None), media_id)
+            
+            CheckStatus(res.get("processing_info", None), media_id)
 
     def fetch_user(self, user_id: Union[str, int]) -> Optional[User]:
         try:
