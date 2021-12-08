@@ -1,6 +1,7 @@
 from typing import Dict, Any
 from .utils import time_parse_todt
 
+
 class Webhook:
     def __init__(self, data: Dict[str, Any]):
         self._payload = data
@@ -25,7 +26,7 @@ class Webhook:
 class Environment:
     def __init__(self, data: Dict[str, Any]):
         self._payload = data
-    
+
     @property
     def name(self) -> str:
         return self._payload.get("environment_name")

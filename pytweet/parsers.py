@@ -3,6 +3,7 @@ from .message import DirectMessage
 from .events import UserFollowActionEvent, UserUnfollowActionEvent, DirectMessageTypingEvent
 from .user import User
 
+
 class PayloadParser:
     def parse_user_payload(self, payload: Dict[str, Any]):
         copy = payload.copy()
@@ -10,17 +11,17 @@ class PayloadParser:
             "followers_count": copy.get("followers_count"),
             "following_count": copy.get("friends_count"),
             "tweet_count": copy.get("statuses_count"),
-            "listed_count": 0
+            "listed_count": 0,
         }
         if "created_timestamp" in copy.keys():
             copy["created_at"] = copy.get("created_timestamp")
         if "screen_name" in copy.keys():
-            copy["username"] = copy.get('screen_name')
-            
+            copy["username"] = copy.get("screen_name")
+
         if "profile_image_url_https" in copy.keys():
             copy["profile_image_url"] = copy.get("profile_image_url_https")
         return copy
-        
+
 
 class EventParser:
     def __init__(self, http_client: object):
@@ -40,7 +41,9 @@ class EventParser:
         event_payload["event"]["message_create"]["target"]["recipient"] = recipient
         event_payload["event"]["message_create"]["target"]["sender"] = sender
 
-        direct_message = DirectMessage(event_payload, http_client=self.http_client) #TODO Log the target and source in cache
+        direct_message = DirectMessage(
+            event_payload, http_client=self.http_client
+        )  # TODO Log the target and source in cache
         self.http_client.message_cache[direct_message.id] = direct_message
         self.http_client.dispatch("direct_message", direct_message)
 
@@ -54,7 +57,7 @@ class EventParser:
         event_payload["target"] = target
         event_payload["source"] = source
         if action_type == "follow":
-            action = UserFollowActionEvent(follow_payload) #TODO Log the target and source in cache
+            action = UserFollowActionEvent(follow_payload)  # TODO Log the target and source in cache
             self.http_client.dispatch("user_follow", action)
         elif action_type == "unfollow":
             action = UserUnfollowActionEvent(follow_payload)

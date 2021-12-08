@@ -129,7 +129,7 @@ class HTTPClient:
         for k, v in self.credentials.items():
             if not isinstance(v, str) and not isinstance(v, type(None)):
                 raise Unauthorized(None, f"Wrong authorization passed for credential: {k}.")
-        
+
         self.__session = requests.Session()
         self.bearer_token: Optional[str] = bearer_token
         self.consumer_key: Optional[str] = consumer_key
@@ -171,7 +171,7 @@ class HTTPClient:
         use_base_url: bool = True,
     ) -> Union[str, Dict[Any, Any], NoReturn]:
         if use_base_url:
-          url = self.base_url + version + path
+            url = self.base_url + version + path
         else:
             url = path
 
@@ -188,7 +188,7 @@ class HTTPClient:
             auth = OauthSession(self.consumer_key, self.consumer_key_secret)
             auth.set_access_token(self.access_token, self.access_token_secret)
             auth = auth.oauth1
-        
+
         if data:
             json = None
         if json:
@@ -196,8 +196,8 @@ class HTTPClient:
 
         response = self.__session.request(
             method.upper(),
-            url, 
-            headers=headers, 
+            url,
+            headers=headers,
             params=params,
             data=data,
             json=json,
@@ -214,7 +214,6 @@ class HTTPClient:
                 return response.text
         else:
             return response.text
-
 
         if "meta" in res.keys():
             try:
@@ -251,13 +250,13 @@ class HTTPClient:
             params = {"command": "STATUS", "media_id": media_id}
 
             res = self.request(
-            'GET', 
-            version=None, 
-            path=self.base_url, 
-            params=params, 
-            auth=True,
-            use_base_url=False,
-        )
+                "GET",
+                version=None,
+                path=self.base_url,
+                params=params,
+                auth=True,
+                use_base_url=False,
+            )
 
             processing_info = res.get("processing_info", None)
             CheckStatus(processing_info, media_id)
@@ -271,10 +270,10 @@ class HTTPClient:
                 "shared": file.dm_only,
             }
             res = self.request(
-                'POST', 
-                version=None, 
-                path=self.upload_url, 
-                data=data, 
+                "POST",
+                version=None,
+                path=self.upload_url,
+                data=data,
                 auth=True,
                 use_base_url=False,
             )
@@ -290,7 +289,7 @@ class HTTPClient:
 
             while bytes_sent < file.total_bytes:
                 res = self.request(
-                    'POST',
+                    "POST",
                     version=None,
                     path=self.upload_url,
                     data={
@@ -308,14 +307,14 @@ class HTTPClient:
 
         elif command.upper() == "FINALIZE":
             res = self.request(
-                'POST',
+                "POST",
                 version=None,
                 path=self.upload_url,
                 data={"command": "FINALIZE", "media_id": media_id},
                 auth=True,
                 use_base_url=False,
             )
-            
+
             CheckStatus(res.get("processing_info", None), media_id)
 
     def fetch_user(self, user_id: Union[str, int]) -> Optional[User]:
@@ -409,7 +408,7 @@ class HTTPClient:
         keys = list(payload.keys())
         if "direct_message_events" in keys:
             self.event_parser.parse_direct_message_create(payload)
-        
+
         elif "follow_events" in keys:
             self.event_parser.parse_user_follow(payload)
 

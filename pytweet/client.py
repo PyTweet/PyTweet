@@ -19,7 +19,8 @@ from .webhook import Environment, Webhook
 
 __all__ = ("Client",)
 
-_log = logging.getLogger(__name__) 
+_log = logging.getLogger(__name__)
+
 
 class Client:
     """Represent a client that connected to Twitter!
@@ -66,7 +67,7 @@ class Client:
             access_token_secret=access_token_secret,
             stream=stream,
         )
-        self._account_user: Optional[User] = None # set in account property.
+        self._account_user: Optional[User] = None  # set in account property.
 
     def __repr__(self) -> str:
         return "Client(bearer_token=SECRET consumer_key=SECRET consumer_key_secret=SECRET access_token=SECRET access_token_secret=SECRET)"
@@ -81,7 +82,9 @@ class Client:
         account_user = self._account_user
         if account_user is None:
             self._set_account_user()
-            return self._account_user # The account_user does not change when the function is called. That is why we are returning this.
+            return (
+                self._account_user
+            )  # The account_user does not change when the function is called. That is why we are returning this.
         return account_user
 
     def _set_account_user(self) -> None:
@@ -606,8 +609,8 @@ class Client:
             print("\nKeyboardInterrupt: Exit stream.")
 
     def register_webhook(self, url: str, env_label: str):
-        """Register your WebHook with your WebApp's url that you develop. Before this, you need to develop, deploy and host a WebApp that will receive Twitter webhook events. You also need to perform a Twitter Challenge Response Check (CRC) GET request and responds with a properly formatted JSON response. 
-        
+        """Register your WebHook with your WebApp's url that you develop. Before this, you need to develop, deploy and host a WebApp that will receive Twitter webhook events. You also need to perform a Twitter Challenge Response Check (CRC) GET request and responds with a properly formatted JSON response.
+
         Parameters
         ------------
         url: :class:`str`
@@ -626,20 +629,18 @@ class Client:
 
         .. note::
             Before using this method you have to register your WebHook url via :meth:`Client.register_webhook`. WebHook url is where Twitter will send account events.
-        
+
         Parameters
         ------------
         env_label: :class:`str`
             This is the type of environment that you set in your Dev environments page. For example, if you use the 'prod' environment name then this argument must be 'prod'
 
         """
-        self.http.request(
-            "POST", "1.1", f"/account_activity/all/{env_label}/subscriptions.json", auth=True
-        )
+        self.http.request("POST", "1.1", f"/account_activity/all/{env_label}/subscriptions.json", auth=True)
 
     def get_all_subscriptions(self, env_label: str) -> List[int]:
         """Returns a list of the current All Activity type subscriptions user id.
-        
+
         Parameters
         ------------
         env_label: :class:`str`
@@ -650,14 +651,10 @@ class Client:
         List[:class:`int`]:
             This method returns a list of :class:`int` object.
 
-        
+
         .. versionadded:: 1.5.0
         """
-        res = self.http.request(
-            "GET",
-            "1.1",
-            f"/account_activity/all/{env_label}/subscriptions/list.json"
-        )
+        res = self.http.request("GET", "1.1", f"/account_activity/all/{env_label}/subscriptions/list.json")
 
         return [int(subscription.get("user_id")) for subscription in res.get("subscriptions")]
 
@@ -670,23 +667,13 @@ class Client:
             _log.warn("CRC Failed: client is not listening! use Client().listen at the very end of your file!")
             return None
 
-        self.http.request(
-            "PUT",
-            "1.1",
-            f"/account_activity/all/{env.label}/webhooks/{webhook.id}.json",
-            auth=True
-        )
+        self.http.request("PUT", "1.1", f"/account_activity/all/{env.label}/webhooks/{webhook.id}.json", auth=True)
         _log.info("Successfully responded to CRC!")
 
     def fetch_all_environments(self):
-        res = self.http.request(
-            "GET",
-            "1.1",
-            "/account_activity/all/webhooks.json"
-        )
-        
-        return [Environment(data) for data in res.get("environments")]
+        res = self.http.request("GET", "1.1", "/account_activity/all/webhooks.json")
 
+        return [Environment(data) for data in res.get("environments")]
 
     def listen(self, app: Flask, path: str, **kwargs):
         disabled_log: bool = kwargs.pop("disabled_log", False)
@@ -696,7 +683,7 @@ class Client:
             for webhook in env.webhooks:
                 if path in webhook.url:
                     path = webhook.url.split("/")
-                    path = '/' + '/'.join(path[3:])
+                    path = "/" + "/".join(path[3:])
                     self.webhook_uri_path = path
                     self.webhook = webhook
                     self.environment = env
@@ -707,10 +694,11 @@ class Client:
 
         if disabled_log:
             app.logger.disabled = True
-            log = logging.getLogger('werkzeug')
+            log = logging.getLogger("werkzeug")
             log.disabled = True
-            
+
         try:
+
             @app.route(self.webhook_uri_path, methods=["POST", "GET"])
             def webhook_receive():
                 if request.method == "GET":
@@ -718,7 +706,7 @@ class Client:
 
                 json_data = request.get_json()
                 self.http.handle_events(json_data)
-                return ('', HTTPStatus.OK)     
+                return ("", HTTPStatus.OK)
 
             app.run(**kwargs)
         except KeyboardInterrupt:

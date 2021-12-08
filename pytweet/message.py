@@ -67,14 +67,13 @@ class Message:
         """
         return MessageTypeEnum(self._type)
 
-class DMChannel:
-    """Represents a Direct Message Channel in Twitter where user can send direct message.
 
-    """
+class DMChannel:
+    """Represents a Direct Message Channel in Twitter where user can send direct message."""
+
     def __init__(self, data: Dict[str, Any]):
         self._payload = data
 
-    
 
 class DirectMessage(Message):
     """Represents a Direct Message in Twitter.
@@ -220,6 +219,7 @@ class DirectMessage(Message):
                 attachment.add_button(**button)
             return attachment
         return None
+
 
 class WelcomeMessage(Message):
     """Represent a Welcome Message in a Direct Message.

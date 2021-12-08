@@ -2,10 +2,10 @@ import datetime
 from typing import Dict, Any
 from .user import User
 
+
 class UserFollowActionEvent:
-    """Represents a follow action event.
-    
-    """
+    """Represents a follow action event."""
+
     def __init__(self, data: Dict[str, Any]):
         self.original_payload = data
         self._payload = data.get("follow_events")[0]
@@ -27,10 +27,10 @@ class UserFollowActionEvent:
     def author(self):
         return self.source
 
+
 class UserUnfollowActionEvent(UserFollowActionEvent):
-    """Represents an unfollow action event. This inherits :class:`UserFollowActionEvent`.
-    
-    """
+    """Represents an unfollow action event. This inherits :class:`UserFollowActionEvent`."""
+
     @property
     def unfollowed_at(self):
         timestamp = str(self._payload.get("created_timestamp"))[:10]
@@ -38,9 +38,8 @@ class UserUnfollowActionEvent(UserFollowActionEvent):
 
 
 class DirectMessageTypingEvent:
-    """Represents a typing event in direct message. 
-    
-    """
+    """Represents a typing event in direct message."""
+
     def __init__(self, data: Dict[str, Any]):
         self._payload = data
 
