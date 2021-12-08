@@ -193,9 +193,10 @@ class HTTPClient:
             json = None
         if json:
             data = None
-
+        
+        method = method.upper()
         response = self.__session.request(
-            method.upper(),
+            method,
             url,
             headers=headers,
             params=params,
@@ -222,6 +223,7 @@ class HTTPClient:
             except KeyError:
                 pass
 
+        _log.debug(f'{method} {url} has returned {response.status_code} status code with {res}')
         return res
 
     def upload(self, file: File, command: str, *, media_id=None):
