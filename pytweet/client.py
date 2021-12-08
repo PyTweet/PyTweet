@@ -1,29 +1,57 @@
 from __future__ import annotations
 
+import base64
+import hashlib
+import hmac
+import json
 import logging
-from typing import List, Optional, Union, Callable
+import threading
+import time
 from asyncio import iscoroutinefunction
-from flask import Flask, request
 from http import HTTPStatus
+from typing import Callable, List, Optional, Union, Dict, Any
 
-from .attachments import Geo, Poll, QuickReply, File, CustomProfile, CTA
-from .errors import PytweetException, UnKnownSpaceState
+from flask import Flask, request
+
+from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .enums import ReplySetting, SpaceState
+from .errors import PytweetException, UnKnownSpaceState
 from .http import HTTPClient
-from .message import DirectMessage, WelcomeMessage, WelcomeMessageRule, Message
+from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .space import Space
+from .stream import Stream
 from .tweet import Tweet
 from .user import User
-from .stream import Stream
 from .webhook import Environment, Webhook
 
 __all__ = ("Client",)
 
 _log = logging.getLogger(__name__)
 
+class ApplicationInfo:
+    """Represents an application's info.
+    
+    """
+    def __init__(self, data: Dict[str, Any]):
+        app_id = self.original_payload.get("apps").keys[0]
+        self.original_payload = data
+        self._payload = self.original_payload.get(app_id)
+
+    @property
+    def name(self) -> str:
+        return self._payload.get("name")
+
+    @property
+    def id(self) -> int:
+        return int(self._payload.get("id"))
+
+    @property
+    def url(self) -> str:
+        return self._payload.get("url")
+
 
 class Client:
-    """Represent a client that connected to Twitter!
+    """Represents a client that connected to Twitter!
 
     Parameters
     ------------
@@ -67,7 +95,12 @@ class Client:
             access_token_secret=access_token_secret,
             stream=stream,
         )
+        self.threading = threading
         self._account_user: Optional[User] = None  # set in account property.
+        #TODO add these in docstring
+        self.webhook = None
+        self.environment = None
+        self.webhook_uri_path = None
 
     def __repr__(self) -> str:
         return "Client(bearer_token=SECRET consumer_key=SECRET consumer_key_secret=SECRET access_token=SECRET access_token_secret=SECRET)"
@@ -657,27 +690,25 @@ class Client:
 
         return [int(subscription.get("user_id")) for subscription in res.get("subscriptions")]
 
-    def respond_crc(self):
-        _log.info("Attempts to responds a CRC!")
-        env = getattr(self, "environment", None)
-        webhook = getattr(self, "webhook", None)
+    def trigger_crc(self) -> bool:
+        _log.info("Triggering a CRC Challenge.")
 
-        if not env or not webhook:
+        if not self.environment or not self.webhook:
             _log.warn("CRC Failed: client is not listening! use Client().listen at the very end of your file!")
-            return None
+            return False
 
-        self.http.request("PUT", "1.1", f"/account_activity/all/{env.label}/webhooks/{webhook.id}.json", auth=True)
-        _log.info("Successfully responded to CRC!")
+        self.http.request("PUT", "1.1", f"/account_activity/all/{self.environment.label}/webhooks/{self.webhook.id}.json", auth=True)
+        _log.info("Successfully triggered a CRC.")
+        return True
 
     def fetch_all_environments(self):
         res = self.http.request("GET", "1.1", "/account_activity/all/webhooks.json")
 
         return [Environment(data) for data in res.get("environments")]
 
-    def listen(self, app: Flask, path: str, **kwargs):
+    def listen(self, app: Flask, path: str,**kwargs):
         disabled_log: bool = kwargs.pop("disabled_log", False)
         environments = self.fetch_all_environments()
-        self.webhook_uri_path = None
         for env in environments:
             for webhook in env.webhooks:
                 if path in webhook.url:
@@ -697,17 +728,34 @@ class Client:
             log.disabled = True
 
         try:
-
             @app.route(self.webhook_uri_path, methods=["POST", "GET"])
             def webhook_receive():
                 if request.method == "GET":
-                    self.respond_crc()
+                    _log.info("Attempts to responds a CRC.")
+                    crc = request.args['crc_token']
+    
+                    validation = hmac.new(
+                        key=bytes(self.http.consumer_key_secret, 'UTF-8'),
+                        msg=bytes(crc, 'UTF-8'),
+                        digestmod = hashlib.sha256
+                    )
+                    digested = base64.b64encode(validation.digest())
+                    
+                    response = {
+                        'response_token': 'sha256=' + format(str(digested)[2:-1])
+                    }
+
+                    return json.dumps(response)
 
                 json_data = request.get_json()
                 self.http.handle_events(json_data)
                 return ("", HTTPStatus.OK)
 
-            app.run(**kwargs)
+            thread = self.threading.Thread(target=app.run, name="pytweet-application-run-thread", kwargs=kwargs)
+            thread.start()
+            
+            time.sleep(0.50)
+            self.trigger_crc()
             
         except KeyboardInterrupt:
             print("\nKeyboardInterrupt: Finish listening.")
