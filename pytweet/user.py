@@ -15,7 +15,7 @@ from .expansions import (
     POLL_FIELD,
     TWEET_FIELD,
 )
-from .utils import build_object 
+from .utils import build_object
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -422,7 +422,7 @@ class User:
 
     @property
     def description(self) -> str:
-        """:class:`str`: an alias to User.bio
+        """:class:`str`: an alias to :meth:`User.bio`
 
         .. versionadded: 1.0.0
         """
