@@ -1,16 +1,18 @@
 from __future__ import annotations
 
 import datetime
+import io
 import mimetypes
 import os
 from dataclasses import dataclass
 from typing import Any, Dict, List, NoReturn, Optional, Union
 
+from .entities import Media
 from .enums import ButtonType
 from .utils import time_parse_todt
-from .entities import Media
 
 __all__ = ("PollOption", "Poll", "QuickReply", "Geo", "CTA", "Button", "Option", "File")
+
 
 
 @dataclass
@@ -443,9 +445,10 @@ class File:
     """
 
     def __init__(self, path: str, *, dm_only: bool = False):
+        mimetype_guesser = mimetypes.MimeTypes().guess_type
         self.__path = path
-        self._total_bytes = os.path.getsize(self.path)
-        self._mimetype = mimetypes.MimeTypes().guess_type(self.path)[0]
+        self._total_bytes = os.path.getsize(path) if isinstance(path,str) else os.path.getsize(path.name)
+        self._mimetype = mimetype_guesser(path) if isinstance(path,str) else mimetype_guesser(path.name)
         self.dm_only = dm_only
 
     def __repr__(self) -> str:
@@ -465,7 +468,7 @@ class File:
 
         .. versionadded:: 1.3.5
         """
-        return self._mimetype
+        return self._mimetype[0]
 
     @property
     def filename(self) -> str:
@@ -473,7 +476,9 @@ class File:
 
         .. versionadded:: 1.3.5
         """
-        return os.path.basename(self.path)
+        path = self.__path
+        return path.name if isinstance(path, io.IOBase) else os.path.basename(path)
+
 
     @property
     def total_bytes(self) -> int:
