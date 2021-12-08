@@ -1,7 +1,13 @@
-from typing import Dict, Any
+from typing import Any, Dict
+
+from .events import (
+    DirectMessageTypingEvent, 
+    UserFollowActionEvent,
+    UserUnfollowActionEvent
+)
 from .message import DirectMessage
-from .events import UserFollowActionEvent, UserUnfollowActionEvent, DirectMessageTypingEvent
 from .user import User
+from .client import ApplicationInfo
 
 
 class PayloadParser:
@@ -35,11 +41,15 @@ class EventParser:
         message_create = event_payload["event"].get("message_create")
         recipient_id = message_create.get("target").get("recipient_id")
         sender_id = message_create.get("sender_id")
+
         recipient = User(self.payload_parser.parse_user_payload(users.get(recipient_id)), http_client=self.http_client)
         sender = User(self.payload_parser.parse_user_payload(users.get(sender_id)), http_client=self.http_client)
+        source_app = ApplicationInfo(direct_message_payload.get("apps"))
+
 
         event_payload["event"]["message_create"]["target"]["recipient"] = recipient
         event_payload["event"]["message_create"]["target"]["sender"] = sender
+        event_payload["event"]["message_create"]["target"]["source_application"] = source_app
 
         direct_message = DirectMessage(
             event_payload, http_client=self.http_client
