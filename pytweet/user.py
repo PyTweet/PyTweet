@@ -83,8 +83,8 @@ class User:
         text: :class:`str`
             The text that will be send to that user.
         file: Optional[:class:`File`]
-            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
-        custom_profile: Optional[:class:`custom_profile`]
+            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File.
+        custom_profile: Optional[:class:`CustomProfile`]
             The custom profile attachment.
         quick_reply: Optional[:class:`QuickReply`]
             The QuickReply attachment that will be send to a user.
