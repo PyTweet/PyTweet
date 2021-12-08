@@ -3,7 +3,8 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from .attachments import QuickReply, CTA, File
+from .client import ApplicationInfo
+from .attachments import CTA, File, QuickReply
 from .entities import Hashtags, Symbols, Urls, UserMentions
 from .enums import MessageEventTypeEnum, MessageTypeEnum
 from .user import User
@@ -147,12 +148,20 @@ class DirectMessage(Message):
         return self.message_create.get("target", {}).get("recipient")
 
     @property
-    def author(self) -> User:
+    def author(self) -> Optional[User]:
         """:class:`User`: Returns the user that sent the direct message.
 
         .. versionadded:: 1.5.0
         """
         return self.message_create.get("target", {}).get("sender", None)
+
+    @property
+    def application_info(self) -> Optional[ApplicationInfo]:
+        """:class:`ApplicationInfo`: Returns the direct messages's source application info.
+
+        .. versionadded:: 1.5.0
+        """
+        return self.message_create.get("target", {}).get("application_info", None)
 
     @property
     def created_at(self) -> datetime.datetime:
