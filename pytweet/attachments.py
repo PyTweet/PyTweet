@@ -442,7 +442,7 @@ class File:
         Indicates if the file is use in dm only. Default to False.
     """
 
-    def __init__(self, path_to_filename: str, *, dm_only: bool = False):
+    def __init__(self, path str, *, dm_only: bool = False):
         self.__path = path_to_filename
         self._total_bytes = os.path.getsize(self.path)
         self._mimetype = mimetypes.MimeTypes().guess_type(self.path)[0]

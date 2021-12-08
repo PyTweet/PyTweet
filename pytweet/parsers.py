@@ -43,7 +43,15 @@ class EventParser:
 
         direct_message = DirectMessage(
             event_payload, http_client=self.http_client
-        )  # TODO Log the target and source in cache
+        )
+        client_id = int(self.http.access_token.partition("-")[0])
+
+        if recipient.id != client_id:
+            self.http.user_cache[recipient.id] = recipient
+
+        if sender.id != client_id:
+            self.http.user_cache[sender.id] = sender
+
         self.http_client.message_cache[direct_message.id] = direct_message
         self.http_client.dispatch("direct_message", direct_message)
 
@@ -56,8 +64,15 @@ class EventParser:
 
         event_payload["target"] = target
         event_payload["source"] = source
+        client_id = int(self.http.access_token.partition("-")[0])
+        if target.id != client_id:
+            self.http.user_cache[target.id] = target
+
+        if source.id != client_id:
+            self.http.user_cache[source.id] = source
+
         if action_type == "follow":
-            action = UserFollowActionEvent(follow_payload)  # TODO Log the target and source in cache
+            action = UserFollowActionEvent(follow_payload)
             self.http_client.dispatch("user_follow", action)
         elif action_type == "unfollow":
             action = UserUnfollowActionEvent(follow_payload)
@@ -74,6 +89,13 @@ class EventParser:
 
         event_payload["target"]["recipient"] = recipient
         event_payload["target"]["sender"] = sender
+        client_id = int(self.http.access_token.partition("-")[0])
+
+        if recipient.id != client_id:
+            self.http.user_cache[recipient.id] = recipient
+
+        if sender.id != client_id:
+            self.http.user_cache[sender.id] = sender
 
         payload = DirectMessageTypingEvent(event_payload)
         self.http_client.dispatch("typing", payload)
