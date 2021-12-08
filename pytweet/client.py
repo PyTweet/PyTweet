@@ -82,9 +82,8 @@ class Client:
         account_user = self._account_user
         if account_user is None:
             self._set_account_user()
-            return (
-                self._account_user
-            )  # The account_user does not change when the function is called. That is why we are returning this.
+            return self._account_user # type: ignore
+            # The account_user does not change when the function is called. That is why we are returning this.
         return account_user
 
     def _set_account_user(self) -> None:
@@ -709,5 +708,6 @@ class Client:
                 return ("", HTTPStatus.OK)
 
             app.run(**kwargs)
+            
         except KeyboardInterrupt:
             print("\nKeyboardInterrupt: Finish listening.")
