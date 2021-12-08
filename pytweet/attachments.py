@@ -436,14 +436,14 @@ class File:
 
     Parameters
     ------------
-    path_to_filename: :class:`str`
+    path: :class:`str`
         The file's path.
     dm_only: :class:`bool`
         Indicates if the file is use in dm only. Default to False.
     """
 
-    def __init__(self, path str, *, dm_only: bool = False):
-        self.__path = path_to_filename
+    def __init__(self, path: str, *, dm_only: bool = False):
+        self.__path = path
         self._total_bytes = os.path.getsize(self.path)
         self._mimetype = mimetypes.MimeTypes().guess_type(self.path)[0]
         self.dm_only = dm_only
