@@ -1,7 +1,9 @@
 import datetime
 import pytweet
+
 from typing import Any, Optional, Union
 from dateutil import parser
+
 
 def build_object(obj: str) -> Any:
     real_obj = getattr(pytweet, obj)
