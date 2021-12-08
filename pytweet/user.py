@@ -63,9 +63,7 @@ class User:
         return self.id == other.id
 
     def __ne__(self, other: User) -> Union[bool, NoReturn]:
-        if not isinstance(other, User):
-            raise ValueError("!= operation cannot be done with one of the element not a valid User object")
-        return self.id != other.id
+        return not self.__eq__(other)
 
     def send(
         self,
@@ -413,20 +411,20 @@ class User:
         return int(self._payload.get("id"))
 
     @property
-    def bio(self) -> str:
+    def description(self) -> str:
         """:class:`str`: Return the user's bio.
 
         .. versionadded: 1.0.0
         """
-        return self._payload.get("description", "")
+        return self._payload.get("description")
 
     @property
-    def description(self) -> str:
-        """:class:`str`: an alias to :meth:`User.bio`
+    def bio(self) -> str:
+        """:class:`str`: an alias to :meth:`User.description`
 
         .. versionadded: 1.0.0
         """
-        return self._payload.get("description")
+        return self.bio
 
     @property
     def profile_url(self) -> str:
@@ -486,7 +484,7 @@ class User:
 
     @property
     def created_at(self) -> datetime.datetime:
-        """Optional[:class:`datetime.datetime`]: Return datetime.datetime object with the user's account date.
+        """Optional[:class:`datetime.datetime`]: Returns a datetime.datetime object with the user's account date.
 
         .. versionadded: 1.0.0
         """
