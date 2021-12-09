@@ -232,10 +232,9 @@ class HTTPClient:
                 return
 
             state = processing_info["state"]
-            try:
-                seconds = processing_info["check_after_secs"]
-            except KeyError:
-                return
+            seconds = processing_info.get("check_after_secs")
+            if seconds is None:
+                return None
 
             if state == "succeeded":
                 return
