@@ -243,13 +243,12 @@ class HTTPClient:
                 raise PytweetException("Failed to finalize Media!")
 
             time.sleep(seconds)
-            params = {"command": "STATUS", "media_id": media_id}
 
             res = self.request(
                 "GET",
                 version=None,
                 path=self.base_url,
-                params=params,
+                params={"command": "STATUS", "media_id": media_id},
                 auth=True,
                 use_base_url=False,
             )
