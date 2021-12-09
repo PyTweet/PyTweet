@@ -199,7 +199,7 @@ class NotFoundError(APIException):
 class UnKnownSpaceState(APIException):
     """This error class inherits :class:`APIException`. This error is raises when a user specified an invalid space state.
 
-    .. versionadded:: 1.3.7
+    .. versionadded:: 1.5.0
     """
     def __init__(self, given_state):
         super().__init__(message="Unknown state passed: %s" % given_state)
