@@ -218,7 +218,7 @@ class Stream:
         return [StreamRule(**data) for data in self.raw_rules]
 
     def add_rule(self, value: str, tag: Optional[str] = None) -> Optional[Stream]:
-        """Add a rule to your stream to match with tweets that the stream return. You can use an operator to do this, check https://developer.twitter.com/en/docs/twitter-api/tweets/search/integrate/build-a-query for more information about the operator.
+        """Add a rule to your stream to match with tweets that the stream return. You can use an operator to do this, check https://developer.twitter.com/en/docs/twitter-api/tweets/search/integrate/build-a-query for more information about the operator. You can add multiple rules depending your access level, 5 for essential access, 25 for elevated access and 100 for academic research access.
 
         Parameters
         ------------

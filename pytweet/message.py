@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from .client import ApplicationInfo
+from .app import ApplicationInfo
 from .attachments import CTA, File, QuickReply
 from .entities import Hashtags, Symbols, Urls, UserMentions
 from .enums import MessageEventTypeEnum, MessageTypeEnum
@@ -48,7 +48,7 @@ class Message:
     def text(self) -> str:
         """:class:`str`: Returns the message's text.
 
-        .. versionadded:: 1.3.5
+        .. versionadded:: 1.2.0
         """
         return self._text
 
@@ -56,7 +56,7 @@ class Message:
     def id(self) -> int:
         """:class:`int`: Returns the message's id.
 
-        .. versionadded:: 1.3.5
+        .. versionadded:: 1.2.0
         """
         return int(self._id)
 
@@ -64,7 +64,7 @@ class Message:
     def type(self) -> MessageTypeEnum:
         """:class:`MessageTypeEnum`: Returns the message's type.
 
-        .. versionadded:: 1.3.5
+        .. versionadded:: 1.2.0
         """
         return MessageTypeEnum(self._type)
 
@@ -157,7 +157,7 @@ class DirectMessage(Message):
 
     @property
     def application_info(self) -> Optional[ApplicationInfo]:
-        """:class:`ApplicationInfo`: Returns the direct messages's source application info.
+        """:class:`ApplicationInfo`: Returns the direct messages's source application info if there is, else it return None.
 
         .. versionadded:: 1.5.0
         """
