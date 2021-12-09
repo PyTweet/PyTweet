@@ -4,7 +4,7 @@ from .enums import MediaType
 
 
 class Media:
-    """Represent media in a message."""
+    """Represents a media attachment in a message."""
 
     def __init__(self, data: Dict[str, Any]):
         self._payload = data
@@ -52,7 +52,7 @@ class Media:
 
 
 class Hashtags:
-    """Represent hashtags in a message"""
+    """Represents hashtags in a message"""
 
     def __init__(self, data=Dict[str, Any]):
         self._payload = data
@@ -71,7 +71,7 @@ class Hashtags:
 
 
 class UserMentions:
-    """Represent user mention in a message."""
+    """Represents user mention in a message."""
 
     def __init__(self, data=Dict[str, Any]):
         self._payload: Dict[str, Any] = data
@@ -102,7 +102,7 @@ class UserMentions:
 
 
 class Urls:
-    """Represent Urls in a message."""
+    """Represents Urls in a message."""
 
     def __init__(self, data=Dict[str, Any]):
         self._payload: Dict[str, Any] = data
@@ -133,7 +133,7 @@ class Urls:
 
 
 class Symbols:
-    """Represent Symbols in a message."""
+    """Represents Symbols in a message."""
 
     def __init__(self, data=Optional[Dict[str, Any]]):
         self._payload: Dict[str, Any] = data

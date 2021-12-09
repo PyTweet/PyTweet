@@ -11,8 +11,7 @@ __all__ = ("OauthSession",)
 
 
 class OauthSession(OAuth1Session):
-    """
-    The OauthSession, this usually is uses for POST requests and requests that need Oauth1 Authorization.
+    """Represents an OauthSession for Oauth1 Authorization. This class is very importantfo
 
     Parameters
     ------------
