@@ -5,9 +5,9 @@ class ApplicationInfo:
     
     """
     def __init__(self, data: Dict[str, Any]):
-        app_id = self.original_payload.get("apps").keys[0]
         self.original_payload = data
-        self._payload = self.original_payload.get(app_id)
+        app_id = list(self.original_payload.get("apps").keys())[0]
+        self._payload = self.original_payload.get("apps", {}).get(app_id, {})
 
     @property
     def name(self) -> str:

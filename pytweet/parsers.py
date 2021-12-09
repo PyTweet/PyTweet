@@ -7,7 +7,7 @@ from .events import (
 )
 from .message import DirectMessage
 from .user import User
-from .client import ApplicationInfo
+from .app import ApplicationInfo
 
 
 class PayloadParser:
@@ -44,8 +44,12 @@ class EventParser:
 
         recipient = User(self.payload_parser.parse_user_payload(users.get(recipient_id)), http_client=self.http_client)
         sender = User(self.payload_parser.parse_user_payload(users.get(sender_id)), http_client=self.http_client)
-        source_app = ApplicationInfo(direct_message_payload.get("apps"))
+        application_info = direct_message_payload.get("apps")
+        if application_info:
+            source_app = ApplicationInfo({"apps": direct_message_payload.get("apps")})
 
+        else:
+            source_app = None
 
         event_payload["event"]["message_create"]["target"]["recipient"] = recipient
         event_payload["event"]["message_create"]["target"]["sender"] = sender
