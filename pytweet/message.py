@@ -209,6 +209,14 @@ class DirectMessage(Message):
         return None
 
     @property
+    def quick_reply_response(self) -> Optional[str]:
+        """Optional[:class:`str`]: Returns the metadata of the quick reply option that the author clicked.
+        
+        .. versionadded:: 1.5.0
+        """
+        return self.message_data.get("quick_reply_response", {}).get("metadata", None)
+
+    @property
     def cta(self) -> Optional[CTA]:
         """Optional[:class:`CTA`]: Returns the message's cta.
 
