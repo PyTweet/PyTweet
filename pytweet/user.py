@@ -1,21 +1,14 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, NoReturn, Optional, List, Union
+from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
-from .attachments import CTA, QuickReply, File, CustomProfile
+from .attachments import CTA, CustomProfile, File, QuickReply
+from .expansions import (MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_EXPANSION,
+                         TWEET_FIELD, USER_FIELD)
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
-from .utils import time_parse_todt
-from .expansions import (
-    USER_FIELD,
-    TWEET_EXPANSION,
-    MEDIA_FIELD,
-    PLACE_FIELD,
-    POLL_FIELD,
-    TWEET_FIELD,
-)
-from .utils import build_object
+from .utils import build_object, time_parse_todt
 
 if TYPE_CHECKING:
     from .http import HTTPClient

@@ -1,4 +1,5 @@
-from typing import Dict, Any
+from typing import Any, Dict
+
 from .utils import time_parse_todt
 
 
@@ -32,9 +33,7 @@ class Environment:
         return self._payload.get("environment_name")
 
     @property
-    def label(self) -> str:
-        return self.name
-
-    @property
     def webhooks(self):
         return [Webhook(data) for data in self._payload.get("webhooks")]
+    
+    label = name # An alias for the name property.

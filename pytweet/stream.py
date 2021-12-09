@@ -1,21 +1,18 @@
 from __future__ import annotations
 
-import requests
 import json
 import logging
 import time
-from typing import Optional, Type, Union, Any, List, TYPE_CHECKING
 from dataclasses import dataclass
-from .tweet import Tweet
-from .errors import PytweetException, ConnectionException
+from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
+
+import requests
+
+from .errors import ConnectionException, PytweetException
 from .expansions import (
-    TWEET_FIELD,
-    MEDIA_FIELD,
-    PLACE_FIELD,
-    POLL_FIELD,
-    USER_FIELD,
-    TWEET_EXPANSION,
-)
+    MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_EXPANSION,
+                         TWEET_FIELD, USER_FIELD)
+from .tweet import Tweet
 
 if TYPE_CHECKING:
     from .http import HTTPClient

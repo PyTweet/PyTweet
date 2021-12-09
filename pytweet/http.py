@@ -1,42 +1,34 @@
 from __future__ import annotations
 
-from json.decoder import JSONDecodeError
+import io
 import logging
 import sys
 import time
-import requests
-from typing import Any, Dict, List, NoReturn, Optional, Union
+from json.decoder import JSONDecodeError
+from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
-from .parsers import EventParser
-from .attachments import CTA, Geo, Poll, QuickReply, File, CustomProfile
+import requests
+
+from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .auth import OauthSession
 from .enums import ReplySetting, SpaceState
-from .errors import (
-    BadRequests,
-    Forbidden,
-    NotFound,
-    Conflict,
-    NotFoundError,
-    PytweetException,
-    TooManyRequests,
-    Unauthorized,
-)
+from .errors import (BadRequests, Conflict, Forbidden, NotFound, NotFoundError,
+                     PytweetException, TooManyRequests, Unauthorized)
+from .expansions import (MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, SPACE_FIELD,
+                         TWEET_EXPANSION, TWEET_FIELD, USER_FIELD)
 from .message import DirectMessage, Message
+from .parsers import EventParser
 from .space import Space
+from .stream import Stream
 from .tweet import Tweet
 from .user import User
-from .stream import Stream
-from .expansions import (
-    TWEET_EXPANSION,
-    USER_FIELD,
-    TWEET_FIELD,
-    SPACE_FIELD,
-    MEDIA_FIELD,
-    PLACE_FIELD,
-    POLL_FIELD,
-)
 
 _log = logging.getLogger(__name__)
+
+
+if TYPE_CHECKING:
+    RequestModel = Dict[str, Any]
+    ResponseModel = Optional[Union[str, RequestModel]]
 
 
 def check_error(response: requests.models.Response) -> NoReturn:
@@ -96,7 +88,6 @@ def check_error(response: requests.models.Response) -> NoReturn:
         )
 
 
-RequestModel = Dict[str, Any]
 
 
 class HTTPClient:
@@ -140,8 +131,10 @@ class HTTPClient:
         self.event_parser = EventParser(self)
         self.base_url = "https://api.twitter.com/"
         self.upload_url = "https://upload.twitter.com/1.1/media/upload.json"
+        self._auth = None # Set in request method.
         self.message_cache = {}
         self.tweet_cache = {}
+        self.user_cache = {}
         self.events = {}
         if self.stream:
             self.stream.http_client = self
@@ -169,11 +162,17 @@ class HTTPClient:
         auth: bool = False,
         is_json: bool = True,
         use_base_url: bool = True,
-    ) -> Union[str, Dict[Any, Any], NoReturn]:
+    ) -> ResponseModel:
         if use_base_url:
             url = self.base_url + version + path
         else:
             url = path
+        
+        if self._auth is None:
+            auth_session = OauthSession(self.consumer_key, self.consumer_key_secret)
+            auth_session.set_access_token(self.access_token, self.access_token_secret)
+            self._auth = auth_session
+
 
         user_agent = "Py-Tweet (https://github.com/TheFarGG/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
         if "Authorization" not in headers.keys():
@@ -185,9 +184,7 @@ class HTTPClient:
             for k, v in self.credentials.items():
                 if v is None:
                     raise PytweetException(f"{k} is a required credential for this action.")
-            auth = OauthSession(self.consumer_key, self.consumer_key_secret)
-            auth.set_access_token(self.access_token, self.access_token_secret)
-            auth = auth.oauth1
+            auth = self._auth.oauth1
 
         if data:
             json = None
@@ -285,7 +282,12 @@ class HTTPClient:
         elif command.upper() == "APPEND":
             segment_id = 0
             bytes_sent = 0
-            open_file = open(file.path, "rb")
+            path = file.path
+            if isinstance(path, io.IOBase):
+                open_file = path
+            else:
+                open_file = open(file.path, "rb")
+
             if not media_id:
                 raise ValueError("'media_id' is None! Please specified it.")
 

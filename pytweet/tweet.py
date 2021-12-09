@@ -4,14 +4,14 @@ import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
 from .attachments import Poll
+from .entities import Media
+from .enums import ReplySetting
+from .expansions import USER_FIELD
 from .message import Message
 from .metrics import TweetPublicMetrics
 from .relations import RelationHide, RelationLike, RelationRetweet
 from .user import User
 from .utils import time_parse_todt
-from .entities import Media
-from .enums import ReplySetting
-from .expansions import USER_FIELD
 
 if TYPE_CHECKING:
     from .http import HTTPClient

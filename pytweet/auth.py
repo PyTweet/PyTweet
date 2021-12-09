@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Optional, Tuple, Any, Type, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional, Tuple, Type
+
 from requests_oauthlib import OAuth1, OAuth1Session
 
 if TYPE_CHECKING:
@@ -45,7 +46,7 @@ class OauthSession(OAuth1Session):
         Parameters
         ------------
         client: :class:`Client`
-            An instance of your :meth:`Client`, note that this staticmethod will invalidate the access token and access token secret in this :meth:`Client`.
+            An instance of your :class:`Client`, note that this staticmethod will invalidate the access token and access token secret in this :class:`Client`.
 
 
         .. versionadded:: 1.3.5
