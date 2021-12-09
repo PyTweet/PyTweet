@@ -9,7 +9,7 @@ import threading
 import time
 from asyncio import iscoroutinefunction
 from http import HTTPStatus
-from typing import Callable, List, Optional, Union, Dict, Any
+from typing import Callable, List, Optional, Union
 
 from flask import Flask, request
 
@@ -27,27 +27,6 @@ from .webhook import Environment, Webhook
 __all__ = ("Client",)
 
 _log = logging.getLogger(__name__)
-
-class ApplicationInfo:
-    """Represents an application's info.
-    
-    """
-    def __init__(self, data: Dict[str, Any]):
-        app_id = self.original_payload.get("apps").keys[0]
-        self.original_payload = data
-        self._payload = self.original_payload.get(app_id)
-
-    @property
-    def name(self) -> str:
-        return self._payload.get("name")
-
-    @property
-    def id(self) -> int:
-        return int(self._payload.get("id"))
-
-    @property
-    def url(self) -> str:
-        return self._payload.get("url")
 
 
 class Client:
@@ -213,7 +192,7 @@ class Client:
         """A method for fetching the message with the message's event ID.
 
         .. warning::
-            This method uses API call and might cause ratelimit if used often! It is more ecommended to use `get_message()` method, as it only retrieves the client's message only.
+            This method uses API call and might cause ratelimit if used often! It is more recommended to use `get_message()` method, as it get the message from the client's internal cache.
 
         Parameters
         ------------
@@ -396,7 +375,12 @@ class Client:
         id = data.get("id")
         timestamp = data.get("created_timestamp")
         text = message_data.get("text")
-        return WelcomeMessage(text=text, id=id, timestamp=timestamp, http_client=self.http)
+        return WelcomeMessage(
+            text=text, 
+            id=id, 
+            timestamp=timestamp, 
+            http_client=self.http
+        )
 
     def fetch_welcome_message_rules(self, welcome_message_rules_id: Union[str, int]) -> WelcomeMessageRule:
         """A method for fetching a welcome message rules.
@@ -491,14 +475,14 @@ class Client:
         ip: Union[:class:`str`, :class:`int`]
             An IP address. Used when attempting to fix geolocation based off of the user's IP address.
         granularity: :class:`str`
-            This is the minimal granularity of place types to return and must be one of: neighborhood ,ity ,admin or country. If no granularity is provided for the request neighborhood is assumed. Setting this to city, for example, will find places which have a type of city, admin or country
+            This is the minimal granularity of place types to return and must be one of: neighborhood, city, admin or country. If no granularity is provided for the request neighborhood is assumed. Setting this to city, for example, will find places which have a type of city, admin or country.
         max_results: Optional[Union[:class:`str`, :class:`int`]]
-            A hint as to the number of results to return. This does not guarantee that the number of results returned will equal max_results, but instead informs how many "nearby" results to return. Ideally, only pass in the number of places you intend to display to the user here
+            A hint as to the number of results to return. This does not guarantee that the number of results returned will equal max_results, but instead informs how many "nearby" results to return. Ideally, only pass in the number of places you intend to display to the user here.
 
         Returns
         ---------
-        :class:`Geo`
-            This method return a :class:`Geo` object.
+        List[:class:`Geo`]
+            This method return a list of :class:`Geo` objects.
 
 
         .. versionadded:: 1.5.3
@@ -528,7 +512,7 @@ class Client:
         """Get a direct message through the client message cache. Returns None if the message is not in the cache.
 
         .. note::
-            Note that only the client's tweet is going to be stored in the cache which means you can't get someone's message other then the client itself from the cache.
+            Note that you can only get the client and the subscriptions users's message.
 
         Parameters
         ------------
@@ -554,7 +538,7 @@ class Client:
         """Gets a tweet through the client internal tweet cache. Return None if the tweet is not in the cache.
 
         .. note::
-            Note that, only the client's tweet is going to be stored in the cache which mean you can't get someone's tweet other then the client itself from the cache.
+            Note that you can only get the client and the subscriptions users's tweet.
 
         Parameters
         ------------
@@ -565,6 +549,7 @@ class Client:
         --------
         ValueError:
             Raised when the tweet_id argument is not an integer or a string of digits.
+
 
         Returns
         ---------
@@ -602,7 +587,17 @@ class Client:
         self.http.upload(file, "APPEND", media_id=media_id)
         self.http.upload(file, "FINALIZE", media_id=media_id)
 
-        data = {"custom_profile": {"name": name, "avatar": {"media": {"id": media_id}}}}
+        data = {
+            "custom_profile": {
+                "name": name, 
+                "avatar": {
+                    "media": 
+                    {
+                        "id": media_id
+                    }
+                }
+            }
+        }
 
         res = self.http.request("POST", "1.1", "/custom_profiles/new.json", json=data, auth=True)
         data = res.get("custom_profile")
@@ -615,15 +610,29 @@ class Client:
         )
 
     def stream(self, *, dry_run: bool = False) -> None:
-        """Stream realtime in twitter! Make sure to put stream kwarg in client. If you want the tweet data make sure to make an `on_stream` event. example:
+        """Stream realtime in twitter for tweets! This method use the stream argument in :meth:`request.get` for streaming in one of the stream endpoint that twitter api provides. If you want to use this method, make sure to provides the stream kwarg in your :class:`Client` instance and make an on_stream event to get the stream's tweet data and connection,
+        example:
 
         .. code-block:: py
 
+            import pytweet
+
+            stream = pytweet.Stream()
+            stream.add_rule("pytweet") #this make sure to only return tweets that has pytweet keyword in it.
+
+            client = pytweet.Client(
+                ...
+                stream=stream
+            )
+
             @client.event
             def on_stream(tweet, connection):
-                ... #Do what you want with tweet and connection you got.
+                ... #Do what you want with tweet and stream connection you got.
 
+            client.stream()
 
+        You can also add rules and specified which tweets must be retrieve via characteristic features. 
+            
         Parameters
         ------------
         dry_run: :class:`bool`
@@ -670,7 +679,7 @@ class Client:
         """
         self.http.request("POST", "1.1", f"/account_activity/all/{env_label}/subscriptions.json", auth=True)
 
-    def get_all_subscriptions(self, env_label: str) -> List[int]:
+    def fetch_all_subscriptions(self, env_label: str) -> List[int]:
         """Returns a list of the current All Activity type subscriptions user id.
 
         Parameters
@@ -690,6 +699,11 @@ class Client:
 
         return [int(subscription.get("user_id")) for subscription in res.get("subscriptions")]
 
+    def fetch_all_environments(self):
+        res = self.http.request("GET", "1.1", "/account_activity/all/webhooks.json")
+
+        return [Environment(data) for data in res.get("environments")]
+
     def trigger_crc(self) -> bool:
         _log.info("Triggering a CRC Challenge.")
 
@@ -700,11 +714,6 @@ class Client:
         self.http.request("PUT", "1.1", f"/account_activity/all/{self.environment.label}/webhooks/{self.webhook.id}.json", auth=True)
         _log.info("Successfully triggered a CRC.")
         return True
-
-    def fetch_all_environments(self):
-        res = self.http.request("GET", "1.1", "/account_activity/all/webhooks.json")
-
-        return [Environment(data) for data in res.get("environments")]
 
     def listen(self, app: Flask, path: str,**kwargs):
         disabled_log: bool = kwargs.pop("disabled_log", False)
@@ -751,9 +760,8 @@ class Client:
                 self.http.handle_events(json_data)
                 return ("", HTTPStatus.OK)
 
-            thread = self.threading.Thread(target=app.run, name="pytweet-application-run-thread", kwargs=kwargs)
+            thread = self.threading.Thread(target=app.run, name="pytweet-client.listen-thread", kwargs=kwargs)
             thread.start()
-            
             time.sleep(0.50)
             self.trigger_crc()
             
