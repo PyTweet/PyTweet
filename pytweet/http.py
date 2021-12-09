@@ -12,10 +12,8 @@ import requests
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .auth import OauthSession
 from .enums import ReplySetting, SpaceState
-from .errors import (BadRequests, Conflict, Forbidden, NotFound, NotFoundError,
-                     PytweetException, TooManyRequests, Unauthorized)
-from .expansions import (MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, SPACE_FIELD,
-                         TWEET_EXPANSION, TWEET_FIELD, USER_FIELD)
+from .errors import BadRequests, Conflict, Forbidden, NotFound, NotFoundError, PytweetException, TooManyRequests, Unauthorized
+from .expansions import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, SPACE_FIELD, TWEET_EXPANSION, TWEET_FIELD, USER_FIELD
 from .message import DirectMessage, Message
 from .parsers import EventParser
 from .space import Space

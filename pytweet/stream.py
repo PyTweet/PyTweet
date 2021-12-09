@@ -9,14 +9,7 @@ from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
 import requests
 
 from .errors import ConnectionException, PytweetException
-from .expansions import (
-    MEDIA_FIELD, 
-    PLACE_FIELD, 
-    POLL_FIELD, 
-    TWEET_EXPANSION,
-    TWEET_FIELD, 
-    USER_FIELD
-)
+from .expansions import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_EXPANSION,TWEET_FIELD, USER_FIELD
 from .tweet import Tweet
 
 if TYPE_CHECKING:
