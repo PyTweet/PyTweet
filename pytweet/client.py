@@ -51,6 +51,8 @@ class Client:
     ------------
     http: Optional[:class:`HTTPClient`]
         Returns the HTTPClient,  the HTTPClient is responsible for making most of the Requests.
+    webhook: Optional[Webhook]
+        Returns the client's main webhook, if there isnt it return None.  
 
 
     .. versionadded:: 1.0.0
@@ -77,9 +79,9 @@ class Client:
         self.threading = threading
         self._account_user: Optional[User] = None  # set in account property.
         #TODO add these in docstring
-        self.webhook = None
-        self.environment = None
-        self.webhook_uri_path = None
+        self.webhook: Optional[Webhook] = None
+        self.environment: Optional[Environment] = None
+        self.webhook_url_path: Optional[str] = None
 
     def __repr__(self) -> str:
         return "Client(bearer_token=SECRET consumer_key=SECRET consumer_key_secret=SECRET access_token=SECRET access_token_secret=SECRET)"
@@ -631,7 +633,7 @@ class Client:
 
             client.stream()
 
-        You can also add rules and specified which tweets must be retrieve via characteristic features. 
+        You can also add rules and specified which tweets must be retrieve via the tweet's characteristic features. 
             
         Parameters
         ------------
@@ -659,13 +661,20 @@ class Client:
         env_label: :class:`str`
             This is the type of environment that you set in your Dev environments page. For example, if you use the 'prod' environment name then this argument must be 'prod'
 
+        Returns
+        ---------
+        :class:`Webhook`
+            This method returns a :class:`Webhook` object.
+
+
+        .. versionadded:: 1.5.0
         """
         res = self.http.request(
             "POST", "1.1", f"/account_activity/all/{env_label}/webhooks.json", auth=True, params={"url": url}
         )
         return Webhook(res)
 
-    def add_my_subscription(self, env_label: str):
+    def add_my_subscription(self, env_label: str) -> None:
         """Add a new user subscription to the webhook, which is the client itself.
 
         .. note::
@@ -676,6 +685,8 @@ class Client:
         env_label: :class:`str`
             This is the type of environment that you set in your Dev environments page. For example, if you use the 'prod' environment name then this argument must be 'prod'
 
+
+        .. versionadded:: 1.5.0
         """
         self.http.request("POST", "1.1", f"/account_activity/all/{env_label}/subscriptions.json", auth=True)
 
@@ -689,7 +700,7 @@ class Client:
 
         Returns
         ---------
-        List[:class:`int`]:
+        List[:class:`int`]
             This method returns a list of :class:`int` object.
 
 
@@ -699,23 +710,57 @@ class Client:
 
         return [int(subscription.get("user_id")) for subscription in res.get("subscriptions")]
 
-    def fetch_all_environments(self):
+    def fetch_all_environments(self) -> Optional[List[Environment]]:
+        """A method for fetching all the client's envirouments.
+
+        Returns
+        ---------
+        Optional[List[:class:`Environment`]]
+            Returns a list of :class:`Environment` objects.
+        
+
+        .. versionadded:: 1.5.0
+        """
         res = self.http.request("GET", "1.1", "/account_activity/all/webhooks.json")
 
         return [Environment(data) for data in res.get("environments")]
 
     def trigger_crc(self) -> bool:
+        """Trigger a challenge-response-checks to enable Twitter to confirm the ownership of the WebApp receiving webhook events. Before this you do need to register your webhook url via :meth:`client.register_webhook`. Will return True if its successful else False.
+
+        Returns
+        ---------
+        :class:`bool`
+            This method returns a :class:`bool` object. 
+        
+
+        .. versionadded:: 1.3.5
+        """
         _log.info("Triggering a CRC Challenge.")
 
         if not self.environment or not self.webhook:
-            _log.warn("CRC Failed: client is not listening! use Client().listen at the very end of your file!")
+            _log.warn("CRC Failed: client is not listening! use the listen method at the very end of your file!")
             return False
 
         self.http.request("PUT", "1.1", f"/account_activity/all/{self.environment.label}/webhooks/{self.webhook.id}.json", auth=True)
         _log.info("Successfully triggered a CRC.")
         return True
 
-    def listen(self, app: Flask, path: str,**kwargs):
+    def listen(self, app: Flask, path: str, **kwargs):
+        """Listen to upcoming account activity events send by twitter to your webhook url. You can use the rest of Flask arguments like port or host via the kwargs argument.
+
+        Parameters
+        ------------
+        app: :class:`flask.Flask`
+            Your flask application.
+        path: :class:`str`
+            Your webhook path url. If the webhook url is `https://your-domain.com/webhook/twitter`, then the path is `/webhook/twitter`.
+        disabled_log: :class:`bool`
+            Indicates to disable flask's log so it doesn't have to print request process in your terminal, this also will disable `werkzeug` log.
+        
+
+        .. versionadded:: 1.3.5
+        """
         disabled_log: bool = kwargs.pop("disabled_log", False)
         environments = self.fetch_all_environments()
         for env in environments:
@@ -723,12 +768,12 @@ class Client:
                 if path in webhook.url:
                     path = webhook.url.split("/")
                     path = "/" + "/".join(path[3:])
-                    self.webhook_uri_path = path
+                    self.webhook_url_path = path
                     self.webhook = webhook
                     self.environment = env
                     break
 
-        if not self.webhook_uri_path:
+        if not self.webhook_url_path:
             raise PytweetException(f"Invalid uri path passed: {path}")
 
         if disabled_log:
@@ -737,7 +782,7 @@ class Client:
             log.disabled = True
 
         try:
-            @app.route(self.webhook_uri_path, methods=["POST", "GET"])
+            @app.route(self.webhook_url_path, methods=["POST", "GET"])
             def webhook_receive():
                 if request.method == "GET":
                     _log.info("Attempts to responds a CRC.")
@@ -764,6 +809,7 @@ class Client:
             thread.start()
             time.sleep(0.50)
             self.trigger_crc()
+            _log.debug("Listening for events!")
             
         except KeyboardInterrupt:
             print("\nKeyboardInterrupt: Finish listening.")

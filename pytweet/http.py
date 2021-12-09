@@ -4,10 +4,9 @@ import io
 import logging
 import sys
 import time
+import requests
 from json import JSONDecodeError
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
-
-import requests
 
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .auth import OauthSession
@@ -29,6 +28,32 @@ if TYPE_CHECKING:
     ResponseModel = Optional[Union[str, RequestModel]]
 
 
+def check_200(response):
+        try:
+            res = response.json()
+            if "errors" in res.keys():
+                if res.get("errors"):
+                    if "detail" in res.get("errors")[0].keys():
+                        detail = res["errors"][0]["detail"]
+                        if detail.startswith("Could not find"):
+                            raise NotFoundError(response)
+                    elif "details" in res.get("errors")[0].keys():
+                        detail = res["errors"][0]["details"][0]
+                        if detail.startswith("Cannot parse rule"):
+                            _log.warning(
+                                f"Invalid stream rule! Rules Info: 'created': {res['meta']['summary'].get('created')}, 'not_created': {res['meta']['summary'].get('not_created')}, 'valid': {res['meta']['summary'].get('valid')}, 'invalid': {res['meta']['summary'].get('invalid')}"
+                            )
+                            raise SyntaxError(detail)
+            
+
+
+                else:
+                    raise PytweetException(response, res["errors"][0]["detail"])
+        except (JSONDecodeError, KeyError) as e:
+            if isinstance(e, KeyError):
+                raise PytweetException(res)
+            return
+
 def check_error(response: requests.models.Response) -> NoReturn:
     code = response.status_code
     if code == 200:
@@ -47,6 +72,8 @@ def check_error(response: requests.models.Response) -> NoReturn:
                                 f"Invalid stream rule! Rules Info: 'created': {res['meta']['summary'].get('created')}, 'not_created': {res['meta']['summary'].get('not_created')}, 'valid': {res['meta']['summary'].get('valid')}, 'invalid': {res['meta']['summary'].get('invalid')}"
                             )
                             raise SyntaxError(detail)
+            
+
 
                 else:
                     raise PytweetException(response, res["errors"][0]["detail"])
@@ -74,11 +101,11 @@ def check_error(response: requests.models.Response) -> NoReturn:
         raise Conflict(response)
 
     elif code == 429:
-        text = response.text
-        __check = response.headers["x-rate-limit-reset"]
-        _time = time.time()
-        time.sleep(_time - __check)
-        raise TooManyRequests(response, text)
+        remaining = int(response.headers["x-rate-limit-reset"])
+        sleep_for = (remaining - int(time.time())) + 1
+        _log.warn(f"Client has been ratelimited. Sleeping for {sleep_for}")
+        time.sleep(sleep_for)
+
 
     else:
         raise PytweetException(
@@ -172,7 +199,7 @@ class HTTPClient:
             self._auth = auth_session
 
 
-        user_agent = "Py-Tweet (https://github.com/TheFarGG/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
+        user_agent = "Py-Tweet (https://github.com/PyTweet/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
         if "Authorization" not in headers.keys():
             headers["Authorization"] = f"Bearer {self.bearer_token}"
 
@@ -200,8 +227,46 @@ class HTTPClient:
             files=files,
             auth=auth,
         )
-        check_error(response)
+        code = response.staus_code
         res = None
+
+        if code == 200:
+            check_200(response)
+        
+        elif code in {201, 202, 204}:
+            return None
+
+        elif code == 400:
+           raise BadRequests(response)
+
+        elif code == 401:
+            raise Unauthorized(response)
+
+        elif code == 403:
+            raise Forbidden(response)
+
+        elif code == 404:
+            raise NotFound(response)
+
+        elif code == 409:
+            raise Conflict(response)
+
+        elif code == 429:
+            remaining = int(response.headers["x-rate-limit-reset"])
+            sleep_for = (remaining - int(time.time())) + 1
+            _log.warn(f"Client has been ratelimited. Sleeping for {sleep_for}")
+            time.sleep(sleep_for)
+            response = self.__session.request(
+            method,
+            url,
+            headers=headers,
+            params=params,
+            data=data,
+            json=json,
+            files=files,
+            auth=auth,
+        )
+
 
         if is_json:
             try:

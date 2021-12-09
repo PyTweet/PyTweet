@@ -85,7 +85,6 @@ class DirectMessage(Message):
 
         super().__init__(self.message_data.get("text"), self._payload.get("id"), 0)
         self.http_client = http_client
-        self.timestamp = round(datetime.datetime.utcnow().timestamp())
 
     def __repr__(self) -> str:
         return "DirectMessage(text={0.text} id={0.id} recipient={0.recipient})".format(self)
@@ -161,7 +160,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.2.0
         """
-        return datetime.datetime.fromtimestamp(int(self._payload.get("created_at")[:7]))
+        return datetime.datetime.fromtimestamp(int(self._payload.get("created_timestamp")[:7]))
 
     @property
     def hashtags(self) -> Optional[List[Hashtags]]:
