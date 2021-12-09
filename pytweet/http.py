@@ -227,16 +227,10 @@ class HTTPClient:
             files=files,
             auth=auth,
         )
-        code = response.staus_code
+        code = response.status_code
         res = None
 
-        if code == 200:
-            check_200(response)
-        
-        elif code in {201, 202, 204}:
-            return None
-
-        elif code == 400:
+        if code == 400:
            raise BadRequests(response)
 
         elif code == 401:
@@ -256,16 +250,6 @@ class HTTPClient:
             sleep_for = (remaining - int(time.time())) + 1
             _log.warn(f"Client has been ratelimited. Sleeping for {sleep_for}")
             time.sleep(sleep_for)
-            response = self.__session.request(
-            method,
-            url,
-            headers=headers,
-            params=params,
-            data=data,
-            json=json,
-            files=files,
-            auth=auth,
-        )
 
 
         if is_json:
@@ -283,7 +267,12 @@ class HTTPClient:
             except KeyError:
                 pass
 
-        _log.debug(f'{method} {url} has returned {response.status_code} status code with {res}')
+        _log.debug(
+            f"{method} {url} has returned: "
+            f"{response.status_code} {response.reason}\n"
+            f"Headers: {response.headers}\n"
+            f"Content: {response.content}\n"
+            )
         return res
 
     def upload(self, file: File, command: str, *, media_id=None):
