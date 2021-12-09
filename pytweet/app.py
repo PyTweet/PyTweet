@@ -11,12 +11,24 @@ class ApplicationInfo:
 
     @property
     def name(self) -> str:
+        """:class:`str`: Returns the application's name.
+        
+        .. versionadded:: 1.5.0
+        """
         return self._payload.get("name")
 
     @property
     def id(self) -> int:
+        """:class:`int`: Returns the application's id.
+        
+        .. versionadded:: 1.5.0
+        """
         return int(self._payload.get("id"))
 
     @property
     def url(self) -> str:
+        """:class:`str`: Returns the application's url, specifically website url from the application authentication settings.
+        
+        .. versionadded:: 1.5.0
+        """
         return self._payload.get("url")

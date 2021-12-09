@@ -51,8 +51,12 @@ class Client:
     ------------
     http: Optional[:class:`HTTPClient`]
         Returns the HTTPClient,  the HTTPClient is responsible for making most of the Requests.
-    webhook: Optional[Webhook]
-        Returns the client's main webhook, if there isnt it return None.  
+    webhook: Optional[:class:`Webhook`]
+        Returns the client's main webhook, if there isn't it return None.
+    environment: Optional[:class:`Environment`]
+        Returns the client's main Environment, if there isn't it return None.
+    webhook_url_path: Optional[:class:`str`]
+        Returns the webhook url path, if there isn't it return None.
 
 
     .. versionadded:: 1.0.0

@@ -166,6 +166,7 @@ class Poll:
         """:class:`str`: Returns the current voting status of the poll.
 
         .. versionadded:: 1.1.0
+
         .. versionchanged:: 1.3.7
         """
         return self._voting_status
@@ -263,8 +264,8 @@ class QuickReply:
         return self._options
 
     @property
-    def raw_options(self) -> List[Dict]:
-        """List[Dict]: Returns the raw options.
+    def raw_options(self) -> List[dict]:
+        """List[:class:`dict`]: Returns the raw options.
 
         .. versionadded:: 1.2.0
         """
