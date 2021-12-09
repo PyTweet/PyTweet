@@ -12,7 +12,7 @@ from .user import User
 if TYPE_CHECKING:
     from .http import HTTPClient
 
-__all__ = ("Message", "DirectMessage", "DMChannel", "WelcomeMessage", "WelcomeMessageRule")
+__all__ = ("Message", "DirectMessage", "WelcomeMessage", "WelcomeMessageRule")
 
 
 class Message:
@@ -30,7 +30,6 @@ class Message:
 
     .. versionadded:: 1.2.0
     """
-
     if TYPE_CHECKING:
         _text: Optional[str]
         _id: Union[str, int]
@@ -54,7 +53,7 @@ class Message:
 
     @property
     def id(self) -> int:
-        """:class:`int`: Returns the message's id.
+        """:class:`int`: Returns the message's id, or if its a direct message it returns an event id.
 
         .. versionadded:: 1.2.0
         """
@@ -67,13 +66,6 @@ class Message:
         .. versionadded:: 1.2.0
         """
         return MessageTypeEnum(self._type)
-
-
-class DMChannel:
-    """Represents a Direct Message Channel in Twitter where user can send direct message."""
-
-    def __init__(self, data: Dict[str, Any]):
-        self._payload = data
 
 
 class DirectMessage(Message):
