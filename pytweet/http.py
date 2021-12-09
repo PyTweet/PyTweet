@@ -4,7 +4,7 @@ import io
 import logging
 import sys
 import time
-from json.decoder import JSONDecodeError
+from json import JSONDecodeError
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
 import requests
