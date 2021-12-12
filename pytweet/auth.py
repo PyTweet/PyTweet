@@ -37,7 +37,7 @@ class OauthSession(OAuth1Session):
 
     @staticmethod
     def invalidate_access_token(client: Client) -> None:
-        """A staticmethod to invalidate a pair of access token and access token secret!
+        """A staticmethod that can be used to invalidate the acecss token and access token secret of a client.
 
         .. warning::
             This staticmethod will invalidate your access token and access token secret that you passed in your :class:`Client` argument.
@@ -45,7 +45,7 @@ class OauthSession(OAuth1Session):
         Parameters
         ------------
         client: :class:`Client`
-            An instance of your :class:`Client`, note that this staticmethod will invalidate the access token and access token secret in this :class:`Client`.
+            Your client.
 
 
         .. versionadded:: 1.3.5
