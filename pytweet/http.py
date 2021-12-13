@@ -463,14 +463,20 @@ class HTTPClient:
         if "direct_message_events" in keys:
             self.event_parser.parse_direct_message_create(payload)
 
-        elif "follow_events" in keys:
-            self.event_parser.parse_user_follow(payload)
-
         elif "direct_message_indicate_typing_events" in keys:
             self.event_parser.parse_direct_message_typing(payload)
 
         elif "direct_message_mark_read_events" in keys:
             self.event_parser.parse_direct_message_read(payload)
+
+        elif "follow_events" in keys:
+            self.event_parser.parse_user_action(payload, "follow_events")
+
+        elif "block_events" in keys:
+            self.event_parser.parse_user_action(payload, "block_events")
+
+        elif "mute_events" in keys:
+            self.event_parser.parse_user_action(payload, "mute_events")
         
         elif "tweet_create_events" in keys:
             self.event_parser.parse_tweet_create(payload)
