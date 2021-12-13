@@ -40,7 +40,8 @@ class OauthSession(OAuth1Session):
         """A staticmethod that can be used to invalidate the access token and access token secret of a client.
 
         .. warning::
-            This staticmethod will invalidate your access token and access token secret that you passed in your :class:`Client` argument.
+            This staticmethod will invalidate your access token and access token secret of your client.
+
 
         Parameters
         ------------

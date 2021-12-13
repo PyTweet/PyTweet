@@ -32,7 +32,7 @@ from .utils import *
 from .webhook import *
 
 __title__ = "PyTweet"
-__version__ = "1.5.0"
+__version__ = "1.5.0a1"
 __author__ = "TheFarGG & TheGenocides"
 __license__ = "MIT"
 __copyright__ = "Copyright 2021 TheFarGG & TheGenocides"
