@@ -149,8 +149,6 @@ class UserUnfollowActionEvent(UserActionEvent):
     """
     pass
 
-#TODO Dispatch the events and return these objects.
-
 class UserBlockActionEvent(UserActionEvent):
     """Represents a block action event by user, This inherits :class:`UserActionEvent`. This object contains information that twitter posts through the webhook url.
     
