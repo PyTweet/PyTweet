@@ -185,14 +185,15 @@ class Tweet(Message):
         original_payload: Dict[str, Any]
         _includes: Any
 
-    def __init__(self, data: Dict[str, Any], **kwargs: Any) -> None:
+    def __init__(self, data: Dict[str, Any], *,deleted_timestamp: Optional[int] = None, http_client: Optional[HTTPClient] = None) -> None:
         self.original_payload = data
         self._payload = data.get("data") or data
         self._includes = self.original_payload.get("includes")
         self.tweet_metrics: TweetPublicMetrics = TweetPublicMetrics(self._payload)
-
+        self.http_client = http_client
+        self.deleted_timestamp = deleted_timestamp
         super().__init__(self._payload.get("text"), self._payload.get("id"), 1)
-        self.http_client: Optional[HTTPClient] = kwargs.get("http_client") or None
+        
 
     def __repr__(self) -> str:
         return "Tweet(text={0.text} id={0.id} author={0.author})".format(self)
@@ -256,8 +257,8 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.0
         """
-        my_id: Union[int, str] = self.http_client.access_token.partition("-")[0]
-        res: dict = self.http_client.request(
+        my_id = self.http_client.access_token.partition("-")[0]
+        res = self.http_client.request(
             "POST",
             "2",
             f"/users/{my_id}/retweets",
@@ -336,7 +337,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        res: dict = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
+        res = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
         return RelationHide(res)
 
     def unhide(self) -> RelationHide:
@@ -350,7 +351,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        res: dict = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
+        res = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
         return RelationHide(res)
 
     def fetch_retweeters(self):
@@ -436,11 +437,26 @@ class Tweet(Message):
 
     @property
     def created_at(self) -> datetime.datetime:
-        """:class:`datetime.datetime`: Return a datetime object with the tweet posted age.
+        """:class:`datetime.datetime`: Return a :class:`datetime.datetime` object when the tweet was created.
 
         .. versionadded: 1.0.0
         """
+        if self._payload.get("timestamp", None):
+            return datetime.datetime.fromtimestamp(int(self._payload.get("timestamp", None))/1000)
         return time_parse_todt(self._payload.get("created_at"))
+
+    @property
+    def deleted_at(self) -> Optional[datetime.datetime]:
+        """Optional[:class:`datetime.datetime`]: Return a :class:`datetime.datetime` object when the tweet was deleted. Returns None when the tweet is not deleted.
+
+        .. note::
+            This property can only be access through `on_tweet_delete` event and if the tweet was not deleted or it isn't in the client tweet cache, it returns None.
+
+        .. versionadded: 1.5.0
+        """
+        if not self.deleted_timestamp:
+            return None
+        return datetime.datetime.fromtimestamp(self.deleted_timestamp/1000)
 
     @property
     def source(self) -> str:
@@ -483,12 +499,18 @@ class Tweet(Message):
         return int(self._payload.get("conversation_id"))
 
     @property
-    def link(self) -> str:
-        """:class:`str`: Get the tweet's link.
+    def link(self) -> Optional[str]:
+        """Optional[:class:`str`]: Get the tweet's link. 
 
-        .. versionadded: 1.1.0
+        .. versionadded:: 1.1.0
+
+        .. versionchanged:: 1.5.0
+            Returns None if the author is invalid or the tweet doesn't have id.
         """
-        return f"https://twitter.com/{self.author.username.split('@', 1)[1]}/status/{self.id}"
+        try:
+            return f"https://twitter.com/{self.author.username.split('@', 1)[1]}/status/{self.id}"
+        except TypeError:
+            return None
 
     @property
     def mentions(self) -> Optional[List[str]]:
