@@ -1,17 +1,20 @@
 from typing import Any, Dict
 
 from .events import (
-    DirectMessageTypingEvent, 
+    DirectMessageTypingEvent,
+    DirectMessageReadEvent,
     UserFollowActionEvent,
     UserUnfollowActionEvent
 )
-from .message import DirectMessage
+from .message import Message, DirectMessage
 from .user import User
 from .app import ApplicationInfo
+from .tweet import Tweet
 
+EventPayload = Dict[str, Any]
 
 class PayloadParser:
-    def parse_user_payload(self, payload: Dict[str, Any]):
+    def parse_user_payload(self, payload: EventPayload):
         copy = payload.copy()
         copy["public_metrics"] = {
             "followers_count": copy.get("followers_count"),
@@ -28,13 +31,32 @@ class PayloadParser:
             copy["profile_image_url"] = copy.get("profile_image_url_https")
         return copy
 
+    def parse_tweet_payload(self, payload: EventPayload):
+        copy = payload.copy()
+        copy["public_metrics"] = {
+            "quote_count": payload.get("quote_count"),
+            "reply_count": payload.get("reply_count"),
+            "retweet_count": payload.get("retweet_count"),
+            "like_count": payload.get("favorite_count")
+        }
+        copy["includes"] = {}
+        copy["includes"]["mentions"] = [user.get("screen_name") for user in copy.get("entities").get("user_mentions")]
+
+        if "timestamp_ms" in payload.keys():
+            copy["timestamp"] = payload.get("timestamp_ms")
+
+        if "user" in payload.keys():
+            copy["includes"]["users"] = [self.parse_user_payload(payload.get("user"))]
+        
+        return copy
+
 
 class EventParser:
     def __init__(self, http_client: object):
         self.http_client = http_client
         self.payload_parser = PayloadParser()
 
-    def parse_direct_message_create(self, direct_message_payload: Dict[str, Any]):
+    def parse_direct_message_create(self, direct_message_payload: EventPayload):
         event_payload = {"event": direct_message_payload.get("direct_message_events")[0]}
         users = direct_message_payload.get("users")
 
@@ -69,7 +91,7 @@ class EventParser:
         self.http_client.message_cache[direct_message.id] = direct_message
         self.http_client.dispatch("direct_message", direct_message)
 
-    def parse_user_follow(self, follow_payload: Dict[str, Any]):
+    def parse_user_follow(self, follow_payload: EventPayload):
         follow_payload = follow_payload.copy()
         event_payload = follow_payload.get("follow_events")[0]
         action_type = event_payload.get("type")
@@ -92,7 +114,7 @@ class EventParser:
             action = UserUnfollowActionEvent(follow_payload)
             self.http_client.dispatch("user_unfollow", action)
 
-    def parse_direct_message_typing(self, typing_payload: Dict[str, Any]):
+    def parse_direct_message_typing(self, typing_payload: EventPayload):
         event_payload = typing_payload.get("direct_message_indicate_typing_events")[0]
         users = typing_payload.get("users")
 
@@ -113,3 +135,46 @@ class EventParser:
 
         payload = DirectMessageTypingEvent(event_payload)
         self.http_client.dispatch("typing", payload)
+
+    def parse_direct_message_read(self, read_payload: EventPayload):
+        event_payload = read_payload.get("direct_message_mark_read_events")[0]
+        users = read_payload.get("users")
+
+        recipient_id = event_payload.get("target").get("recipient_id")
+        sender_id = event_payload.get("sender_id")
+        recipient = User(self.payload_parser.parse_user_payload(users.get(recipient_id)), http_client=self.http_client)
+        sender = User(self.payload_parser.parse_user_payload(users.get(sender_id)), http_client=self.http_client)
+
+        event_payload["target"]["recipient"] = recipient
+        event_payload["target"]["sender"] = sender
+        client_id = int(self.http_client.access_token.partition("-")[0])
+
+        if recipient.id != client_id:
+            self.http_client.user_cache[recipient.id] = recipient
+
+        if sender.id != client_id:
+            self.http_client.user_cache[sender.id] = sender
+
+        payload = DirectMessageReadEvent(event_payload)
+        self.http_client.dispatch("read", payload)
+    
+    def parse_tweet_create(self, tweet_payload: EventPayload):
+        tweet_payload = self.payload_parser.parse_tweet_payload(tweet_payload.get("tweet_create_events")[0])
+        tweet = Tweet(tweet_payload, http_client=self.http_client)
+        self.http_client.tweet_cache[tweet.id] = tweet
+        self.http_client.dispatch("tweet_create", tweet)
+
+    def parse_tweet_delete(self, tweet_payload: EventPayload):
+        event_payload = tweet_payload.get("tweet_delete_events")[0]
+        tweet_id = event_payload.get("status").get("id")
+        tweet = self.http_client.tweet_cache.get(int(tweet_id))
+        if not tweet:
+            message = Message(None, tweet_id, 1)
+            return self.http_client.dispatch("tweet_delete", message)
+
+        try:
+            tweet.deleted_timestamp = int(event_payload.get("timestamp_ms"))
+            self.http_client.tweet_cache.pop(int(tweet_id))
+            self.http_client.dispatch("tweet_delete", tweet)
+        except KeyError:
+            pass
