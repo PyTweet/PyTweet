@@ -29,88 +29,88 @@ if TYPE_CHECKING:
 
 
 def check_200(response):
-        try:
-            res = response.json()
-            if "errors" in res.keys():
-                if res.get("errors"):
-                    if "detail" in res.get("errors")[0].keys():
-                        detail = res["errors"][0]["detail"]
-                        if detail.startswith("Could not find"):
-                            raise NotFoundError(response)
-                    elif "details" in res.get("errors")[0].keys():
-                        detail = res["errors"][0]["details"][0]
-                        if detail.startswith("Cannot parse rule"):
-                            _log.warning(
-                                f"Invalid stream rule! Rules Info: 'created': {res['meta']['summary'].get('created')}, 'not_created': {res['meta']['summary'].get('not_created')}, 'valid': {res['meta']['summary'].get('valid')}, 'invalid': {res['meta']['summary'].get('invalid')}"
-                            )
-                            raise SyntaxError(detail)
+    try:
+        res = response.json()
+        if "errors" in res.keys():
+            if res.get("errors"):
+                if "detail" in res.get("errors")[0].keys():
+                    detail = res["errors"][0]["detail"]
+                    if detail.startswith("Could not find"):
+                        raise NotFoundError(response)
+                elif "details" in res.get("errors")[0].keys():
+                    detail = res["errors"][0]["details"][0]
+                    if detail.startswith("Cannot parse rule"):
+                        _log.warning(
+                            f"Invalid stream rule! Rules Info: 'created': {res['meta']['summary'].get('created')}, 'not_created': {res['meta']['summary'].get('not_created')}, 'valid': {res['meta']['summary'].get('valid')}, 'invalid': {res['meta']['summary'].get('invalid')}"
+                        )
+                        raise SyntaxError(detail)
+        
+
+
+            else:
+                raise PytweetException(response, res["errors"][0]["detail"])
+    except (JSONDecodeError, KeyError) as e:
+        if isinstance(e, KeyError):
+            raise PytweetException(res)
+        return
+
+# def check_error(response: requests.models.Response) -> NoReturn:
+#     code = response.status_code
+#     if code == 200:
+#         try:
+#             res = response.json()
+#             if "errors" in res.keys():
+#                 if res.get("errors"):
+#                     if "detail" in res.get("errors")[0].keys():
+#                         detail = res["errors"][0]["detail"]
+#                         if detail.startswith("Could not find"):
+#                             raise NotFoundError(response)
+#                     elif "details" in res.get("errors")[0].keys():
+#                         detail = res["errors"][0]["details"][0]
+#                         if detail.startswith("Cannot parse rule"):
+#                             _log.warning(
+#                                 f"Invalid stream rule! Rules Info: 'created': {res['meta']['summary'].get('created')}, 'not_created': {res['meta']['summary'].get('not_created')}, 'valid': {res['meta']['summary'].get('valid')}, 'invalid': {res['meta']['summary'].get('invalid')}"
+#                             )
+#                             raise SyntaxError(detail)
             
 
 
-                else:
-                    raise PytweetException(response, res["errors"][0]["detail"])
-        except (JSONDecodeError, KeyError) as e:
-            if isinstance(e, KeyError):
-                raise PytweetException(res)
-            return
+#                 else:
+#                     raise PytweetException(response, res["errors"][0]["detail"])
+#         except (JSONDecodeError, KeyError) as e:
+#             if isinstance(e, KeyError):
+#                 raise PytweetException(res)
+#             return
 
-def check_error(response: requests.models.Response) -> NoReturn:
-    code = response.status_code
-    if code == 200:
-        try:
-            res = response.json()
-            if "errors" in res.keys():
-                if res.get("errors"):
-                    if "detail" in res.get("errors")[0].keys():
-                        detail = res["errors"][0]["detail"]
-                        if detail.startswith("Could not find"):
-                            raise NotFoundError(response)
-                    elif "details" in res.get("errors")[0].keys():
-                        detail = res["errors"][0]["details"][0]
-                        if detail.startswith("Cannot parse rule"):
-                            _log.warning(
-                                f"Invalid stream rule! Rules Info: 'created': {res['meta']['summary'].get('created')}, 'not_created': {res['meta']['summary'].get('not_created')}, 'valid': {res['meta']['summary'].get('valid')}, 'invalid': {res['meta']['summary'].get('invalid')}"
-                            )
-                            raise SyntaxError(detail)
-            
+#     elif code in (201, 202, 204):
+#         pass
 
+#     elif code == 400:
+#         raise BadRequests(response)
 
-                else:
-                    raise PytweetException(response, res["errors"][0]["detail"])
-        except (JSONDecodeError, KeyError) as e:
-            if isinstance(e, KeyError):
-                raise PytweetException(res)
-            return
+#     elif code == 401:
+#         raise Unauthorized(response)
 
-    elif code in (201, 202, 204):
-        pass
+#     elif code == 403:
+#         raise Forbidden(response)
 
-    elif code == 400:
-        raise BadRequests(response)
+#     elif code == 404:
+#         raise NotFound(response)
 
-    elif code == 401:
-        raise Unauthorized(response)
+#     elif code == 409:
+#         raise Conflict(response)
 
-    elif code == 403:
-        raise Forbidden(response)
-
-    elif code == 404:
-        raise NotFound(response)
-
-    elif code == 409:
-        raise Conflict(response)
-
-    elif code == 429:
-        remaining = int(response.headers["x-rate-limit-reset"])
-        sleep_for = (remaining - int(time.time())) + 1
-        _log.warn(f"Client has been ratelimited. Sleeping for {sleep_for}")
-        time.sleep(sleep_for)
+#     elif code == 429:
+#         remaining = int(response.headers["x-rate-limit-reset"])
+#         sleep_for = (remaining - int(time.time())) + 1
+#         _log.warn(f"Client has been ratelimited. Sleeping for {sleep_for}")
+#         time.sleep(sleep_for)
 
 
-    else:
-        raise PytweetException(
-            f"Unknown exception raised (status code: {response.status_code}): Open an issue in github or go to the support server to report this unknown exception!"
-        )
+#     else:
+#         raise PytweetException(
+#             f"Unknown exception raised (status code: {response.status_code}): Open an issue in github or go to the support server to report this unknown exception!"
+#         )
 
 
 
@@ -413,7 +413,7 @@ class HTTPClient:
         except NotFoundError:
             return None
 
-    def fetch_tweet(self, tweet_id: Union[str, int]) -> Tweet:
+    def fetch_tweet(self, tweet_id: Union[str, int]) -> Optional[Tweet]:
         try:
 
             res = self.request(
@@ -459,7 +459,7 @@ class HTTPClient:
         return Space(res)
 
     def handle_events(self, payload: Dict[str, Any]):
-        keys = list(payload.keys())
+        keys = payload.keys()
         if "direct_message_events" in keys:
             self.event_parser.parse_direct_message_create(payload)
 
@@ -468,6 +468,15 @@ class HTTPClient:
 
         elif "direct_message_indicate_typing_events" in keys:
             self.event_parser.parse_direct_message_typing(payload)
+
+        elif "direct_message_mark_read_events" in keys:
+            self.event_parser.parse_direct_message_read(payload)
+        
+        elif "tweet_create_events" in keys:
+            self.event_parser.parse_tweet_create(payload)
+
+        elif "tweet_delete_events" in keys:
+            self.event_parser.parse_tweet_delete(payload)
 
     def send_message(
         self,
