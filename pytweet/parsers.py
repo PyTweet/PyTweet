@@ -4,7 +4,11 @@ from .events import (
     DirectMessageTypingEvent,
     DirectMessageReadEvent,
     UserFollowActionEvent,
-    UserUnfollowActionEvent
+    UserUnfollowActionEvent,
+    UserBlockActionEvent,
+    UserUnblockActionEvent,
+    UserMuteActionEvent,
+    UserUnmuteActionEvent
 )
 from .message import Message, DirectMessage
 from .user import User
@@ -91,29 +95,6 @@ class EventParser:
         self.http_client.message_cache[direct_message.id] = direct_message
         self.http_client.dispatch("direct_message", direct_message)
 
-    def parse_user_follow(self, follow_payload: EventPayload):
-        follow_payload = follow_payload.copy()
-        event_payload = follow_payload.get("follow_events")[0]
-        action_type = event_payload.get("type")
-        target = User(self.payload_parser.parse_user_payload(event_payload.get("target")), http_client=self.http_client)
-        source = User(self.payload_parser.parse_user_payload(event_payload.get("source")), http_client=self.http_client)
-
-        event_payload["target"] = target
-        event_payload["source"] = source
-        client_id = int(self.http_client.access_token.partition("-")[0])
-        if target.id != client_id:
-            self.http_client.user_cache[target.id] = target
-
-        if source.id != client_id:
-            self.http_client.user_cache[source.id] = source
-
-        if action_type == "follow":
-            action = UserFollowActionEvent(follow_payload)
-            self.http_client.dispatch("user_follow", action)
-        elif action_type == "unfollow":
-            action = UserUnfollowActionEvent(follow_payload)
-            self.http_client.dispatch("user_unfollow", action)
-
     def parse_direct_message_typing(self, typing_payload: EventPayload):
         event_payload = typing_payload.get("direct_message_indicate_typing_events")[0]
         users = typing_payload.get("users")
@@ -157,6 +138,47 @@ class EventParser:
 
         payload = DirectMessageReadEvent(event_payload)
         self.http_client.dispatch("read", payload)
+
+    def parse_user_action(self, action_payload: EventPayload, action_type):
+        action_payload = action_payload.copy()
+        event_payload = action_payload.get(action_type)[0]
+        action_type = event_payload.get("type")
+        target = User(self.payload_parser.parse_user_payload(event_payload.get("target")), http_client=self.http_client)
+        source = User(self.payload_parser.parse_user_payload(event_payload.get("source")), http_client=self.http_client)
+
+        event_payload["target"] = target
+        event_payload["source"] = source
+        client_id = int(self.http_client.access_token.partition("-")[0])
+        
+        if target.id != client_id:
+            self.http_client.user_cache[target.id] = target
+
+        if source.id != client_id:
+            self.http_client.user_cache[source.id] = source
+
+        if action_type == "follow":
+            action = UserFollowActionEvent(action_payload)
+            self.http_client.dispatch("user_follow", action)
+
+        elif action_type == "unfollow":
+            action = UserUnfollowActionEvent(action_payload)
+            self.http_client.dispatch("user_unfollow", action)
+
+        elif action_type == "block":
+            action = UserBlockActionEvent(action_payload)
+            self.http_client.dispatch("user_block", action)
+
+        elif action_type == "unblock":
+            action = UserUnblockActionEvent(action_payload)
+            self.http_client.dispatch("user_unblock", action)
+
+        elif action_type == "mute":
+            action = UserMuteActionEvent(action_payload)
+            self.http_client.dispatch("user_mute", action)
+
+        elif action_type == "unmute":
+            action = UserUnmuteActionEvent(action_payload)
+            self.http_client.dispatch("user_unmute", action)
     
     def parse_tweet_create(self, tweet_payload: EventPayload):
         tweet_payload = self.payload_parser.parse_tweet_payload(tweet_payload.get("tweet_create_events")[0])
