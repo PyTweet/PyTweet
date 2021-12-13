@@ -2,7 +2,8 @@ from typing import Dict, Any
 
 class ApplicationInfo:
     """Represents an application's info.
-    
+
+    .. versionadded:: 1.5.0
     """
     def __init__(self, data: Dict[str, Any]):
         self.original_payload = data
