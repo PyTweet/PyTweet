@@ -25,11 +25,13 @@ class Message:
     id: Union[:class:`str`, :class:`int`]
         The messages's unique ID.
     type: :class:`int`.
-        The message's type in int form, it will get form to MessageTypeEnum.
+        The message's type in int form, it will gets form to MessageTypeEnum.
 
 
     .. versionadded:: 1.2.0
     """
+    __slots__= ("_text", "_id", "_type")
+
     if TYPE_CHECKING:
         _text: Optional[str]
         _id: Union[str, int]
@@ -73,24 +75,24 @@ class DirectMessage(Message):
 
     .. versionadded:: 1.2.0
     """
+    __slots__ = ("__original_payload", "_payload", "__message_create", "__message_data", "__entities", "_quick_reply_data", "_cta_data", "http_client")
 
     def __init__(self, data: Dict[str, Any], *, http_client: HTTPClient):
-        self.original_payload = data
+        self.__original_payload = data
         self._payload = data.get("event", None)
-        self.message_create = self._payload.get("message_create", None)
-        self.message_data = self.message_create.get("message_data", None)
-        self.entities = self.message_data.get("entities", None)
-        self.quick_reply_data = self.message_data.get("quick_reply")
-        self.cta_data = self.message_data.get("ctas")
-
-        super().__init__(self.message_data.get("text"), self._payload.get("id"), 0)
+        self.__message_create = self._payload.get("message_create", None)
+        self.__message_data = self.__message_create.get("message_data", None)
+        self.__entities = self.__message_data.get("entities", None)
+        self._quick_reply_data = self.__message_data.get("quick_reply")
+        self._cta_data = self.__message_data.get("ctas")
         self.http_client = http_client
+        super().__init__(self.__message_data.get("text"), self._payload.get("id"), 0)
 
     def __repr__(self) -> str:
         return "DirectMessage(text={0.text} id={0.id} recipient={0.recipient})".format(self)
 
     def delete(self) -> None:
-        """Make a Request to delete the DirectMessage.
+        """Delete the direct message.
 
         .. versionadded:: 1.1.0
         """
@@ -136,7 +138,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.2.0
         """
-        return self.message_create.get("target", {}).get("recipient")
+        return self.__message_create.get("target", {}).get("recipient")
 
     @property
     def author(self) -> Optional[User]:
@@ -144,7 +146,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.5.0
         """
-        return self.message_create.get("target", {}).get("sender", None)
+        return self.__message_create.get("target", {}).get("sender", None)
 
     @property
     def application_info(self) -> Optional[ApplicationInfo]:
@@ -152,7 +154,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.5.0
         """
-        return self.message_create.get("target", {}).get("application_info", None)
+        return self.__message_create.get("target", {}).get("application_info", None)
 
     @property
     def created_at(self) -> datetime.datetime:
@@ -168,7 +170,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.2.0
         """
-        return [Hashtags(data) for data in self.entities.get("hashtags")]
+        return [Hashtags(data) for data in self.__entities.get("hashtags")]
 
     @property
     def symbols(self) -> Optional[List[Symbols]]:
@@ -176,7 +178,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.2.0
         """
-        return [Symbols(data) for data in self.entities.get("symbols")]
+        return [Symbols(data) for data in self.__entities.get("symbols")]
 
     @property
     def mentions(self) -> Optional[List[UserMentions]]:
@@ -184,7 +186,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.2.0
         """
-        return [UserMentions(data) for data in self.entities.get("user_mentions")]
+        return [UserMentions(data) for data in self.__entities.get("user_mentions")]
 
     @property
     def urls(self) -> Optional[List[Urls]]:
@@ -192,7 +194,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.2.0
         """
-        return [Urls(data) for data in self.entities.get("urls")]
+        return [Urls(data) for data in self.__entities.get("urls")]
 
     @property
     def quick_reply(self) -> Optional[QuickReply]:
@@ -200,9 +202,9 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.3.5
         """
-        if self.quick_reply_data and self.quick_reply_data.get("options"):
-            attachment = QuickReply(self.quick_reply_data.get("type"))
-            for option in self.quick_reply_data.get("options"):
+        if self._quick_reply_data and self._quick_reply_data.get("options"):
+            attachment = QuickReply(self._quick_reply_data.get("type"))
+            for option in self._quick_reply_data.get("options"):
                 attachment.add_option(**option)
             return attachment
         return None
@@ -213,17 +215,17 @@ class DirectMessage(Message):
         
         .. versionadded:: 1.5.0
         """
-        return self.message_data.get("quick_reply_response", {}).get("metadata", None)
+        return self.__message_data.get("quick_reply_response", {}).get("metadata", None)
 
     @property
     def cta(self) -> Optional[CTA]:
-        """Optional[:class:`CTA`]: Returns the message's cta.
+        """Optional[:class:`CTA`]: Returns the message's cta attachment.
 
         .. versionadded:: 1.3.5
         """
-        if self.cta_data:
+        if self._cta_data:
             attachment = CTA()
-            for button in self.cta_data:
+            for button in self._cta_data:
                 attachment.add_button(**button)
             return attachment
         return None
@@ -248,6 +250,7 @@ class WelcomeMessage(Message):
 
     .. versionadded:: 1.3.5
     """
+    __slots__ = ("_name", "_timestamp")
 
     def __init__(
         self,
@@ -265,9 +268,6 @@ class WelcomeMessage(Message):
 
     def __repr__(self) -> str:
         return "WelcomeMessage(text={0.text} id={0.id})".format(self)
-
-    def __str__(self) -> str:
-        return self.text
 
     def set_rule(self) -> WelcomeMessageRule:
         """Set a new Welcome Message Rule that determines which Welcome Message will be shown in a given conversation. Returns the created rule if successful.
@@ -289,12 +289,12 @@ class WelcomeMessage(Message):
             auth=True,
         )
 
-        args: list = [v for k, v in res.get("welcome_message_rule").items()]
+        args = [v for k, v in res.get("welcome_message_rule").items()]
         return WelcomeMessageRule(args[0], args[2], args[1], http_client=self.http_client)
 
     def update(
         self,
-        text: str = None,
+        text: str,
         *,
         file: Optional[File] = None,
         quick_reply: Optional[QuickReply] = None,
@@ -411,7 +411,7 @@ class WelcomeMessageRule(Message):
 
     .. versionadded:: 1.3.5
     """
-
+    __slots__ = ("_welcome_message_id", "_timestamp", "http_client")
     def __init__(
         self,
         id: Union[str, int],
