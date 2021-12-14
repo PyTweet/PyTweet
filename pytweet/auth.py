@@ -1,14 +1,12 @@
 from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any, Optional, Tuple, Type
-
+from typing import Any, Type, Tuple, Optional, TYPE_CHECKING 
 from requests_oauthlib import OAuth1, OAuth1Session
+from .utils import build_object
 
 if TYPE_CHECKING:
     from .client import Client
 
 __all__ = ("OauthSession",)
-
 
 class OauthSession(OAuth1Session):
     """Represents an OauthSession for Oauth1 Authorization. This class is very importantfo
@@ -26,9 +24,11 @@ class OauthSession(OAuth1Session):
     .. versionadded:: 1.2.0
     """
 
-    def __init__(self, consumer_key: Optional[str], consumer_secret: Optional[str], callback=None) -> None:
+    def __init__(self, consumer_key: Optional[str], consumer_secret: Optional[str], *, http_client: object, callback: Optional[str] = None) -> None:
         super().__init__(consumer_key, client_secret=consumer_secret, callback_uri=callback)
-        self.is_with_oauth_flow = False
+        HTTPClient = build_object("HTTPClient")
+        
+        self.http_client: HTTPClient = http_client
         self.consumer_key = consumer_key
         self.consumer_key_secret = consumer_secret
         self.access_token: str = None
@@ -53,90 +53,68 @@ class OauthSession(OAuth1Session):
         """
         client.http.request("POST", "1.1", "/oauth/invalidate_token", auth=True)
 
-    @classmethod
-    def with_oauth_flow(cls: Type[OauthSession], client, *, callback: str = "https://twitter.com") -> OauthSession:
-        """Authorize a user using the 3 legged oauth flow classmethod! This let's your application to do an action on behalf of a user. This will give you 2 new methods, :meth:`OauthSession.generate_oauth_url` for generating an oauth url so a user can authorize and `post_oauth_token` posting oauth token and verifier for getting a pair of access token and secret.
+    def generate_oauth_url(self, auth_access_type: str = "write") -> Optional[str]:
+        """Generate an oauth url with an access type.
 
-        .. note::
-            There are 3 steps for using 3 legged oauth flow:
+        Parameters
+        ------------
+        auth_access_type: :class:`str`
+            Must be either read, write, direct_messages. read for reading twitter info only, write will have the same as read and also write permission this includes but not limited to post & delete a :class:`Tweet`, and direct_messages is for read & write and sending & deleting :class:`DirectMessages`.
 
-            * Use :meth:`OauthSession.generate_oauth_url`
-            method and generate an oauth link.
+        Returns
+        ---------
+        :class:`str`
+            Returns an oauth url.
 
-            * Click that link and press the authorize button, you should get redirect to the callback-url with an oauth token and verifier appended in that url, e.g `http://twitter.com/home` will be `http://twitter.com/home?oauth_token=xxxxxxxxxxxxxxxxxx?oauth_verifier=xxxxxxxxxxxxxxxxxx`, copy the oauth token & verifier and use it in the next step.
 
-            * Use post_oauth_token method with the oauth token and verifier. It should return a pair of access token & secret, it also return the screen name and user id. Now use those access token & secret in access_token & access_token_secret arguments in pytweet.Client, and now you can use the client to do certain action!
-
+        .. versionadded:: 1.3.5
         """
-        self = cls(None, None, callback)
-        self.is_with_oauth_flow = True
+        auth_access_type = auth_access_type.lower()
+        assert auth_access_type in ("read", "write", "direct_messages")
+        request_tokens = self.http_client.request(
+            "POST",
+            "",
+            "oauth/request_token",
+            params={
+                "oauth_callback": self.callback,
+                "x_auth_access_type": auth_access_type,
+            },
+            auth=True,
+        )
+        (
+            oauth_token,
+            oauth_token_secret,
+            oauth_callback_confirmed,
+        ) = request_tokens.split("&")
+        url = "https://api.twitter.com/oauth/authorize" + f"?{oauth_token}"
+        return url
 
-        def generate_oauth_url(auth_access_type: str = "write") -> Optional[str]:
-            """Generate an oauth url with an access type.
+    def post_oauth_token(self, oauth_token: str, oauth_verifier: str) -> Optional[Tuple[str]]:
+        """Post the oauth token & verifier, this method will returns a pair of access token & secret.
 
-            Parameters
-            ------------
-            auth_access_type: :class:`str`
-                Must be either read, write, direct_messages. read for reading twitter info only, write will have the same as read and also write permission this includes but not limited to post & delete a :class:`Tweet`, and direct_messages is for read & write and sending & deleting :class:`DirectMessages`.
+        Parameters
+        ------------
+        oauth_token: :class:`str`
+            The Oauth token.
+        oauth_verifier: :class:`str`
+            The Oauth verifier.
 
-            Returns
-            ---------
-            :class:`str`
-                Returns an oauth url.
-
-
-            .. versionadded:: 1.3.5
-            """
-            auth_access_type = auth_access_type.lower()
-            assert auth_access_type in ("read", "write", "direct_messages")
-            request_tokens = client.http.request(
-                "POST",
-                "",
-                "oauth/request_token",
-                params={
-                    "oauth_callback": callback,
-                    "x_auth_access_type": auth_access_type,
-                },
-                auth=True,
-            )
-            (
-                oauth_token,
-                oauth_token_secret,
-                oauth_callback_confirmed,
-            ) = request_tokens.split("&")
-            url = "https://api.twitter.com/oauth/authorize" + f"?{oauth_token}"
-            return url
-
-        def post_oauth_token(oauth_token: str, oauth_verifier: str) -> Optional[Tuple[str]]:
-            """Post the oauth token & verifier, this method will returns a pair of access token & secret.
-
-            Parameters
-            ------------
-            oauth_token: :class:`str`
-                The Oauth token.
-            oauth_verifier: :class:`str`
-                The Oauth verifier.
-
-            Returns
-            ---------
-            :class:`tuple`
-                Returns a :class:`tuple` object with the credentials in.
+        Returns
+        ---------
+        :class:`tuple`
+            Returns a :class:`tuple` object with the credentials in.
 
 
-            .. versionadded:: 1.3.5
-            """
-            res = client.http.request(
-                "POST",
-                "",
-                "oauth/access_token",
-                params={"oauth_token": oauth_token, "oauth_verifier": oauth_verifier},
-            )
+        .. versionadded:: 1.3.5
+        """
+        res = self.http_client.request(
+            "POST",
+            "",
+            "oauth/access_token",
+            params={"oauth_token": oauth_token, "oauth_verifier": oauth_verifier},
+        )
 
-            return tuple(res.split("&"))
-
-        self.post_oauth_token = post_oauth_token
-        self.generate_oauth_url = generate_oauth_url
-        return self
+        return tuple(res.split("&"))
 
     @property
     def oauth1(self) -> OAuth1:
