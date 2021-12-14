@@ -83,7 +83,6 @@ class Client:
             stream = stream,
             callback = callback
         )
-        self.threading = threading
         self._account_user: Optional[User] = None  # set in account property.
         self.webhook: Optional[Webhook] = None
         self.environment: Optional[Environment] = None
@@ -816,7 +815,7 @@ class Client:
                 self.http.handle_events(json_data)
                 return ("", HTTPStatus.OK)
 
-            thread = self.threading.Thread(target=app.run, name="pytweet-client.listen-thread", kwargs=kwargs)
+            thread = threading.Thread(target=app.run, name="PyTweet: Flask App Thread", kwargs=kwargs)
             thread.start()
             time.sleep(sleep_for) #Ensure the flask application is running before triggering crc.
             self.trigger_crc()
