@@ -1,6 +1,5 @@
-from typing import Any, Dict
-
 from .events import (
+    EventPayload,
     DirectMessageTypingEvent,
     DirectMessageReadEvent,
     UserFollowActionEvent,
@@ -15,7 +14,7 @@ from .user import User
 from .app import ApplicationInfo
 from .tweet import Tweet
 
-EventPayload = Dict[str, Any]
+
 
 class PayloadParser:
     def parse_user_payload(self, payload: EventPayload):
@@ -114,7 +113,7 @@ class EventParser:
         if sender.id != client_id:
             self.http_client.user_cache[sender.id] = sender
 
-        payload = DirectMessageTypingEvent(event_payload)
+        payload = DirectMessageTypingEvent(event_payload, http_client=self.http_client)
         self.http_client.dispatch("typing", payload)
 
     def parse_direct_message_read(self, read_payload: EventPayload):
@@ -136,7 +135,7 @@ class EventParser:
         if sender.id != client_id:
             self.http_client.user_cache[sender.id] = sender
 
-        payload = DirectMessageReadEvent(event_payload)
+        payload = DirectMessageReadEvent(event_payload, http_client=self.http_client)
         self.http_client.dispatch("read", payload)
 
     def parse_user_action(self, action_payload: EventPayload, action_type):
@@ -195,8 +194,9 @@ class EventParser:
             return self.http_client.dispatch("tweet_delete", message)
 
         try:
-            tweet.deleted_timestamp = int(event_payload.get("timestamp_ms"))
             self.http_client.tweet_cache.pop(int(tweet_id))
-            self.http_client.dispatch("tweet_delete", tweet)
         except KeyError:
             pass
+        finally:
+            tweet.deleted_timestamp = int(event_payload.get("timestamp_ms"))
+            self.http_client.dispatch("tweet_delete", tweet)
