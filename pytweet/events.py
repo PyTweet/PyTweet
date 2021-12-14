@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 from .user import User
 
 class UserActionEvent:
-    """Represents a user action type event, this could be but not limited to follow or unfollow. This also a parent class to all UserAction events.
+    """Represents a user action type event, this could be but not limited to follow or unfollow. This is also a parent class to all UserAction events.
     
     .. versionadded:: 1.3.5
     """
