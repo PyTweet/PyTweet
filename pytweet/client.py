@@ -10,7 +10,6 @@ import time
 from asyncio import iscoroutinefunction
 from http import HTTPStatus
 from typing import Callable, List, Optional, Union
-
 from flask import Flask, request
 
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
@@ -82,7 +81,6 @@ class Client:
         )
         self.threading = threading
         self._account_user: Optional[User] = None  # set in account property.
-        #TODO add these in docstring
         self.webhook: Optional[Webhook] = None
         self.environment: Optional[Environment] = None
         self.webhook_url_path: Optional[str] = None
@@ -750,7 +748,7 @@ class Client:
         _log.info("Successfully triggered a CRC.")
         return True
 
-    def listen(self, app: Flask, path: str, **kwargs):
+    def listen(self, app: Flask, path: str, sleep_for: Union[int, float] = 0.50, **kwargs):
         """Listen to upcoming account activity events send by twitter to your webhook url. You can use the rest of Flask arguments like port or host via the kwargs argument.
 
         Parameters
@@ -759,8 +757,10 @@ class Client:
             Your flask application.
         path: :class:`str`
             Your webhook path url. If the webhook url is `https://your-domain.com/webhook/twitter`, then the path is `/webhook/twitter`.
+        sleep_for: Union[:class:`int`, :class:`float`]
+            Ensure the flask application is running before triggering a CRC by sleeping after starting a thread. Default to 0.50.
         disabled_log: :class:`bool`
-            Indicates to disable flask's log so it doesn't have to print request process in your terminal, this also will disable `werkzeug` log.
+            A kwarg that indicates to disable flask's log so it does not print the request process in your terminal, this also will disable `werkzeug` log.
         
 
         .. versionadded:: 1.3.5
@@ -811,9 +811,8 @@ class Client:
 
             thread = self.threading.Thread(target=app.run, name="pytweet-client.listen-thread", kwargs=kwargs)
             thread.start()
-            time.sleep(0.50)
+            time.sleep(sleep_for) #Ensure the flask application is running before triggering crc.
             self.trigger_crc()
             _log.debug("Listening for events!")
-            
         except KeyboardInterrupt:
             print("\nKeyboardInterrupt: Finish listening.")
