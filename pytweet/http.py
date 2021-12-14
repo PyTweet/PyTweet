@@ -125,6 +125,7 @@ class HTTPClient:
         access_token: Optional[str],
         access_token_secret: Optional[str],
         stream: Optional[Stream] = None,
+        callback: Optional[str] = None
     ) -> Union[None, NoReturn]:
         self.credentials: Dict[str, Optional[str]] = {
             "bearer_token": bearer_token,
@@ -153,6 +154,7 @@ class HTTPClient:
         self.access_token: Optional[str] = access_token
         self.access_token_secret: Optional[str] = access_token_secret
         self.stream = stream
+        self.oauth_callback = callback
         self.event_parser = EventParser(self)
         self.base_url = "https://api.twitter.com/"
         self.upload_url = "https://upload.twitter.com/1.1/media/upload.json"
@@ -194,7 +196,7 @@ class HTTPClient:
             url = path
         
         if self._auth is None:
-            auth_session = OauthSession(self.consumer_key, self.consumer_key_secret)
+            auth_session = OauthSession(self.consumer_key, self.consumer_key_secret, http_client = self, callback = self.oauth_callback)
             auth_session.set_access_token(self.access_token, self.access_token_secret)
             self._auth = auth_session
 
@@ -206,10 +208,10 @@ class HTTPClient:
         headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
 
         if auth:
+            auth = self._auth.oauth1
             for k, v in self.credentials.items():
                 if v is None:
                     raise PytweetException(f"{k} is a required credential for this action.")
-            auth = self._auth.oauth1
 
         if data:
             json = None
@@ -378,18 +380,16 @@ class HTTPClient:
             raise ValueError("user_id must be an int, or a string of digits!")
 
         try:
-
             data = self.request(
                 "GET",
                 "2",
                 f"/users/{user_id}",
-                headers={"Authorization": f"Bearer {self.bearer_token}"},
-                params={"user.fields": USER_FIELD},
-                is_json=True,
+                headers = {"Authorization": f"Bearer {self.bearer_token}"},
+                params = {"user.fields": USER_FIELD},
+                auth = True
             )
 
             return User(data, http_client=self)
-
         except NotFoundError:
             return None
 
@@ -398,29 +398,25 @@ class HTTPClient:
             username = username.replace("@", "", 1)
 
         try:
-
             data = self.request(
                 "GET",
                 "2",
                 f"/users/by/username/{username}",
-                headers={"Authorization": f"Bearer {self.bearer_token}"},
-                params={"user.fields": USER_FIELD},
-                is_json=True,
+                headers = {"Authorization": f"Bearer {self.bearer_token}"},
+                params = {"user.fields": USER_FIELD},
+                auth = True
             )
-
             return User(data, http_client=self)
-
         except NotFoundError:
             return None
 
     def fetch_tweet(self, tweet_id: Union[str, int]) -> Optional[Tweet]:
         try:
-
             res = self.request(
                 "GET",
                 "2",
                 f"/tweets/{tweet_id}",
-                params={
+                params = {
                     "tweet.fields": TWEET_FIELD,
                     "user.fields": USER_FIELD,
                     "expansions": TWEET_EXPANSION,
@@ -428,11 +424,10 @@ class HTTPClient:
                     "place.fields": PLACE_FIELD,
                     "poll.fields": POLL_FIELD,
                 },
-                auth=True,
+                auth = True,
             )
 
             return Tweet(res, http_client=self)
-
         except NotFoundError:
             return None
 
@@ -468,6 +463,9 @@ class HTTPClient:
 
         elif "direct_message_mark_read_events" in keys:
             self.event_parser.parse_direct_message_read(payload)
+
+        elif "favorite_events" in keys:
+            self.event_parser.parse_favorite_tweet(payload)
 
         elif "follow_events" in keys:
             self.event_parser.parse_user_action(payload, "follow_events")
