@@ -2,6 +2,7 @@ from .events import (
     EventPayload,
     DirectMessageTypingEvent,
     DirectMessageReadEvent,
+    TweetFavoriteActionEvent,
     UserFollowActionEvent,
     UserUnfollowActionEvent,
     UserBlockActionEvent,
@@ -56,8 +57,9 @@ class PayloadParser:
 
 class EventParser:
     def __init__(self, http_client: object):
-        self.http_client = http_client
         self.payload_parser = PayloadParser()
+        self.http_client = http_client
+        self.client_id = int(self.http_client.access_token.partition("-")[0])
 
     def parse_direct_message_create(self, direct_message_payload: EventPayload):
         event_payload = {"event": direct_message_payload.get("direct_message_events")[0]}
@@ -83,12 +85,11 @@ class EventParser:
         direct_message = DirectMessage(
             event_payload, http_client=self.http_client
         )
-        client_id = int(self.http_client.access_token.partition("-")[0])
 
-        if recipient.id != client_id:
+        if recipient.id != self.client_id:
             self.http_client.user_cache[recipient.id] = recipient
 
-        if sender.id != client_id:
+        if sender.id != self.client_id:
             self.http_client.user_cache[sender.id] = sender
 
         self.http_client.message_cache[direct_message.id] = direct_message
@@ -105,12 +106,11 @@ class EventParser:
 
         event_payload["target"]["recipient"] = recipient
         event_payload["target"]["sender"] = sender
-        client_id = int(self.http_client.access_token.partition("-")[0])
 
-        if recipient.id != client_id:
+        if recipient.id != self.client_id:
             self.http_client.user_cache[recipient.id] = recipient
 
-        if sender.id != client_id:
+        if sender.id != self.client_id:
             self.http_client.user_cache[sender.id] = sender
 
         payload = DirectMessageTypingEvent(event_payload, http_client=self.http_client)
@@ -127,12 +127,11 @@ class EventParser:
 
         event_payload["target"]["recipient"] = recipient
         event_payload["target"]["sender"] = sender
-        client_id = int(self.http_client.access_token.partition("-")[0])
 
-        if recipient.id != client_id:
+        if recipient.id != self.client_id:
             self.http_client.user_cache[recipient.id] = recipient
 
-        if sender.id != client_id:
+        if sender.id != self.client_id:
             self.http_client.user_cache[sender.id] = sender
 
         payload = DirectMessageReadEvent(event_payload, http_client=self.http_client)
@@ -147,12 +146,11 @@ class EventParser:
 
         event_payload["target"] = target
         event_payload["source"] = source
-        client_id = int(self.http_client.access_token.partition("-")[0])
         
-        if target.id != client_id:
+        if target.id != self.client_id:
             self.http_client.user_cache[target.id] = target
 
-        if source.id != client_id:
+        if source.id != self.client_id:
             self.http_client.user_cache[source.id] = source
 
         if action_type == "follow":
@@ -200,3 +198,17 @@ class EventParser:
         finally:
             tweet.deleted_timestamp = int(event_payload.get("timestamp_ms"))
             self.http_client.dispatch("tweet_delete", tweet)
+
+    def parse_favorite_tweet(self, favorite_payload: EventPayload):
+        action_payload = favorite_payload.copy()
+        event_payload = favorite_payload.get("favorite_events")[0]
+        tweet = Tweet(self.payload_parser.parse_tweet_payload(event_payload.get("favorited_status")))
+        user = User(self.payload_parser.parse_user_payload(event_payload.get("user")))
+        event_payload["tweet"] = tweet
+        event_payload["liker"] = user
+
+        if user.id != self.client_id:
+            self.http_client.user_cache[user.id] = user
+
+        action = TweetFavoriteActionEvent(action_payload)
+        self.http_client.dispatch("tweet_favorite", action)
