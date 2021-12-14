@@ -9,7 +9,7 @@ import threading
 import time
 from asyncio import iscoroutinefunction
 from http import HTTPStatus
-from typing import Callable, List, Optional, Union
+from typing import Callable, List, Optional, Union, Any
 from flask import Flask, request
 
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
@@ -45,6 +45,8 @@ class Client:
         The Access Token Secret of the app.
     stream: Optional[Stream]
         The client's stream. Must be an instance of :class:`Stream`.
+    callback: Optional[:class:`str`]
+        The oauth callbacl url, default to None.
 
     Attributes
     ------------
@@ -70,14 +72,16 @@ class Client:
         access_token: Optional[str] = None,
         access_token_secret: Optional[str] = None,
         stream: Optional[Stream] = None,
+        callback: Optional[str] = None
     ) -> None:
         self.http = HTTPClient(
             bearer_token,
-            consumer_key=consumer_key,
-            consumer_key_secret=consumer_key_secret,
-            access_token=access_token,
-            access_token_secret=access_token_secret,
-            stream=stream,
+            consumer_key = consumer_key,
+            consumer_key_secret = consumer_key_secret,
+            access_token = access_token,
+            access_token_secret = access_token_secret,
+            stream = stream,
+            callback = callback
         )
         self.threading = threading
         self._account_user: Optional[User] = None  # set in account property.
@@ -748,7 +752,7 @@ class Client:
         _log.info("Successfully triggered a CRC.")
         return True
 
-    def listen(self, app: Flask, path: str, sleep_for: Union[int, float] = 0.50, **kwargs):
+    def listen(self, app: Flask, path: str, sleep_for: Union[int, float] = 0.50, **kwargs: Any):
         """Listen to upcoming account activity events send by twitter to your webhook url. You can use the rest of Flask arguments like port or host via the kwargs argument.
 
         Parameters
@@ -761,11 +765,14 @@ class Client:
             Ensure the flask application is running before triggering a CRC by sleeping after starting a thread. Default to 0.50.
         disabled_log: :class:`bool`
             A kwarg that indicates to disable flask's log so it does not print the request process in your terminal, this also will disable `werkzeug` log.
+        ngrok: :class:`bool`
+            A kwarg that indicates to use ngrok for tunneling your localhost. This usually uses for users that use localhost url. 
         
 
         .. versionadded:: 1.3.5
         """
         disabled_log: bool = kwargs.pop("disabled_log", False)
+        ngrok: bool = kwargs.pop("ngrok", False) #TODO Use it later...
         environments = self.fetch_all_environments()
         for env in environments:
             for webhook in env.webhooks:
