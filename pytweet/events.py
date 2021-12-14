@@ -1,6 +1,7 @@
 import datetime
 from typing import Any, Dict, Union, Optional
 from .user import User
+from .tweet import Tweet
 from .enums import ActionEventType, UserActionEventType
 
 EventPayload = Dict[str, Any]
@@ -10,7 +11,7 @@ EventPayload = Dict[str, Any]
 class Event:
     """The base class of all event, this provides a type property that the event belongs to.  
 
-    .. versionadded:: 1.3.5
+    .. versionadded:: 1.5.0
     """
     __slots__ = ("_payload", "_type")
 
@@ -40,7 +41,7 @@ class Event:
 class UserActionEvent(Event):
     """Represents a user action event, this could be but not limited to: follow or unfollow. This is also a parent class to all UserAction events, this class inherits :class:`Event`.
     
-    .. versionadded:: 1.3.5
+    .. versionadded:: 1.5.0
     """
     @property
     def created_at(self) -> datetime.datetime:
@@ -136,13 +137,51 @@ class DirectMessageReadEvent(DirectMessageEvent):
     def last_read_message(self) -> Optional[int]:
         """Optional[:class:`int`]: Returns the last message that got read, returns the event id if none found
         
-        .. versionadded:: 1.3.5
+        .. versionadded:: 1.5.0
         """
         event_id = self.payload.get("last_read_event_id")
         message = self.http_client.message_cache.get(int(event_id))
         if not message:
             return event_id
         return message
+
+class TweetFavoriteActionEvent(Event):
+    """Represents a tweet favorite event object for `on_tweet_favorite` event, this inherits :class:`Event`. This object contains information that twitter posts through the webhook url.
+    
+    .. versionadded:: 1.5.0
+    """
+    @property
+    def id(self) -> str:
+        """:class:`str`: Returns the action's unique ID.
+        
+        .. versionadded:: 1.5.0
+        """
+        return self.payload.get("id")
+
+    @property
+    def created_at(self) -> datetime.datetime:
+        """:class:`datetime.datetime`: Returns a datetime.datetime object with the action's created timestamp.
+
+        .. versionadded:: 1.5.0
+        """
+        return datetime.datetime.fromtimestamp(int(self.payload.get("timestamp_ms"))/1000)
+
+    @property
+    def favorited_tweet(self) -> Tweet:
+        """:class:`Tweet`: Returns the favorited tweet.
+        
+        .. versionadded:: 1.5.0
+        """
+        return self.payload.get("tweet")
+
+    @property
+    def liker(self) -> User:
+        """:class:`User`: Returns the user who favorited the tweet.
+        
+        .. versionadded:: 1.5.0
+        """
+        return self.payload.get("liker")
+
 
 class UserFollowActionEvent(UserActionEvent):
     """Represents a follow action event by user or of user, This inherits :class:`UserActionEvent`. This object contains information that twitter posts through the webhook url.
