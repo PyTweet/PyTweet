@@ -43,3 +43,14 @@ class MediaType(Enum):
     photo = "photo"
     video = "video"
     gif = "gif"
+
+
+class ActionEventType(Enum):
+    direct_message_read = "direct_message_mark_read_events"
+    direct_message_typing = "direct_message_indicate_typing_events"
+
+
+class UserActionEventType(Enum):
+    follow = "follow_events"
+    block = "block_events"
+    unmute = "mute_events"
