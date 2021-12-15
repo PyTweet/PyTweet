@@ -250,7 +250,7 @@ class WelcomeMessage(Message):
 
     .. versionadded:: 1.3.5
     """
-    __slots__ = ("_name", "_timestamp")
+    __slots__ = ("_name", "_timestamp", "http_client")
 
     def __init__(
         self,
