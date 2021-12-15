@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
-from .attachments import Poll
+from .attachments import Poll, Geo, File
 from .entities import Media
 from .enums import ReplySetting
 from .expansions import USER_FIELD
@@ -20,7 +20,7 @@ __all__ = ("EmbedsImages", "Embed", "Tweet")
 
 
 class EmbedsImages:
-    """Represent the tweets embed images.
+    """Represents the tweets embed images.
 
     .. versionadded: 1.1.3
     """
@@ -60,7 +60,7 @@ class EmbedsImages:
 
 
 class Embed:
-    """Represent the embedded urls in a tweet.
+    """Represents the embedded urls in a tweet.
 
     .. versionadded: 1.1.3
     """
@@ -159,7 +159,7 @@ class Embed:
 
 
 class Tweet(Message):
-    """Represent a tweet message from Twitter.
+    """Represents a tweet message from Twitter.
     A Tweet is any message posted to Twitter which may contain photos, videos, links, and text.
 
     .. describe:: x == y
@@ -301,30 +301,57 @@ class Tweet(Message):
         except KeyError:
             pass
 
-    def reply(self, text: str) -> None:
-        """Post a tweet to reply a specific tweet present by the tweet's id.
+    def reply(
+        self,
+        text: str = None,
+        *,
+        file: Optional[File] = None,
+        geo: Optional[Union[Geo, str]] = None,
+        direct_message_deep_link: Optional[str] = None,
+        reply_setting: Optional[Union[ReplySetting, str]] = None,
+        reply_tweet: Optional[Union[str, int]] = None,
+        exclude_reply_users: Optional[List[Union[str, int]]] = None,
+    ) -> Union[Tweet, Message]:
+        """Post a tweet to reply a specific tweet present by the tweet's id. Returns a :class:`Tweet` object or :class:`Message` if the tweet is not found in the cache. 
 
         .. note::
-            Note that if the tweet is a retweet you cannot reply to the tweet, it might not raise error but it will post the tweet has a normal tweet and it will ping the :class:`Tweet.author`.
+            Note that if the tweet is a retweet you cannot reply to that tweet, it might not raise an error but it will post the tweet has a normal tweet rather then a reply tweet and it ping the :class:`Tweet.author`.
 
         Parameters
         ------------
-        text: str
-            The reply tweet's main text.
+        text: :class:`str`
+            The tweet's text, it will show up as the main text in a tweet.
+            
+        .. versionadded:: 1.5.0
+            file: Optional[:class:`File`]
+                Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
+            geo: Optional[Union[:class:`Geo`, :class:`str`]]
+                The geo attachment, you can put an object that is an instance of :class:`Geo` or the place ID in a string.
+            direct_message_deep_link: Optional[:class:`str`]
+                The direct message deep link, It will showup as a CTA(call-to-action) with button attachment. Example of direct message deep link:
+            reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
+                The reply setting that you can set to minimize users that can reply. If None is specified, the default is set to 'everyone' can reply.
+            exclude_reply_users: Optional[List[Union[:class:`str`, :class:`int`]]]
+                Exclude the users when replying to a tweet, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you don't want to mention.
+
+        Returns
+        ---------
+        Union[:class:`Tweet`, :class:`Message`]
+            Returns a :class:`Tweet` object or :class:`Message` object if the tweet is not found in the cache.
 
 
         .. versionadded:: 1.2.5
         """
-        tweet = self.http_client.request(
-            "POST",
-            "1.1",
-            f"/statuses/update.json",
-            params={
-                "status": self.author.username + " " + text,
-                "in_reply_to_status_id": str(self.id),
-            },
-            auth=True,
-        )  # TODO Returns the tweet in Tweet object
+        tweet = self.http_client.post_tweet(
+            text,
+            file=file,
+            geo=geo,
+            direct_message_deep_link=direct_message_deep_link,
+            reply_setting=reply_setting,
+            reply_tweet=reply_tweet,
+            exclude_reply_users=exclude_reply_users,
+        )
+        return self.http_client.tweet_cache.get(tweet.id, tweet)
 
     def hide(self) -> RelationHide:
         """Hide a reply tweet.
@@ -429,11 +456,19 @@ class Tweet(Message):
 
     @property
     def possibly_sensitive(self) -> bool:
-        """:class`bool`: Return True if the tweet is possible sensitive to some users, else False
+        """:class`bool`: Return True if the tweet is possible sensitive to some users, else False.
 
         .. versionadded: 1.0.0
         """
         return self._payload.get("possibly_sensitive")
+
+    @property
+    def sensitive(self) -> bool:
+        """:class`bool`: An alias to :meth:`Tweet.possibly_sensitive`.
+
+        .. versionadded: 1.5.0
+        """
+        return self.possibly_sensitive
 
     @property
     def created_at(self) -> datetime.datetime:
@@ -476,7 +511,7 @@ class Tweet(Message):
 
     @property
     def reply_setting(self) -> ReplySetting:
-        """:class:`ReplySetting`: Return a :class:`ReplySetting` object with the tweet's reply setting. If everyone can reply, this method return ReplySetting.everyone.
+        """:class:`ReplySetting`: Return a :class:`ReplySetting` object with the tweet's reply setting. If everyone can reply, this method return :class:`replySetting.everyone`.
 
         .. versionadded: 1.3.5
         """
@@ -491,12 +526,15 @@ class Tweet(Message):
         return self._payload.get("lang")
 
     @property
-    def conversation_id(self) -> int:
-        """:class:`int`: All replied are bind to an id named conversation id. An alias to :meth:`Tweet.id`, this set as an alias due to the api return it in the tweet data.
+    def conversation_id(self) -> Optional[int]:
+        """Optional[:class:`int`]: All replied are bind to the original tweet, this property returns the tweet's id if the tweet count as reply tweet else it returns None.
 
         .. versionadded: 1.0.0
         """
-        return int(self._payload.get("conversation_id"))
+        try:
+            return int(self._payload.get("conversation_id"))
+        except ValueError:
+            return None
 
     @property
     def link(self) -> Optional[str]:
@@ -593,5 +631,3 @@ class Tweet(Message):
         .. versionadded: 1.1.0
         """
         return self.tweet_metrics.quote_count
-
-    sensitive = possibly_sensitive
