@@ -13,7 +13,7 @@ from .auth import OauthSession
 from .enums import ReplySetting, SpaceState
 from .errors import BadRequests, Conflict, Forbidden, NotFound, NotFoundError, PytweetException, TooManyRequests, Unauthorized
 from .expansions import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, SPACE_FIELD, TWEET_EXPANSION, TWEET_FIELD, USER_FIELD
-from .message import DirectMessage, Message
+from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser
 from .space import Space
 from .stream import Stream
@@ -556,11 +556,11 @@ class HTTPClient:
         self.message_cache[msg.id] = msg
         return msg
 
-    def fetch_message(self, event_id: Union[str, int]) -> Optional[DirectMessage]:
+    def fetch_direct_message(self, event_id: Union[str, int]) -> Optional[DirectMessage]:
         try:
             event_id = str(event_id)
         except ValueError:
-            raise ValueError("event_id must be an integer or a :class:`str`ing of digits.")
+            raise ValueError("event_id must be an integer or a string of digits.")
 
         res = self.request("GET", "1.1", f"/direct_messages/events/show.json?id={event_id}", auth=True)
 
@@ -571,6 +571,51 @@ class HTTPClient:
 
         return DirectMessage(res, http_client=self)
 
+    def fetch_welcome_message(self, welcome_message_id: Union[str, int]) -> Optional[WelcomeMessage]:
+        try:
+            welcome_message_id = str(welcome_message_id)
+        except ValueError:
+            raise ValueError("welcome_message_id must be an integer or a string of digits.")
+
+        res = self.request(
+            "GET",
+            "1.1",
+            "/direct_messages/welcome_messages/show.json",
+            params={"id": str(welcome_message_id)},
+            auth=True,
+        )
+
+        data = res.get("welcome_message")
+        message_data = data.get("message_data")
+        id = data.get("id")
+        timestamp = data.get("created_timestamp")
+        text = message_data.get("text")
+        return WelcomeMessage(
+            text=text, 
+            id=id, 
+            timestamp=timestamp, 
+            http_client=self
+        )
+
+    def fetch_welcome_message_rule(self, welcome_message_rule_id) -> Optional[WelcomeMessageRule]:
+        res = self.request(
+            "GET",
+            "1.1",
+            "/direct_messages/welcome_messages/rules/show.json",
+            params={"id": str(welcome_message_rule_id)},
+            auth=True,
+        )
+        data = res.get("welcome_message_rule")
+        id = data.get("id")
+        timestamp = data.get("created_timestamp")
+        welcome_message_id = data.get("welcome_message_id")
+        return WelcomeMessageRule(
+            id, 
+            welcome_message_id, 
+            timestamp, 
+            http_client=self
+        )
+    
     def post_tweet(
         self,
         text: str = None,
@@ -638,3 +683,118 @@ class HTTPClient:
         res = self.request("POST", "2", "/tweets", json=payload, auth=True)
         data = res.get("data")
         return Message(data.get("text"), data.get("id"), 1)
+
+    def search_geo(
+        self,
+        query: str,
+        max_result: Optional[Union[str, int]] = None,
+        *,
+        lat: Optional[int] = None,
+        long: Optional[int] = None,
+        ip: Optional[Union[str, int]] = None,
+        granularity: str = "neighborhood"
+    ) -> Optional[Geo]:
+        if query:
+            query = query.replace(" ", "%20")
+
+        data = self.request(
+            "GET",
+            "1.1",
+            "/geo/search.json",
+            params={
+                "query": query,
+                "lat": lat,
+                "long": long,
+                "ip": ip,
+                "granularity": granularity,
+                "max_results": max_result,
+            },
+            auth=True,
+        )
+
+        return [Geo(data) for data in data.get("result").get("places")]
+
+    def create_custom_profile(self, name: str, file: File) -> Optional[CustomProfile]:
+        if not isinstance(file, File):
+            raise PytweetException("'file' argument must be an instance of pytweet.File")
+
+        media_id = self.upload(file, "INIT")
+        self.upload(file, "APPEND", media_id=media_id)
+        self.upload(file, "FINALIZE", media_id=media_id)
+
+        data = {
+            "custom_profile": {
+                "name": name, 
+                "avatar": {
+                    "media": 
+                    {
+                        "id": media_id
+                    }
+                }
+            }
+        }
+
+        res = self.request("POST", "1.1", "/custom_profiles/new.json", json=data, auth=True)
+        data = res.get("custom_profile")
+
+        return CustomProfile(
+            data.get("name"),
+            data.get("id"),
+            data.get("created_timestamp"),
+            data.get("avatar"),
+        )
+
+    def create_welcome_message(
+        self,
+        name: Optional[str] = None,
+        text: Optional[str] = None,
+        *,
+        file: Optional[File] = None,
+        quick_reply: Optional[QuickReply] = None,
+        cta: Optional[CTA] = None,
+    ) -> Optional[WelcomeMessage]:
+        data = {"welcome_message": {"message_data": {}}}
+        message_data = data["welcome_message"]["message_data"]
+
+        data["welcome_message"]["name"] = str(name)
+        message_data["text"] = str(text)
+
+        if file:
+            media_id = self.upload(file, "INIT")
+            self.upload(file, "APPEND", media_id=media_id)
+            self.upload(file, "FINALIZE", media_id=media_id)
+            message_data["attachment"] = {}
+            message_data["attachment"]["type"] = "media"
+            message_data["attachment"]["media"] = {}
+            message_data["attachment"]["media"]["id"] = str(media_id)
+
+        if quick_reply:
+            message_data["quick_reply"] = {
+                "type": quick_reply.type,
+                "options": quick_reply.raw_options,
+            }
+
+        if cta:
+            message_data["ctas"] = cta.raw_buttons
+
+        res = self.request(
+            "POST",
+            "1.1",
+            "/direct_messages/welcome_messages/new.json",
+            json=data,
+            auth=True,
+        )
+
+        data = res.get("welcome_message")
+        id = data.get("id")
+        name = res.get("name")
+        timestamp = data.get("created_timestamp")
+        text = data.get("message_data").get("text")
+
+        return WelcomeMessage(
+            name,
+            text=text,
+            id=id,
+            timestamp=timestamp,
+            http_client=self,
+        )
