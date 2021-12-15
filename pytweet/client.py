@@ -195,8 +195,8 @@ class Client:
         """
         return self.http.fetch_tweet(tweet_id)
 
-    def fetch_message(self, event_id: Union[str, int] = None) -> DirectMessage:
-        """A method for fetching the message with the message's event ID.
+    def fetch_direct_message(self, event_id: Union[str, int] = None) -> DirectMessage:
+        """A method for fetching a direct message with the direct message's event ID.
 
         .. warning::
             This method uses API call and might cause ratelimit if used often! It is more recommended to use `get_message()` method, as it get the message from the client's internal cache.
@@ -214,7 +214,7 @@ class Client:
 
         .. versionadded:: 1.2.0
         """
-        return self.http.fetch_message(event_id)
+        return self.http.fetch_direct_message(event_id)
 
     def tweet(
         self,
@@ -284,8 +284,8 @@ class Client:
         file: Optional[File] = None,
         quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
-    ) -> WelcomeMessage:
-        """Create a welcome message which you can set with :class:`WelcomeMessage.set_rule()`.
+    ) -> Optional[WelcomeMessage]:
+        """Create a welcome message which you can set with :meth:`WelcomeMessage.set_rule()`.
 
         Parameters
         ------------
@@ -308,50 +308,12 @@ class Client:
 
         .. versionadded:: 1.3.5
         """
-        data = {"welcome_message": {"message_data": {}}}
-        message_data = data["welcome_message"]["message_data"]
-
-        data["welcome_message"]["name"] = str(name)
-        message_data["text"] = str(text)
-
-        if file:
-            media_id = self.http.upload(file, "INIT")
-            self.http.upload(file, "APPEND", media_id=media_id)
-            self.http.upload(file, "FINALIZE", media_id=media_id)
-            message_data["attachment"] = {}
-            message_data["attachment"]["type"] = "media"
-            message_data["attachment"]["media"] = {}
-            message_data["attachment"]["media"]["id"] = str(media_id)
-
-        if quick_reply:
-            message_data["quick_reply"] = {
-                "type": quick_reply.type,
-                "options": quick_reply.raw_options,
-            }
-
-        if cta:
-            message_data["ctas"] = cta.raw_buttons
-
-        res = self.http.request(
-            "POST",
-            "1.1",
-            "/direct_messages/welcome_messages/new.json",
-            json=data,
-            auth=True,
-        )
-
-        data = res.get("welcome_message")
-        id = data.get("id")
-        name = res.get("name")
-        timestamp = data.get("created_timestamp")
-        text = data.get("message_data").get("text")
-
-        return WelcomeMessage(
+        return self.http.create_welcome_message(
             name,
-            text=text,
-            id=id,
-            timestamp=timestamp,
-            http_client=self.http,
+            text,
+            file = file,
+            quick_reply = quick_reply,
+            cta = cta
         )
 
     def fetch_welcome_message(self, welcome_message_id: Union[str, int]) -> WelcomeMessage:
@@ -370,31 +332,14 @@ class Client:
 
         .. versionadded:: 1.3.5
         """
-        res = self.http.request(
-            "GET",
-            "1.1",
-            "/direct_messages/welcome_messages/show.json",
-            params={"id": str(welcome_message_id)},
-            auth=True,
-        )
-        data = res.get("welcome_message")
-        message_data = data.get("message_data")
-        id = data.get("id")
-        timestamp = data.get("created_timestamp")
-        text = message_data.get("text")
-        return WelcomeMessage(
-            text=text, 
-            id=id, 
-            timestamp=timestamp, 
-            http_client=self.http
-        )
+        return self.http.fetch_welcome_message(welcome_message_id)
 
-    def fetch_welcome_message_rules(self, welcome_message_rules_id: Union[str, int]) -> WelcomeMessageRule:
-        """A method for fetching a welcome message rules.
+    def fetch_welcome_message_rule(self, welcome_message_rule_id: Union[str, int]) -> WelcomeMessageRule:
+        """A method for fetching a welcome message rule.
 
         Parameters
         ------------
-        welcome_message_rules_id: Union[:class:`str`, :class:`int`]
+        welcome_message_rule_id: Union[:class:`str`, :class:`int`]
             Represents the welcome message rule ID that you wish to fetch with.
 
         Returns
@@ -405,18 +350,7 @@ class Client:
 
         .. versionadded:: 1.3.5
         """
-        res = self.http.request(
-            "GET",
-            "1.1",
-            "/direct_messages/welcome_messages/rules/show.json",
-            params={"id": str(welcome_message_rules_id)},
-            auth=True,
-        )
-        data = res.get("welcome_message_rule")
-        id = data.get("id")
-        timestamp = data.get("created_timestamp")
-        welcome_message_id = data.get("welcome_message_id")
-        return WelcomeMessageRule(id, welcome_message_id, timestamp, http_client=self.http)
+        return self.http.fetch_welcome_message_rule(welcome_message_rule_id)
 
     def fetch_space(self, space_id: Union[str, int]) -> Space:
         """A method for fetching a space.
@@ -462,19 +396,21 @@ class Client:
     def search_geo(
         self,
         query: str,
+        max_result: Optional[Union[str, int]] = None,
         *,
         lat: Optional[int] = None,
         long: Optional[int] = None,
         ip: Optional[Union[str, int]] = None,
-        granularity: str = "neighborhood",
-        max_results: Optional[Union[str, int]] = None,
-    ) -> Geo:
-        """Search a location with the given arguments.
+        granularity: str = "neighborhood"
+    ) -> Geo: #TODO make enums for granularity
+        """Search a geo with the given arguments.
 
         Parameters
         ------------
         query: :class:`str`
             Free-form text to match against while executing a geo-based query, best suited for finding nearby locations by name. Remember to URL encode the query.
+        max_results: Optional[Union[:class:`str`, :class:`int`]]
+            A hint as to the number of results to return. This does not guarantee that the number of results returned will equal max_results, but instead informs how many "nearby" results to return. Ideally, only pass in the number of places you intend to display to the user here.
         lat: :class:`int`
             The latitude to search around. This parameter will be ignored unless it is inside the range -90.0 to +90.0 (North is positive) inclusive. It will also be ignored if there isn't a corresponding long parameter.
         long: :class:`int`
@@ -483,8 +419,6 @@ class Client:
             An IP address. Used when attempting to fix geolocation based off of the user's IP address.
         granularity: :class:`str`
             This is the minimal granularity of place types to return and must be one of: neighborhood, city, admin or country. If no granularity is provided for the request neighborhood is assumed. Setting this to city, for example, will find places which have a type of city, admin or country.
-        max_results: Optional[Union[:class:`str`, :class:`int`]]
-            A hint as to the number of results to return. This does not guarantee that the number of results returned will equal max_results, but instead informs how many "nearby" results to return. Ideally, only pass in the number of places you intend to display to the user here.
 
         Returns
         ---------
@@ -494,26 +428,14 @@ class Client:
 
         .. versionadded:: 1.5.3
         """
-
-        if query:
-            query = query.replace(" ", "%20")
-
-        data = self.http.request(
-            "GET",
-            "1.1",
-            "/geo/search.json",
-            params={
-                "query": query,
-                "lat": lat,
-                "long": long,
-                "ip": ip,
-                "granularity": granularity,
-                "max_results": max_results,
-            },
-            auth=True,
+        return self.http.search_geo(
+            query,
+            max_result,
+            lat = lat,
+            long = long,
+            ip = ip,
+            granularity = granularity
         )
-
-        return [Geo(data) for data in data.get("result").get("places")]
 
     def get_message(self, event_id: Union[str, int] = None) -> Optional[DirectMessage]:
         """Get a direct message through the client message cache. Returns None if the message is not in the cache.
@@ -572,7 +494,7 @@ class Client:
 
         return self.http.message_cache.get(tweet_id)
 
-    def create_custom_profile(self, name: str, file: File) -> CustomProfile:
+    def create_custom_profile(self, name: str, file: File) -> Optional[CustomProfile]:
         """Create a custom profile
 
         Parameters
@@ -587,34 +509,7 @@ class Client:
         :class:`CustomProfile`
             This method returns a :class:`CustomProfile` object.
         """
-        if not isinstance(file, File):
-            raise PytweetException("'file' argument must be an instance of pytweet.File")
-
-        media_id = self.http.upload(file, "INIT")
-        self.http.upload(file, "APPEND", media_id=media_id)
-        self.http.upload(file, "FINALIZE", media_id=media_id)
-
-        data = {
-            "custom_profile": {
-                "name": name, 
-                "avatar": {
-                    "media": 
-                    {
-                        "id": media_id
-                    }
-                }
-            }
-        }
-
-        res = self.http.request("POST", "1.1", "/custom_profiles/new.json", json=data, auth=True)
-        data = res.get("custom_profile")
-
-        return CustomProfile(
-            data.get("name"),
-            data.get("id"),
-            data.get("created_timestamp"),
-            data.get("avatar"),
-        )
+        return self.http.create_custom_profile(name, file)
 
     def stream(self, *, dry_run: bool = False) -> None:
         """Stream realtime in twitter for tweets! This method use the stream argument in :meth:`request.get` for streaming in one of the stream endpoint that twitter api provides. If you want to use this method, make sure to provides the stream kwarg in your :class:`Client` instance and make an on_stream event to get the stream's tweet data and connection,
