@@ -547,8 +547,7 @@ class CustomProfile:
 
         .. versionadded:: 1.3.5
         """
-        timestamp = str(self._timestamp)[:10]
-        return datetime.datetime.fromtimestamp(int(timestamp))
+        return datetime.datetime.fromtimestamp(int(self._timestamp)/1000)
 
     @property
     def media(self) -> Media:

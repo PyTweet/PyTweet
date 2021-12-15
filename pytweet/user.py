@@ -482,7 +482,7 @@ class User:
         .. versionadded: 1.0.0
         """
         if isinstance(self._payload.get("created_at"), str):
-            return datetime.datetime.fromtimestamp(int(self._payload.get("created_at")[:7]))
+            return datetime.datetime.fromtimestamp(int(self._payload.get("created_at"))/1000)
         return time_parse_todt(self._payload.get("created_at"))
 
     @property

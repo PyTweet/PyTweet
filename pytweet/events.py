@@ -49,8 +49,7 @@ class UserActionEvent(Event):
         
         .. versionadded:: 1.5.0
         """
-        timestamp = str(self.payload.get("created_timestamp"))[:10]
-        return datetime.datetime.fromtimestamp(int(timestamp))
+        return datetime.datetime.fromtimestamp(int(self.payload.get("created_timestamp"))/1000)
 
     @property
     def target(self) -> User:

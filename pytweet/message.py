@@ -162,7 +162,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.2.0
         """
-        return datetime.datetime.fromtimestamp(int(self._payload.get("created_timestamp")[:7]))
+        return datetime.datetime.fromtimestamp(int(self._payload.get("created_timestamp"))/1000)
 
     @property
     def hashtags(self) -> Optional[List[Hashtags]]:
@@ -382,8 +382,7 @@ class WelcomeMessage(Message):
 
         .. versionadded:: 1.3.5
         """
-        timestamp = str(self._timestamp)[:10]
-        return datetime.datetime.fromtimestamp(int(timestamp))
+        return datetime.datetime.fromtimestamp(int(self._timestamp)/1000)
 
     @property
     def name(self) -> str:
@@ -451,8 +450,7 @@ class WelcomeMessageRule(Message):
 
         .. versionadded:: 1.3.5
         """
-        timestamp = str(self._timestamp)[:10]
-        return datetime.datetime.fromtimestamp(int(timestamp))
+        return datetime.datetime.fromtimestamp(int(self._timestamp)/1000)
 
     @property
     def welcome_message_id(self) -> Union[str, int]:
