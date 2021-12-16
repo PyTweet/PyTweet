@@ -38,7 +38,6 @@ Client
     :members:
 
 
-
 Twitter Models
 ---------------------
 
@@ -293,6 +292,8 @@ EmbedsImages
 .. autoclass:: EmbedsImages
     :members:
 
+
+.. _twitter-api-events:
 
 Event Reference
 ---------------------

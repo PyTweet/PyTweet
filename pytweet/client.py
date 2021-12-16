@@ -116,21 +116,24 @@ class Client:
         """
         A decorator for making an event, the event will be register in the client's internal cache.
 
+        See the :ref:`Event Reference <twitter-api-events>` for the currently documented events.
+
         Parameters
         ------------
         func: :class:`typing.Callable`
             The function that execute when the event is trigger. The event must be a synchronous function. You must also put the right event name in the function's name, See event reference for full events name.
 
-
-        .. seealso::
-            Event Reference
-                See the `Event Reference`.
+        
+        Raises
+        --------
+        TypeError
+            The function passed is a coroutine function.
 
 
         .. versionadded:: 1.3.5
         """
         if iscoroutinefunction(func):
-            raise TypeError("Event must be a synchronous function!")
+            raise TypeError("Function passed in event() must NOT be a coroutine function.")
         self.http.events[func.__name__[3:]] = func
 
     def fetch_user(self, user_id: Union[str, int] = None) -> Optional[User]:
