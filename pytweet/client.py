@@ -20,7 +20,7 @@ from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .space import Space
 from .stream import Stream
 from .tweet import Tweet
-from .user import User
+from .user import User, ClientAccount
 from .webhook import Environment, Webhook
 
 __all__ = ("Client",)
@@ -109,7 +109,8 @@ class Client:
         if not self.http.access_token:
             return None
 
-        self._account_user = self.fetch_user(self.http.access_token.partition("-")[0])
+        data = self.fetch_user(self.http.access_token.partition("-")[0])._User__original_payload
+        self._account_user = ClientAccount(data, http_client=self.http)
 
     def event(self, func: Callable) -> None:
         """
