@@ -316,7 +316,7 @@ class HTTPClient:
             if isinstance(path, io.IOBase):
                 open_file = path
             else:
-                open_file = open(file.path, "rb")
+                open_file = open(path, "rb")
 
             if not media_id:
                 raise ValueError("'media_id' is None! Please specified it.")
