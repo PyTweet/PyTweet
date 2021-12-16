@@ -212,7 +212,10 @@ class HTTPClient:
             f"Content: {response.content}\n"
         )
 
-        if code == 400:
+        if code in (201, 202, 204):
+            return
+
+        elif code == 400:
            raise BadRequests(response)
 
         elif code == 401:
@@ -227,7 +230,7 @@ class HTTPClient:
         elif code == 409:
             raise Conflict(response)
 
-        elif code == 429:
+        elif code in (420, 429): # Read more about 420 here: https://evertpot.com/http/420-enhance-your-calm
             remaining = int(response.headers["x-rate-limit-reset"])
             sleep_for = (remaining - int(time.time())) + 1
             _log.warn(f"Client has been ratelimited. Sleeping for {sleep_for}")
@@ -428,7 +431,7 @@ class HTTPClient:
         )
         return Space(res)
 
-    def handle_events(self, payload: Dict[str, Any]):
+    def handle_events(self, payload: RequestModel):
         keys = payload.keys()
         if "direct_message_events" in keys:
             self.event_parser.parse_direct_message_create(payload)
