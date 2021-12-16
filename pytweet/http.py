@@ -28,32 +28,6 @@ if TYPE_CHECKING:
     ResponseModel = Optional[Union[str, RequestModel]]
 
 
-def check_200(response):
-    try:
-        res = response.json()
-        if "errors" in res.keys():
-            if res.get("errors"):
-                if "detail" in res.get("errors")[0].keys():
-                    detail = res["errors"][0]["detail"]
-                    if detail.startswith("Could not find"):
-                        raise NotFoundError(response)
-                elif "details" in res.get("errors")[0].keys():
-                    detail = res["errors"][0]["details"][0]
-                    if detail.startswith("Cannot parse rule"):
-                        _log.warning(
-                            f"Invalid stream rule! Rules Info: 'created': {res['meta']['summary'].get('created')}, 'not_created': {res['meta']['summary'].get('not_created')}, 'valid': {res['meta']['summary'].get('valid')}, 'invalid': {res['meta']['summary'].get('invalid')}"
-                        )
-                        raise SyntaxError(detail)
-        
-
-
-            else:
-                raise PytweetException(response, res["errors"][0]["detail"])
-    except (JSONDecodeError, KeyError) as e:
-        if isinstance(e, KeyError):
-            raise PytweetException(res)
-        return
-
 # def check_error(response: requests.models.Response) -> NoReturn:
 #     code = response.status_code
 #     if code == 200:
