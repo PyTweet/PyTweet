@@ -395,40 +395,11 @@ Oauth is a way to authenticate a twitter user account. You can do this with the 
 OauthSession
 ~~~~~~~
 
-
-
 .. attributetable:: OauthSession
 
 
 .. autoclass:: OauthSession
     :members:
-
-
-
-Webhooks
---------
-These are used for new message events that willl be documented soon.
-
-Webhhook
-~~~~~~~
-
-.. attributetable:: Webhook
-
-
-.. autoclass:: Webhook
-    :members:
-
-
-Environment
-~~~~~~~~~~
-
-.. attributetable:: Environment
-
-
-.. autoclass:: Environment
-    :members:
-
-
 
 
 Errors
