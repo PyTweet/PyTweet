@@ -4,8 +4,14 @@ import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
 from .attachments import CTA, CustomProfile, File, QuickReply
-from .expansions import (MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_EXPANSION,
-                         TWEET_FIELD, USER_FIELD)
+from .expansions import (
+    MEDIA_FIELD, 
+    PLACE_FIELD, 
+    POLL_FIELD, 
+    TWEET_EXPANSION,
+    TWEET_FIELD, 
+    USER_FIELD
+)
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import build_object, time_parse_todt
@@ -16,7 +22,7 @@ if TYPE_CHECKING:
 
 
 class User:
-    """Represent a user in Twitter.
+    """Represents a user in Twitter.
     User is an identity in twitter, its very interactive. Can send message, post a tweet, and even send messages to other user through Dms.
 
 
@@ -39,10 +45,10 @@ class User:
     """
 
     def __init__(self, data: Dict[str, Any], http_client: Optional[HTTPClient] = None) -> None:
-        self.original_payload: Dict[str, Any] = data
-        self._payload: Dict[Any, Any] = self.original_payload.get("data") or self.original_payload
+        self.__original_payload: Dict[str, Any] = data
+        self._payload: Dict[Any, Any] = self.__original_payload.get("data") or self.__original_payload
         self.http_client = http_client
-        self._metrics = UserPublicMetrics(self._payload) or self.original_payload
+        self._metrics = UserPublicMetrics(self._payload) or self.__original_payload
 
     def __str__(self) -> str:
         return self.username
@@ -74,7 +80,7 @@ class User:
         text: :class:`str`
             The text that will be send to that user.
         file: Optional[:class:`File`]
-            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File.
+            Represents a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File.
         custom_profile: Optional[:class:`CustomProfile`]
             The custom profile attachment.
         quick_reply: Optional[:class:`QuickReply`]
@@ -436,8 +442,8 @@ class User:
         return self._payload.get("profile_image_url", "")
 
     @property
-    def link(self) -> str:
-        """:class:`str`: Return url where the user put links, return an empty string if there isn't a url
+    def url(self) -> Optional[str]:
+        """:class:`str`: Return url where the user put url, return an empty string if there isn't a url
 
         .. versionadded: 1.0.0
         """
@@ -516,3 +522,34 @@ class User:
         .. versionadded: 1.1.0
         """
         return self._metrics.listed_count
+
+class ClientAccount(User):
+    """Represents the client's account. This inherits :class:`User` object.
+    
+    .. versionadded:: 1.5.0
+    """
+    def update_profile(
+        self, 
+        name: Optional[str] = None,
+        description: Optional[str] = None, 
+        *,
+        location: Optional[str] = None,
+        profile_url: Optional[str] = None,
+        profile_link_color: Optional[int] = None
+
+    ):
+        data = self.http_client.request(
+            "POST", 
+            "1.1", 
+            "/account/update_profile.json",
+            params={
+                "name": name,
+                "description": description,
+                "location": location,
+                "url": profile_url,
+                "profile_link_color": profile_link_color
+            },
+            auth=True
+        )
+        data = self.http_client.event_parser.payload_parser.parse_user_payload(data)
+        return User(data, http_client=self.http_client)
