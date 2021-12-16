@@ -279,9 +279,9 @@ class WelcomeMessage(Message):
         except Exception as e:
             raise e
 
-        data: Dict[str, Union[int, Dict[str, int]]] = {"welcome_message_rule": {"welcome_message_id": str(self.id)}}
+        data = {"welcome_message_rule": {"welcome_message_id": str(self.id)}}
 
-        res: dict = self.http_client.request(
+        res = self.http_client.request(
             "POST",
             "1.1",
             "/direct_messages/welcome_messages/rules/new.json",
@@ -343,13 +343,13 @@ class WelcomeMessage(Message):
 
         if cta:
             message_data["ctas"] = cta.raw_buttons
-
+        
         res = self.http_client.request(
             "PUT",
             "1.1",
             "/direct_messages/welcome_messages/update.json",
             params={"id": str(self.id)},
-            json=message_data,
+            json=data,
             auth=True,
         )
 
@@ -361,7 +361,7 @@ class WelcomeMessage(Message):
         timestamp = welcome_message.get("created_timestamp")
         text = message_data.get("text")
 
-        return WelcomeMessage(name, text=text, id=id, timestamp=timestamp)
+        return WelcomeMessage(name, text=text, id=id, timestamp=timestamp, http_client=self.http_client)
 
     def delete(self):
         """Delete the Welcome Message.
@@ -443,6 +443,19 @@ class WelcomeMessageRule(Message):
             params={"id": str(self.id)},
             auth=True,
         )
+
+    def fetch_welcome_message(self) -> Optional[WelcomeMessage] :
+        """A method for fetching the welcome message rule's welcome message. An equivalent to :meth:`Client.fetch_welcome_message`.
+
+        Returns
+        ---------
+        Optional[:class:`WelcomeMessage`]
+            This method returns a :class:`WelcomeMessage` object.
+        
+        
+        .. versionadded:: 1.5.0
+        """
+        return self.http_client.fetch_welcome_message(self.welcome_message_id)
 
     @property
     def created_at(self) -> datetime.datetime:
