@@ -231,6 +231,12 @@ class HTTPClient:
         )
         code = response.status_code
         res = None
+        _log.debug(
+            f"{method} {url} has returned: "
+            f"{response.status_code} {response.reason}\n"
+            f"Headers: {response.headers}\n"
+            f"Content: {response.content}\n"
+        )
 
         if code == 400:
            raise BadRequests(response)
@@ -269,19 +275,14 @@ class HTTPClient:
             except KeyError:
                 pass
 
-        _log.debug(
-            f"{method} {url} has returned: "
-            f"{response.status_code} {response.reason}\n"
-            f"Headers: {response.headers}\n"
-            f"Content: {response.content}\n"
-            )
         return res
 
     def upload(self, file: File, command: str, *, media_id=None):
         assert command.upper() in ("INIT", "APPEND", "FINALIZE", "STATUS")
-        auth = OauthSession(self.consumer_key, self.consumer_key_secret)
-        auth.set_access_token(self.access_token, self.access_token_secret)
-        auth = auth.oauth1
+        if self._auth is None:
+            auth_session = OauthSession(self.consumer_key, self.consumer_key_secret, http_client = self, callback = self.oauth_callback)
+            auth_session.set_access_token(self.access_token, self.access_token_secret)
+            self._auth = auth_session
 
         def CheckStatus(processing_info, media_id):
             if not processing_info:
