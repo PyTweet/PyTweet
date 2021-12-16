@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .auth import OauthSession
 from .enums import ReplySetting, SpaceState
-from .errors import BadRequests, Conflict, Forbidden, NotFound, NotFoundError, PytweetException, TooManyRequests, Unauthorized
+from .errors import BadRequests, Conflict, Forbidden, NotFound, NotFoundError, PytweetException, TooManyRequests, Unauthorized, FieldsTooLarge
 from .expansions import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, SPACE_FIELD, TWEET_EXPANSION, TWEET_FIELD, USER_FIELD
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser
@@ -235,6 +235,9 @@ class HTTPClient:
             sleep_for = (remaining - int(time.time())) + 1
             _log.warn(f"Client has been ratelimited. Sleeping for {sleep_for}")
             time.sleep(sleep_for)
+        
+        elif code == 431:
+            raise FieldsTooLarge(resposne)
 
 
         if is_json:
