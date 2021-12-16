@@ -53,11 +53,11 @@ class Client:
     http: Optional[:class:`HTTPClient`]
         Returns the HTTPClient,  the HTTPClient is responsible for making most of the Requests.
     webhook: Optional[:class:`Webhook`]
-        Returns the client's main webhook, if there isn't it return None.
+        Returns the client's main webhook, if there is None it returns None
     environment: Optional[:class:`Environment`]
-        Returns the client's main Environment, if there isn't it return None.
+        Returns the client's main Environment, if there is None it returns None
     webhook_url_path: Optional[:class:`str`]
-        Returns the webhook url path, if there isn't it return None.
+        Returns the webhook url path, if there is None it returns None
 
 
     .. versionadded:: 1.0.0
@@ -647,7 +647,7 @@ class Client:
         _log.info("Successfully triggered a CRC.")
         return True
 
-    def listen(self, app: Flask, path: str, sleep_for: Union[int, float] = 0.50, **kwargs: Any):
+    def listen(self, app: Flask, path: str, sleep_for: Union[int, float] = 0.50, ngrok: bool = False, **kwargs: Any):
         """Listen to upcoming account activity events send by twitter to your webhook url. You can use the rest of Flask arguments like port or host via the kwargs argument.
 
         Parameters
@@ -658,10 +658,12 @@ class Client:
             Your webhook path url. If the webhook url is `https://your-domain.com/webhook/twitter`, then the path is `/webhook/twitter`.
         sleep_for: Union[:class:`int`, :class:`float`]
             Ensure the flask application is running before triggering a CRC by sleeping after starting a thread. Default to 0.50.
+        ngrok: :class:`bool`
+            indicates to use ngrok for tunneling your localhost. This usually uses for users that use localhost url.
         disabled_log: :class:`bool`
             A kwarg that indicates to disable flask's log so it does not print the request process in your terminal, this also will disable `werkzeug` log.
-        ngrok: :class:`bool`
-            A kwarg that indicates to use ngrok for tunneling your localhost. This usually uses for users that use localhost url. 
+        make_new: :class:`bool`:
+            ...
         
 
         .. versionadded:: 1.3.5
@@ -669,6 +671,9 @@ class Client:
         disabled_log: bool = kwargs.pop("disabled_log", False)
         ngrok: bool = kwargs.pop("ngrok", False) #TODO Use it later...
         environments = self.fetch_all_environments()
+        if ngrok:
+            ...
+
         for env in environments:
             for webhook in env.webhooks:
                 if path in webhook.url:
