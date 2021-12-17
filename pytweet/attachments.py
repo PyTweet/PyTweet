@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-import datetime
-import io
 import mimetypes
+import datetime
+import base64
+import io
 import os
 from dataclasses import dataclass
 from typing import Any, Dict, List, NoReturn, Optional, Union
@@ -432,7 +433,6 @@ class CTA:
         .. versionadded:: 1.3.5
         """
         return self._raw_buttons
-
 
 class File:
     """Represent a File attachment for messages.
