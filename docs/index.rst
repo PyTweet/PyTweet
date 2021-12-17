@@ -2,9 +2,6 @@ Welcome to PyTweet's documentation!
 ===================================
 PyTweet is a Synchronous python API wrapper for twitter's api, Its filled with rich features and is very easy to use.
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
 
 Features:
 -----------------
@@ -35,5 +32,4 @@ Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
