@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class RelationsTypeEnum(Enum):
     PENDING = 0
     ACCEPT = 1
@@ -53,6 +54,7 @@ class UserActionEventType(Enum):
     follow = "follow_events"
     block = "block_events"
     unmute = "mute_events"
+
 
 class Timezone(Enum):
     international_date_line_west = "Etc/GMT+12"

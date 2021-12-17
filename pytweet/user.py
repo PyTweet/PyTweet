@@ -5,14 +5,7 @@ import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
 from .attachments import CTA, CustomProfile, File, QuickReply
-from .expansions import (
-    MEDIA_FIELD, 
-    PLACE_FIELD, 
-    POLL_FIELD, 
-    TWEET_EXPANSION,
-    TWEET_FIELD, 
-    USER_FIELD
-)
+from .expansions import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_EXPANSION, TWEET_FIELD, USER_FIELD
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import build_object, time_parse_todt
@@ -22,6 +15,7 @@ from .models import UserSettings, SleepTimeSettings, Location, TimezoneInfo
 if TYPE_CHECKING:
     from .http import HTTPClient
     from .message import DirectMessage
+
 
 class User:
     """Represents a user in Twitter.
@@ -490,7 +484,7 @@ class User:
         .. versionadded: 1.0.0
         """
         if isinstance(self._payload.get("created_at"), str):
-            return datetime.datetime.fromtimestamp(int(self._payload.get("created_at"))/1000)
+            return datetime.datetime.fromtimestamp(int(self._payload.get("created_at")) / 1000)
         return time_parse_todt(self._payload.get("created_at"))
 
     @property
@@ -525,21 +519,22 @@ class User:
         """
         return self._metrics.listed_count
 
+
 class ClientAccount(User):
     """Represents the client's account. This inherits :class:`User` object. This class unlock methods that you can use only for the client. Like updating settings which you can only do with the client's account.
-    
+
     .. versionadded:: 1.5.0
     """
+
     def update_profile(
-        self, 
+        self,
         *,
         name: Optional[str] = None,
-        description: Optional[str] = None, 
+        description: Optional[str] = None,
         image: Optional[File] = None,
         location: Optional[str] = None,
         profile_url: Optional[str] = None,
-        profile_link_color: Optional[int] = None
-
+        profile_link_color: Optional[int] = None,
     ):
         if image:
             path = image.path
@@ -548,81 +543,56 @@ class ClientAccount(User):
                     "POST",
                     "1.1",
                     "/account/update_profile_image.json",
-                    files={
-                        "image": path.read(4 * 1024 * 1024)
-                    },
-                    auth=True
+                    files={"image": path.read(4 * 1024 * 1024)},
+                    auth=True,
                 )
             else:
                 self.http_client.request(
                     "POST",
                     "1.1",
                     "/account/update_profile_image.json",
-                    files={
-                        "image": open(path, "rb").read(4 * 1024 * 1024)
-                    },
-                    auth=True
+                    files={"image": open(path, "rb").read(4 * 1024 * 1024)},
+                    auth=True,
                 )
 
-
         res = self.http_client.request(
-            "POST", 
-            "1.1", 
+            "POST",
+            "1.1",
             "/account/update_profile.json",
             params={
                 "name": name,
                 "description": description,
                 "location": location,
                 "url": profile_url,
-                "profile_link_color": profile_link_color
+                "profile_link_color": profile_link_color,
             },
-            auth=True
+            auth=True,
         )
         data = self.http_client.event_parser.payload_parser.parse_user_payload(res)
         return data
 
     def update_profile_banner(
-        self,
-        *,
-        banner: File,
-        width: int = 0,
-        height: int = 0,
-        offset_left: int = 0,
-        offset_top: int = 0
+        self, *, banner: File, width: int = 0, height: int = 0, offset_left: int = 0, offset_top: int = 0
     ) -> None:
         path = banner.path
 
         if isinstance(path, io.IOBase):
             self.http_client.request(
-                "POST", 
-                "1.1", 
+                "POST",
+                "1.1",
                 "/account/update_profile_banner.json",
-                params={
-                    "width": width,
-                    "height": height,
-                    "offset_left": offset_left,
-                    "offset_top": offset_top
-                },
-                files = {
-                    "banner": path.read(4 * 1024 * 1024)
-                },
-                auth=True
+                params={"width": width, "height": height, "offset_left": offset_left, "offset_top": offset_top},
+                files={"banner": path.read(4 * 1024 * 1024)},
+                auth=True,
             )
         else:
             self.http_client.request(
-                "POST", 
-                "1.1", 
+                "POST",
+                "1.1",
                 "/account/update_profile_banner.json",
-                params={
-                    "width": width,
-                    "height": height,
-                    "offset_left": offset_left,
-                    "offset_top": offset_top
-                },
-                files = {
-                    "banner": open(path, "rb").read(4 * 1024 * 1024)
-                },
-                auth=True
+                params={"width": width, "height": height, "offset_left": offset_left, "offset_top": offset_top},
+                files={"banner": open(path, "rb").read(4 * 1024 * 1024)},
+                auth=True,
             )
         return None
 
@@ -632,9 +602,9 @@ class ClientAccount(User):
         lang: Optional[str] = None,
         enabled_sleep_time: Optional[bool] = None,
         start_sleep_time: Optional[int] = None,
-        end_sleep_time:  Optional[int] = None,
+        end_sleep_time: Optional[int] = None,
         timezone: Optional[Timezone] = None,
-        trend_location_woeid: Optional[int] = None
+        trend_location_woeid: Optional[int] = None,
     ):
         res = self.http_client.request(
             "POST",
@@ -646,14 +616,14 @@ class ClientAccount(User):
                 "end_sleep_time": end_sleep_time,
                 "time_zone": timezone.value,
                 "trend_location_woeid": trend_location_woeid,
-                "lang": lang
+                "lang": lang,
             },
-            auth=True
+            auth=True,
         )
         if res.get("sleep_time"):
             res["sleep_time_setting"] = SleepTimeSettings(**res["sleep_time"])
             res.pop("sleep_time")
-        
+
         if res.get("location"):
             res["location"] = Location(**res["trend_location"])
 
@@ -662,25 +632,20 @@ class ClientAccount(User):
             res["time_zone"].pop("tzinfo_name")
             res["timezone"] = TimezoneInfo(**res["time_zone"])
             res.pop("time_zone")
-        
+
         return UserSettings(**res)
-        
+
     def fetch_settings(self):
-        res = self.http_client.request(
-            "GET",
-            "1.1",
-            "/account/settings.json",
-            auth=True
-        )
+        res = self.http_client.request("GET", "1.1", "/account/settings.json", auth=True)
         if res.get("sleep_time"):
             res["sleep_time_setting"] = SleepTimeSettings(**res["sleep_time"])
             res.pop("sleep_time")
-        
+
         if res.get("location"):
             res["location"] = Location(**res["trend_location"])
 
         if res.get("time_zone"):
             res["timezone"] = Timezone(**res["timezone"])
             res.pop("time_zone")
-        
+
         return UserSettings(**res)

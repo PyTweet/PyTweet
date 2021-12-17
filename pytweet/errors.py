@@ -2,6 +2,7 @@ import requests
 from typing import Optional
 from json import decoder
 
+
 class PytweetException(Exception):
     """Exception: This is the base class of all exceptions.
 
@@ -131,16 +132,14 @@ class FieldsTooLarge(HTTPException):
             else:
                 detail = response.json().get("detail")
         except decoder.JSONDecodeError:
-            super().__init__(
-                response,
-                response.text
-            )
-        
+            super().__init__(response, response.text)
+
         else:
             super().__init__(
                 response,
                 msg if msg else detail if detail else "Request Header Fields Too Large",
             )
+
 
 class NotFound(HTTPException):
     """This class inherits :class:`HTTPException`. raises when a request returns status code: 404.
@@ -169,11 +168,13 @@ class TooManyRequests(HTTPException):
 
     pass
 
+
 class ConnectionException(HTTPException):
     """This error class inherits :class:`HTTPException`. This error is raises when a stream connection throw an error.
 
     .. versionadded:: 1.3.5
     """
+
     def __init__(
         self,
         response: Optional[requests.models.Response] = None,
@@ -192,9 +193,8 @@ class ConnectionException(HTTPException):
 
 
 class Conflict(HTTPException):
-    """This error class inherits :class:`HTTPException`. This error is raises when a request return 409 status code.
+    """This error class inherits :class:`HTTPException`. This error is raises when a request return 409 status code."""
 
-    """
     def __init__(
         self,
         response: Optional[requests.models.Response] = None,
@@ -203,6 +203,7 @@ class Conflict(HTTPException):
         msg = response.json().get("errors")[0].get("message") if not message else message
         detail = response.json().get("errors")[0].get("detail")
         super().__init__(response, msg if msg else detail if detail else "Not Found!")
+
 
 class NotFoundError(APIException):
     """This error class inherits :class:`APIException`. This error is usually raises when trying to find specific Tweet or User that does not exist.
@@ -225,5 +226,6 @@ class UnKnownSpaceState(APIException):
 
     .. versionadded:: 1.5.0
     """
+
     def __init__(self, given_state):
         super().__init__(message="Unknown state passed: %s" % given_state)

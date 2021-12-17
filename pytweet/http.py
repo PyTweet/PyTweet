@@ -11,7 +11,17 @@ from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .auth import OauthSession
 from .enums import ReplySetting, SpaceState
-from .errors import BadRequests, Conflict, Forbidden, NotFound, NotFoundError, PytweetException, TooManyRequests, Unauthorized, FieldsTooLarge
+from .errors import (
+    BadRequests,
+    Conflict,
+    Forbidden,
+    NotFound,
+    NotFoundError,
+    PytweetException,
+    TooManyRequests,
+    Unauthorized,
+    FieldsTooLarge,
+)
 from .expansions import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, SPACE_FIELD, TWEET_EXPANSION, TWEET_FIELD, USER_FIELD
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser
@@ -46,7 +56,6 @@ if TYPE_CHECKING:
 #                                 f"Invalid stream rule! Rules Info: 'created': {res['meta']['summary'].get('created')}, 'not_created': {res['meta']['summary'].get('not_created')}, 'valid': {res['meta']['summary'].get('valid')}, 'invalid': {res['meta']['summary'].get('invalid')}"
 #                             )
 #                             raise SyntaxError(detail)
-            
 
 
 #                 else:
@@ -87,8 +96,6 @@ if TYPE_CHECKING:
 #         )
 
 
-
-
 class HTTPClient:
     def __init__(
         self,
@@ -99,7 +106,7 @@ class HTTPClient:
         access_token: Optional[str],
         access_token_secret: Optional[str],
         stream: Optional[Stream] = None,
-        callback: Optional[str] = None
+        callback: Optional[str] = None,
     ) -> Union[None, NoReturn]:
         self.credentials: Dict[str, Optional[str]] = {
             "bearer_token": bearer_token,
@@ -132,7 +139,7 @@ class HTTPClient:
         self.event_parser = EventParser(self)
         self.base_url = "https://api.twitter.com/"
         self.upload_url = "https://upload.twitter.com/1.1/media/upload.json"
-        self._auth: Optional[OauthSession] = None # Set in request method.
+        self._auth: Optional[OauthSession] = None  # Set in request method.
         self.current_header: Optional[RequestModel] = None
         self.message_cache = {}
         self.tweet_cache = {}
@@ -173,12 +180,13 @@ class HTTPClient:
             url = self.base_url + version + path
         else:
             url = path
-        
+
         if self._auth is None:
-            auth_session = OauthSession(self.consumer_key, self.consumer_key_secret, http_client = self, callback = self.oauth_callback)
+            auth_session = OauthSession(
+                self.consumer_key, self.consumer_key_secret, http_client=self, callback=self.oauth_callback
+            )
             auth_session.set_access_token(self.access_token, self.access_token_secret)
             self._auth = auth_session
-
 
         user_agent = "Py-Tweet (https://github.com/PyTweet/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
         if "Authorization" not in headers.keys():
@@ -196,7 +204,7 @@ class HTTPClient:
             json = None
         if json:
             data = None
-        
+
         method = method.upper()
         response = self.__session.request(
             method,
@@ -222,7 +230,7 @@ class HTTPClient:
             return
 
         elif code == 400:
-           raise BadRequests(response)
+            raise BadRequests(response)
 
         elif code == 401:
             raise Unauthorized(response)
@@ -238,7 +246,6 @@ class HTTPClient:
 
         elif code == 431:
             raise FieldsTooLarge(response)
-
 
         if is_json:
             try:
@@ -260,7 +267,9 @@ class HTTPClient:
     def upload(self, file: File, command: str, *, media_id=None):
         assert command.upper() in ("INIT", "APPEND", "FINALIZE", "STATUS")
         if self._auth is None:
-            auth_session = OauthSession(self.consumer_key, self.consumer_key_secret, http_client = self, callback = self.oauth_callback)
+            auth_session = OauthSession(
+                self.consumer_key, self.consumer_key_secret, http_client=self, callback=self.oauth_callback
+            )
             auth_session.set_access_token(self.access_token, self.access_token_secret)
             self._auth = auth_session
 
@@ -365,9 +374,9 @@ class HTTPClient:
                 "GET",
                 "2",
                 f"/users/{user_id}",
-                headers = {"Authorization": f"Bearer {self.bearer_token}"},
-                params = {"user.fields": USER_FIELD},
-                auth = True
+                headers={"Authorization": f"Bearer {self.bearer_token}"},
+                params={"user.fields": USER_FIELD},
+                auth=True,
             )
 
             return User(data, http_client=self)
@@ -384,18 +393,13 @@ class HTTPClient:
             else:
                 str_ids.append(str(id))
 
-        
         ids = ",".join(str_ids)
         res = self.request(
             "GET",
             "2",
             f"/users?ids={ids}",
-            params={
-                "expansions": "pinned_tweet_id",
-                "user.fields": USER_FIELD,
-                "tweet.fields": TWEET_FIELD 
-            },
-            auth=True
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            auth=True,
         )
 
         return [User(data, http_client=self) for data in res["data"]]
@@ -409,9 +413,9 @@ class HTTPClient:
                 "GET",
                 "2",
                 f"/users/by/username/{username}",
-                headers = {"Authorization": f"Bearer {self.bearer_token}"},
-                params = {"user.fields": USER_FIELD},
-                auth = True
+                headers={"Authorization": f"Bearer {self.bearer_token}"},
+                params={"user.fields": USER_FIELD},
+                auth=True,
             )
             return User(data, http_client=self)
         except NotFoundError:
@@ -423,7 +427,7 @@ class HTTPClient:
                 "GET",
                 "2",
                 f"/tweets/{tweet_id}",
-                params = {
+                params={
                     "tweet.fields": TWEET_FIELD,
                     "user.fields": USER_FIELD,
                     "expansions": TWEET_EXPANSION,
@@ -431,7 +435,7 @@ class HTTPClient:
                     "place.fields": PLACE_FIELD,
                     "poll.fields": POLL_FIELD,
                 },
-                auth = True,
+                auth=True,
             )
 
             return Tweet(res, http_client=self)
@@ -482,7 +486,7 @@ class HTTPClient:
 
         elif "mute_events" in keys:
             self.event_parser.parse_user_action(payload, "mute_events")
-        
+
         elif "tweet_create_events" in keys:
             self.event_parser.parse_tweet_create(payload)
 
@@ -597,12 +601,7 @@ class HTTPClient:
         id = data.get("id")
         timestamp = data.get("created_timestamp")
         text = message_data.get("text")
-        return WelcomeMessage(
-            text=text, 
-            id=id, 
-            timestamp=timestamp, 
-            http_client=self
-        )
+        return WelcomeMessage(text=text, id=id, timestamp=timestamp, http_client=self)
 
     def fetch_welcome_message_rule(self, welcome_message_rule_id) -> Optional[WelcomeMessageRule]:
         res = self.request(
@@ -616,13 +615,8 @@ class HTTPClient:
         id = data.get("id")
         timestamp = data.get("created_timestamp")
         welcome_message_id = data.get("welcome_message_id")
-        return WelcomeMessageRule(
-            id, 
-            welcome_message_id, 
-            timestamp, 
-            http_client=self
-        )
-    
+        return WelcomeMessageRule(id, welcome_message_id, timestamp, http_client=self)
+
     def post_tweet(
         self,
         text: str = None,
@@ -699,7 +693,7 @@ class HTTPClient:
         lat: Optional[int] = None,
         long: Optional[int] = None,
         ip: Optional[Union[str, int]] = None,
-        granularity: str = "neighborhood"
+        granularity: str = "neighborhood",
     ) -> Optional[Geo]:
         if query:
             query = query.replace(" ", "%20")
@@ -729,17 +723,7 @@ class HTTPClient:
         self.upload(file, "APPEND", media_id=media_id)
         self.upload(file, "FINALIZE", media_id=media_id)
 
-        data = {
-            "custom_profile": {
-                "name": name, 
-                "avatar": {
-                    "media": 
-                    {
-                        "id": media_id
-                    }
-                }
-            }
-        }
+        data = {"custom_profile": {"name": name, "avatar": {"media": {"id": media_id}}}}
 
         res = self.request("POST", "1.1", "/custom_profiles/new.json", json=data, auth=True)
         data = res.get("custom_profile")

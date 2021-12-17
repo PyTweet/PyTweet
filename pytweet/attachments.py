@@ -14,7 +14,6 @@ from .utils import time_parse_todt
 __all__ = ("Poll", "QuickReply", "Geo", "CTA", "File")
 
 
-
 class Poll:
     """Represent a Poll attachment in a tweet.
 
@@ -396,6 +395,7 @@ class CTA:
         """
         return self._raw_buttons
 
+
 class File:
     """Represent a File attachment for messages.
 
@@ -410,8 +410,8 @@ class File:
     def __init__(self, path: str, *, dm_only: bool = False):
         mimetype_guesser = mimetypes.MimeTypes().guess_type
         self.__path = path
-        self._total_bytes = os.path.getsize(path) if isinstance(path,str) else os.path.getsize(path.name)
-        self._mimetype = mimetype_guesser(path) if isinstance(path,str) else mimetype_guesser(path.name)
+        self._total_bytes = os.path.getsize(path) if isinstance(path, str) else os.path.getsize(path.name)
+        self._mimetype = mimetype_guesser(path) if isinstance(path, str) else mimetype_guesser(path.name)
         self.dm_only = dm_only
 
     def __repr__(self) -> str:
@@ -441,7 +441,6 @@ class File:
         """
         path = self.__path
         return path.name if isinstance(path, io.IOBase) else os.path.basename(path)
-
 
     @property
     def total_bytes(self) -> int:
@@ -509,7 +508,7 @@ class CustomProfile:
 
         .. versionadded:: 1.3.5
         """
-        return datetime.datetime.fromtimestamp(int(self._timestamp)/1000)
+        return datetime.datetime.fromtimestamp(int(self._timestamp) / 1000)
 
     @property
     def media(self) -> Media:

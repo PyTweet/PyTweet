@@ -6,13 +6,15 @@ from .enums import ActionEventType, UserActionEventType
 
 EventPayload = Dict[str, Any]
 
-#Events type
+# Events type
+
 
 class Event:
-    """The base class of all event, this provides a type property that the event belongs to.  
+    """The base class of all event, this provides a type property that the event belongs to.
 
     .. versionadded:: 1.5.0
     """
+
     __slots__ = ("_payload", "_type")
 
     def __init__(self, data: EventPayload):
@@ -22,7 +24,7 @@ class Event:
     @property
     def type(self) -> Union[UserActionEventType, ActionEventType]:
         """Union[:class:`UserActionEventType`, :class:`ActionEventType`]: Returns the event's action type.
-        
+
         .. versionadded:: 1.5.0
         """
         try:
@@ -33,28 +35,30 @@ class Event:
     @property
     def payload(self) -> EventPayload:
         """Returns the event payload.
-        
+
         .. versionadded:: 1.5.0
         """
-        return self._payload         
+        return self._payload
+
 
 class UserActionEvent(Event):
     """Represents a user action event, this could be but not limited to: follow or unfollow. This is also a parent class to all UserAction events, this class inherits :class:`Event`.
-    
+
     .. versionadded:: 1.5.0
     """
+
     @property
     def created_at(self) -> datetime.datetime:
         """:class:`datetime.datetime`: Returns a datetime.datetime object with the action's created timestamp.
-        
+
         .. versionadded:: 1.5.0
         """
-        return datetime.datetime.fromtimestamp(int(self.payload.get("created_timestamp"))/1000)
+        return datetime.datetime.fromtimestamp(int(self.payload.get("created_timestamp")) / 1000)
 
     @property
     def target(self) -> User:
         """:class:`User`: Returns the user who got followed/unfollowed by the source.
-        
+
         .. versionadded:: 1.5.0
         """
         return self.payload.get("target")
@@ -62,7 +66,7 @@ class UserActionEvent(Event):
     @property
     def source(self) -> User:
         """:class:`User`: Returns a user object that trigger this event.
-        
+
         .. versionadded:: 1.5.0
         """
         return self.payload.get("source")
@@ -70,13 +74,14 @@ class UserActionEvent(Event):
     @property
     def author(self):
         """:class:`User`: An alias to source.
-        
+
         .. versionadded:: 1.5.0
         """
         return self.source
 
+
 class DirectMessageEvent(Event):
-    def __init__(self, data: EventPayload, *,http_client: object):
+    def __init__(self, data: EventPayload, *, http_client: object):
         super().__init__(data)
         self.http_client = http_client
 
@@ -86,7 +91,7 @@ class DirectMessageEvent(Event):
 
         .. versionadded:: 1.5.0
         """
-        return datetime.datetime.fromtimestamp(int(self.payload.get("created_at")/1000))
+        return datetime.datetime.fromtimestamp(int(self.payload.get("created_at") / 1000))
 
     @property
     def recipient(self) -> User:
@@ -104,13 +109,16 @@ class DirectMessageEvent(Event):
         """
         return self.payload.get("target", {}).get("sender", None)
 
-#Events
+
+# Events
+
 
 class DirectMessageTypingEvent(DirectMessageEvent):
-    """Represents a typing event object for `on_typing` event, this inherits :class:`DirectMessageEvent`. This object contains the event information that twitter posts through the webhook url. 
-    
+    """Represents a typing event object for `on_typing` event, this inherits :class:`DirectMessageEvent`. This object contains the event information that twitter posts through the webhook url.
+
     .. versionadded:: 1.5.0
     """
+
     @property
     def typer(self) -> User:
         """:class:`User`: An alias to :meth:`DirectMessageEvent.sender`.
@@ -119,11 +127,13 @@ class DirectMessageTypingEvent(DirectMessageEvent):
         """
         return self.sender
 
+
 class DirectMessageReadEvent(DirectMessageEvent):
     """Represents a direct message read event object for `on_direct_message_read` event, this inherits :class:`DirectMessageEvent`. This object contains information that twitter posts through the webhook url.
-    
+
     .. versionadded:: 1.5.0
     """
+
     @property
     def reader(self) -> Optional[User]:
         """:class:`User`: An alias to :meth:`DirectMessageEvent.sender`.
@@ -135,7 +145,7 @@ class DirectMessageReadEvent(DirectMessageEvent):
     @property
     def last_read_message(self) -> Optional[int]:
         """Optional[:class:`int`]: Returns the last message that got read, returns the event id if none found
-        
+
         .. versionadded:: 1.5.0
         """
         event_id = self.payload.get("last_read_event_id")
@@ -144,15 +154,17 @@ class DirectMessageReadEvent(DirectMessageEvent):
             return event_id
         return message
 
+
 class TweetFavoriteActionEvent(Event):
     """Represents a tweet favorite event object for `on_tweet_favorite` event, this inherits :class:`Event`. This object contains information that twitter posts through the webhook url.
-    
+
     .. versionadded:: 1.5.0
     """
+
     @property
     def id(self) -> str:
         """:class:`str`: Returns the action's unique ID.
-        
+
         .. versionadded:: 1.5.0
         """
         return self.payload.get("id")
@@ -163,12 +175,12 @@ class TweetFavoriteActionEvent(Event):
 
         .. versionadded:: 1.5.0
         """
-        return datetime.datetime.fromtimestamp(int(self.payload.get("timestamp_ms"))/1000)
+        return datetime.datetime.fromtimestamp(int(self.payload.get("timestamp_ms")) / 1000)
 
     @property
     def favorited_tweet(self) -> Tweet:
         """:class:`Tweet`: Returns the favorited tweet.
-        
+
         .. versionadded:: 1.5.0
         """
         return self.payload.get("tweet")
@@ -176,7 +188,7 @@ class TweetFavoriteActionEvent(Event):
     @property
     def liker(self) -> User:
         """:class:`User`: Returns the user who favorited the tweet.
-        
+
         .. versionadded:: 1.5.0
         """
         return self.payload.get("liker")
@@ -184,43 +196,53 @@ class TweetFavoriteActionEvent(Event):
 
 class UserFollowActionEvent(UserActionEvent):
     """Represents a follow action event by user or of user, This inherits :class:`UserActionEvent`. This object contains information that twitter posts through the webhook url.
-    
+
     .. versionadded:: 1.5.0
     """
+
     ...
 
 
 class UserUnfollowActionEvent(UserActionEvent):
     """Represents an unfollow action event by user, This inherits :class:`UserActionEvent`. This object contains information that twitter posts through the webhook url.
-    
+
     .. versionadded:: 1.5.0
     """
+
     ...
+
 
 class UserBlockActionEvent(UserActionEvent):
     """Represents a block action event by user, This inherits :class:`UserActionEvent`. This object contains information that twitter posts through the webhook url.
-    
+
     .. versionadded:: 1.5.0
     """
+
     ...
+
 
 class UserUnblockActionEvent(UserActionEvent):
     """Represents an unblock action event by user, This inherits :class:`UserActionEvent`. This object contains information that twitter posts through the webhook url.
-    
+
     .. versionadded:: 1.5.0
     """
+
     ...
+
 
 class UserMuteActionEvent(UserActionEvent):
     """Represents a mute action event by user, This inherits :class:`UserActionEvent`. This object contains information that twitter posts through the webhook url.
-    
+
     .. versionadded:: 1.5.0
     """
+
     ...
+
 
 class UserUnmuteActionEvent(UserActionEvent):
     """Represents an unmute action event by user, This inherits :class:`UserActionEvent`. This object contains information that twitter posts through the webhook url.
-    
+
     .. versionadded:: 1.5.0
     """
+
     ...

@@ -5,9 +5,10 @@ from typing import Any, List, Dict, Union, TYPE_CHECKING
 from .utils import time_parse_todt
 
 if TYPE_CHECKING:
-    from .client import Client 
+    from .client import Client
 
 _log = logging.getLogger(__name__)
+
 
 class Webhook:
     def __init__(self, data: Dict[str, Any], env: Environment, *, client: Client):
@@ -65,11 +66,13 @@ class Webhook:
         ---------
         :class:`Webhook`
             Returns the webhook object with the valid set to False.
-        
+
 
         .. versionadded:: 1.5.0
         """
-        self.client.http.request("DELETE", "1.1", f"/account_activity/all/{self.env.label}/webhooks/{self.id}.json", auth=True)
+        self.client.http.request(
+            "DELETE", "1.1", f"/account_activity/all/{self.env.label}/webhooks/{self.id}.json", auth=True
+        )
         self.valid = False
         return self
 
@@ -79,8 +82,8 @@ class Webhook:
         Returns
         ---------
         :class:`bool`
-            This method returns a :class:`bool` object. 
-        
+            This method returns a :class:`bool` object.
+
 
         .. versionadded:: 1.3.5
         """
@@ -90,13 +93,15 @@ class Webhook:
             _log.warn("CRC Failed: client is not listening! use the listen method at the very end of your file!")
             return False
 
-        self.client.http.request("PUT", "1.1", f"/account_activity/all/{self.env.label}/webhooks/{self.id}.json", auth=True)
+        self.client.http.request(
+            "PUT", "1.1", f"/account_activity/all/{self.env.label}/webhooks/{self.id}.json", auth=True
+        )
         _log.info("Successfully triggered a CRC.")
         return True
 
 
 class Environment:
-    def __init__(self, data: Dict[str, Any], *,client: Client):
+    def __init__(self, data: Dict[str, Any], *, client: Client):
         self._payload = data
         self.client = client
 
@@ -120,7 +125,7 @@ class Environment:
 
         .. note::
             If you want to add other user subscription, use 3 legged oauth flow to get the user's access token and secret, then construct a client object with the user's access token and secret. After that pass it in client argument.
-            
+
 
         .. versionadded:: 1.5.0
         """
@@ -128,7 +133,7 @@ class Environment:
 
     def add_my_subscription(self) -> None:
         """Add a new user subscription to the environment, which is the client WHO made the environment request. Use :meth:`add_user_subscription` to add other user subscription. This method only add the client WHO made the fetch environment request.
-        
+
 
         .. versionadded:: 1.5.0
         """

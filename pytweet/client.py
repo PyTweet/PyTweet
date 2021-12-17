@@ -7,7 +7,7 @@ import json
 import logging
 import threading
 import time
-from yarl import URL # for the listen method.
+from yarl import URL  # for the listen method.
 from asyncio import iscoroutinefunction
 from http import HTTPStatus
 from typing import Callable, List, Optional, Union, Any
@@ -73,16 +73,16 @@ class Client:
         access_token: Optional[str] = None,
         access_token_secret: Optional[str] = None,
         stream: Optional[Stream] = None,
-        callback: Optional[str] = None
+        callback: Optional[str] = None,
     ) -> None:
         self.http = HTTPClient(
             bearer_token,
-            consumer_key = consumer_key,
-            consumer_key_secret = consumer_key_secret,
-            access_token = access_token,
-            access_token_secret = access_token_secret,
-            stream = stream,
-            callback = callback
+            consumer_key=consumer_key,
+            consumer_key_secret=consumer_key_secret,
+            access_token=access_token,
+            access_token_secret=access_token_secret,
+            stream=stream,
+            callback=callback,
         )
         self._account_user: Optional[User] = None  # set in account property.
         self.webhook: Optional[Webhook] = None
@@ -102,7 +102,7 @@ class Client:
         account_user = self._account_user
         if account_user is None:
             self._set_account_user()
-            return self._account_user # type: ignore
+            return self._account_user  # type: ignore
             # The account_user does not change when the function is called. That is why we are returning this.
         return account_user
 
@@ -124,7 +124,7 @@ class Client:
         func: :class:`typing.Callable`
             The function that execute when the event is trigger. The event must be a synchronous function. You must also put the right event name in the function's name, See event reference for full events name.
 
-        
+
         Raises
         --------
         TypeError
@@ -313,13 +313,7 @@ class Client:
 
         .. versionadded:: 1.3.5
         """
-        return self.http.create_welcome_message(
-            name,
-            text,
-            file = file,
-            quick_reply = quick_reply,
-            cta = cta
-        )
+        return self.http.create_welcome_message(name, text, file=file, quick_reply=quick_reply, cta=cta)
 
     def fetch_welcome_message(self, welcome_message_id: Union[str, int]) -> WelcomeMessage:
         """Fetches the welcome message with the given welcome message ID argument.
@@ -406,8 +400,8 @@ class Client:
         lat: Optional[int] = None,
         long: Optional[int] = None,
         ip: Optional[Union[str, int]] = None,
-        granularity: str = "neighborhood"
-    ) -> Geo: #TODO make enums for granularity
+        granularity: str = "neighborhood",
+    ) -> Geo:  # TODO make enums for granularity
         """Search a geo with the given arguments.
 
         Parameters
@@ -433,14 +427,7 @@ class Client:
 
         .. versionadded:: 1.5.3
         """
-        return self.http.search_geo(
-            query,
-            max_result,
-            lat = lat,
-            long = long,
-            ip = ip,
-            granularity = granularity
-        )
+        return self.http.search_geo(query, max_result, lat=lat, long=long, ip=ip, granularity=granularity)
 
     def get_message(self, event_id: Union[str, int] = None) -> Optional[DirectMessage]:
         """Get a direct message through the client message cache. Returns None if the message is not in the cache.
@@ -538,8 +525,8 @@ class Client:
 
             client.stream()
 
-        You can also add rules and specified which tweets must be retrieve via the tweet's characteristic features. 
-            
+        You can also add rules and specified which tweets must be retrieve via the tweet's characteristic features.
+
         Parameters
         ------------
         dry_run: :class:`bool`
@@ -563,7 +550,7 @@ class Client:
         ---------
         Optional[List[:class:`Environment`]]
             Returns a list of :class:`Environment` objects.
-        
+
 
         .. versionadded:: 1.5.0
         """
@@ -571,7 +558,15 @@ class Client:
 
         return [Environment(data, client=self) for data in res.get("environments")]
 
-    def listen(self, app: Flask, url: str, env_label: str, sleep_for: Union[int, float] = 0.50, ngrok: bool = False, **kwargs: Any):
+    def listen(
+        self,
+        app: Flask,
+        url: str,
+        env_label: str,
+        sleep_for: Union[int, float] = 0.50,
+        ngrok: bool = False,
+        **kwargs: Any,
+    ):
         """Listen to upcoming account activity events send by twitter to your webhook url. You can use the rest of Flask arguments like port or host via the kwargs argument.
 
         Parameters
@@ -590,7 +585,7 @@ class Client:
             A kwarg that indicates to disable flask's log so it does not print the request process in your terminal, this also will disable `werkzeug` log.
         make_new: :class:`bool`:
             A kwarg indicates to make a new webhook url when the api cant find the url passed. Default to True.
-        
+
         .. versionadded:: 1.5.0
         """
         disabled_log: bool = kwargs.pop("disabled_log", False)
@@ -605,7 +600,7 @@ class Client:
         for env in environments:
             if env.label == env_label:
                 self.environment = env
-                
+
             for webhook in env.webhooks:
                 if url == webhook.url:
                     self.webhook_url_path = URL(webhook.url).path
@@ -613,43 +608,43 @@ class Client:
                     self.environment = env
                     break
 
-        try:    
+        try:
             thread = threading.Thread(target=app.run, name="PyTweet: Flask App Thread", kwargs=kwargs)
 
-            if not self.webhook and not ngrok: 
+            if not self.webhook and not ngrok:
                 self.webhook_url_path = URL(webhook.url).path
 
             elif self.webhook and ngrok:
-                self.webhook_url_path = "THE URL PATH PASSSED BY NGROK" #TODO add ngrok support
+                self.webhook_url_path = "THE URL PATH PASSSED BY NGROK"  # TODO add ngrok support
 
             @app.route(self.webhook_url_path, methods=["POST", "GET"])
             def webhook_receive():
                 if request.method == "GET":
                     _log.info("Attempts to responds a CRC.")
-                    crc = request.args['crc_token']
-    
+                    crc = request.args["crc_token"]
+
                     validation = hmac.new(
-                        key=bytes(self.http.consumer_key_secret, 'UTF-8'),
-                        msg=bytes(crc, 'UTF-8'),
-                        digestmod = hashlib.sha256
+                        key=bytes(self.http.consumer_key_secret, "UTF-8"),
+                        msg=bytes(crc, "UTF-8"),
+                        digestmod=hashlib.sha256,
                     )
                     digested = base64.b64encode(validation.digest())
-                    
-                    response = {
-                        'response_token': 'sha256=' + format(str(digested)[2:-1])
-                    }
+
+                    response = {"response_token": "sha256=" + format(str(digested)[2:-1])}
 
                     return json.dumps(response)
 
                 json_data = request.get_json()
                 self.http.handle_events(json_data)
                 return ("", HTTPStatus.OK)
-            
+
             check = not self.webhook and self.webhook_url_path
-            if check and make_new: 
+            if check and make_new:
                 thread.start()
                 time.sleep(sleep_for)
-                webhook = self.environment.register_webhook(url) #Register a new webhook url if no webhook found also if make_new is True.
+                webhook = self.environment.register_webhook(
+                    url
+                )  # Register a new webhook url if no webhook found also if make_new is True.
                 self.webhook = webhook
                 self.environment = env
                 self.environment.add_my_subscription()
@@ -657,11 +652,15 @@ class Client:
                 users = self.http.fetch_users(ids)
                 for user in users:
                     self.http.user_cache[user.id] = user
-                    
-                _log.debug(f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\nNgrok: {ngrok}\nMake a new webhook when not found: {make_new}\nIn Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}.")
+
+                _log.debug(
+                    f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\nNgrok: {ngrok}\nMake a new webhook when not found: {make_new}\nIn Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
+                )
 
             elif check and not make_new:
-                raise PytweetException(f"Cannot find url passed: {url} Invalid url passed, please check the spelling of your url")
+                raise PytweetException(
+                    f"Cannot find url passed: {url} Invalid url passed, please check the spelling of your url"
+                )
 
             else:
                 thread.start()
@@ -672,7 +671,9 @@ class Client:
                 for user in users:
                     self.http.user_cache[user.id] = user
 
-                _log.debug(f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\nNgrok: {ngrok}\nMake a new webhook when not found: {make_new}\nIn Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}.")
+                _log.debug(
+                    f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\nNgrok: {ngrok}\nMake a new webhook when not found: {make_new}\nIn Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
+                )
             thread.join()
         except Exception as e:
             _log.warn(f"An error was caught during listening: {e}")

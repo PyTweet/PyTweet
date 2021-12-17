@@ -30,7 +30,8 @@ class Message:
 
     .. versionadded:: 1.2.0
     """
-    __slots__= ("_text", "_id", "_type")
+
+    __slots__ = ("_text", "_id", "_type")
 
     if TYPE_CHECKING:
         _text: Optional[str]
@@ -75,7 +76,17 @@ class DirectMessage(Message):
 
     .. versionadded:: 1.2.0
     """
-    __slots__ = ("__original_payload", "_payload", "__message_create", "__message_data", "__entities", "_quick_reply_data", "_cta_data", "http_client")
+
+    __slots__ = (
+        "__original_payload",
+        "_payload",
+        "__message_create",
+        "__message_data",
+        "__entities",
+        "_quick_reply_data",
+        "_cta_data",
+        "http_client",
+    )
 
     def __init__(self, data: Dict[str, Any], *, http_client: HTTPClient):
         self.__original_payload = data
@@ -162,7 +173,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.2.0
         """
-        return datetime.datetime.fromtimestamp(int(self._payload.get("created_timestamp"))/1000)
+        return datetime.datetime.fromtimestamp(int(self._payload.get("created_timestamp")) / 1000)
 
     @property
     def hashtags(self) -> Optional[List[Hashtags]]:
@@ -212,7 +223,7 @@ class DirectMessage(Message):
     @property
     def quick_reply_response(self) -> Optional[str]:
         """Optional[:class:`str`]: Returns the metadata of the quick reply option that the author clicked.
-        
+
         .. versionadded:: 1.5.0
         """
         return self.__message_data.get("quick_reply_response", {}).get("metadata", None)
@@ -250,6 +261,7 @@ class WelcomeMessage(Message):
 
     .. versionadded:: 1.3.5
     """
+
     __slots__ = ("_name", "_timestamp", "http_client")
 
     def __init__(
@@ -343,7 +355,7 @@ class WelcomeMessage(Message):
 
         if cta:
             message_data["ctas"] = cta.raw_buttons
-        
+
         res = self.http_client.request(
             "PUT",
             "1.1",
@@ -382,7 +394,7 @@ class WelcomeMessage(Message):
 
         .. versionadded:: 1.3.5
         """
-        return datetime.datetime.fromtimestamp(int(self._timestamp)/1000)
+        return datetime.datetime.fromtimestamp(int(self._timestamp) / 1000)
 
     @property
     def name(self) -> str:
@@ -410,7 +422,9 @@ class WelcomeMessageRule(Message):
 
     .. versionadded:: 1.3.5
     """
+
     __slots__ = ("_welcome_message_id", "_timestamp", "http_client")
+
     def __init__(
         self,
         id: Union[str, int],
@@ -444,15 +458,15 @@ class WelcomeMessageRule(Message):
             auth=True,
         )
 
-    def fetch_welcome_message(self) -> Optional[WelcomeMessage] :
+    def fetch_welcome_message(self) -> Optional[WelcomeMessage]:
         """A method for fetching the welcome message rule's welcome message. An equivalent to :meth:`Client.fetch_welcome_message`.
 
         Returns
         ---------
         Optional[:class:`WelcomeMessage`]
             This method returns a :class:`WelcomeMessage` object.
-        
-        
+
+
         .. versionadded:: 1.5.0
         """
         return self.http_client.fetch_welcome_message(self.welcome_message_id)
@@ -463,7 +477,7 @@ class WelcomeMessageRule(Message):
 
         .. versionadded:: 1.3.5
         """
-        return datetime.datetime.fromtimestamp(int(self._timestamp)/1000)
+        return datetime.datetime.fromtimestamp(int(self._timestamp) / 1000)
 
     @property
     def welcome_message_id(self) -> Union[str, int]:

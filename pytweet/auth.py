@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Type, Tuple, Optional, TYPE_CHECKING 
+from typing import Any, Type, Tuple, Optional, TYPE_CHECKING
 from requests_oauthlib import OAuth1, OAuth1Session
 from .utils import build_object
 
@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from .client import Client
 
 __all__ = ("OauthSession",)
+
 
 class OauthSession(OAuth1Session):
     """Represents an OauthSession for Oauth1 Authorization. This class is very importantfo
@@ -24,10 +25,17 @@ class OauthSession(OAuth1Session):
     .. versionadded:: 1.2.0
     """
 
-    def __init__(self, consumer_key: Optional[str], consumer_secret: Optional[str], *, http_client: object, callback: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        consumer_key: Optional[str],
+        consumer_secret: Optional[str],
+        *,
+        http_client: object,
+        callback: Optional[str] = None,
+    ) -> None:
         super().__init__(consumer_key, client_secret=consumer_secret, callback_uri=callback)
         HTTPClient = build_object("HTTPClient")
-        
+
         self.http_client: HTTPClient = http_client
         self.consumer_key = consumer_key
         self.consumer_key_secret = consumer_secret

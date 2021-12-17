@@ -185,7 +185,9 @@ class Tweet(Message):
         original_payload: Dict[str, Any]
         _includes: Any
 
-    def __init__(self, data: Dict[str, Any], *,deleted_timestamp: Optional[int] = None, http_client: Optional[HTTPClient] = None) -> None:
+    def __init__(
+        self, data: Dict[str, Any], *, deleted_timestamp: Optional[int] = None, http_client: Optional[HTTPClient] = None
+    ) -> None:
         self.original_payload = data
         self._payload = data.get("data") or data
         self._includes = self.original_payload.get("includes")
@@ -193,7 +195,6 @@ class Tweet(Message):
         self.http_client = http_client
         self.deleted_timestamp = deleted_timestamp
         super().__init__(self._payload.get("text"), self._payload.get("id"), 1)
-        
 
     def __repr__(self) -> str:
         return "Tweet(text={0.text} id={0.id} author={0.author})".format(self)
@@ -312,7 +313,7 @@ class Tweet(Message):
         reply_tweet: Optional[Union[str, int]] = None,
         exclude_reply_users: Optional[List[Union[str, int]]] = None,
     ) -> Union[Tweet, Message]:
-        """Post a tweet to reply a specific tweet present by the tweet's id. Returns a :class:`Tweet` object or :class:`Message` if the tweet is not found in the cache. 
+        """Post a tweet to reply a specific tweet present by the tweet's id. Returns a :class:`Tweet` object or :class:`Message` if the tweet is not found in the cache.
 
         .. note::
             Note that if the tweet is a retweet you cannot reply to that tweet, it might not raise an error but it will post the tweet has a normal tweet rather then a reply tweet and it ping the :class:`Tweet.author`.
@@ -321,7 +322,7 @@ class Tweet(Message):
         ------------
         text: :class:`str`
             The tweet's text, it will show up as the main text in a tweet.
-            
+
         .. versionadded:: 1.5.0
             file: Optional[:class:`File`]
                 Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
@@ -477,7 +478,7 @@ class Tweet(Message):
         .. versionadded: 1.0.0
         """
         if self._payload.get("timestamp", None):
-            return datetime.datetime.fromtimestamp(int(self._payload.get("timestamp", None))/1000)
+            return datetime.datetime.fromtimestamp(int(self._payload.get("timestamp", None)) / 1000)
         return time_parse_todt(self._payload.get("created_at"))
 
     @property
@@ -491,7 +492,7 @@ class Tweet(Message):
         """
         if not self.deleted_timestamp:
             return None
-        return datetime.datetime.fromtimestamp(self.deleted_timestamp/1000)
+        return datetime.datetime.fromtimestamp(self.deleted_timestamp / 1000)
 
     @property
     def source(self) -> str:
@@ -538,7 +539,7 @@ class Tweet(Message):
 
     @property
     def link(self) -> Optional[str]:
-        """Optional[:class:`str`]: Get the tweet's link. 
+        """Optional[:class:`str`]: Get the tweet's link.
 
         .. versionadded:: 1.1.0
 

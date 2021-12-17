@@ -8,13 +8,12 @@ from .events import (
     UserBlockActionEvent,
     UserUnblockActionEvent,
     UserMuteActionEvent,
-    UserUnmuteActionEvent
+    UserUnmuteActionEvent,
 )
 from .message import Message, DirectMessage
 from .user import User
 from .app import ApplicationInfo
 from .tweet import Tweet
-
 
 
 class PayloadParser:
@@ -41,7 +40,7 @@ class PayloadParser:
             "quote_count": payload.get("quote_count"),
             "reply_count": payload.get("reply_count"),
             "retweet_count": payload.get("retweet_count"),
-            "like_count": payload.get("favorite_count")
+            "like_count": payload.get("favorite_count"),
         }
         copy["includes"] = {}
         copy["includes"]["mentions"] = [user.get("screen_name") for user in copy.get("entities").get("user_mentions")]
@@ -51,7 +50,7 @@ class PayloadParser:
 
         if "user" in payload.keys():
             copy["includes"]["users"] = [self.parse_user_payload(payload.get("user"))]
-        
+
         return copy
 
 
@@ -82,9 +81,7 @@ class EventParser:
         event_payload["event"]["message_create"]["target"]["sender"] = sender
         event_payload["event"]["message_create"]["target"]["source_application"] = source_app
 
-        direct_message = DirectMessage(
-            event_payload, http_client=self.http_client
-        )
+        direct_message = DirectMessage(event_payload, http_client=self.http_client)
 
         if recipient.id != self.client_id:
             self.http_client.user_cache[recipient.id] = recipient
@@ -146,7 +143,7 @@ class EventParser:
 
         event_payload["target"] = target
         event_payload["source"] = source
-        
+
         if target.id != self.client_id:
             self.http_client.user_cache[target.id] = target
 
@@ -176,7 +173,7 @@ class EventParser:
         elif action_type == "unmute":
             action = UserUnmuteActionEvent(action_payload)
             self.http_client.dispatch("user_unmute", action)
-    
+
     def parse_tweet_create(self, tweet_payload: EventPayload):
         tweet_payload = self.payload_parser.parse_tweet_payload(tweet_payload.get("tweet_create_events")[0])
         tweet = Tweet(tweet_payload, http_client=self.http_client)

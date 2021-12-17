@@ -11,6 +11,7 @@ def build_object(obj: str) -> Any:
         return real_obj
     return None
 
+
 def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
     """Parse time return from twitter to datetime object!
 

@@ -2,11 +2,13 @@ from dataclasses import dataclass
 from typing import Optional
 from .locations import Location, TimezoneInfo
 
+
 @dataclass
 class SleepTimeSettings:
     enabled: bool
     end_time: Optional[int]
     start_time: Optional[int]
+
 
 @dataclass
 class UserSettings:

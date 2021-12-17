@@ -1,10 +1,12 @@
 from dataclasses import dataclass
 from typing import Optional
 
+
 @dataclass
 class PlaceType:
     code: int
     name: str
+
 
 @dataclass
 class Location:
@@ -16,6 +18,7 @@ class Location:
     url: str
     woeid: int
 
+
 @dataclass
 class Trend:
     name: str
@@ -23,6 +26,7 @@ class Trend:
     promoted_content: Optional[str]
     query: str
     tweet_volume: Optional[str]
+
 
 @dataclass
 class TimezoneInfo:
