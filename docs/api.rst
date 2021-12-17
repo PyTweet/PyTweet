@@ -312,21 +312,21 @@ Example:
 
 .. function:: on_stream_connect(connection)
 
-    `on_stream_connect` is an event trigger when the client succesfuly connect to stream, this might trigger multiple times as a reconnect logic would trigger this event too.
+    `on_stream_connect` is an event triggered when the client succesfuly connect to stream, this might trigger multiple times as a reconnect logic would trigger this event too.
 
     :param connection: The Stream connection.
     :type connection: :class:`StreamConnection`
 
 .. function:: on_stream_disconnect(connection)
 
-    `on_stream_disconnect` is an event trigger when the client disconnect from stream.
+    `on_stream_disconnect` is an event triggered when the client disconnect from stream.
 
     :param connection: The Stream connection.
     :type connection: :class:`StreamConnection` 
 
 .. function:: on_stream(tweet, connection)
 
-    `on_stream` is an event trigger when a stream return a tweet data.
+    `on_stream` is an event triggered when a stream return a tweet data.
 
     :param tweet: The data that’s going to be returns from the stream.
     :param connection: The stream connection
