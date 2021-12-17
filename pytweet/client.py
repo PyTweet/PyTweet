@@ -654,7 +654,7 @@ class Client:
                     self.http.user_cache[user.id] = user
 
                 _log.debug(
-                    f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\nNgrok: {ngrok}\nMake a new webhook when not found: {make_new}\nIn Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
+                    f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\n In Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
                 )
 
             elif check and not make_new:
@@ -672,7 +672,7 @@ class Client:
                     self.http.user_cache[user.id] = user
 
                 _log.debug(
-                    f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\nNgrok: {ngrok}\nMake a new webhook when not found: {make_new}\nIn Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
+                    f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\nIn Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
                 )
             thread.join()
         except Exception as e:
