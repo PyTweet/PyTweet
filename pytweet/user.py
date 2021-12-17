@@ -17,14 +17,11 @@ from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import build_object, time_parse_todt
 from .enums import Timezone
+from .models import UserSettings, SleepTimeSettings, Location, TimezoneInfo
 
 if TYPE_CHECKING:
     from .http import HTTPClient
     from .message import DirectMessage
-
-class UserSetting: #TODO Elevated the class
-    def __init__(self, data: Dict[str, Any]):
-        self._payload = data
 
 class User:
     """Represents a user in Twitter.
@@ -631,6 +628,7 @@ class ClientAccount(User):
 
     def update_setting(
         self,
+        *,
         lang: Optional[str] = None,
         enabled_sleep_time: Optional[bool] = None,
         start_sleep_time: Optional[int] = None,
@@ -646,9 +644,43 @@ class ClientAccount(User):
                 "sleep_time_enabled": enabled_sleep_time,
                 "start_sleep_time": start_sleep_time,
                 "end_sleep_time": end_sleep_time,
-                "time_zone": timezone,
+                "time_zone": timezone.value,
                 "trend_location_woeid": trend_location_woeid,
                 "lang": lang
-            }
+            },
+            auth=True
         )
-        return UserSetting(res) #TODO elevated the class.
+        if res.get("sleep_time"):
+            res["sleep_time_setting"] = SleepTimeSettings(**res["sleep_time"])
+            res.pop("sleep_time")
+        
+        if res.get("location"):
+            res["location"] = Location(**res["trend_location"])
+
+        if res.get("time_zone"):
+            res["time_zone"]["name_info"] = res["time_zone"]["tzinfo_name"]
+            res["time_zone"].pop("tzinfo_name")
+            res["timezone"] = TimezoneInfo(**res["time_zone"])
+            res.pop("time_zone")
+        
+        return UserSettings(**res)
+        
+    def fetch_settings(self):
+        res = self.http_client.request(
+            "GET",
+            "1.1",
+            "/account/settings.json",
+            auth=True
+        )
+        if res.get("sleep_time"):
+            res["sleep_time_setting"] = SleepTimeSettings(**res["sleep_time"])
+            res.pop("sleep_time")
+        
+        if res.get("location"):
+            res["location"] = Location(**res["trend_location"])
+
+        if res.get("time_zone"):
+            res["timezone"] = Timezone(**res["timezone"])
+            res.pop("time_zone")
+        
+        return UserSettings(**res)
