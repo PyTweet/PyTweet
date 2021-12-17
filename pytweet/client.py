@@ -29,7 +29,7 @@ _log = logging.getLogger(__name__)
 
 
 class Client:
-    """Represents a client that connected to Twitter!
+    """Represents a twitter-api client for twitter api version 1.1 and 2 interface.
 
     Parameters
     ------------
@@ -46,7 +46,7 @@ class Client:
     stream: Optional[Stream]
         The client's stream. Must be an instance of :class:`Stream`.
     callback: Optional[:class:`str`]
-        The oauth callbacl url, default to None.
+        The oauth callback url, default to None.
 
     Attributes
     ------------
@@ -555,65 +555,6 @@ class Client:
         except KeyboardInterrupt:
             print("\nKeyboardInterrupt: Exit stream.")
 
-    def register_webhook(self, url: str, env_label: str):
-        """Register your WebHook with your WebApp's url that you develop. Before this, you need to develop, deploy and host a WebApp that will receive Twitter webhook events. You also need to perform a Twitter Challenge Response Check (CRC) GET request and responds with a properly formatted JSON response.
-
-        Parameters
-        ------------
-        url: :class:`str`
-            Your WebApp url that you want to register as the WebHook url. Twitter will send account events to this url as an http post request.
-        env_label: :class:`str`
-            This is the type of environment that you set in your Dev environments page. For example, if you use the 'prod' environment name then this argument must be 'prod'
-
-        Returns
-        ---------
-        :class:`Webhook`
-            This method returns a :class:`Webhook` object.
-
-
-        .. versionadded:: 1.5.0
-        """
-        res = self.http.request(
-            "POST", "1.1", f"/account_activity/all/{env_label}/webhooks.json", auth=True, params={"url": url}
-        )
-        return Webhook(res)
-
-    def add_my_subscription(self, env_label: str) -> None:
-        """Add a new user subscription to the webhook, which is the client itself.
-
-        .. note::
-            Before using this method you have to register your WebHook url via :meth:`Client.register_webhook`. WebHook url is where Twitter will send account events.
-
-        Parameters
-        ------------
-        env_label: :class:`str`
-            This is the type of environment that you set in your Dev environments page. For example, if you use the 'prod' environment name then this argument must be 'prod'
-
-
-        .. versionadded:: 1.5.0
-        """
-        self.http.request("POST", "1.1", f"/account_activity/all/{env_label}/subscriptions.json", auth=True)
-
-    def fetch_all_subscriptions(self, env_label: str) -> List[int]:
-        """Returns a list of the current All Activity type subscriptions user id.
-
-        Parameters
-        ------------
-        env_label: :class:`str`
-            This is the type of environment that you set in your Dev environments page. For example, if you use the 'prod' environment name then this argument must be 'prod'
-
-        Returns
-        ---------
-        List[:class:`int`]
-            This method returns a list of :class:`int` object.
-
-
-        .. versionadded:: 1.5.0
-        """
-        res = self.http.request("GET", "1.1", f"/account_activity/all/{env_label}/subscriptions/list.json")
-
-        return [int(subscription.get("user_id")) for subscription in res.get("subscriptions")]
-
     def fetch_all_environments(self) -> Optional[List[Environment]]:
         """A method for fetching all the client's envirouments.
 
@@ -627,38 +568,19 @@ class Client:
         """
         res = self.http.request("GET", "1.1", "/account_activity/all/webhooks.json")
 
-        return [Environment(data) for data in res.get("environments")]
+        return [Environment(data, client=self) for data in res.get("environments")]
 
-    def trigger_crc(self) -> bool:
-        """Trigger a challenge-response-checks to enable Twitter to confirm the ownership of the WebApp receiving webhook events. Before this you do need to register your webhook url via :meth:`client.register_webhook`. Will return True if its successful else False.
-
-        Returns
-        ---------
-        :class:`bool`
-            This method returns a :class:`bool` object. 
-        
-
-        .. versionadded:: 1.3.5
-        """
-        _log.info("Triggering a CRC Challenge.")
-
-        if not self.environment or not self.webhook:
-            _log.warn("CRC Failed: client is not listening! use the listen method at the very end of your file!")
-            return False
-
-        self.http.request("PUT", "1.1", f"/account_activity/all/{self.environment.label}/webhooks/{self.webhook.id}.json", auth=True)
-        _log.info("Successfully triggered a CRC.")
-        return True
-
-    def listen(self, app: Flask, path: str, sleep_for: Union[int, float] = 0.50, ngrok: bool = False, **kwargs: Any):
+    def listen(self, app: Flask, url: str, env_label: str, sleep_for: Union[int, float] = 0.50, ngrok: bool = False, **kwargs: Any):
         """Listen to upcoming account activity events send by twitter to your webhook url. You can use the rest of Flask arguments like port or host via the kwargs argument.
 
         Parameters
         ------------
         app: :class:`flask.Flask`
             Your flask application.
-        path: :class:`str`
-            Your webhook path url. If the webhook url is `https://your-domain.com/webhook/twitter`, then the path is `/webhook/twitter`.
+        url: :class:`str`
+            The webhook url. This completely up to you, e.g https://your-domain.com/webhook/twitter etc.
+        env_label: :class:`str`
+            The environment's label.
         sleep_for: Union[:class:`int`, :class:`float`]
             Ensure the flask application is running before triggering a CRC by sleeping after starting a thread. Default to 0.50.
         ngrok: :class:`bool`
@@ -666,20 +588,25 @@ class Client:
         disabled_log: :class:`bool`
             A kwarg that indicates to disable flask's log so it does not print the request process in your terminal, this also will disable `werkzeug` log.
         make_new: :class:`bool`:
-            ...
+            A kwarg indicates to make a new webhook url when the api cant find the url passed. Default to True.
         
-
-        .. versionadded:: 1.3.5
+        .. versionadded:: 1.5.0
         """
         disabled_log: bool = kwargs.pop("disabled_log", False)
-        ngrok: bool = kwargs.pop("ngrok", False) #TODO Use it later...
+        make_new: bool = kwargs.pop("make_new", True)
         environments = self.fetch_all_environments()
-        if ngrok:
-            ...
+
+        if disabled_log:
+            app.logger.disabled = True
+            log = logging.getLogger("werkzeug")
+            log.disabled = True
 
         for env in environments:
+            if env.label == env_label:
+                self.environment = env
+                
             for webhook in env.webhooks:
-                if path in webhook.url:
+                if url == webhook.url:
                     path = webhook.url.split("/")
                     path = "/" + "/".join(path[3:])
                     self.webhook_url_path = path
@@ -687,15 +614,17 @@ class Client:
                     self.environment = env
                     break
 
-        if not self.webhook_url_path:
-            raise PytweetException(f"Invalid uri path passed: {path}")
+        try:    
+            thread = threading.Thread(target=app.run, name="PyTweet: Flask App Thread", kwargs=kwargs)
 
-        if disabled_log:
-            app.logger.disabled = True
-            log = logging.getLogger("werkzeug")
-            log.disabled = True
+            if not self.webhook and not ngrok: 
+                path = url.split("/")
+                path = "/" + "/".join(path[3:])
+                self.webhook_url_path = path
 
-        try:
+            elif self.webhook and ngrok:
+                self.webhook_url_path = "THE URL PATH PASSSED BY NGROK" #TODO add ngrok support
+
             @app.route(self.webhook_url_path, methods=["POST", "GET"])
             def webhook_receive():
                 if request.method == "GET":
@@ -718,11 +647,39 @@ class Client:
                 json_data = request.get_json()
                 self.http.handle_events(json_data)
                 return ("", HTTPStatus.OK)
+            
+            check = not self.webhook and self.webhook_url_path
+            if check and make_new: 
+                thread.start()
+                time.sleep(sleep_for)
+                webhook = self.environment.register_webhook(url) #Register a new webhook url if no webhook found also if make_new is True.
+                self.webhook = webhook
+                self.environment = env
+                self.environment.add_my_subscription()
+                ids = self.environment.fetch_all_subscriptions()
+                users = self.http.fetch_users(ids)
+                for user in users:
+                    self.http.user_cache[user.id] = user
+                    
+                _log.debug(f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\nNgrok: {ngrok}\nMake a new webhook when not found: {make_new}\nWebhook info: {repr(self.webhook)} in environment: {repr(self.environment)}.")
 
-            thread = threading.Thread(target=app.run, name="PyTweet: Flask App Thread", kwargs=kwargs)
-            thread.start()
-            time.sleep(sleep_for) #Ensure the flask application is running before triggering crc.
-            self.trigger_crc()
-            _log.debug("Listening for events!")
-        except KeyboardInterrupt:
-            print("\nKeyboardInterrupt: Finish listening.")
+            elif check and not make_new:
+                raise PytweetException(f"Cannot find url passed: {url} Invalid url passed, please check the spelling of your url")
+
+            else:
+                thread.start()
+                time.sleep(sleep_for)
+                self.webhook.trigger_crc()
+                ids = self.environment.fetch_all_subscriptions()
+                users = self.http.fetch_users(ids)
+                for user in users:
+                    self.http.user_cache[user.id] = user
+
+                _log.debug(f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\nNgrok: {ngrok}\nMake a new webhook when not found: {make_new}\nWebhook info: {repr(self.webhook)} in environment: {repr(self.environment)}.")
+            thread.join()
+        except Exception as e:
+            _log.warn(f"An error was caught during listening: {e}")
+            raise e
+
+        finally:
+            _log.debug(f"Stop listening due to internal/external problem!")
