@@ -132,7 +132,8 @@ class HTTPClient:
         self.event_parser = EventParser(self)
         self.base_url = "https://api.twitter.com/"
         self.upload_url = "https://upload.twitter.com/1.1/media/upload.json"
-        self._auth = None # Set in request method.
+        self._auth: Optional[OauthSession] = None # Set in request method.
+        self.current_header: Optional[RequestModel] = None
         self.message_cache = {}
         self.tweet_cache = {}
         self.user_cache = {}
@@ -141,13 +142,17 @@ class HTTPClient:
             self.stream.http_client = self
             self.stream.connection.http_client = self
 
-    def dispatch(self, event_name: str, *args: Any):
+    @property
+    def access_level(self):
+        return self.current_header.get("x-access-levels").split("-")
+
+    def dispatch(self, event_name: str, *args: Any, **kwargs: Any):
         try:
             event = self.events[event_name]
         except KeyError:
             return
         else:
-            event(*args)
+            event(*args, **kwargs)
 
     def request(
         self,
@@ -204,6 +209,7 @@ class HTTPClient:
             auth=auth,
         )
         code = response.status_code
+        self.current_header = response.headers
         res = None
         _log.debug(
             f"{method} {url} has returned: "
@@ -230,14 +236,8 @@ class HTTPClient:
         elif code == 409:
             raise Conflict(response)
 
-        elif code in (420, 429): # Read more about 420 here: https://evertpot.com/http/420-enhance-your-calm
-            remaining = int(response.headers["x-rate-limit-reset"])
-            sleep_for = (remaining - int(time.time())) + 1
-            _log.warn(f"Client has been ratelimited. Sleeping for {sleep_for}")
-            time.sleep(sleep_for)
-        
         elif code == 431:
-            raise FieldsTooLarge(resposne)
+            raise FieldsTooLarge(response)
 
 
         if is_json:
@@ -373,6 +373,32 @@ class HTTPClient:
             return User(data, http_client=self)
         except NotFoundError:
             return None
+
+    def fetch_users(self, ids: List[Union[str, int]]) -> List[User]:
+        str_ids = []
+        for id in ids:
+            try:
+                int(id)
+            except ValueError as e:
+                raise e
+            else:
+                str_ids.append(str(id))
+
+        
+        ids = ",".join(str_ids)
+        res = self.request(
+            "GET",
+            "2",
+            f"/users?ids={ids}",
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD 
+            },
+            auth=True
+        )
+
+        return [User(data, http_client=self) for data in res["data"]]
 
     def fetch_user_byname(self, username: str) -> Optional[User]:
         if "@" in username:
