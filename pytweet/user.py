@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
@@ -15,11 +16,15 @@ from .expansions import (
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import build_object, time_parse_todt
+from .enums import Timezone
 
 if TYPE_CHECKING:
     from .http import HTTPClient
     from .message import DirectMessage
 
+class UserSetting: #TODO Elevated the class
+    def __init__(self, data: Dict[str, Any]):
+        self._payload = data
 
 class User:
     """Represents a user in Twitter.
@@ -524,21 +529,46 @@ class User:
         return self._metrics.listed_count
 
 class ClientAccount(User):
-    """Represents the client's account. This inherits :class:`User` object.
+    """Represents the client's account. This inherits :class:`User` object. This class unlock methods that you can use only for the client. Like updating settings which you can only do with the client's account.
     
     .. versionadded:: 1.5.0
     """
     def update_profile(
         self, 
+        *,
         name: Optional[str] = None,
         description: Optional[str] = None, 
-        *,
+        image: Optional[File] = None,
         location: Optional[str] = None,
         profile_url: Optional[str] = None,
         profile_link_color: Optional[int] = None
 
     ):
-        data = self.http_client.request(
+        if image:
+            path = image.path
+            if isinstance(path, io.IOBase):
+                self.http_client.request(
+                    "POST",
+                    "1.1",
+                    "/account/update_profile_image.json",
+                    files={
+                        "image": path.read(4 * 1024 * 1024)
+                    },
+                    auth=True
+                )
+            else:
+                self.http_client.request(
+                    "POST",
+                    "1.1",
+                    "/account/update_profile_image.json",
+                    files={
+                        "image": open(path, "rb").read(4 * 1024 * 1024)
+                    },
+                    auth=True
+                )
+
+
+        res = self.http_client.request(
             "POST", 
             "1.1", 
             "/account/update_profile.json",
@@ -551,5 +581,74 @@ class ClientAccount(User):
             },
             auth=True
         )
-        data = self.http_client.event_parser.payload_parser.parse_user_payload(data)
-        return User(data, http_client=self.http_client)
+        data = self.http_client.event_parser.payload_parser.parse_user_payload(res)
+        return data
+
+    def update_profile_banner(
+        self,
+        *,
+        banner: File,
+        width: int = 0,
+        height: int = 0,
+        offset_left: int = 0,
+        offset_top: int = 0
+    ) -> None:
+        path = banner.path
+
+        if isinstance(path, io.IOBase):
+            self.http_client.request(
+                "POST", 
+                "1.1", 
+                "/account/update_profile_banner.json",
+                params={
+                    "width": width,
+                    "height": height,
+                    "offset_left": offset_left,
+                    "offset_top": offset_top
+                },
+                files = {
+                    "banner": path.read(4 * 1024 * 1024)
+                },
+                auth=True
+            )
+        else:
+            self.http_client.request(
+                "POST", 
+                "1.1", 
+                "/account/update_profile_banner.json",
+                params={
+                    "width": width,
+                    "height": height,
+                    "offset_left": offset_left,
+                    "offset_top": offset_top
+                },
+                files = {
+                    "banner": open(path, "rb").read(4 * 1024 * 1024)
+                },
+                auth=True
+            )
+        return None
+
+    def update_setting(
+        self,
+        lang: Optional[str] = None,
+        enabled_sleep_time: Optional[bool] = None,
+        start_sleep_time: Optional[int] = None,
+        end_sleep_time:  Optional[int] = None,
+        timezone: Optional[Timezone] = None,
+        trend_location_woeid: Optional[int] = None
+    ):
+        res = self.http_client.request(
+            "POST",
+            "1.1",
+            "/account/settings.json",
+            params={
+                "sleep_time_enabled": enabled_sleep_time,
+                "start_sleep_time": start_sleep_time,
+                "end_sleep_time": end_sleep_time,
+                "time_zone": timezone,
+                "trend_location_woeid": trend_location_woeid,
+                "lang": lang
+            }
+        )
+        return UserSetting(res) #TODO elevated the class.
