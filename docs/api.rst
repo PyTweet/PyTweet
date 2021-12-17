@@ -144,15 +144,6 @@ Poll
 
 
 
-PollOption
-~~~~~~~
-
-
-.. attributetable:: PollOption
-
-.. autoclass:: PollOption
-    :members:
-
 
 
 CTA
@@ -191,22 +182,6 @@ File
     :members:
 
 
-Button
-~~~~~~~
-
-.. attributetable:: Button
-
-.. autoclass:: Button
-    :members:
-
-
-Option
-~~~~~~~
-
-.. attributetable:: Option
-
-.. autoclass:: Option
-    :members:
 
 
 Streaming

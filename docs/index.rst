@@ -22,6 +22,10 @@ Manuals
 - :doc:`api`
 
 
+Manual for ``pytweet.models``
+-----------------
+- :doc:`models/api`
+
 Links
 -----------------
 - :gh:`Github`
