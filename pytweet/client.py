@@ -7,6 +7,7 @@ import json
 import logging
 import threading
 import time
+from yarl import URL # for the listen method.
 from asyncio import iscoroutinefunction
 from http import HTTPStatus
 from typing import Callable, List, Optional, Union, Any
@@ -607,9 +608,7 @@ class Client:
                 
             for webhook in env.webhooks:
                 if url == webhook.url:
-                    path = webhook.url.split("/")
-                    path = "/" + "/".join(path[3:])
-                    self.webhook_url_path = path
+                    self.webhook_url_path = URL(webhook.url).path
                     self.webhook = webhook
                     self.environment = env
                     break
@@ -618,9 +617,7 @@ class Client:
             thread = threading.Thread(target=app.run, name="PyTweet: Flask App Thread", kwargs=kwargs)
 
             if not self.webhook and not ngrok: 
-                path = url.split("/")
-                path = "/" + "/".join(path[3:])
-                self.webhook_url_path = path
+                self.webhook_url_path = URL(webhook.url).path
 
             elif self.webhook and ngrok:
                 self.webhook_url_path = "THE URL PATH PASSSED BY NGROK" #TODO add ngrok support
@@ -661,7 +658,7 @@ class Client:
                 for user in users:
                     self.http.user_cache[user.id] = user
                     
-                _log.debug(f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\nNgrok: {ngrok}\nMake a new webhook when not found: {make_new}\nWebhook info: {repr(self.webhook)} in environment: {repr(self.environment)}.")
+                _log.debug(f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\nNgrok: {ngrok}\nMake a new webhook when not found: {make_new}\nIn Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}.")
 
             elif check and not make_new:
                 raise PytweetException(f"Cannot find url passed: {url} Invalid url passed, please check the spelling of your url")
@@ -675,7 +672,7 @@ class Client:
                 for user in users:
                     self.http.user_cache[user.id] = user
 
-                _log.debug(f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\nNgrok: {ngrok}\nMake a new webhook when not found: {make_new}\nWebhook info: {repr(self.webhook)} in environment: {repr(self.environment)}.")
+                _log.debug(f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\nNgrok: {ngrok}\nMake a new webhook when not found: {make_new}\nIn Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}.")
             thread.join()
         except Exception as e:
             _log.warn(f"An error was caught during listening: {e}")
