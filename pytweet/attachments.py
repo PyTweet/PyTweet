@@ -2,55 +2,17 @@ from __future__ import annotations
 
 import mimetypes
 import datetime
-import base64
 import io
 import os
-from dataclasses import dataclass
 from typing import Any, Dict, List, NoReturn, Optional, Union
+from .models import PollOption, Option, Button
 
 from .entities import Media
 from .enums import ButtonType
 from .utils import time_parse_todt
 
-__all__ = ("PollOption", "Poll", "QuickReply", "Geo", "CTA", "Button", "Option", "File")
+__all__ = ("Poll", "QuickReply", "Geo", "CTA", "File")
 
-
-
-@dataclass
-class Button:
-    """Represent a Button object. Button are attachment that you can attach via :class:`CTA`
-
-    .. versionadded:: 1.3.5
-    """
-
-    label: str
-    type: Union[ButtonType, str]
-    url: str
-    tco_url: Optional[str] = None
-
-
-@dataclass
-class Option:
-    """Represent an Option object. You can create an Option using :class:`QuickReply.add_option`
-
-    .. versionadded:: 1.3.5
-    """
-
-    label: str
-    description: str
-    metadata: str
-
-
-@dataclass
-class PollOption:
-    """Represent an Option for :class:`Poll`
-
-    .. versionadded 1.3.5
-    """
-
-    label: str
-    position: int = 0
-    votes: int = 0
 
 
 class Poll:
