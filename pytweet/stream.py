@@ -99,14 +99,11 @@ class StreamConnection:
 
         .. versionadded:: 1.3.5
         """
-
-        http_client = self.http_client
         while True:
             try:
-                response = http_client.request(
-                    "GET",
-                    version=None,
-                    path=self.url,
+                response = requests.get(
+                    self.url,
+                    headers={"Authorization": f"Bearer {self.http_client.bearer_token}"},
                     params={
                         "backfill_minutes": int(self.backfill_minutes),
                         "expansions": TWEET_EXPANSION,
@@ -117,15 +114,12 @@ class StreamConnection:
                         "user.fields": USER_FIELD,
                     },
                     stream=True,
-                    is_json=False,
-                    use_base_url=False,
                 )
-                print(response)
                 _log.info("Client connected to stream!")
                 self.http_client.dispatch("stream_connect", self)
                 self.session = response
 
-                for response_line in response.iter_lines(chunk_size=1024):
+                for response_line in response.iter_lines():
                     if response_line:
                         json_data = json.loads(response_line.decode("UTF-8"))
                         _check_for_errors(json_data, self.session)
