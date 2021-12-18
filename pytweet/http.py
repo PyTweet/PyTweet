@@ -106,7 +106,7 @@ class HTTPClient:
         access_token: Optional[str],
         access_token_secret: Optional[str],
         stream: Optional[Stream] = None,
-        callback: Optional[str] = None,
+        callback_url: Optional[str] = None,
     ) -> Union[None, NoReturn]:
         self.credentials: Dict[str, Optional[str]] = {
             "bearer_token": bearer_token,
@@ -135,7 +135,7 @@ class HTTPClient:
         self.access_token: Optional[str] = access_token
         self.access_token_secret: Optional[str] = access_token_secret
         self.stream = stream
-        self.oauth_callback = callback
+        self.callback_url = callback_url
         self.event_parser = EventParser(self)
         self.base_url = "https://api.twitter.com/"
         self.upload_url = "https://upload.twitter.com/1.1/media/upload.json"
@@ -184,7 +184,7 @@ class HTTPClient:
 
         if self._auth is None:
             auth_session = OauthSession(
-                self.consumer_key, self.consumer_key_secret, http_client=self, callback=self.oauth_callback
+                self.consumer_key, self.consumer_key_secret, http_client=self, callback=self.callback_url
             )
             auth_session.set_access_token(self.access_token, self.access_token_secret)
             self._auth = auth_session
@@ -269,7 +269,7 @@ class HTTPClient:
         assert command.upper() in ("INIT", "APPEND", "FINALIZE", "STATUS")
         if self._auth is None:
             auth_session = OauthSession(
-                self.consumer_key, self.consumer_key_secret, http_client=self, callback=self.oauth_callback
+                self.consumer_key, self.consumer_key_secret, http_client=self, callback=self.callback_url
             )
             auth_session.set_access_token(self.access_token, self.access_token_secret)
             self._auth = auth_session
