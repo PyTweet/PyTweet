@@ -159,6 +159,7 @@ class HTTPClient:
         except KeyError:
             return
         else:
+            _log.debug(f"Dispatching Event: on_{event_name}")
             event(*args, **kwargs)
 
     def request(
