@@ -463,7 +463,7 @@ class Client:
 
         Parameters
         ------------
-        event_id: Union[:class:`str`, :class:`int`]
+        tweet_id: Union[:class:`str`, :class:`int`]
             The ID of a tweet that you want to get.
 
         Raises
@@ -484,7 +484,7 @@ class Client:
         except ValueError:
             raise ValueError("tweet_id must be an integer or a string of digits.")
 
-        return self.http.message_cache.get(tweet_id)
+        return self.http.tweet_cache.get(tweet_id)
 
     def create_custom_profile(self, name: str, file: File) -> Optional[CustomProfile]:
         """Create a custom profile
@@ -568,7 +568,7 @@ class Client:
         **kwargs: Any,
     ):
         """Listen to upcoming account activity events send by twitter to your webhook url. You can use the rest of Flask arguments like port or host via the kwargs argument.
-
+        
         Parameters
         ------------
         app: :class:`flask.Flask`
