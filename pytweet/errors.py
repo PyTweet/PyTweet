@@ -44,10 +44,13 @@ class HTTPException(PytweetException):
         response: Optional[requests.models.Response] = None,
         message: str = None,
     ):
-        self.res = response
-        self.json = response.json() if response else None
-        self.message = message
-        super().__init__(f"Request returned an Exception (status code: {self.res.status_code}): {self.message}")
+            self.res = response
+            try:
+                self.json = response.json() if response else None
+            except Exception:
+                pass
+            self.message = message
+            super().__init__(f"Request returned an Exception (status code: {self.res.status_code}): {self.message}")
 
     @property
     def status_code(self) -> Optional[int]:
@@ -69,7 +72,7 @@ class BadRequests(HTTPException):
         message: Optional[str] = None,
     ):
         msg = response.json().get("error")
-        super().__init__(msg if msg else "Not Found!")
+        super().__init__(msg if msg else "Bad Request!")
 
 
 class Unauthorized(HTTPException):
