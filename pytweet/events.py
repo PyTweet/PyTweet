@@ -95,7 +95,7 @@ class DirectMessageEvent(Event):
 
     @property
     def recipient(self) -> User:
-        """:class:`User`: Returns the user where the :meth:`DirectMessageTypingEvent.sender` trigger the typing animation.
+        """:class:`User`: Returns the user that :meth:`DirectMessageEvent.sender` interacted.
 
         .. versionadded:: 1.5.0
         """
@@ -103,7 +103,7 @@ class DirectMessageEvent(Event):
 
     @property
     def sender(self) -> User:
-        """:class:`User`: Returns the user that trigger this event.
+        """:class:`User`: Returns the user that trigger the event.
 
         .. versionadded:: 1.5.0
         """
@@ -144,7 +144,7 @@ class DirectMessageReadEvent(DirectMessageEvent):
 
     @property
     def last_read_message(self) -> Optional[int]:
-        """Optional[:class:`int`]: Returns the last message that got read, returns the event id if none found
+        """Optional[:class:`int`]: Returns the last message that got read, returns the event id if none found.
 
         .. versionadded:: 1.5.0
         """
