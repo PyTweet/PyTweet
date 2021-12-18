@@ -1,13 +1,68 @@
 from __future__ import annotations
-from typing import Any, Type, Tuple, Optional, TYPE_CHECKING
+
+import base64
+import random  
+import string 
+import hashlib
+from datetime import datetime
+from random import randint
+from typing import Tuple, Optional, TYPE_CHECKING
 from requests_oauthlib import OAuth1, OAuth1Session
 from .utils import build_object
 
 if TYPE_CHECKING:
     from .client import Client
 
-__all__ = ("OauthSession",)
+__all__ = ("OauthSession", "Scope")
 
+
+class Scope:
+    def __init__(self, *,tweet_read: bool = False, tweet_write: bool = False, tweet_moderate_write: bool = False, users_read: bool = False, follows_read: bool = False, follows_write: bool = False, offline_access: bool = False, space_read: bool = False, mute_read: bool = False, mute_write: bool = False, like_read: bool = False, like_write: bool = False, list_read: bool = False, list_write: bool = False, block_read: bool = False, block_write: bool = False):
+        self.tweet_read = "tweet.read" if tweet_read else None
+        self.tweet_write = "tweet.write" if tweet_write else None
+        self.tweet_moderate_write = "tweet.moderate.write" if tweet_moderate_write else None
+        self.users_read = "users.read" if users_read else None
+        self.follows_read = "follows.read" if follows_read else None
+        self.follows_write = "follows.write" if follows_write else None
+        self.offline_access = "offline.access" if offline_access else None
+        self.space_read = "space.read" if space_read else None
+        self.mute_read = "mute.read" if mute_read else None
+        self.mute_write = "mute.write" if mute_write else None
+        self.like_read = "like.read" if like_read else None
+        self.like_write = "like.write" if like_write else None
+        self.list_read = "list.read" if list_read else None
+        self.list_write = "list.write" if list_write else None
+        self.block_read = "block.read" if block_read else None
+        self.block_write = "block.write" if block_write else None
+
+    @classmethod
+    def read_only(cls, offline_access: bool = False):
+        self = cls(tweet_read=True, users_read=True, follows_read=True, space_read=True, mute_read=True, like_read=True, list_read=True, block_read=True, offline_access=offline_access)
+        return self
+
+    @classmethod
+    def write_only(cls, offline_access: bool = False):
+        self = cls(tweet_write=True, follows_write=True, mute_write=True, like_write=True, list_write=True, block_write=True, tweet_moderate_write=True, offline_access=offline_access)
+        return self
+
+    @classmethod
+    def all(cls, offline_access: bool = False):
+        self = cls(tweet_read=True, users_read=True, follows_read=True, space_read=True, mute_read=True, like_read=True, list_read=True, block_read=True, tweet_write=True, follows_write=True, mute_write=True, like_write=True, list_write=True, block_write=True, tweet_moderate_write=True, offline_access=offline_access)
+        return self
+
+    @property
+    def values(self):
+        value = ""
+        for attr in dir(self):
+            if "_read" in attr or "_write" in attr or "_access" in attr:
+                try:
+                    e=getattr(self, attr)
+                    if e:
+                        value += f"{e}%20"
+                except Exception:
+                    continue
+        
+        return value.rstrip("%20")
 
 class OauthSession(OAuth1Session):
     """Represents an OauthSession for Oauth1 Authorization. This class is very importantfo
@@ -20,6 +75,8 @@ class OauthSession(OAuth1Session):
         The application's consumer secret.
     callback: Optional[:class:`str`]
         The callback url, the user will get redirect to the callback url after they authorize. Default to None.
+    client_id: Optional[:class:`str`]
+        The client's unique ID.
 
 
     .. versionadded:: 1.2.0
@@ -31,6 +88,7 @@ class OauthSession(OAuth1Session):
         consumer_secret: Optional[str],
         *,
         http_client: object,
+        client_id: Optional[str] = None,
         callback: Optional[str] = None,
     ) -> None:
         super().__init__(consumer_key, client_secret=consumer_secret, callback_uri=callback)
@@ -39,9 +97,10 @@ class OauthSession(OAuth1Session):
         self.http_client: HTTPClient = http_client
         self.consumer_key = consumer_key
         self.consumer_key_secret = consumer_secret
-        self.access_token: str = None
-        self.access_token_secret: str = None
-        self.callback: Any = callback
+        self.access_token = None
+        self.access_token_secret = None
+        self.callback = callback
+        self.client_id = client_id  
 
     @staticmethod
     def invalidate_access_token(client: Client) -> None:
@@ -97,6 +156,31 @@ class OauthSession(OAuth1Session):
         url = "https://api.twitter.com/oauth/authorize" + f"?{oauth_token}"
         return url
 
+    def generate_oauth2_url(self, state: str, scope: Scope):
+        if not state:
+            state = ''.join(random.choices(string.ascii_uppercase + string.digits, k = 10)).lower()
+        else:
+            state = base64.b64decode(state.encode())
+
+        now = datetime.now()
+        timestamp = now.strftime("%m%d%Y%H%M%S")
+        random_append = randint(1000, 100000)
+        rand_dec = randint(300, 800)
+
+        state = base64.b64encode(state.encode()).decode()
+        code_challenge = "{}{}.{}".format(timestamp, random_append, rand_dec)
+        client_id = self.client_id
+        response_type = "code"
+        scope = scope.values
+        print(scope)
+        code_challenge_method = "plain"
+
+        return f"https://twitter.com/i/oauth2/authorize?response_type={response_type}&client_id={client_id}&redirect_uri={self.callback}&scope={scope}&state={state}&code_challenge={code_challenge}&code_challenge_method={code_challenge_method}"
+
+        
+
+
+
     def post_oauth_token(self, oauth_token: str, oauth_verifier: str) -> Optional[Tuple[str]]:
         """Post the oauth token & verifier, this method will returns a pair of access token & secret.
 
@@ -123,6 +207,8 @@ class OauthSession(OAuth1Session):
         )
 
         return tuple(res.split("&"))
+
+    
 
     @property
     def oauth1(self) -> OAuth1:

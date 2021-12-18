@@ -6,8 +6,8 @@ import hmac
 import json
 import logging
 import threading
+from urllib.parse import urlparse
 import time
-from yarl import URL  # for the listen method.
 from asyncio import iscoroutinefunction
 from http import HTTPStatus
 from typing import Callable, List, Optional, Union, Any
@@ -73,7 +73,8 @@ class Client:
         access_token: Optional[str] = None,
         access_token_secret: Optional[str] = None,
         stream: Optional[Stream] = None,
-        callback: Optional[str] = None,
+        callback_url: Optional[str] = None,
+        client_id: Optional[str] = None
     ) -> None:
         self.http = HTTPClient(
             bearer_token,
@@ -82,7 +83,8 @@ class Client:
             access_token=access_token,
             access_token_secret=access_token_secret,
             stream=stream,
-            callback=callback,
+            callback_url=callback_url,
+            client_id=client_id
         )
         self._account_user: Optional[User] = None  # set in account property.
         self.webhook: Optional[Webhook] = None
@@ -603,7 +605,7 @@ class Client:
 
             for webhook in env.webhooks:
                 if url == webhook.url:
-                    self.webhook_url_path = URL(webhook.url).path
+                    self.webhook_url_path = urlparse(webhook.url).path
                     self.webhook = webhook
                     self.environment = env
                     break
@@ -612,7 +614,7 @@ class Client:
             thread = threading.Thread(target=app.run, name="PyTweet: Flask App Thread", kwargs=kwargs)
 
             if not self.webhook and not ngrok:
-                self.webhook_url_path = URL(webhook.url).path
+                self.webhook_url_path = urlparse(webhook.url).path
 
             elif self.webhook and ngrok:
                 self.webhook_url_path = "THE URL PATH PASSSED BY NGROK"  # TODO add ngrok support
@@ -620,7 +622,7 @@ class Client:
             @app.route(self.webhook_url_path, methods=["POST", "GET"])
             def webhook_receive():
                 if request.method == "GET":
-                    _log.info("Attempts to responds a CRC.")
+                    _log.info("Attempting to respond to a CRC.")
                     crc = request.args["crc_token"]
 
                     validation = hmac.new(

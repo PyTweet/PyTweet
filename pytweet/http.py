@@ -107,6 +107,7 @@ class HTTPClient:
         access_token_secret: Optional[str],
         stream: Optional[Stream] = None,
         callback_url: Optional[str] = None,
+        client_id: Optional[str] = None
     ) -> Union[None, NoReturn]:
         self.credentials: Dict[str, Optional[str]] = {
             "bearer_token": bearer_token,
@@ -141,6 +142,7 @@ class HTTPClient:
         self.upload_url = "https://upload.twitter.com/1.1/media/upload.json"
         self._auth: Optional[OauthSession] = None  # Set in request method.
         self.current_header: Optional[RequestModel] = None
+        self.client_id = client_id
         self.message_cache = {}
         self.tweet_cache = {}
         self.user_cache = {}
@@ -184,7 +186,8 @@ class HTTPClient:
 
         if self._auth is None:
             auth_session = OauthSession(
-                self.consumer_key, self.consumer_key_secret, http_client=self, callback=self.callback_url
+                self.consumer_key, self.consumer_key_secret, http_client=self, callback=self.callback_url,
+                client_id=self.client_id
             )
             auth_session.set_access_token(self.access_token, self.access_token_secret)
             self._auth = auth_session
@@ -244,6 +247,12 @@ class HTTPClient:
 
         elif code == 409:
             raise Conflict(response)
+        
+        elif code in (420, 429):
+            remaining = int(response.headers["x-rate-limit-reset"])
+            sleep_for = (remaining - int(time.time())) + 1
+            _log.warn(f"Client has been ratelimited. Sleeping for {sleep_for}")
+            time.sleep(sleep_for)
 
         elif code == 431:
             raise FieldsTooLarge(response)
