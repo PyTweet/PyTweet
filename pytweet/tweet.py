@@ -310,10 +310,9 @@ class Tweet(Message):
         geo: Optional[Union[Geo, str]] = None,
         direct_message_deep_link: Optional[str] = None,
         reply_setting: Optional[Union[ReplySetting, str]] = None,
-        reply_tweet: Optional[Union[str, int]] = None,
         exclude_reply_users: Optional[List[Union[str, int]]] = None,
     ) -> Union[Tweet, Message]:
-        """Post a tweet to reply a specific tweet present by the tweet's id. Returns a :class:`Tweet` object or :class:`Message` if the tweet is not found in the cache.
+        """Post a tweet to reply to the tweet present by the tweet's id. Returns a :class:`Tweet` object or :class:`Message` if the tweet is not found in the cache.
 
         .. note::
             Note that if the tweet is a retweet you cannot reply to that tweet, it might not raise an error but it will post the tweet has a normal tweet rather then a reply tweet and it ping the :class:`Tweet.author`.
@@ -322,18 +321,16 @@ class Tweet(Message):
         ------------
         text: :class:`str`
             The tweet's text, it will show up as the main text in a tweet.
-
-        .. versionadded:: 1.5.0
-            file: Optional[:class:`File`]
-                Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
-            geo: Optional[Union[:class:`Geo`, :class:`str`]]
-                The geo attachment, you can put an object that is an instance of :class:`Geo` or the place ID in a string.
-            direct_message_deep_link: Optional[:class:`str`]
-                The direct message deep link, It will showup as a CTA(call-to-action) with button attachment. Example of direct message deep link:
-            reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
-                The reply setting that you can set to minimize users that can reply. If None is specified, the default is set to 'everyone' can reply.
-            exclude_reply_users: Optional[List[Union[:class:`str`, :class:`int`]]]
-                Exclude the users when replying to a tweet, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you don't want to mention.
+        file: Optional[:class:`File`]
+            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
+        geo: Optional[Union[:class:`Geo`, :class:`str`]]
+            The geo attachment, you can put an object that is an instance of :class:`Geo` or the place ID in a string.
+        direct_message_deep_link: Optional[:class:`str`]
+            The direct message deep link, It will showup as a CTA(call-to-action) with button attachment. Example of direct message deep link:
+        reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
+            The reply setting that you can set to minimize users that can reply. If None is specified, the default is set to 'everyone' can reply.
+        exclude_reply_users: Optional[List[Union[:class:`str`, :class:`int`]]]
+            Exclude the users when replying to a tweet, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you don't want to mention.
 
         Returns
         ---------
@@ -349,7 +346,7 @@ class Tweet(Message):
             geo=geo,
             direct_message_deep_link=direct_message_deep_link,
             reply_setting=reply_setting,
-            reply_tweet=reply_tweet,
+            reply_tweet=self.id,
             exclude_reply_users=exclude_reply_users,
         )
         return self.http_client.tweet_cache.get(tweet.id, tweet)
