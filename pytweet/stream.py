@@ -55,6 +55,7 @@ class StreamConnection:
         self.http_client: Optional[HTTPClient] = http_client
         self.session: Optional[Any] = None
         self.errors = 0
+        self.running = False
 
     @property
     def closed(self) -> Optional[bool]:
@@ -62,7 +63,7 @@ class StreamConnection:
 
         .. versionadded:: 1.3.5
         """
-        return self.session is None
+        return not self.running
 
     def is_close(self) -> Optional[bool]:
         """ "An alias to :class:`StreamConnection.closed`.
@@ -87,23 +88,24 @@ class StreamConnection:
 
         .. versionadded:: 1.3.5
         """
-        if self.is_close():
+        if not self.running:
             raise PytweetException("Attempt to close a stream that's already closed!")
 
-        _log.info("Closing connection!")
-        self.session.close()
-        self.session = None
+        self.running = False
 
     def connect(self) -> Optional[Any]:
         """ "Connect to the current stream connection.
 
         .. versionadded:: 1.3.5
         """
-        while True:
+
+        self.running = True
+        http = self.http_client
+        while self.running:
             try:
                 response = requests.get(
                     self.url,
-                    headers={"Authorization": f"Bearer {self.http_client.bearer_token}"},
+                    headers={"Authorization": f"Bearer {http.bearer_token}"},
                     params={
                         "backfill_minutes": int(self.backfill_minutes),
                         "expansions": TWEET_EXPANSION,
@@ -116,16 +118,16 @@ class StreamConnection:
                     stream=True,
                 )
                 _log.info("Client connected to stream!")
-                self.http_client.dispatch("stream_connect", self)
+                http.dispatch("stream_connect", self)
                 self.session = response
 
                 for response_line in response.iter_lines():
                     if response_line:
                         json_data = json.loads(response_line.decode("UTF-8"))
                         _check_for_errors(json_data, self.session)
-                        tweet = Tweet(json_data, http_client=self.http_client)
-                        self.http_client.tweet_cache[tweet.id] = tweet
-                        self.http_client.dispatch("stream", tweet, self)
+                        tweet = Tweet(json_data, http_client=http)
+                        http.tweet_cache[tweet.id] = tweet
+                        http.dispatch("stream", tweet, self)
 
             except Exception as e:
                 if isinstance(e, AttributeError):
@@ -136,7 +138,7 @@ class StreamConnection:
                     if self.errors > self.reconnect_attempts:
                         _log.error("Too many errors caught during streaming, closing stream!")
                         self.close()
-                        self.http_client.dispatch("stream_disconnect", self)
+                        http.dispatch("stream_disconnect", self)
                         break
 
                     _log.warning(f"An error caught during streaming session: {e}")
