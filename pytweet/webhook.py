@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import datetime
 from typing import Any, List, Dict, Union, TYPE_CHECKING
 from .utils import time_parse_todt
 
@@ -11,6 +12,10 @@ _log = logging.getLogger(__name__)
 
 
 class Webhook:
+    """Represents a webhook for an environment. This webhook belongs to an environment and have a webhook url for sending account acitivity events.
+    
+    .. versionadded:: 1.5.0
+    """
     def __init__(self, data: Dict[str, Any], env: Environment, *, client: Client):
         self._id = data.get("id")
         self._url = data.get("url")
@@ -23,6 +28,10 @@ class Webhook:
 
     @property
     def id(self) -> int:
+        """:class:`int`: Returns the webhook unique id.
+        
+        .. versionadded:: 1.5.0
+        """
         return self._id
 
     @id.setter
@@ -31,6 +40,10 @@ class Webhook:
 
     @property
     def url(self) -> str:
+        """:class:`str`: Returns the webhook url.
+        
+        .. versionadded:: 1.5.0
+        """
         return self._url
 
     @url.setter
@@ -39,6 +52,10 @@ class Webhook:
 
     @property
     def valid(self) -> bool:
+        """:class:`bool`: Returns True if the webhook is valid else False.
+        
+        .. versionadded:: 1.5.0
+        """
         return self._valid
 
     @valid.setter
@@ -48,15 +65,27 @@ class Webhook:
         self._valid = obj
 
     @property
-    def environment(self):
+    def environment(self) -> Environment:
+        """:class:`Environment`: Returns an environment where the webhook belongs to.
+        
+        .. versionadded:: 1.5.0
+        """
         return self._env
 
     @property
     def env(self):
+        """:class:`Environment`: An alias to :meth:`Webhook.environment`
+        
+        .. versionadded:: 1.5.0
+        """
         return self.environment
 
     @property
-    def created_at(self) -> int:
+    def created_at(self) -> datetime.datetime:
+        """:class:`datetime.datetime`: Returns a datetime.datetime object with the webhook's created timestamp.
+        
+        .. versionadded:: 1.5.0
+        """
         return time_parse_todt(self._payload.get("created_at"))
 
     def delete(self) -> Webhook:
@@ -101,6 +130,10 @@ class Webhook:
 
 
 class Environment:
+    """Represents a dev environment to use one of the subscription APIs (Account Activity API or events etc)
+    
+    .. versionadded:: 1.5.0
+    """
     def __init__(self, data: Dict[str, Any], *, client: Client):
         self._payload = data
         self.client = client
@@ -110,18 +143,30 @@ class Environment:
 
     @property
     def name(self) -> str:
+        """:class:`str`: The environment name/label.
+        
+        .. versionadded:: 1.5.0
+        """
         return self._payload.get("environment_name")
 
     @property
     def label(self) -> str:
+        """:class:`str`: An alias to :meth:`Environment.name`
+        
+        .. versionadded:: 1.5.0
+        """
         return self.name
 
     @property
-    def webhooks(self):
+    def webhooks(self) -> List[Webhook]:
+        """List[:class:`Webhook`]: Returns a list of webhooks.
+        
+        .. versionadded:: 1.5.0
+        """
         return [Webhook(data, self, client=self.client) for data in self._payload.get("webhooks")]
 
     def add_user_subscription(self, client: Client) -> None:
-        """Add a new user subscription to the environment, which is the client itself.
+        """Add a new user subscription to the environment, which is the client (that you passed in the argument) itself.
 
         .. note::
             If you want to add other user subscription, use 3 legged oauth flow to get the user's access token and secret, then construct a client object with the user's access token and secret. After that pass it in client argument.
@@ -129,7 +174,7 @@ class Environment:
 
         .. versionadded:: 1.5.0
         """
-        self.client.http.request("POST", "1.1", f"/account_activity/all/{self.label}/subscriptions.json", auth=True)
+        client.http.request("POST", "1.1", f"/account_activity/all/{self.label}/subscriptions.json", auth=True)
 
     def add_my_subscription(self) -> None:
         """Add a new user subscription to the environment, which is the client WHO made the environment request. Use :meth:`add_user_subscription` to add other user subscription. This method only add the client WHO made the fetch environment request.
@@ -139,7 +184,7 @@ class Environment:
         """
         self.client.http.request("POST", "1.1", f"/account_activity/all/{self.label}/subscriptions.json", auth=True)
 
-    def register_webhook(self, url: str):
+    def register_webhook(self, url: str) -> Webhook:
         """Register your WebHook with your WebApp's url that you develop. Before this, you need to develop, deploy and host a WebApp that will receive Twitter webhook events. You also need to perform a Twitter Challenge Response Check (CRC) GET request and responds with a properly formatted JSON response.
 
         Parameters
