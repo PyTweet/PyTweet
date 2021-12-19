@@ -6,8 +6,9 @@ import hmac
 import json
 import logging
 import threading
-from urllib.parse import urlparse
 import time
+
+from urllib.parse import urlparse
 from asyncio import iscoroutinefunction
 from http import HTTPStatus
 from typing import Callable, List, Optional, Union, Any
@@ -587,6 +588,7 @@ class Client:
             A kwarg that indicates to disable flask's log so it does not print the request process in your terminal, this also will disable `werkzeug` log.
         make_new: :class:`bool`:
             A kwarg indicates to make a new webhook url when the api cant find the url passed. Default to True.
+
 
         .. versionadded:: 1.5.0
         """
