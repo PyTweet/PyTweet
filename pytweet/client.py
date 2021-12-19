@@ -24,6 +24,7 @@ from .stream import Stream
 from .tweet import Tweet
 from .user import User, ClientAccount
 from .environment import Environment, Webhook
+from .dataclass import Location, Trend
 
 __all__ = ("Client",)
 
@@ -431,6 +432,80 @@ class Client:
         .. versionadded:: 1.5.3
         """
         return self.http.search_geo(query, max_result, lat=lat, long=long, ip=ip, granularity=granularity)
+
+    def search_trend_with_place(self, woeid: Union[str, int], exclude: Optional[str] = None
+    ):
+        """Search trends with woeid.
+
+        .. note::
+            You can find woeid information through :class:`Location` with :meth:`Client.search_trend_locations` or :meth:`Client.search_trend_closest`.
+
+        Parameters
+        ------------
+        woeid: Union[:class:`str`, :class:`int`]
+            "where on earth identifier" or WOEID, which is a legacy identifier created by Yahoo and has been deprecated. Twitter API v1.1 still uses the numeric value to identify town and country trend locations. Example WOEID locations include: Worldwide: 1 UK: 23424975 Brazil: 23424768 Germany: 23424829 Mexico: 23424900 Canada: 23424775 United States: 23424977 New York: 2459115.
+        exclude: Optional[:class:`str`]
+            Setting this equal to hashtags will remove all hashtags from the trends list.
+
+        
+        .. versionadded:: 1.5.0
+        """
+        res = self.http.request(
+            "GET",
+            "1.1",
+            "/trends/place.json",
+            params={
+                "id": str(woeid),
+                "exclude": exclude
+            },
+            auth=True
+        )
+        
+        return [Trend(**data) for data in res[0].get("trends")]
+    
+    def search_trend_locations(self):
+        """Search locations that Twitter has trending topic information.
+        
+
+        .. versionadded:: 1.5.0
+        """
+        res = self.http.request(
+            "GET",
+            "1.1",
+            "/trends/available.json",
+            auth=True
+        )
+        for data in res:
+            data["parent_id"] = data["parentid"]
+            data.pop("parentid")
+        
+        return [Location(**data) for data in res]
+
+    def search_trend_closest(self, lat: int, long: int):
+        """Search the rend closest to the lat and long.
+
+        parameters
+        ------------
+        lat: :class:`int`
+            If provided with a long parameter the available trend locations will be sorted by distance, nearest to furthest, to the co-ordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive. 
+        long: :class:`int`
+            If provided with a lat parameter the available trend locations will be sorted by distance, nearest to furthest, to the co-ordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.        -122.400612831116
+
+
+        .. versionadded:: 1.5.0
+        """
+        res = self.http.request(
+            "GET",
+            "1.1",
+            "/trends/available.json",
+            params={
+                "lat": lat,
+                "long": long
+            },
+            auth=True
+        )
+        
+        return [Location(**data) for data in res]
 
     def get_message(self, event_id: Union[str, int] = None) -> Optional[DirectMessage]:
         """Get a direct message through the client message cache. Returns None if the message is not in the cache.
