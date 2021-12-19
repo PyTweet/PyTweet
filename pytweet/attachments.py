@@ -5,7 +5,7 @@ import datetime
 import io
 import os
 from typing import Any, Dict, List, NoReturn, Optional, Union
-from .models import PollOption, Option, Button
+from .dataclass import PollOption, Option, Button
 
 from .entities import Media
 from .enums import ButtonType
