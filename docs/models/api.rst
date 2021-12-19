@@ -1,13 +1,13 @@
-.. currentmodule:: pytweet.models
+.. currentmodule:: pytweet.dataclass
 
 API Reference
 ===============
 
 
-The following section outlines the API of pytweet.models.
+The following section outlines the API of pytweet.dataclass.
 
 
-Classes-Models
+Dataclass
 --------
 
 PollOption
