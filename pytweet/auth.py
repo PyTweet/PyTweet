@@ -3,8 +3,9 @@ from __future__ import annotations
 import base64
 import random  
 import string 
-import hashlib
-from datetime import datetime
+import datetime
+
+from requests.auth import HTTPBasicAuth
 from random import randint
 from typing import Tuple, Optional, TYPE_CHECKING
 from requests_oauthlib import OAuth1, OAuth1Session
@@ -99,7 +100,7 @@ class OauthSession(OAuth1Session):
         self.consumer_key_secret = consumer_secret
         self.access_token = None
         self.access_token_secret = None
-        self.callback = callback
+        self.callback_uri = callback
         self.client_id = client_id  
 
     @staticmethod
@@ -143,7 +144,7 @@ class OauthSession(OAuth1Session):
             "",
             "oauth/request_token",
             params={
-                "oauth_callback": self.callback,
+                "oauth_callback": self.callback_uri,
                 "x_auth_access_type": auth_access_type,
             },
             auth=True,
@@ -155,31 +156,6 @@ class OauthSession(OAuth1Session):
         ) = request_tokens.split("&")
         url = "https://api.twitter.com/oauth/authorize" + f"?{oauth_token}"
         return url
-
-    def generate_oauth2_url(self, state: str, scope: Scope):
-        if not state:
-            state = ''.join(random.choices(string.ascii_uppercase + string.digits, k = 10)).lower()
-        else:
-            state = base64.b64decode(state.encode())
-
-        now = datetime.now()
-        timestamp = now.strftime("%m%d%Y%H%M%S")
-        random_append = randint(1000, 100000)
-        rand_dec = randint(300, 800)
-
-        state = base64.b64encode(state.encode()).decode()
-        code_challenge = "{}{}.{}".format(timestamp, random_append, rand_dec)
-        client_id = self.client_id
-        response_type = "code"
-        scope = scope.values
-        print(scope)
-        code_challenge_method = "plain"
-
-        return f"https://twitter.com/i/oauth2/authorize?response_type={response_type}&client_id={client_id}&redirect_uri={self.callback}&scope={scope}&state={state}&code_challenge={code_challenge}&code_challenge_method={code_challenge_method}"
-
-        
-
-
 
     def post_oauth_token(self, oauth_token: str, oauth_verifier: str) -> Optional[Tuple[str]]:
         """Post the oauth token & verifier, this method will returns a pair of access token & secret.
@@ -208,7 +184,30 @@ class OauthSession(OAuth1Session):
 
         return tuple(res.split("&"))
 
-    
+    def generate_oauth2_url(self, *,scope: Scope, code_challenge_method: str = "plain", state: Optional[str] = None):
+        code_challenge_method = code_challenge_method.lower()
+        assert code_challenge_method in ["plain", "s256"], "Wrong code_challenge_method passed: must be 'plain' or 's256'"
+        
+        if not state:
+            state = ''.join(random.choices(string.ascii_uppercase + string.digits, k = 10)).lower()
+        else:
+            state = base64.b64decode(state.encode())
+
+        now = datetime.datetime.now()
+        timestamp = now.strftime("%m%d%Y%H%M%S")
+        random_append = randint(1000, 100000)
+        rand_dec = randint(300, 800)
+
+        state = base64.b64encode(state.encode()).decode()
+        code_challenge = "{}{}.{}".format(timestamp, random_append, rand_dec)
+        client_id = self.client_id
+        response_type = "code"
+        scope = scope.values
+
+        return f"https://twitter.com/i/oauth2/authorize?response_type={response_type}&client_id={client_id}&redirect_uri={self.callback_uri}&scope={scope}&state={state}&code_challenge={code_challenge}&code_challenge_method={code_challenge_method}"
+
+    def post_auth_code(self, code: str):
+        ...
 
     @property
     def oauth1(self) -> OAuth1:
@@ -221,7 +220,7 @@ class OauthSession(OAuth1Session):
             client_secret=self.consumer_key_secret,
             resource_owner_key=self.access_token,
             resource_owner_secret=self.access_token_secret,
-            callback_uri=self.callback,
+            callback_uri=self.callback_uri,
             decoding=None,
         )
 
