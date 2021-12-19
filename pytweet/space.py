@@ -112,15 +112,32 @@ class Space:
         .. versionadded:: 1.3.5
         """
         return time_parse_todt(self._payload.get("updated_at"))
-
-    def is_ticketed(self) -> bool:
+    
+    @property
+    def ticketed(self) -> bool:
         """Returns a bool indicate if the space is ticketed.
 
         Returns
         ---------
         :class:`bool`
-            This method returns a bool object.
+            This method returns a :class:`bool` object.
 
-        .. versionadded:: 1.3.5
+        .. versionadded:: 1.5.0
         """
         return self._payload.get("is_ticketed")
+
+    def is_ticketed(self) -> bool:
+        """An alias to :meth:`Space.ticketed`.
+
+        Returns
+        ---------
+        :class:`bool`
+            This method returns a :class:`bool` object.
+
+
+        .. versionadded:: 1.3.5
+
+        .. versionchanged:: 1.5.0
+            Made as an alias to :meth:`Space.ticketed`.
+        """
+        return self.ticketed

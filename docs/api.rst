@@ -37,6 +37,36 @@ Client
 .. autoclass:: Client
     :members:
 
+Application
+----------------
+
+ApplicationInfo
+~~~~~~~
+
+.. attributetable:: ApplicationInfo
+
+.. autoclass:: ApplicationInfo
+    :members:
+
+Environment
+----------------
+
+Webhook
+~~~~~~~
+
+.. attributetable:: Webhook
+
+.. autoclass:: Webhook
+    :members:
+
+Environment
+~~~~~~~
+
+.. attributetable:: Environment
+
+.. autoclass:: Environment
+    :members:
+
 
 Twitter Models
 ---------------------
@@ -50,6 +80,14 @@ User
 .. attributetable:: User
 
 .. autoclass:: User
+    :members:
+
+ClientAccount
+~~~~~~~
+
+.. attributetable:: ClientAccount
+
+.. autoclass:: ClientAccount
     :members:
 
 Tweet
@@ -68,11 +106,6 @@ Space
 .. autoclass:: Space
     :members:
 
-
-Messages
----------------------
-
-These following object are not meant to be create as an instance rather its for knowledge of what you can do with them.
 
 Message
 ~~~~~~~
@@ -247,6 +280,8 @@ RelationHide
 Embeds
 ----------------
 
+The embedded urls object returned by :class:`Tweet.embeds`.
+
 Embed
 ~~~~~~~
 
@@ -263,6 +298,52 @@ EmbedsImages
 
 
 .. autoclass:: EmbedsImages
+    :members:
+
+
+Entities
+----------------
+
+Objects derives from entities.py
+
+Hashtags
+~~~~~~~
+
+.. attributetable:: Hashtags
+
+.. autoclass:: Hashtags
+    :members:
+
+UserMentions
+~~~~~~~
+
+.. attributetable:: UserMentions
+
+.. autoclass:: UserMentions
+    :members:
+
+Urls
+~~~~~~~
+
+.. attributetable:: Urls
+
+.. autoclass:: Urls
+    :members:
+
+Symbols
+~~~~~~~
+
+.. attributetable:: Symbols
+
+.. autoclass:: Symbols
+    :members:
+
+Media
+~~~~~~~
+
+.. attributetable:: Media
+
+.. autoclass:: Media
     :members:
 
 

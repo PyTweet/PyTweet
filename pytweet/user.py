@@ -102,7 +102,7 @@ class User:
         )
 
     def follow(self) -> RelationFollow:
-        """Make a Request to follow a User.
+        """Method to follow the User.
 
         Parameters
         ------------
@@ -128,7 +128,7 @@ class User:
         return RelationFollow(res)
 
     def unfollow(self) -> RelationFollow:
-        """Make a DELETE Request to unfollow a User.
+        """Method to unfollow the User.
 
         Parameters
         ------------
@@ -148,7 +148,7 @@ class User:
         return RelationFollow(res)
 
     def block(self) -> None:
-        """Make a POST Request to Block a User.
+        """Method to block the user.
 
         Parameters
         ------------
@@ -168,7 +168,7 @@ class User:
         )
 
     def unblock(self) -> None:
-        """Make a DELETE Request to unblock a User.
+        """Method to unblock the user.
 
         Parameters
         ------------
@@ -182,7 +182,7 @@ class User:
         self.http_client.request("DELETE", "2", f"/users/{my_id}/blocking/{self.id}", auth=True)
 
     def mute(self) -> None:
-        """Make a POST Request to mute a User.
+        """Method to mute the user.
 
         Parameters
         ------------
@@ -202,7 +202,7 @@ class User:
         )
 
     def unmute(self) -> None:
-        """Make a DELETE Request to unmute the User.
+        """Method to unmute the user.
 
         Parameters
         ------------
@@ -216,10 +216,10 @@ class User:
         self.http_client.request("DELETE", "2", f"/users/{my_id}/muting/{self.id}", auth=True)
 
     def trigger_typing(self):
-        """Indicates that the client is typing in a user Dm.
+        """Trigger the typing animation in the user's dm.
 
         .. versionadded:: 1.3.5
-        """
+        """ #TODO Returns a context manager | Or thread it.
         self.http_client.request(
             "POST",
             "1.1",
@@ -233,8 +233,8 @@ class User:
 
         Parameters
         -----------
-        block:
-            Indicates that the client perform a block action to the user if set to True. Default to True.
+        block: :class:`bool`
+            Indicates to perform a block action to the user if set to True. Default to True.
 
 
         .. versionadded:: 1.3.5
@@ -479,7 +479,7 @@ class User:
 
     @property
     def created_at(self) -> datetime.datetime:
-        """Optional[:class:`datetime.datetime`] Returns a datetime.datetime object with the user's account date.
+        """Optional[:class:`datetime.datetime`]: Returns a datetime.datetime object with the user's account date.
 
         .. versionadded: 1.0.0
         """

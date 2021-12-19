@@ -387,6 +387,7 @@ class Tweet(Message):
         Optional[List[:class:`User`], List]
             This method returns a list of :class:`User` objects
 
+
         .. versionadded:: 1.1.3
         """
         res = self.http_client.request(
@@ -409,6 +410,7 @@ class Tweet(Message):
         Optional[List[:class:`User`], List]
             This method returns a list of :class:`User` objects
 
+
         .. versionadded:: 1.1.3
         """
         res = self.http_client.request(
@@ -430,6 +432,7 @@ class Tweet(Message):
         ---------
         Optional[:class:`User`]
             This method returns a :class:`User` object or :class:`NoneType`
+
 
         .. versionadded:: 1.1.3
         """
