@@ -38,6 +38,7 @@ if TYPE_CHECKING:
     RequestModel = Dict[str, Any]
     ResponseModel = Optional[Union[str, RequestModel]]
 
+
 class HTTPClient:
     def __init__(
         self,
@@ -49,7 +50,7 @@ class HTTPClient:
         access_token_secret: Optional[str],
         stream: Optional[Stream] = None,
         callback_url: Optional[str] = None,
-        client_id: Optional[str] = None
+        client_id: Optional[str] = None,
     ) -> Union[None, NoReturn]:
         self.credentials: Dict[str, Optional[str]] = {
             "bearer_token": bearer_token,
@@ -120,7 +121,7 @@ class HTTPClient:
         auth: bool = False,
         is_json: bool = True,
         use_base_url: bool = True,
-        basic_auth: bool = False
+        basic_auth: bool = False,
     ) -> ResponseModel:
         if use_base_url:
             url = self.base_url + version + path
@@ -129,8 +130,11 @@ class HTTPClient:
 
         if self._auth is None:
             auth_session = OauthSession(
-                self.consumer_key, self.consumer_key_secret, http_client=self, callback=self.callback_url,
-                client_id=self.client_id
+                self.consumer_key,
+                self.consumer_key_secret,
+                http_client=self,
+                callback=self.callback_url,
+                client_id=self.client_id,
             )
             auth_session.set_access_token(self.access_token, self.access_token_secret)
             self._auth = auth_session
@@ -146,14 +150,14 @@ class HTTPClient:
             for k, v in self.credentials.items():
                 if v is None:
                     raise PytweetException(f"{k} is a required credential for this action.")
-        
+
         if basic_auth:
             encoded = base64.b64encode(bytes(f"{self.client_id}:{self.consumer_key_secret}", "utf-8"))
             headers["Authorization"] = f"Basic {str(encoded)}"
 
         if data:
             json = None
-            
+
         if json:
             data = None
 
@@ -181,7 +185,6 @@ class HTTPClient:
         if code in (201, 202, 204):
             return
 
-
         elif code == 400:
             raise BadRequests(response)
 
@@ -196,7 +199,7 @@ class HTTPClient:
 
         elif code == 409:
             raise Conflict(response)
-        
+
         elif code in (420, 429):
             remaining = int(response.headers["x-rate-limit-reset"])
             sleep_for = (remaining - int(time.time())) + 1

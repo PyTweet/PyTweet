@@ -72,11 +72,13 @@ class HTTPException(PytweetException):
             return None
         return self.response.status_code
 
+
 class BadRequests(HTTPException):
     """This class inherits :class:`HTTPException`. raises when a request return status code: 400.
 
     .. versionadded:: 1.2.0
     """
+
     pass
 
 
@@ -85,6 +87,7 @@ class Unauthorized(HTTPException):
 
     .. versionadded:: 1.0.0
     """
+
     pass
 
 
@@ -98,7 +101,8 @@ class Forbidden(HTTPException):
 
 
 class FieldsTooLarge(HTTPException):
-    """"This class inherits :class:`HTTPException`. Raises when a request returns status code: 431"""
+    """ "This class inherits :class:`HTTPException`. Raises when a request returns status code: 431"""
+
     pass
 
 
@@ -107,6 +111,7 @@ class NotFound(HTTPException):
 
     .. versionadded:: 1.2.0
     """
+
     pass
 
 
@@ -124,6 +129,7 @@ class ConnectionException(HTTPException):
 
     .. versionadded:: 1.3.5
     """
+
     pass
 
 

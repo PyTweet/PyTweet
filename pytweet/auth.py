@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import base64
-import random  
-import string 
+import random
+import string
 import datetime
 
 from requests.auth import HTTPBasicAuth
@@ -18,7 +18,26 @@ __all__ = ("OauthSession", "Scope")
 
 
 class Scope:
-    def __init__(self, *,tweet_read: bool = False, tweet_write: bool = False, tweet_moderate_write: bool = False, users_read: bool = False, follows_read: bool = False, follows_write: bool = False, offline_access: bool = False, space_read: bool = False, mute_read: bool = False, mute_write: bool = False, like_read: bool = False, like_write: bool = False, list_read: bool = False, list_write: bool = False, block_read: bool = False, block_write: bool = False):
+    def __init__(
+        self,
+        *,
+        tweet_read: bool = False,
+        tweet_write: bool = False,
+        tweet_moderate_write: bool = False,
+        users_read: bool = False,
+        follows_read: bool = False,
+        follows_write: bool = False,
+        offline_access: bool = False,
+        space_read: bool = False,
+        mute_read: bool = False,
+        mute_write: bool = False,
+        like_read: bool = False,
+        like_write: bool = False,
+        list_read: bool = False,
+        list_write: bool = False,
+        block_read: bool = False,
+        block_write: bool = False,
+    ):
         self.tweet_read = "tweet.read" if tweet_read else None
         self.tweet_write = "tweet.write" if tweet_write else None
         self.tweet_moderate_write = "tweet.moderate.write" if tweet_moderate_write else None
@@ -38,17 +57,53 @@ class Scope:
 
     @classmethod
     def read_only(cls, offline_access: bool = False):
-        self = cls(tweet_read=True, users_read=True, follows_read=True, space_read=True, mute_read=True, like_read=True, list_read=True, block_read=True, offline_access=offline_access)
+        self = cls(
+            tweet_read=True,
+            users_read=True,
+            follows_read=True,
+            space_read=True,
+            mute_read=True,
+            like_read=True,
+            list_read=True,
+            block_read=True,
+            offline_access=offline_access,
+        )
         return self
 
     @classmethod
     def write_only(cls, offline_access: bool = False):
-        self = cls(tweet_write=True, follows_write=True, mute_write=True, like_write=True, list_write=True, block_write=True, tweet_moderate_write=True, offline_access=offline_access)
+        self = cls(
+            tweet_write=True,
+            follows_write=True,
+            mute_write=True,
+            like_write=True,
+            list_write=True,
+            block_write=True,
+            tweet_moderate_write=True,
+            offline_access=offline_access,
+        )
         return self
 
     @classmethod
     def all(cls, offline_access: bool = False):
-        self = cls(tweet_read=True, users_read=True, follows_read=True, space_read=True, mute_read=True, like_read=True, list_read=True, block_read=True, tweet_write=True, follows_write=True, mute_write=True, like_write=True, list_write=True, block_write=True, tweet_moderate_write=True, offline_access=offline_access)
+        self = cls(
+            tweet_read=True,
+            users_read=True,
+            follows_read=True,
+            space_read=True,
+            mute_read=True,
+            like_read=True,
+            list_read=True,
+            block_read=True,
+            tweet_write=True,
+            follows_write=True,
+            mute_write=True,
+            like_write=True,
+            list_write=True,
+            block_write=True,
+            tweet_moderate_write=True,
+            offline_access=offline_access,
+        )
         return self
 
     @property
@@ -57,13 +112,14 @@ class Scope:
         for attr in dir(self):
             if "_read" in attr or "_write" in attr or "_access" in attr:
                 try:
-                    e=getattr(self, attr)
+                    e = getattr(self, attr)
                     if e:
                         value += f"{e}%20"
                 except Exception:
                     continue
-        
+
         return value.rstrip("%20")
+
 
 class OauthSession(OAuth1Session):
     """Represents an OauthSession for Oauth1 Authorization. This class is very importantfo
@@ -101,7 +157,7 @@ class OauthSession(OAuth1Session):
         self.access_token = None
         self.access_token_secret = None
         self.callback_uri = callback
-        self.client_id = client_id  
+        self.client_id = client_id
 
     @staticmethod
     def invalidate_access_token(client: Client) -> None:
@@ -184,12 +240,15 @@ class OauthSession(OAuth1Session):
 
         return tuple(res.split("&"))
 
-    def generate_oauth2_url(self, *,scope: Scope, code_challenge_method: str = "plain", state: Optional[str] = None):
+    def generate_oauth2_url(self, *, scope: Scope, code_challenge_method: str = "plain", state: Optional[str] = None):
         code_challenge_method = code_challenge_method.lower()
-        assert code_challenge_method in ["plain", "s256"], "Wrong code_challenge_method passed: must be 'plain' or 's256'"
-        
+        assert code_challenge_method in [
+            "plain",
+            "s256",
+        ], "Wrong code_challenge_method passed: must be 'plain' or 's256'"
+
         if not state:
-            state = ''.join(random.choices(string.ascii_uppercase + string.digits, k = 10)).lower()
+            state = "".join(random.choices(string.ascii_uppercase + string.digits, k=10)).lower()
         else:
             state = base64.b64decode(state.encode())
 

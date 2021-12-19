@@ -74,7 +74,7 @@ class Client:
         access_token_secret: Optional[str] = None,
         stream: Optional[Stream] = None,
         callback_url: Optional[str] = None,
-        client_id: Optional[str] = None
+        client_id: Optional[str] = None,
     ) -> None:
         self.http = HTTPClient(
             bearer_token,
@@ -84,7 +84,7 @@ class Client:
             access_token_secret=access_token_secret,
             stream=stream,
             callback_url=callback_url,
-            client_id=client_id
+            client_id=client_id,
         )
         self._account_user: Optional[User] = None  # set in account property.
         self.webhook: Optional[Webhook] = None
@@ -570,7 +570,7 @@ class Client:
         **kwargs: Any,
     ):
         """Listen to upcoming account activity events send by twitter to your webhook url. You can use the rest of Flask arguments like port or host via the kwargs argument.
-        
+
         Parameters
         ------------
         app: :class:`flask.Flask`
