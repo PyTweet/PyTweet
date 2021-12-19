@@ -206,14 +206,16 @@ StreamRule
 Relations
 ----------------
 
+Relations is an object that returns from a user action or a tweet action. This include but not limited to: :class:`Tweet.like`, :class:`Tweet.retweet`, :class:`Tweet.hide`, and :class:`User.follow`.
+
 RelationFollow
 ~~~~~~~
-
 
 .. attributetable:: RelationFollow
 
 .. autoclass:: RelationFollow
     :members:
+
 
 RelationLike
 ~~~~~~~
@@ -230,6 +232,15 @@ RelationRetweet
 .. attributetable:: RelationRetweet
 
 .. autoclass:: RelationRetweet
+    :members:
+
+
+RelationHide
+~~~~~~~
+
+.. attributetable:: RelationHide
+
+.. autoclass:: RelationHide
     :members:
 
 
