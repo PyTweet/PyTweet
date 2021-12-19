@@ -5,6 +5,7 @@ import logging
 import sys
 import time
 import requests
+import base64
 from json import JSONDecodeError
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
@@ -36,65 +37,6 @@ _log = logging.getLogger(__name__)
 if TYPE_CHECKING:
     RequestModel = Dict[str, Any]
     ResponseModel = Optional[Union[str, RequestModel]]
-
-
-# def check_error(response: requests.models.Response) -> NoReturn:
-#     code = response.status_code
-#     if code == 200:
-#         try:
-#             res = response.json()
-#             if "errors" in res.keys():
-#                 if res.get("errors"):
-#                     if "detail" in res.get("errors")[0].keys():
-#                         detail = res["errors"][0]["detail"]
-#                         if detail.startswith("Could not find"):
-#                             raise NotFoundError(response)
-#                     elif "details" in res.get("errors")[0].keys():
-#                         detail = res["errors"][0]["details"][0]
-#                         if detail.startswith("Cannot parse rule"):
-#                             _log.warning(
-#                                 f"Invalid stream rule! Rules Info: 'created': {res['meta']['summary'].get('created')}, 'not_created': {res['meta']['summary'].get('not_created')}, 'valid': {res['meta']['summary'].get('valid')}, 'invalid': {res['meta']['summary'].get('invalid')}"
-#                             )
-#                             raise SyntaxError(detail)
-
-
-#                 else:
-#                     raise PytweetException(response, res["errors"][0]["detail"])
-#         except (JSONDecodeError, KeyError) as e:
-#             if isinstance(e, KeyError):
-#                 raise PytweetException(res)
-#             return
-
-#     elif code in (201, 202, 204):
-#         pass
-
-#     elif code == 400:
-#         raise BadRequests(response)
-
-#     elif code == 401:
-#         raise Unauthorized(response)
-
-#     elif code == 403:
-#         raise Forbidden(response)
-
-#     elif code == 404:
-#         raise NotFound(response)
-
-#     elif code == 409:
-#         raise Conflict(response)
-
-#     elif code == 429:
-#         remaining = int(response.headers["x-rate-limit-reset"])
-#         sleep_for = (remaining - int(time.time())) + 1
-#         _log.warn(f"Client has been ratelimited. Sleeping for {sleep_for}")
-#         time.sleep(sleep_for)
-
-
-#     else:
-#         raise PytweetException(
-#             f"Unknown exception raised (status code: {response.status_code}): Open an issue in github or go to the support server to report this unknown exception!"
-#         )
-
 
 class HTTPClient:
     def __init__(
@@ -178,6 +120,7 @@ class HTTPClient:
         auth: bool = False,
         is_json: bool = True,
         use_base_url: bool = True,
+        basic_auth: bool = False
     ) -> ResponseModel:
         if use_base_url:
             url = self.base_url + version + path
@@ -203,9 +146,14 @@ class HTTPClient:
             for k, v in self.credentials.items():
                 if v is None:
                     raise PytweetException(f"{k} is a required credential for this action.")
+        
+        if basic_auth:
+            encoded = base64.b64encode(bytes(f"{self.client_id}:{self.consumer_key_secret}", "utf-8"))
+            headers["Authorization"] = f"Basic {str(encoded)}"
 
         if data:
             json = None
+            
         if json:
             data = None
 
@@ -232,6 +180,7 @@ class HTTPClient:
 
         if code in (201, 202, 204):
             return
+
 
         elif code == 400:
             raise BadRequests(response)
