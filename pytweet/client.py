@@ -433,8 +433,7 @@ class Client:
         """
         return self.http.search_geo(query, max_result, lat=lat, long=long, ip=ip, granularity=granularity)
 
-    def search_trend_with_place(self, woeid: Union[str, int], exclude: Optional[str] = None
-    ):
+    def search_trend_with_place(self, woeid: Union[str, int], exclude: Optional[str] = None):
         """Search trends with woeid.
 
         .. note::
@@ -447,38 +446,26 @@ class Client:
         exclude: Optional[:class:`str`]
             Setting this equal to hashtags will remove all hashtags from the trends list.
 
-        
-        .. versionadded:: 1.5.0
-        """
-        res = self.http.request(
-            "GET",
-            "1.1",
-            "/trends/place.json",
-            params={
-                "id": str(woeid),
-                "exclude": exclude
-            },
-            auth=True
-        )
-        
-        return [Trend(**data) for data in res[0].get("trends")]
-    
-    def search_trend_locations(self):
-        """Search locations that Twitter has trending topic information.
-        
 
         .. versionadded:: 1.5.0
         """
         res = self.http.request(
-            "GET",
-            "1.1",
-            "/trends/available.json",
-            auth=True
+            "GET", "1.1", "/trends/place.json", params={"id": str(woeid), "exclude": exclude}, auth=True
         )
+
+        return [Trend(**data) for data in res[0].get("trends")]
+
+    def search_trend_locations(self):
+        """Search locations that Twitter has trending topic information.
+
+
+        .. versionadded:: 1.5.0
+        """
+        res = self.http.request("GET", "1.1", "/trends/available.json", auth=True)
         for data in res:
             data["parent_id"] = data["parentid"]
             data.pop("parentid")
-        
+
         return [Location(**data) for data in res]
 
     def search_trend_closest(self, lat: int, long: int):
@@ -487,24 +474,15 @@ class Client:
         parameters
         ------------
         lat: :class:`int`
-            If provided with a long parameter the available trend locations will be sorted by distance, nearest to furthest, to the co-ordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive. 
+            If provided with a long parameter the available trend locations will be sorted by distance, nearest to furthest, to the co-ordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.
         long: :class:`int`
             If provided with a lat parameter the available trend locations will be sorted by distance, nearest to furthest, to the co-ordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.        -122.400612831116
 
 
         .. versionadded:: 1.5.0
         """
-        res = self.http.request(
-            "GET",
-            "1.1",
-            "/trends/available.json",
-            params={
-                "lat": lat,
-                "long": long
-            },
-            auth=True
-        )
-        
+        res = self.http.request("GET", "1.1", "/trends/available.json", params={"lat": lat, "long": long}, auth=True)
+
         return [Location(**data) for data in res]
 
     def get_message(self, event_id: Union[str, int] = None) -> Optional[DirectMessage]:

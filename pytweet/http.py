@@ -361,11 +361,7 @@ class HTTPClient:
             "GET",
             "2",
             f"/users?ids={ids}",
-            params={
-                "expansions": "pinned_tweet_id", 
-                "user.fields": USER_FIELD, 
-                "tweet.fields": TWEET_FIELD
-            },
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
             auth=True,
         )
 
