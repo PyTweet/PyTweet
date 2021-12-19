@@ -586,7 +586,7 @@ class Client:
             indicates to use ngrok for tunneling your localhost. This usually uses for users that use localhost url.
         disabled_log: :class:`bool`
             A kwarg that indicates to disable flask's log so it does not print the request process in your terminal, this also will disable `werkzeug` log.
-        make_new: :class:`bool`:
+        make_new: :class:`bool`
             A kwarg indicates to make a new webhook url when the api cant find the url passed. Default to True.
 
 

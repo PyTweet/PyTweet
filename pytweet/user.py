@@ -315,9 +315,9 @@ class User:
         ------------
         max_results: :class:`int`
             Specified how many tweets should be return.
-        start_time: Optional[:class:`datetime.datetime`]:
+        start_time: Optional[:class:`datetime.datetime`]
             This will make sure the tweets created datetime is after that specific time.
-        end_time: Optional[:class:`datetime.datetime`]:
+        end_time: Optional[:class:`datetime.datetime`]
             This will make sure the tweets created datetime is before that specific time.
         since_id: Optional[Union[:class:`str`, :class:`int`]]
             Returns results with a Tweet ID greater than (that is, more recent than) the specified 'since' Tweet ID. Only the 3200 most recent Tweets are available. The result will exclude the since_id. If the limit of Tweets has occurred since the since_id, the since_id will be forced to the oldest ID available.
@@ -431,7 +431,7 @@ class User:
 
     @property
     def profile_image_url(self) -> Optional[str]:
-        """Optional[:class:`str`]: Return the user profile image.
+        """Optional[:class:`str`] Return the user profile image.
 
         .. versionadded: 1.0.0
         """
@@ -479,7 +479,7 @@ class User:
 
     @property
     def created_at(self) -> datetime.datetime:
-        """Optional[:class:`datetime.datetime`]: Returns a datetime.datetime object with the user's account date.
+        """Optional[:class:`datetime.datetime`] Returns a datetime.datetime object with the user's account date.
 
         .. versionadded: 1.0.0
         """
@@ -539,17 +539,17 @@ class ClientAccount(User):
 
         Parameters
         ------------
-        lang: Optional[:class:`str`]:
+        lang: Optional[:class:`str`]
             The new language replacing the old one.
-        enabled_sleep_time: Optional[:class:`bool`]:
+        enabled_sleep_time: Optional[:class:`bool`]
             Indicates to enabled sleep time.
-        start_sleep_time: Optional[:class:`int`]:
+        start_sleep_time: Optional[:class:`int`]
             The hour that sleep time should begin if it is enabled. Must be an instance of datetime.datetime.
-        end_sleep_time: Optional[:class:`int`]:
+        end_sleep_time: Optional[:class:`int`]
             The hour that sleep time should end if it is enabled. Must be an instance of datetime.datetime.
-        timezone: Optional[:class:`Timezone`]:
+        timezone: Optional[:class:`Timezone`]
             The new timezone replacing the old one. Must be an instance of :class:`Timezone` (e.g :class:`Timezone`.jakarta or :class:`Timezone`.paris)
-        location: Optional[:class:`int`]:
+        location: Optional[:class:`int`]
             The Yahoo! Where On Earth ID to use as the user's default trend location. Global information is available by using 1 as the WOEID. Must be an instance of :class:`Location` or the woeid in :class:`int`.
 
 
@@ -618,17 +618,17 @@ class ClientAccount(User):
         
         Parameters
         ------------
-        name: Optional[:class:`str`]:
+        name: Optional[:class:`str`]
             The new name replacing the client's oldname. Note that this isn't going to update the username.
-        description: Optional[:class:`str`]:
+        description: Optional[:class:`str`]
             The new description that you want to replace with the old version.
-        image: Optional[:class:`File`]:
+        image: Optional[:class:`File`]
             The new image that you want to replace with the old version. Must be an instance of :class:`File`.
-        location: Optional[:class:`Geo`]:
+        location: Optional[:class:`Geo`]
             The new location you want to replace with the old version. Must be an instance of :class:`Geo` or the fullname of geo. You use :meth:`Geo.fullname` to get the fullname.
-        profile_url: Optional[:class:`str`]:
+        profile_url: Optional[:class:`str`]
             URL associated with the profile. Will be prepended with http:// if not present.
-        profile_link_color: Optional[:class:`str`]:
+        profile_link_color: Optional[:class:`str`]
             Sets a hex value that controls the color scheme of links used on the authenticating user's profile page on twitter.com. This must be a valid hexadecimal value, and may be either three or six characters (ex: F00 or FF0000 in string). If you instead use int, the process will use hex() function to change the int value to a hex value.
         
         
@@ -686,15 +686,15 @@ class ClientAccount(User):
 
         Parameters
         ------------
-        banner: :class:`File`:
+        banner: :class:`File`
             The new banner to replace the old one. Must be an instance of :class:`File`.
-        width: :class:`int`:
+        width: :class:`int`
             The width of the preferred section of the image being uploaded in pixels. Use with height , offset_left , and offset_top to select the desired region of the image to use.
-        height: :class:`int`:
+        height: :class:`int`
             The height of the preferred section of the image being uploaded in pixels. Use with width , offset_left , and offset_top to select the desired region of the image to use.
-        offset_left: :class:`int`:      
+        offset_left: :class:`int`      
             The number of pixels by which to offset the uploaded image from the left. Use with height , width , and offset_top to select the desired region of the image to use.
-        offset_top: :class:`int`:
+        offset_top: :class:`int`
             The number of pixels by which to offset the uploaded image from the top. Use with height , width , and offset_left to select the desired region of the image to use.
         
 
