@@ -10,7 +10,6 @@ PyTweet is a Synchronous python API wrapper for Twitter's API!
 import logging
 from typing import Literal, NamedTuple
 
-from . import models
 from .app import *
 from .attachments import *
 from .auth import *
