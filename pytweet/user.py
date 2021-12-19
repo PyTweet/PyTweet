@@ -4,13 +4,13 @@ import io
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
-from .attachments import CTA, CustomProfile, File, QuickReply
+from .attachments import Geo, CTA, CustomProfile, File, QuickReply
 from .expansions import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_EXPANSION, TWEET_FIELD, USER_FIELD
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import build_object, time_parse_todt
 from .enums import Timezone
-from .models import UserSettings, SleepTimeSettings, Location, TimezoneInfo
+from .dataclass import UserSettings, SleepTimeSettings, Location, TimezoneInfo
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -439,7 +439,7 @@ class User:
 
     @property
     def url(self) -> Optional[str]:
-        """:class:`str`: Return url where the user put url, return an empty string if there isn't a url
+        """:class:`str`: Return url that associated with the user profile.
 
         .. versionadded: 1.0.0
         """
@@ -521,10 +521,88 @@ class User:
 
 
 class ClientAccount(User):
-    """Represents the client's account. This inherits :class:`User` object. This class unlock methods that you can use only for the client. Like updating settings which you can only do with the client's account.
+    """Represents the client's account. This inherits :class:`User` object. This class unlock methods that you can only use for the authenticated user (the client).
 
     .. versionadded:: 1.5.0
     """
+    def update_setting(
+        self,
+        *,
+        lang: Optional[str] = None,
+        enabled_sleep_time: Optional[bool] = None,
+        start_sleep_time: Optional[datetime.datetime] = None,
+        end_sleep_time: Optional[datetime.datetime] = None,
+        timezone: Optional[Timezone] = None,
+        location: Optional[Location, int] = None,
+    ):
+        """Update the user settings.
+
+        Parameters
+        ------------
+        lang: Optional[:class:`str`]:
+            The new language replacing the old one.
+        enabled_sleep_time: Optional[:class:`bool`]:
+            Indicates to enabled sleep time.
+        start_sleep_time: Optional[:class:`int`]:
+            The hour that sleep time should begin if it is enabled. Must be an instance of datetime.datetime.
+        end_sleep_time: Optional[:class:`int`]:
+            The hour that sleep time should end if it is enabled. Must be an instance of datetime.datetime.
+        timezone: Optional[:class:`Timezone`]:
+            The new timezone replacing the old one. Must be an instance of :class:`Timezone` (e.g :class:`Timezone`.jakarta or :class:`Timezone`.paris)
+        location: Optional[:class:`int`]:
+            The Yahoo! Where On Earth ID to use as the user's default trend location. Global information is available by using 1 as the WOEID. Must be an instance of :class:`Location` or the woeid in :class:`int`.
+
+
+        .. versionadded:: 1.5.0
+        """
+        res = self.http_client.request(
+            "POST",
+            "1.1",
+            "/account/settings.json",
+            params={
+                "sleep_time_enabled": enabled_sleep_time,
+                "start_sleep_time": start_sleep_time,
+                "end_sleep_time": end_sleep_time,
+                "time_zone": timezone.value,
+                "trend_location_woeid": location.woeid if isinstance(location, Location) else location,
+                "lang": lang,
+            },
+            auth=True,
+        )
+        if res.get("sleep_time"):
+            res["sleep_time_setting"] = SleepTimeSettings(**res["sleep_time"])
+            res.pop("sleep_time")
+
+        if res.get("location"):
+            res["location"] = Location(**res["trend_location"])
+
+        if res.get("time_zone"):
+            res["time_zone"]["name_info"] = res["time_zone"]["tzinfo_name"]
+            res["time_zone"].pop("tzinfo_name")
+            res["timezone"] = TimezoneInfo(**res["time_zone"])
+            res.pop("time_zone")
+
+        return UserSettings(**res)
+
+    def fetch_settings(self):
+        """Fetch the user settings.
+        
+
+        .. versionadded:: 1.5.0
+        """
+        res = self.http_client.request("GET", "1.1", "/account/settings.json", auth=True)
+        if res.get("sleep_time"):
+            res["sleep_time_setting"] = SleepTimeSettings(**res["sleep_time"])
+            res.pop("sleep_time")
+
+        if res.get("location"):
+            res["location"] = Location(**res["trend_location"])
+
+        if res.get("time_zone"):
+            res["timezone"] = Timezone(**res["timezone"])
+            res.pop("time_zone")
+
+        return UserSettings(**res)
 
     def update_profile(
         self,
@@ -532,10 +610,30 @@ class ClientAccount(User):
         name: Optional[str] = None,
         description: Optional[str] = None,
         image: Optional[File] = None,
-        location: Optional[str] = None,
+        location: Optional[Union[Geo, str]] = None,
         profile_url: Optional[str] = None,
         profile_link_color: Optional[int] = None,
     ):
+        """Updates the client profile information from the given arguments.
+        
+        Parameters
+        ------------
+        name: Optional[:class:`str`]:
+            The new name replacing the client's oldname. Note that this isn't going to update the username.
+        description: Optional[:class:`str`]:
+            The new description that you want to replace with the old version.
+        image: Optional[:class:`File`]:
+            The new image that you want to replace with the old version. Must be an instance of :class:`File`.
+        location: Optional[:class:`Geo`]:
+            The new location you want to replace with the old version. Must be an instance of :class:`Geo` or the fullname of geo. You use :meth:`Geo.fullname` to get the fullname.
+        profile_url: Optional[:class:`str`]:
+            URL associated with the profile. Will be prepended with http:// if not present.
+        profile_link_color: Optional[:class:`str`]:
+            Sets a hex value that controls the color scheme of links used on the authenticating user's profile page on twitter.com. This must be a valid hexadecimal value, and may be either three or six characters (ex: F00 or FF0000 in string). If you instead use int, the process will use hex() function to change the int value to a hex value.
+        
+        
+        .. versionadded:: 1.5.0
+        """
         if image:
             path = image.path
             if isinstance(path, io.IOBase):
@@ -555,6 +653,10 @@ class ClientAccount(User):
                     auth=True,
                 )
 
+        if isinstance(profile_link_color, int):
+            profile_link_color = hex(profile_link_color).replace("0x", "", 1)
+
+
         res = self.http_client.request(
             "POST",
             "1.1",
@@ -562,9 +664,9 @@ class ClientAccount(User):
             params={
                 "name": name,
                 "description": description,
-                "location": location,
+                "location": location.fullname if isinstance(location, Geo) else location,
                 "url": profile_url,
-                "profile_link_color": profile_link_color,
+                "profile_link_color": str(profile_link_color),
             },
             auth=True,
         )
@@ -572,8 +674,32 @@ class ClientAccount(User):
         return data
 
     def update_profile_banner(
-        self, *, banner: File, width: int = 0, height: int = 0, offset_left: int = 0, offset_top: int = 0
+        self, 
+        *, 
+        banner: File, 
+        width: int = 0, 
+        height: int = 0, 
+        offset_left: int = 0, 
+        offset_top: int = 0
     ) -> None:
+        """Update the profile banner.
+
+        Parameters
+        ------------
+        banner: :class:`File`:
+            The new banner to replace the old one. Must be an instance of :class:`File`.
+        width: :class:`int`:
+            The width of the preferred section of the image being uploaded in pixels. Use with height , offset_left , and offset_top to select the desired region of the image to use.
+        height: :class:`int`:
+            The height of the preferred section of the image being uploaded in pixels. Use with width , offset_left , and offset_top to select the desired region of the image to use.
+        offset_left: :class:`int`:      
+            The number of pixels by which to offset the uploaded image from the left. Use with height , width , and offset_top to select the desired region of the image to use.
+        offset_top: :class:`int`:
+            The number of pixels by which to offset the uploaded image from the top. Use with height , width , and offset_left to select the desired region of the image to use.
+        
+
+        .. versionadded:: 1.5.0
+        """
         path = banner.path
 
         if isinstance(path, io.IOBase):
@@ -596,56 +722,15 @@ class ClientAccount(User):
             )
         return None
 
-    def update_setting(
-        self,
-        *,
-        lang: Optional[str] = None,
-        enabled_sleep_time: Optional[bool] = None,
-        start_sleep_time: Optional[int] = None,
-        end_sleep_time: Optional[int] = None,
-        timezone: Optional[Timezone] = None,
-        trend_location_woeid: Optional[int] = None,
-    ):
-        res = self.http_client.request(
+    def remove_profile_banner(self):
+        """Remove the user profile banner.
+
+
+        .. versionadded:: 1.5.0
+        """
+        self.http_client.request(
             "POST",
             "1.1",
-            "/account/settings.json",
-            params={
-                "sleep_time_enabled": enabled_sleep_time,
-                "start_sleep_time": start_sleep_time,
-                "end_sleep_time": end_sleep_time,
-                "time_zone": timezone.value,
-                "trend_location_woeid": trend_location_woeid,
-                "lang": lang,
-            },
-            auth=True,
+            "/account/remove_profile_banner.json",
+            auth=True
         )
-        if res.get("sleep_time"):
-            res["sleep_time_setting"] = SleepTimeSettings(**res["sleep_time"])
-            res.pop("sleep_time")
-
-        if res.get("location"):
-            res["location"] = Location(**res["trend_location"])
-
-        if res.get("time_zone"):
-            res["time_zone"]["name_info"] = res["time_zone"]["tzinfo_name"]
-            res["time_zone"].pop("tzinfo_name")
-            res["timezone"] = TimezoneInfo(**res["time_zone"])
-            res.pop("time_zone")
-
-        return UserSettings(**res)
-
-    def fetch_settings(self):
-        res = self.http_client.request("GET", "1.1", "/account/settings.json", auth=True)
-        if res.get("sleep_time"):
-            res["sleep_time_setting"] = SleepTimeSettings(**res["sleep_time"])
-            res.pop("sleep_time")
-
-        if res.get("location"):
-            res["location"] = Location(**res["trend_location"])
-
-        if res.get("time_zone"):
-            res["timezone"] = Timezone(**res["timezone"])
-            res.pop("time_zone")
-
-        return UserSettings(**res)
