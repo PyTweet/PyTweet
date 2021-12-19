@@ -141,7 +141,7 @@ class Client:
             raise TypeError("Function passed in event() must NOT be a coroutine function.")
         self.http.events[func.__name__[3:]] = func
 
-    def fetch_user(self, user_id: Union[str, int] = None) -> Optional[User]:
+    def fetch_user(self, user_id: Union[str, int]) -> Optional[User]:
         """A method for fetching the user with the user's id.
 
         .. warning::
@@ -183,7 +183,7 @@ class Client:
         """
         return self.http.fetch_user_byname(username)
 
-    def fetch_tweet(self, tweet_id: Union[str, int] = None) -> Tweet:
+    def fetch_tweet(self, tweet_id: Union[str, int]) -> Tweet:
         """A method for fetching tweet with the tweet's id.
 
         .. warning::
@@ -204,7 +204,7 @@ class Client:
         """
         return self.http.fetch_tweet(tweet_id)
 
-    def fetch_direct_message(self, event_id: Union[str, int] = None) -> DirectMessage:
+    def fetch_direct_message(self, event_id: Union[str, int]) -> DirectMessage:
         """A method for fetching a direct message with the direct message's event ID.
 
         .. warning::
@@ -485,7 +485,7 @@ class Client:
 
         return [Location(**data) for data in res]
 
-    def get_message(self, event_id: Union[str, int] = None) -> Optional[DirectMessage]:
+    def get_message(self, event_id: Union[str, int]) -> Optional[DirectMessage]:
         """Get a direct message through the client message cache. Returns None if the message is not in the cache.
 
         .. note::
@@ -511,7 +511,7 @@ class Client:
 
         return self.http.message_cache.get(event_id)
 
-    def get_tweet(self, tweet_id: Union[str, int] = None) -> Optional[Tweet]:
+    def get_tweet(self, tweet_id: Union[str, int]) -> Optional[Tweet]:
         """Gets a tweet through the client internal tweet cache. Return None if the tweet is not in the cache.
 
         .. note::
