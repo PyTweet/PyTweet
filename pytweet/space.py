@@ -8,6 +8,10 @@ __all__ = ("Space",)
 
 
 class Space:
+    """Represents a twitter space.
+    
+    .. versionadded:: 1.3.5
+    """
     def __init__(self, data: Dict[str, Any]):
         self.original_payload = data
         try:
@@ -16,7 +20,7 @@ class Space:
             else:
                 self._payload = data.get("data")
         except AttributeError:
-            return self.original_payload
+            self._payload = self.original_payload
 
     def __repr__(self) -> str:
         return "Space(name={0.title} id={0.id} state={0.state})".format(self)
