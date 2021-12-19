@@ -16,6 +16,7 @@ from .auth import *
 from .client import *
 from .entities import *
 from .enums import *
+from .environment import *
 from .errors import *
 from .events import *
 from .expansions import *
@@ -29,7 +30,6 @@ from .stream import *
 from .tweet import *
 from .user import *
 from .utils import *
-from .webhook import *
 
 __title__ = "PyTweet"
 __version__ = "1.5.0a1"

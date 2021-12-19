@@ -23,7 +23,7 @@ from .space import Space
 from .stream import Stream
 from .tweet import Tweet
 from .user import User, ClientAccount
-from .webhook import Environment, Webhook
+from .environment import Environment, Webhook
 
 __all__ = ("Client",)
 
@@ -474,11 +474,11 @@ class Client:
         ValueError:
             Raised when the tweet_id argument is not an integer or a string of digits.
 
-
         Returns
         ---------
         :class:`Tweet`
             This method returns a :class:`Tweet` object or None if the tweet was not found.
+
 
         .. versionadded:: 1.2.0
         """
