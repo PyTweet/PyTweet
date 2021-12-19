@@ -113,7 +113,7 @@ WelcomeMessageRule
 Attachments
 ---------------------
 
-These following object are not meant to be create as an instance rather its for knowledge of what you can do with them.
+Attachments is a way to attach additional part to a message, this include tweet and direct message. You may contruct this following objects except :class:`CustomProfile`. Consider using :class:`client.create_custom_profile` for making a custom profile attachment.
 
 CustomProfile
 ~~~~~~~
@@ -122,17 +122,7 @@ CustomProfile
 
 .. autoclass:: CustomProfile
     :members:
-
-
-Media
-~~~~~~~
-
-
-.. attributetable:: Media
-
-.. autoclass:: Media
-    :members:
-
+    
 
 Poll
 ~~~~~~~
@@ -141,9 +131,6 @@ Poll
 
 .. autoclass:: Poll
     :members:
-
-
-
 
 
 CTA
@@ -187,7 +174,7 @@ File
 Streaming
 ---------------------
 
-These following object are not meant to be create as an instance rather its for knowledge of what you can do with them.
+Streaming is a way to stream in twitter for tweets! This differ with `on_tweet_create`, Stream can detech global tweets while `on_tweet_create` only detech tweets from subscription users.
 
 Stream
 ~~~~~~~
