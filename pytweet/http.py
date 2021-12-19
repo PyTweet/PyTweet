@@ -217,12 +217,13 @@ class HTTPClient:
         else:
             return response.text
 
-        if "meta" in res.keys():
-            try:
-                if res["meta"]["result_count"] == 0:
-                    return []
-            except KeyError:
-                pass
+        if isinstance(res, dict):
+            if "meta" in res.keys():
+                try:
+                    if res["meta"]["result_count"] == 0:
+                        return []
+                except KeyError:
+                    pass
 
         return res
 
@@ -360,7 +361,11 @@ class HTTPClient:
             "GET",
             "2",
             f"/users?ids={ids}",
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id", 
+                "user.fields": USER_FIELD, 
+                "tweet.fields": TWEET_FIELD
+            },
             auth=True,
         )
 
@@ -579,6 +584,36 @@ class HTTPClient:
         welcome_message_id = data.get("welcome_message_id")
         return WelcomeMessageRule(id, welcome_message_id, timestamp, http_client=self)
 
+    def search_geo(
+        self,
+        query: str,
+        max_result: Optional[Union[str, int]] = None,
+        *,
+        lat: Optional[int] = None,
+        long: Optional[int] = None,
+        ip: Optional[Union[str, int]] = None,
+        granularity: str = "neighborhood",
+    ) -> Optional[Geo]:
+        if query:
+            query = query.replace(" ", "%20")
+
+        data = self.request(
+            "GET",
+            "1.1",
+            "/geo/search.json",
+            params={
+                "query": query,
+                "lat": lat,
+                "long": long,
+                "ip": ip,
+                "granularity": granularity,
+                "max_results": max_result,
+            },
+            auth=True,
+        )
+
+        return [Geo(data) for data in data.get("result").get("places")]
+
     def post_tweet(
         self,
         text: str = None,
@@ -646,36 +681,6 @@ class HTTPClient:
         res = self.request("POST", "2", "/tweets", json=payload, auth=True)
         data = res.get("data")
         return Message(data.get("text"), data.get("id"), 1)
-
-    def search_geo(
-        self,
-        query: str,
-        max_result: Optional[Union[str, int]] = None,
-        *,
-        lat: Optional[int] = None,
-        long: Optional[int] = None,
-        ip: Optional[Union[str, int]] = None,
-        granularity: str = "neighborhood",
-    ) -> Optional[Geo]:
-        if query:
-            query = query.replace(" ", "%20")
-
-        data = self.request(
-            "GET",
-            "1.1",
-            "/geo/search.json",
-            params={
-                "query": query,
-                "lat": lat,
-                "long": long,
-                "ip": ip,
-                "granularity": granularity,
-                "max_results": max_result,
-            },
-            auth=True,
-        )
-
-        return [Geo(data) for data in data.get("result").get("places")]
 
     def create_custom_profile(self, name: str, file: File) -> Optional[CustomProfile]:
         if not isinstance(file, File):
