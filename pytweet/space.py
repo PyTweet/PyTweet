@@ -9,9 +9,10 @@ __all__ = ("Space",)
 
 class Space:
     """Represents a twitter space.
-    
+
     .. versionadded:: 1.3.5
     """
+
     def __init__(self, data: Dict[str, Any]):
         self.original_payload = data
         try:
@@ -116,7 +117,7 @@ class Space:
         .. versionadded:: 1.3.5
         """
         return time_parse_todt(self._payload.get("updated_at"))
-    
+
     @property
     def ticketed(self) -> bool:
         """Returns a bool indicate if the space is ticketed.

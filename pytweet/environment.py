@@ -13,9 +13,10 @@ _log = logging.getLogger(__name__)
 
 class Webhook:
     """Represents a webhook for an environment. This webhook belongs to an environment and have a webhook url for sending account acitivity events.
-    
+
     .. versionadded:: 1.5.0
     """
+
     def __init__(self, data: Dict[str, Any], env: Environment, *, client: Client):
         self._id = data.get("id")
         self._url = data.get("url")
@@ -29,7 +30,7 @@ class Webhook:
     @property
     def id(self) -> int:
         """:class:`int`: Returns the webhook unique id.
-        
+
         .. versionadded:: 1.5.0
         """
         return self._id
@@ -41,7 +42,7 @@ class Webhook:
     @property
     def url(self) -> str:
         """:class:`str`: Returns the webhook url.
-        
+
         .. versionadded:: 1.5.0
         """
         return self._url
@@ -53,7 +54,7 @@ class Webhook:
     @property
     def valid(self) -> bool:
         """:class:`bool`: Returns True if the webhook is valid else False.
-        
+
         .. versionadded:: 1.5.0
         """
         return self._valid
@@ -67,7 +68,7 @@ class Webhook:
     @property
     def environment(self) -> Environment:
         """:class:`Environment`: Returns an environment where the webhook belongs to.
-        
+
         .. versionadded:: 1.5.0
         """
         return self._env
@@ -75,7 +76,7 @@ class Webhook:
     @property
     def env(self):
         """:class:`Environment`: An alias to :meth:`Webhook.environment`
-        
+
         .. versionadded:: 1.5.0
         """
         return self.environment
@@ -83,7 +84,7 @@ class Webhook:
     @property
     def created_at(self) -> datetime.datetime:
         """:class:`datetime.datetime`: Returns a datetime.datetime object with the webhook's created timestamp.
-        
+
         .. versionadded:: 1.5.0
         """
         return time_parse_todt(self._payload.get("created_at"))
@@ -131,9 +132,10 @@ class Webhook:
 
 class Environment:
     """Represents a dev environment to use one of the subscription APIs (Account Activity API or events etc)
-    
+
     .. versionadded:: 1.5.0
     """
+
     def __init__(self, data: Dict[str, Any], *, client: Client):
         self._payload = data
         self.client = client
@@ -144,7 +146,7 @@ class Environment:
     @property
     def name(self) -> str:
         """:class:`str`: The environment name/label.
-        
+
         .. versionadded:: 1.5.0
         """
         return self._payload.get("environment_name")
@@ -152,7 +154,7 @@ class Environment:
     @property
     def label(self) -> str:
         """:class:`str`: An alias to :meth:`Environment.name`
-        
+
         .. versionadded:: 1.5.0
         """
         return self.name
@@ -160,7 +162,7 @@ class Environment:
     @property
     def webhooks(self) -> List[Webhook]:
         """List[:class:`Webhook`]: Returns a list of webhooks.
-        
+
         .. versionadded:: 1.5.0
         """
         return [Webhook(data, self, client=self.client) for data in self._payload.get("webhooks")]

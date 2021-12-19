@@ -219,7 +219,7 @@ class User:
         """Trigger the typing animation in the user's dm.
 
         .. versionadded:: 1.3.5
-        """ #TODO Returns a context manager | Or thread it.
+        """  # TODO Returns a context manager | Or thread it.
         self.http_client.request(
             "POST",
             "1.1",
@@ -525,6 +525,7 @@ class ClientAccount(User):
 
     .. versionadded:: 1.5.0
     """
+
     def update_setting(
         self,
         *,
@@ -586,7 +587,7 @@ class ClientAccount(User):
 
     def fetch_settings(self):
         """Fetch the user settings.
-        
+
 
         .. versionadded:: 1.5.0
         """
@@ -615,7 +616,7 @@ class ClientAccount(User):
         profile_link_color: Optional[int] = None,
     ):
         """Updates the client profile information from the given arguments.
-        
+
         Parameters
         ------------
         name: Optional[:class:`str`]
@@ -630,8 +631,8 @@ class ClientAccount(User):
             URL associated with the profile. Will be prepended with http:// if not present.
         profile_link_color: Optional[:class:`str`]
             Sets a hex value that controls the color scheme of links used on the authenticating user's profile page on twitter.com. This must be a valid hexadecimal value, and may be either three or six characters (ex: F00 or FF0000 in string). If you instead use int, the process will use hex() function to change the int value to a hex value.
-        
-        
+
+
         .. versionadded:: 1.5.0
         """
         if image:
@@ -656,7 +657,6 @@ class ClientAccount(User):
         if isinstance(profile_link_color, int):
             profile_link_color = hex(profile_link_color).replace("0x", "", 1)
 
-
         res = self.http_client.request(
             "POST",
             "1.1",
@@ -674,13 +674,7 @@ class ClientAccount(User):
         return data
 
     def update_profile_banner(
-        self, 
-        *, 
-        banner: File, 
-        width: int = 0, 
-        height: int = 0, 
-        offset_left: int = 0, 
-        offset_top: int = 0
+        self, *, banner: File, width: int = 0, height: int = 0, offset_left: int = 0, offset_top: int = 0
     ) -> None:
         """Update the profile banner.
 
@@ -692,11 +686,11 @@ class ClientAccount(User):
             The width of the preferred section of the image being uploaded in pixels. Use with height , offset_left , and offset_top to select the desired region of the image to use.
         height: :class:`int`
             The height of the preferred section of the image being uploaded in pixels. Use with width , offset_left , and offset_top to select the desired region of the image to use.
-        offset_left: :class:`int`      
+        offset_left: :class:`int`
             The number of pixels by which to offset the uploaded image from the left. Use with height , width , and offset_top to select the desired region of the image to use.
         offset_top: :class:`int`
             The number of pixels by which to offset the uploaded image from the top. Use with height , width , and offset_left to select the desired region of the image to use.
-        
+
 
         .. versionadded:: 1.5.0
         """
@@ -728,9 +722,4 @@ class ClientAccount(User):
 
         .. versionadded:: 1.5.0
         """
-        self.http_client.request(
-            "POST",
-            "1.1",
-            "/account/remove_profile_banner.json",
-            auth=True
-        )
+        self.http_client.request("POST", "1.1", "/account/remove_profile_banner.json", auth=True)
