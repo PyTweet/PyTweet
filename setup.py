@@ -34,7 +34,7 @@ setup(
     maintainer=", ".join(("TheFarGG", "TheGenocide")),
     url="https://github.com/PyTweet/PyTweet/",
     version=version,
-    packages=["pytweet", "pytweet.models"],
+    packages=["pytweet", "pytweet.dataclass"],
     include_package_data=True,
     license="MIT",
     project_urls={
