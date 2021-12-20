@@ -367,7 +367,7 @@ class HTTPClient:
 
         return [User(data, http_client=self) for data in res["data"]]
 
-    def fetch_user_byname(self, username: str) -> Optional[User]:
+    def fetch_user_by_username(self, username: str) -> Optional[User]:
         if "@" in username:
             username = username.replace("@", "", 1)
 

@@ -13,7 +13,7 @@ client = pytweet.Client(
 )  # if you dont have one make an application in https://apps.twitter.com
 
 try:
-    user = client.fetch_user_by_name("SomeoneUserName")
+    user = client.fetch_user_by_username("SomeoneUserName")
     user.send(f"Hello World from {client.account}")
 except Exception as e:
     raise e

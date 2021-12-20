@@ -37,8 +37,6 @@ python3 -m pip install PyTweet
 
 ## Usage
 
-#### First we create our client instance using pytweet.Client()
-
 ```py
 import pytweet
 
@@ -49,18 +47,8 @@ client = pytweet.Client(
     access_token="Your access_token here", 
     access_token_secret="Your access_token_secret here",
 ) #if you dont have one make an application in https://apps.twitter.com
-```
 
-#### After that we use functions to get info from twitter api
-
-```py
-user = client.fetch_user_by_name("TheGenocides")
-print(user.name, user.username, user.id)
-# Return The user's name, username, and id
-
-tweet = client.fetch_tweet(Tweet ID Here)
-print(tweet.text, tweet.id, tweet.author.username)
-# Return the tweet's text, id, and the author's username.
+client.tweet("Hello world, Hello twitter!")
 ```
 
 You can check in `examples` directory for more example code.
