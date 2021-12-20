@@ -5,7 +5,6 @@ import random
 import string
 import datetime
 
-from requests.auth import HTTPBasicAuth
 from random import randint
 from typing import Tuple, Optional, TYPE_CHECKING
 from requests_oauthlib import OAuth1, OAuth1Session
@@ -122,7 +121,7 @@ class Scope:
 
 
 class OauthSession(OAuth1Session):
-    """Represents an OauthSession for Oauth1 Authorization. This class is very importantfo
+    """Represents an OauthSession for Oauth1 Authorization. This class handle the authorization using oauth1.
 
     Parameters
     ------------
@@ -178,7 +177,7 @@ class OauthSession(OAuth1Session):
         client.http.request("POST", "1.1", "/oauth/invalidate_token", auth=True)
 
     def generate_oauth_url(self, auth_access_type: str = "write") -> Optional[str]:
-        """Generate an oauth url with an access type.
+        """Generates an oauth url with an access type. The callback after pressing authorize button is your callback uri that you passed in your :class:`Client`. The oauth_token and oauth_verifier will automatically appended in the callback uri. If you are setting up a sign up button in your website to lookup the user's profile information, You have to setup a system where if the oauth_token or oauth_verifier is present in the url then, it will use :meth:`OauthSession.post_oauth_token` to post an oauth token and verifier to exchange with the user's access token and secret. If its for personal uses then just copy the result and passed in :meth:`OauthSession.post_oauth_token`. 
 
         Parameters
         ------------
@@ -214,7 +213,7 @@ class OauthSession(OAuth1Session):
         return url
 
     def post_oauth_token(self, oauth_token: str, oauth_verifier: str) -> Optional[Tuple[str]]:
-        """Post the oauth token & verifier, this method will returns a pair of access token & secret.
+        """Posts the oauth token & verifier, this method will returns a pair of access token & secret also the user's username(present as screen_name) and id e.g ("access_token=xxxxxxxxxxxxx", "access_token_secret=xxxxxxxxxxxxx", "screen_name=TheGenocides", "user_id=1382006704171196419")
 
         Parameters
         ------------

@@ -107,7 +107,7 @@ class Webhook:
         return self
 
     def trigger_crc(self) -> bool:
-        """Trigger a challenge-response-checks to enable Twitter to confirm the ownership of the WebApp receiving webhook events. Before this you do need to register your webhook url via :meth:`client.register_webhook`. Will return True if its successful else False.
+        """Trigger a challenge-response-checks to enable Twitter to confirm the ownership of the WebApp receiving webhook events. Will return True if its successful else False.
 
         Returns
         ---------
@@ -171,7 +171,7 @@ class Environment:
         """Add a new user subscription to the environment, which is the client (that you passed in the argument) itself.
 
         .. note::
-            If you want to add other user subscription, use 3 legged oauth flow to get the user's access token and secret, then construct a client object with the user's access token and secret. After that pass it in client argument.
+            If you want to add other user subscription, use :class:`OauthSession.generate_oauth_url` to generate an oauth url and get the oauth token and verifier, then use :class:`OauthSession.post_oauth_token` to post the oauth token.
 
 
         .. versionadded:: 1.5.0
