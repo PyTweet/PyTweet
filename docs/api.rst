@@ -503,9 +503,9 @@ Example:
     :param tweet: The :class:`Tweet` that deleted by a subscription user.
     :type tweet: :class:`Tweet`
 
-.. function:: on_tweet_like(action)
+.. function:: on_tweet_favorite(action)
 
-    `on_tweet_like` is an event triggered when someone liked the subscription user's tweet.
+    `on_tweet_favorite` is an event triggered when someone liked the subscription user's tweet.
 
     :param action: The event action object information.
     :type action: :class:`TweetFavoriteActionEvent`
