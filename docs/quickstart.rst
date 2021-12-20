@@ -16,10 +16,10 @@ A Basic PyTweet Client
 
     client = pytweet.Client(
         "Your Bearer Token Here!!!", 
-        consumer_key="Your consumer_key here", 
-        consumer_key_secret="Your consumer_key_secret here", 
-        access_token="Your access_token here", 
-        access_token_secret="Your access_token_secret here",
+        consumer_key="Your consumer key here", 
+        consumer_secret="Your consumer secret here", 
+        access_token="Your access token here", 
+        access_token_secret="Your access token secret here",
     )
     #if you dont have one make an application in https://apps.twitter.com
 

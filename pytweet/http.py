@@ -45,7 +45,7 @@ class HTTPClient:
         bearer_token: str,
         *,
         consumer_key: Optional[str],
-        consumer_key_secret: Optional[str],
+        consumer_secret: Optional[str],
         access_token: Optional[str],
         access_token_secret: Optional[str],
         stream: Optional[Stream] = None,
@@ -55,7 +55,7 @@ class HTTPClient:
         self.credentials: Dict[str, Optional[str]] = {
             "bearer_token": bearer_token,
             "consumer_key": consumer_key,
-            "consumer_key_secret": consumer_key_secret,
+            "consumer_secret": consumer_secret,
             "access_token": access_token,
             "access_token_secret": access_token_secret,
         }
@@ -75,7 +75,7 @@ class HTTPClient:
         self.__session = requests.Session()
         self.bearer_token: Optional[str] = bearer_token
         self.consumer_key: Optional[str] = consumer_key
-        self.consumer_key_secret: Optional[str] = consumer_key_secret
+        self.consumer_secret: Optional[str] = consumer_secret
         self.access_token: Optional[str] = access_token
         self.access_token_secret: Optional[str] = access_token_secret
         self.stream = stream
@@ -131,7 +131,7 @@ class HTTPClient:
         if self._auth is None:
             auth_session = OauthSession(
                 self.consumer_key,
-                self.consumer_key_secret,
+                self.consumer_secret,
                 http_client=self,
                 callback=self.callback_url,
                 client_id=self.client_id,
@@ -152,7 +152,7 @@ class HTTPClient:
                     raise PytweetException(f"{k} is a required credential for this action.")
 
         if basic_auth:
-            encoded = base64.b64encode(bytes(f"{self.client_id}:{self.consumer_key_secret}", "utf-8"))
+            encoded = base64.b64encode(bytes(f"{self.client_id}:{self.consumer_secret}", "utf-8"))
             headers["Authorization"] = f"Basic {str(encoded)}"
 
         if data:
@@ -231,7 +231,7 @@ class HTTPClient:
         assert command.upper() in ("INIT", "APPEND", "FINALIZE", "STATUS")
         if self._auth is None:
             auth_session = OauthSession(
-                self.consumer_key, self.consumer_key_secret, http_client=self, callback=self.callback_url
+                self.consumer_key, self.consumer_secret, http_client=self, callback=self.callback_url
             )
             auth_session.set_access_token(self.access_token, self.access_token_secret)
             self._auth = auth_session

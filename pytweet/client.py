@@ -40,7 +40,7 @@ class Client:
         The Bearer Token of the app. The most important one, because this makes most of the requests for Twitter's api version 2.
     consumer_key: Optional[:class:`str`]
         The Consumer Key of the app.
-    consumer_key_secret: Optional[:class:`str`]
+    consumer_secret: Optional[:class:`str`]
         The Consumer Key Secret of the app.
     access_token: Optional[:class:`str`]
         The Access Token of the app.
@@ -71,7 +71,7 @@ class Client:
         bearer_token: Optional[str],
         *,
         consumer_key: Optional[str] = None,
-        consumer_key_secret: Optional[str] = None,
+        consumer_secret: Optional[str] = None,
         access_token: Optional[str] = None,
         access_token_secret: Optional[str] = None,
         stream: Optional[Stream] = None,
@@ -81,7 +81,7 @@ class Client:
         self.http = HTTPClient(
             bearer_token,
             consumer_key=consumer_key,
-            consumer_key_secret=consumer_key_secret,
+            consumer_secret=consumer_secret,
             access_token=access_token,
             access_token_secret=access_token_secret,
             stream=stream,
@@ -94,7 +94,7 @@ class Client:
         self.webhook_url_path: Optional[str] = None
 
     def __repr__(self) -> str:
-        return "Client(bearer_token=SECRET consumer_key=SECRET consumer_key_secret=SECRET access_token=SECRET access_token_secret=SECRET)"
+        return "Client(bearer_token=SECRET consumer_key=SECRET consumer_secret=SECRET access_token=SECRET access_token_secret=SECRET)"
 
     @property
     def account(self) -> Optional[User]:
@@ -681,7 +681,7 @@ class Client:
                     crc = request.args["crc_token"]
 
                     validation = hmac.new(
-                        key=bytes(self.http.consumer_key_secret, "UTF-8"),
+                        key=bytes(self.http.consumer_secret, "UTF-8"),
                         msg=bytes(crc, "UTF-8"),
                         digestmod=hashlib.sha256,
                     )
