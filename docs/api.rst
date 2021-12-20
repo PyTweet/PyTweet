@@ -146,7 +146,7 @@ WelcomeMessageRule
 Attachments
 ---------------------
 
-Attachments is a way to attach additional part to a message, this include tweet and direct message. You may contruct this following objects except :class:`CustomProfile`. Consider using :class:`client.create_custom_profile` for making a custom profile attachment.
+Attachments is a way to attach additional part to a message, this include tweet and direct message. You may contruct this following objects except :class:`CustomProfile`. Consider using :class:`Client.create_custom_profile` for making a custom profile attachment.
 
 CustomProfile
 ~~~~~~~
@@ -347,6 +347,108 @@ Media
     :members:
 
 
+Event Objects
+----------------
+
+Event objects are objects returned by an event filled with the event data.
+
+Event
+~~~~~~~
+
+.. attributetable:: Event
+
+.. autoclass:: Event
+    :members:
+
+DirectMessageEvent
+~~~~~~~
+
+.. attributetable:: DirectMessageEvent
+
+.. autoclass:: DirectMessageEvent
+    :members:
+
+UserActionEvent
+~~~~~~~
+
+.. attributetable:: UserActionEvent
+
+.. autoclass:: UserActionEvent
+    :members:
+
+DirectMessageTypingEvent
+~~~~~~~
+
+.. attributetable:: DirectMessageTypingEvent
+
+.. autoclass:: DirectMessageTypingEvent
+    :members:
+
+DirectMessageReadEvent
+~~~~~~~
+
+.. attributetable:: DirectMessageReadEvent
+
+.. autoclass:: DirectMessageReadEvent
+    :members:
+
+TweetFavoriteActionEvent
+~~~~~~~
+
+.. attributetable:: TweetFavoriteActionEvent
+
+.. autoclass:: TweetFavoriteActionEvent
+    :members:
+
+UserFollowActionEvent
+~~~~~~~
+
+.. attributetable:: UserFollowActionEvent
+
+.. autoclass:: UserFollowActionEvent
+    :members:
+
+UserUnfollowActionEvent
+~~~~~~~
+
+.. attributetable:: UserUnfollowActionEvent
+
+.. autoclass:: UserUnfollowActionEvent
+    :members:
+
+UserBlockActionEvent
+~~~~~~~
+
+.. attributetable:: UserBlockActionEvent
+
+.. autoclass:: UserBlockActionEvent
+    :members:
+
+UserUnblockActionEvent
+~~~~~~~
+
+.. attributetable:: UserUnblockActionEvent
+
+.. autoclass:: UserUnblockActionEvent
+    :members:
+
+UserMuteActionEvent
+~~~~~~~
+
+.. attributetable:: UserMuteActionEvent
+
+.. autoclass:: UserMuteActionEvent
+    :members:
+
+UserUnmuteActionEvent
+~~~~~~~
+
+.. attributetable:: UserUnmuteActionEvent
+
+.. autoclass:: UserUnmuteActionEvent
+    :members:
+
+
 .. _twitter-api-events:
 
 Event Reference
@@ -386,6 +488,90 @@ Example:
     :param connection: The stream connection
     :type tweet: :class:`Tweet`
     :type connection: :class:`StreamConnection`
+
+.. function:: on_tweet_create(tweet)
+
+    `on_tweet_create` is an event triggered when a subscription user created a tweet.
+
+    :param tweet: The :class:`Tweet` that created by a subscription user.
+    :type tweet: :class:`Tweet`
+
+.. function:: on_tweet_delete(tweet)
+
+    `on_tweet_delete` is an event triggered when a subscription user deleted a tweet.
+
+    :param tweet: The :class:`Tweet` that deleted by a subscription user.
+    :type tweet: :class:`Tweet`
+
+.. function:: on_tweet_like(action)
+
+    `on_tweet_like` is an event triggered when someone liked the subscription user's tweet.
+
+    :param action: The event action object information.
+    :type action: :class:`TweetFavoriteActionEvent`
+
+.. function:: on_user_follow(action)
+
+    `on_user_follow` is an event triggered when someone follows the subscription user or the subscription user follows someone.
+
+    :param action: The event action object information.
+    :type action: :class:`UserFollowActionEvent`
+
+.. function:: on_user_unfollow(action)
+
+    `on_user_unfollow` is an event triggered when someone unfollows the subscription user.
+
+    :param action: The event action object information.
+    :type action: :class:`UserUnfollowActionEvent`
+
+.. function:: on_user_block(action)
+
+    `on_user_block` is an event triggered when someone blocks the subscription user.
+
+    :param action: The event action object information.
+    :type action: :class:`UserBlockActionEvent`
+
+.. function:: on_user_unblock(action)
+
+    `on_user_unblock` is an event triggered when someone unblocks the subscription user.
+
+    :param action: The event action object information.
+    :type action: :class:`UserUnblockActionEvent`
+
+.. function:: on_user_mute(action)
+
+    `on_user_mute` is an event triggered when someone mutes the subscription user.
+
+    :param action: The event action object information.
+    :type action: :class:`UserMuteActionEvent`
+
+.. function:: on_user_unmute(action)
+
+    `on_user_unmute` is an event triggered when someone unmutes the subscription user.
+
+    :param action: The event action object information.
+    :type action: :class:`UserUnmuteActionEvent`
+
+.. function:: on_direct_message(message)
+
+    `on_direct_message` is an event triggered when someone send a message to the subscription user or from the the subscription user. 
+
+    :param message: The :class:`DirectMessage` that the subscription user sent or from the the subscription user.
+    :type message: :class:`DirectMessage`
+
+.. function:: on_direct_message_read(action)
+
+    `on_direct_message_read` is an event triggered when someone read messages in the subscription user's dm.
+
+    :param action: The event action object information.
+    :type action: :class:`DirectMessageReadEvent`
+
+.. function:: on_typing(action)
+
+    `on_typing` is an event triggered when someone trigger a typing animation in the subscription user dm.
+
+    :param action: The event action object information.
+    :type action: :class:`DirectMessageTypingEvent`
 
 Enums 
 --------------
@@ -471,9 +657,17 @@ Error raised by pytweet.
 
 .. autoexception:: Unauthorized
 
+.. autoexception:: BadRequests
+
 .. autoexception:: TooManyRequests
 
 .. autoexception:: Forbidden
+
+.. autoexception:: Conflict
+
+.. autoexception:: ConnectionException
+
+.. autoexception:: FieldsTooLarge
 
 
 .. autoexception:: NotFound 
