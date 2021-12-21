@@ -202,11 +202,12 @@ class UserFollowActionEvent(UserActionEvent):
 
     @property
     def follower(self) -> User:
-        """:class:`User`: An alias to :meth:`UserActionEvent.source`. The user who followed/unfollowed the target. 
-        
+        """:class:`User`: An alias to :meth:`UserActionEvent.source`. The user who followed/unfollowed the target.
+
         .. versionadded:: 1.5.0
         """
         return self.source
+
 
 class UserBlockActionEvent(UserActionEvent):
     """Represents a block action event by user, This inherits :class:`UserActionEvent`. This object contains information that twitter posts through the webhook url.
@@ -217,10 +218,11 @@ class UserBlockActionEvent(UserActionEvent):
     @property
     def blocker(self) -> User:
         """:class:`User`: An alias to :meth:`UserActionEvent.source`. The user who blocked/unblocked the target.
-        
+
         .. versionadded:: 1.5.0
         """
         return self.source
+
 
 class UserMuteActionEvent(UserActionEvent):
     """Represents a mute action event by user, This inherits :class:`UserActionEvent`. This object contains information that twitter posts through the webhook url.
@@ -231,10 +233,11 @@ class UserMuteActionEvent(UserActionEvent):
     @property
     def muter(self) -> User:
         """:class:`User`: An alias to :meth:`UserActionEvent.source`. The user who muted/unmuted the target.
-        
+
         .. versionadded:: 1.5.0
         """
         return self.source
+
 
 class UserUnfollowActionEvent(UserFollowActionEvent):
     """Represents an unfollow action event by user, This inherits :class:`UserFollowActionEvent`. This object contains information that twitter posts through the webhook url.
@@ -252,6 +255,7 @@ class UserUnblockActionEvent(UserBlockActionEvent):
     """
 
     ...
+
 
 class UserUnmuteActionEvent(UserMuteActionEvent):
     """Represents an unmute action event by user, This inherits :class:`UserMuteActionEvent`. This object contains information that twitter posts through the webhook url.
