@@ -30,6 +30,7 @@ from .space import Space
 from .stream import Stream
 from .tweet import Tweet
 from .user import User
+from .mixins import EventMixin
 
 _log = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ if TYPE_CHECKING:
     ResponseModel = Optional[Union[str, RequestModel]]
 
 
-class HTTPClient:
+class HTTPClient(EventMixin):
     def __init__(
         self,
         bearer_token: str,
@@ -89,7 +90,6 @@ class HTTPClient:
         self.message_cache = {}
         self.tweet_cache = {}
         self.user_cache = {}
-        self.events = {}
         if self.stream:
             self.stream.http_client = self
             self.stream.connection.http_client = self
@@ -97,15 +97,6 @@ class HTTPClient:
     @property
     def access_level(self):
         return self.current_header.get("x-access-levels").split("-")
-
-    def dispatch(self, event_name: str, *args: Any, **kwargs: Any):
-        try:
-            event = self.events[event_name]
-        except KeyError:
-            return
-        else:
-            _log.debug(f"Dispatching Event: on_{event_name}")
-            event(*args, **kwargs)
 
     def request(
         self,
@@ -152,8 +143,8 @@ class HTTPClient:
                     raise PytweetException(f"{k} is a required credential for this action.")
 
         if basic_auth:
-            encoded = base64.b64encode(bytes(f"{self.client_id}:{self.consumer_secret}", "utf-8"))
-            headers["Authorization"] = f"Basic {str(encoded)}"
+            encoded = base64.b64encode(f"{self.client_id}:{self.consumer_secret}".encode())
+            headers["Authorization"] = f"Basic {encoded.decode()}"
 
         if data:
             json = None
