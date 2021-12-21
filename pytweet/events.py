@@ -57,7 +57,7 @@ class UserActionEvent(Event):
 
     @property
     def target(self) -> User:
-        """:class:`User`: Returns the user who got followed/unfollowed by the source.
+        """:class:`User`: Returns the user that was targeted by the source.
 
         .. versionadded:: 1.5.0
         """
@@ -200,17 +200,13 @@ class UserFollowActionEvent(UserActionEvent):
     .. versionadded:: 1.5.0
     """
 
-    ...
-
-
-class UserUnfollowActionEvent(UserActionEvent):
-    """Represents an unfollow action event by user, This inherits :class:`UserActionEvent`. This object contains information that twitter posts through the webhook url.
-
-    .. versionadded:: 1.5.0
-    """
-
-    ...
-
+    @property
+    def follower(self) -> User:
+        """:class:`User`: An alias to :meth:`UserActionEvent.source`. The user who followed/unfollowed the target. 
+        
+        .. versionadded:: 1.5.0
+        """
+        return self.source
 
 class UserBlockActionEvent(UserActionEvent):
     """Represents a block action event by user, This inherits :class:`UserActionEvent`. This object contains information that twitter posts through the webhook url.
@@ -218,17 +214,13 @@ class UserBlockActionEvent(UserActionEvent):
     .. versionadded:: 1.5.0
     """
 
-    ...
-
-
-class UserUnblockActionEvent(UserActionEvent):
-    """Represents an unblock action event by user, This inherits :class:`UserActionEvent`. This object contains information that twitter posts through the webhook url.
-
-    .. versionadded:: 1.5.0
-    """
-
-    ...
-
+    @property
+    def blocker(self) -> User:
+        """:class:`User`: An alias to :meth:`UserActionEvent.source`. The user who blocked/unblocked the target.
+        
+        .. versionadded:: 1.5.0
+        """
+        return self.source
 
 class UserMuteActionEvent(UserActionEvent):
     """Represents a mute action event by user, This inherits :class:`UserActionEvent`. This object contains information that twitter posts through the webhook url.
@@ -236,11 +228,33 @@ class UserMuteActionEvent(UserActionEvent):
     .. versionadded:: 1.5.0
     """
 
+    @property
+    def muter(self) -> User:
+        """:class:`User`: An alias to :meth:`UserActionEvent.source`. The user who muted/unmuted the target.
+        
+        .. versionadded:: 1.5.0
+        """
+        return self.source
+
+class UserUnfollowActionEvent(UserFollowActionEvent):
+    """Represents an unfollow action event by user, This inherits :class:`UserFollowActionEvent`. This object contains information that twitter posts through the webhook url.
+
+    .. versionadded:: 1.5.0
+    """
+
     ...
 
 
-class UserUnmuteActionEvent(UserActionEvent):
-    """Represents an unmute action event by user, This inherits :class:`UserActionEvent`. This object contains information that twitter posts through the webhook url.
+class UserUnblockActionEvent(UserBlockActionEvent):
+    """Represents an unblock action event by user, This inherits :class:`UserBlockActionEvent`. This object contains information that twitter posts through the webhook url.
+
+    .. versionadded:: 1.5.0
+    """
+
+    ...
+
+class UserUnmuteActionEvent(UserMuteActionEvent):
+    """Represents an unmute action event by user, This inherits :class:`UserMuteActionEvent`. This object contains information that twitter posts through the webhook url.
 
     .. versionadded:: 1.5.0
     """
