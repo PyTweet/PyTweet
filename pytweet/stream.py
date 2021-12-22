@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 import json
+import requests
 import logging
 import time
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, List, Optional, Type, Union
 
-import requests
-
+from typing import TYPE_CHECKING, Any, List, Type, Optional
+from .dataclass import StreamRule
 from .errors import ConnectionException, PytweetException
 from .expansions import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_EXPANSION, TWEET_FIELD, USER_FIELD
 from .tweet import Tweet
+
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -21,19 +21,6 @@ _log = logging.getLogger(__name__)
 def _check_for_errors(data, session):
     if "errors" in data.keys():
         raise ConnectionException(session, None)
-
-
-@dataclass
-class StreamRule:
-    """Represent a stream rule.
-
-    .. versionadded:: 1.3.5
-    """
-
-    value: str
-    tag: Optional[str] = None
-    id: Optional[Union[str, int]] = None
-
 
 class StreamConnection:
     """Represent the twitter api stream connection. This will handle the stream connection.
