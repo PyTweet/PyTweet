@@ -104,11 +104,6 @@ class User:
     def follow(self) -> RelationFollow:
         """Method to follow the User.
 
-        Parameters
-        ------------
-        user_id: Union[:class:`str`, :class:`int`]
-            The user's id that you wish to follow.
-
         Returns
         ---------
         :class:`RelationFollow`
@@ -130,11 +125,6 @@ class User:
     def unfollow(self) -> RelationFollow:
         """Method to unfollow the User.
 
-        Parameters
-        ------------
-        user_id: Union[:class:`str`, :class:`int`]
-            The user's id that you wish to unfollow.
-
         Returns
         ---------
         :class:`RelationFollow`
@@ -150,12 +140,6 @@ class User:
     def block(self) -> None:
         """Method to block the user.
 
-        Parameters
-        ------------
-        user_id: Union[:class:`str`, :class:`int`]
-            The user's id that you wish to block.
-
-
         .. versionadded:: 1.2.0
         """
         my_id = self.http_client.access_token.partition("-")[0]
@@ -170,12 +154,6 @@ class User:
     def unblock(self) -> None:
         """Method to unblock the user.
 
-        Parameters
-        ------------
-        user_id: Union[:class:`str`, :class:`int`]
-            The user's id that you wish to unblock.
-
-
         .. versionadded:: 1.2.0
         """
         my_id = self.http_client.access_token.partition("-")[0]
@@ -183,12 +161,6 @@ class User:
 
     def mute(self) -> None:
         """Method to mute the user.
-
-        Parameters
-        ------------
-        user_id: Union[:class:`str`, :class:`int`]
-            The user's id that you wish to mute.
-
 
         .. versionadded:: 1.2.5
         """
@@ -203,12 +175,6 @@ class User:
 
     def unmute(self) -> None:
         """Method to unmute the user.
-
-        Parameters
-        ------------
-        user_id: Union[:class:`str`, :class:`int`]
-            The user's id that you wish to unmute.
-
 
         .. versionadded:: 1.2.5
         """
