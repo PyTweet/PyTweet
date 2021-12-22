@@ -32,8 +32,6 @@ Clients
 Client
 ~~~~~~~
 
-.. attributetable:: Client
-
 .. autoclass:: Client
     :members:
 
