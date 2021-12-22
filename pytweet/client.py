@@ -474,9 +474,9 @@ class Client:
         parameters
         ------------
         lat: :class:`int`
-            If provided with a long parameter the available trend locations will be sorted by distance, nearest to furthest, to the co-ordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.
+            If provided with a long parameter the available trend locations will be sorted by distance, nearest to furthest, to the coordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.
         long: :class:`int`
-            If provided with a lat parameter the available trend locations will be sorted by distance, nearest to furthest, to the co-ordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.        -122.400612831116
+            If provided with a lat parameter the available trend locations will be sorted by distance, nearest to furthest, to the coordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.        -122.400612831116
 
 
         .. versionadded:: 1.5.0
@@ -640,7 +640,7 @@ class Client:
         disabled_log: :class:`bool`
             A kwarg that indicates to disable flask's log so it does not print the request process in your terminal, this also will disable `werkzeug` log.
         make_new: :class:`bool`
-            A kwarg indicates to make a new webhook url when the api cant find the url passed. Default to True.
+            A kwarg indicates to make a new webhook url when the api can't find the url passed. Default to True.
 
 
         .. versionadded:: 1.5.0
@@ -729,7 +729,7 @@ class Client:
                     self.http.user_cache[user.id] = user
 
                 _log.debug(
-                    f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\nIn Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
+                    f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\n In Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
                 )
             thread.join()
         except Exception as e:

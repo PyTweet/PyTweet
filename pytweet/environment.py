@@ -12,7 +12,7 @@ _log = logging.getLogger(__name__)
 
 
 class Webhook:
-    """Represents a webhook for an environment. This webhook belongs to an environment and have a webhook url for sending account acitivity events.
+    """Represents a webhook for an environment. This webhook belongs to an environment and have a webhook url for sending account activity events.
 
     .. versionadded:: 1.5.0
     """
