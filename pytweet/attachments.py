@@ -15,7 +15,7 @@ __all__ = ("Poll", "QuickReply", "Geo", "CTA", "File")
 
 
 class Poll:
-    """Represent a Poll attachment in a tweet.
+    """Represents a Poll attachment in a tweet.
 
     .. describe:: x == y
         Check if one Poll's id is equal to another.
@@ -169,7 +169,7 @@ class Poll:
 
 
 class QuickReply:
-    """Represent a quick_reply attachment in Direct Message.
+    """Represents a quick_reply attachment in Direct Message.
 
     Parameters
     ------------
@@ -235,7 +235,7 @@ class QuickReply:
 
 
 class Geo:
-    """Represent the Geo location in twitter.
+    """Represents the Geo location in twitter.
     You can use this as attachment in a tweet or for searching a location
 
     Parameters
@@ -258,7 +258,7 @@ class Geo:
 
     @property
     def name(self) -> str:
-        """:class:`str`: Returns place's name.
+        """:class:`str`: Returns the geo's name.
 
         .. versionadded:: 1.3.5
         """
@@ -266,7 +266,7 @@ class Geo:
 
     @property
     def id(self) -> str:
-        """:class:`str`: Returns place's unique id.
+        """:class:`str`: Returns the geo's unique id.
 
         .. versionadded:: 1.3.5
         """
@@ -274,7 +274,7 @@ class Geo:
 
     @property
     def fullname(self) -> str:
-        """:class:`str`: Returns place's fullname.
+        """:class:`str`: Returns the geo's fullname.
 
         .. versionadded:: 1.3.5
         """
@@ -282,7 +282,7 @@ class Geo:
 
     @property
     def type(self) -> str:
-        """:class:`str`: Returns place's type.
+        """:class:`str`: Returns the geo's type.
 
         .. versionadded:: 1.3.5
         """
@@ -290,7 +290,7 @@ class Geo:
 
     @property
     def country(self) -> str:
-        """:class:`str`: Returns the country where the place is in.
+        """:class:`str`: Returns the country where the geo is in.
 
         .. versionadded:: 1.3.5
         """
@@ -298,7 +298,7 @@ class Geo:
 
     @property
     def country_code(self) -> str:
-        """:class:`str`: Returns the country's code where the location is in.
+        """:class:`str`: Returns the country's code where the geo is in.
 
         .. versionadded:: 1.3.5
         """
@@ -306,7 +306,7 @@ class Geo:
 
     @property
     def centroid(self) -> str:
-        """:class:`str`: Returns the place's centroid.
+        """:class:`str`: Returns the geo's centroid.
 
         .. versionadded:: 1.3.5
         """
@@ -314,7 +314,7 @@ class Geo:
 
     @property
     def bounding_box_type(self) -> str:
-        """:class:`str`: Returns the place's bounding box type.
+        """:class:`str`: Returns the geo's bounding box type.
 
         .. versionadded:: 1.3.5
         """
@@ -324,7 +324,7 @@ class Geo:
 
     @property
     def coordinates(self) -> List[str]:
-        """List[:class:`str`]: Returns a list of coordinates where the place's located.
+        """List[:class:`str`]: Returns a list of coordinates where the geo's located.
 
         .. versionadded:: 1.3.5
         """
@@ -334,8 +334,8 @@ class Geo:
 
 
 class CTA:
-    """Represent call-to-action attachment(CTA)
-    You can use this in a post_tweet method via direct_message_deep_link kwarg or use it in direct message via CTA kwarg. CTA will perform and action whenever a user "call" something, an example of this is buttons.
+    """Represents call-to-action attachment(CTA)
+    You can use it in :meth:`User.send` via CTA kwarg. CTA will perform and action whenever a user "call" something, an example of this is buttons.
 
     .. versionadded:: 1.3.5
     """
@@ -397,7 +397,7 @@ class CTA:
 
 
 class File:
-    """Represent a File attachment for messages.
+    """Represents a File attachment for messages.
 
     Parameters
     ------------
@@ -466,7 +466,7 @@ class File:
 
 
 class CustomProfile:
-    """Represent a CustomProfile attachments that allow a Direct Message author to present a different identity than that of the Twitter account being used.
+    """Represents a CustomProfile attachments that allow a Direct Message author to present a different identity than that of the Twitter account being used.
 
     .. versionadded:: 1.3.5
     """
