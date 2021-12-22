@@ -29,17 +29,7 @@ classifiers = [
 ]
 
 # fmt: off
-extras_require = {
-    "docs": 
-        [
-            "sphinx>=4.0.2",
-            "furo==2021.11.23",
-            "sphinx_copybutton>=0.4.0",
-        ], 
-    "events": [
-        "Flask>=2.0.2"
-        ]
-}
+
 # fmt: on
 
 setup(
