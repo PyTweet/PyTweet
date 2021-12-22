@@ -23,6 +23,7 @@ from .expansions import *
 from .http import *
 from .message import *
 from .metrics import *
+from .mixins import *
 from .parsers import *
 from .relations import *
 from .space import *
@@ -46,7 +47,7 @@ class VersionInfo(NamedTuple):
     serial: int
 
 
-version_info: VersionInfo = VersionInfo(major=1, minor=5, micro=0, releaselevel="alpha", serial=1)
+version_info: VersionInfo = VersionInfo(major=1, minor=5, micro=0, releaselevel="alpha", serial=3)
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
