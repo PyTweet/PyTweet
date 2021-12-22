@@ -22,6 +22,7 @@ def _check_for_errors(data, session):
     if "errors" in data.keys():
         raise ConnectionException(session, None)
 
+
 class StreamConnection:
     """Represent the twitter api stream connection. This will handle the stream connection.
 

@@ -3,9 +3,8 @@ from typing import Any, Dict, Callable
 
 _log = logging.getLogger(__name__)
 
-__all__ = (
-    "EventMixin",
-)
+__all__ = ("EventMixin",)
+
 
 class EventMixin:
     events: Dict[str, Callable] = {}

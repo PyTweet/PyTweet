@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, Union
 
+
 @dataclass
 class StreamRule:
     """Represents a stream rule.
@@ -10,4 +11,4 @@ class StreamRule:
 
     value: str
     tag: Optional[str] = None
-    id: Optional[Union[str, int]] = None  
+    id: Optional[Union[str, int]] = None
