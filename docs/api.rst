@@ -559,7 +559,7 @@ All these enums are a subclass of :class:`enum.Enum`
 Oauth
 -------------
 
-Oauth is a way to authenticate a twitter user account. You can do this with the 3 legged authentication via :meth:`OauthSession.with_oauth_flow`. This also required in every request you've made for identification!
+Oauth is a way to authenticate a twitter user account. You can do this with 3 legged authentication via :meth:`OauthSession.generate_oauth_url` to generate an oauth url and :meth:`OauthSession.post_oauth_token` to post an oauth token and verifier. This also required in every request you've made for identification!
 
 OauthSession
 ~~~~~~~
