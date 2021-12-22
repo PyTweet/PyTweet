@@ -28,6 +28,20 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
 ]
 
+# fmt: off
+extras_require={
+    "docs": 
+    [
+        "sphinx>=4.0.2",
+        "furo",
+        "sphinx_copybutton",
+    ], 
+    "events": [
+        "Flask>=2.0.2"
+        ]
+},
+# fmt: on
+
 setup(
     name="PyTweet",
     author="TheGenocide & TheFarGG",
@@ -45,7 +59,7 @@ setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     install_requires=requirements,
-    extras_require={"docs": ["sphinx>=4.0.2"], "events": ["Flask>=2.0.2"]},
+    extras_require=extras_require,
     keywords="PyTweet, pytweet, twitter, tweet.py twitter.py",
     python_requires=">=3.7.0",
     classifiers=classifiers,

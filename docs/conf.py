@@ -36,10 +36,13 @@ author = "TheGenocide & TheFarGG"
 # ones.
 
 extensions = [
+    # In-built sphinx extensions
     "sphinx.ext.autodoc",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
+    # Third-Party Extensions:
+    "sphinx_copybutton",
 ]
 autodoc_member_order = "bysource"
 autodoc_typehints = "none"
