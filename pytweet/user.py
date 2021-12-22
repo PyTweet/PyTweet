@@ -219,7 +219,7 @@ class User:
         """Trigger the typing animation in the user's dm.
 
         .. versionadded:: 1.3.5
-        """  # TODO Returns a context manager | Or thread it.
+        """
         self.http_client.request(
             "POST",
             "1.1",
