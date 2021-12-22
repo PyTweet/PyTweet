@@ -55,6 +55,8 @@ class PayloadParser:
 
 
 class EventParser:
+    __slots__ = ("payload_parser", "http_client", "client_id")
+
     def __init__(self, http_client: object):
         self.payload_parser = PayloadParser()
         self.http_client = http_client

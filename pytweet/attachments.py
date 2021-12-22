@@ -42,6 +42,7 @@ class Poll:
 
     .. versionadded:: 1.1.0
     """
+    __slots__ = ("_id", "_voting_status", "_end_date", "_duration", "_options", "_raw_options")
 
     def __init__(self, duration: int, **kwargs):
         self._id: Optional[Union[str, int]] = kwargs.get("id", None)
@@ -183,6 +184,7 @@ class QuickReply:
 
     .. versionadded:: 1.2.0
     """
+    __slots__ = ("type", "_options", "_raw_options")
 
     def __init__(self, type: str = "options"):
         self.type = type if type == "options" else "options"
@@ -246,10 +248,11 @@ class Geo:
 
     .. versionadded:: 1.3.5
     """
+    __slots__ = ("_payload", "__bounding_box")
 
     def __init__(self, data: Dict[str, Any]):
         self._payload = data
-        self._bounding_box = self._payload.get("bounding_box")
+        self.__bounding_box = self._payload.get("bounding_box")
 
     def __repr__(self) -> str:
         return "Geo(name={0.name} fullname={0.fullname} country={0.country} country_code={0.country_code} id={0.id})".format(
@@ -318,8 +321,8 @@ class Geo:
 
         .. versionadded:: 1.3.5
         """
-        if self._bounding_box:
-            return self._bounding_box.get("type")
+        if self.__bounding_box:
+            return self.__bounding_box.get("type")
         return None
 
     @property
@@ -328,8 +331,8 @@ class Geo:
 
         .. versionadded:: 1.3.5
         """
-        if self._bounding_box:
-            return self._bounding_box.get("coordinates")
+        if self.__bounding_box:
+            return self.__bounding_box.get("coordinates")
         return None
 
 
@@ -339,6 +342,7 @@ class CTA:
 
     .. versionadded:: 1.3.5
     """
+    __slots__ = ("_buttons", "_raw_buttons")
 
     def __init__(self):
         self._buttons = []
@@ -406,6 +410,7 @@ class File:
     dm_only: :class:`bool`
         Indicates if the file is use in dm only. Default to False.
     """
+    __slots__ = ("__path", "_total_bytes", "_mimetype", "dm_only")
 
     def __init__(self, path: str, *, dm_only: bool = False):
         mimetype_guesser = mimetypes.MimeTypes().guess_type
@@ -470,6 +475,7 @@ class CustomProfile:
 
     .. versionadded:: 1.3.5
     """
+    __slots__ = ("_name", "_id", "_timestamp", "_media")
 
     def __init__(
         self,

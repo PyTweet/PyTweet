@@ -29,6 +29,7 @@ class StreamConnection:
 
     .. versionadded:: 1.3.5
     """
+    __slots__ = ("url", "backfill_minutes", "reconnect_attempts", "http_client", "session", "errors", "running")
 
     def __init__(
         self,
@@ -152,6 +153,7 @@ class Stream:
 
     .. versionadded:: 1.3.5
     """
+    __slots__ = ("backfill_minutes", "raw_rules", "http_client", "reconnect_attempts", "sample", "connection")
 
     def __init__(self, backfill_minutes: int = 0, reconnect_attempts: int = 15):
         self.backfill_minutes = backfill_minutes

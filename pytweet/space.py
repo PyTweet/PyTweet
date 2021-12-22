@@ -12,9 +12,12 @@ class Space:
 
     .. versionadded:: 1.3.5
     """
+    __slots__ = ("original_payload", "_payload")
 
     def __init__(self, data: Dict[str, Any]):
         self.original_payload = data
+        self._payload = None
+
         try:
             if isinstance(data.get("data"), list):
                 self._payload = data.get("data")[0]

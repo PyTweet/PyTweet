@@ -7,6 +7,8 @@ __all__ = (
 
 
 class UserPublicMetrics:
+    __slots__ = ("original_payload", "_public")
+
     def __init__(self, data: Dict[str, Any] = {}):
         self.original_payload: Dict[str, Any] = data
         self._public: Dict[Any, Any] = self.original_payload.get("public_metrics")
@@ -32,6 +34,8 @@ class UserPublicMetrics:
 
 
 class TweetPublicMetrics:
+    __slots__ = ("original_payload", "_public")
+
     def __init__(self, data: Dict[str, Any] = {}) -> None:
         self.original_payload = data
         self._public = data.get("public_metrics")

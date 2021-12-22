@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 from .app import ApplicationInfo
 from .attachments import CTA, File, QuickReply
-from .entities import Hashtags, Symbols, Urls, UserMentions
+from .entities import Hashtag, Symbol, Url, UserMention
 from .enums import MessageEventTypeEnum, MessageTypeEnum
 from .user import User
 
@@ -176,36 +176,36 @@ class DirectMessage(Message):
         return datetime.datetime.fromtimestamp(int(self._payload.get("created_timestamp")) / 1000)
 
     @property
-    def hashtags(self) -> Optional[List[Hashtags]]:
-        """List[:class:`Hashtags`]: Returns the messages's hashtags.
+    def hashtags(self) -> Optional[List[Hashtag]]:
+        """List[:class:`Hashtag`]: Returns the messages's hashtags.
 
         .. versionadded:: 1.2.0
         """
-        return [Hashtags(data) for data in self.__entities.get("hashtags")]
+        return [Hashtag(data) for data in self.__entities.get("hashtag")]
 
     @property
-    def symbols(self) -> Optional[List[Symbols]]:
-        """List[:class:`Symbols`]: Returns the messages's hashtags.
+    def symbols(self) -> Optional[List[Symbol]]:
+        """List[:class:`Symbol`]: Returns the messages's symbols.
 
         .. versionadded:: 1.2.0
         """
-        return [Symbols(data) for data in self.__entities.get("symbols")]
+        return [Symbol(data) for data in self.__entities.get("symbols")]
 
     @property
-    def mentions(self) -> Optional[List[UserMentions]]:
-        """List[:class:`UserMentions`]: Returns the messages usermentions.
+    def mentions(self) -> Optional[List[UserMention]]:
+        """List[:class:`UserMention`]: Returns the messages mentioned users.
 
         .. versionadded:: 1.2.0
         """
-        return [UserMentions(data) for data in self.__entities.get("user_mentions")]
+        return [UserMention(data) for data in self.__entities.get("user_mentions")]
 
     @property
-    def urls(self) -> Optional[List[Urls]]:
-        """List[:class:`Urls`]: Returns the message's urls.
+    def urls(self) -> Optional[List[Url]]:
+        """List[:class:`Url`]: Returns the message's urls.
 
         .. versionadded:: 1.2.0
         """
-        return [Urls(data) for data in self.__entities.get("urls")]
+        return [Url(data) for data in self.__entities.get("urls")]
 
     @property
     def quick_reply(self) -> Optional[QuickReply]:
