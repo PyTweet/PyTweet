@@ -12,6 +12,7 @@ class Space:
 
     .. versionadded:: 1.3.5
     """
+
     __slots__ = ("original_payload", "_payload")
 
     def __init__(self, data: Dict[str, Any]):

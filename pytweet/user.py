@@ -39,6 +39,7 @@ class User:
 
     .. versionadded: 1.0.0
     """
+
     __slots__ = ("__original_payload", "_payload", "http_client", "_metrics")
 
     def __init__(self, data: Dict[str, Any], http_client: Optional[HTTPClient] = None) -> None:

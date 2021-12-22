@@ -42,7 +42,6 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     # Third-Party Extensions:
-    
 ]
 autodoc_member_order = "bysource"
 autodoc_typehints = "none"

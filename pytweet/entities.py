@@ -5,6 +5,7 @@ from .enums import MediaType
 
 class Media:
     """Represents a media attachment in a message."""
+
     __slots__ = ("_payload", "_url", "_preview_image_url", "_media_key", "_type", "_width", "_height")
 
     def __init__(self, data: Dict[str, Any]):
@@ -54,9 +55,10 @@ class Media:
 
 class Hashtag:
     """Represents a hashtag in a message."""
+
     __slots__ = ("_payload", "_text", "_startpoint", "_endpoint")
 
-    def __init__(self, data = Dict[str, Any]):
+    def __init__(self, data=Dict[str, Any]):
         self._payload = data
         self._text: Optional[str] = self._payload.get("text")
         self._startpoint, self._endpoint = self._payload.get("indices")
@@ -74,9 +76,10 @@ class Hashtag:
 
 class UserMention:
     """Represents a user mention in a message."""
+
     __slots__ = ("_payload", "_name", "_screen_name", "_id", "_startpoint", "_endpoint")
 
-    def __init__(self, data = Dict[str, Any]):
+    def __init__(self, data=Dict[str, Any]):
         self._payload: Dict[str, Any] = data
         self._name: str = self._payload.get("name")
         self._screen_name: str = self._payload.get("screen_name")
@@ -106,9 +109,10 @@ class UserMention:
 
 class Url:
     """Represents Url in a message."""
+
     __slots__ = ("_payload", "_url", "_display_url", "_expanded_url", "_startpoint", "_endpoint")
 
-    def __init__(self, data = Dict[str, Any]):
+    def __init__(self, data=Dict[str, Any]):
         self._payload: Dict[str, Any] = data
         self._url: str = self._payload.get("url")
         self._display_url: str = self._payload.get("display_url")
@@ -138,9 +142,10 @@ class Url:
 
 class Symbol:
     """Represents a Symbol in a message."""
+
     __slots__ = ("_payload", "_text", "_startpoint", "_endpoint")
 
-    def __init__(self, data = Optional[Dict[str, Any]]):
+    def __init__(self, data=Optional[Dict[str, Any]]):
         self._payload: Dict[str, Any] = data
         self._text: str = self._payload.get("text")
         self._startpoint, self._endpoint = self._payload.get("indices")

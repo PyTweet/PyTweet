@@ -42,6 +42,7 @@ class Poll:
 
     .. versionadded:: 1.1.0
     """
+
     __slots__ = ("_id", "_voting_status", "_end_date", "_duration", "_options", "_raw_options")
 
     def __init__(self, duration: int, **kwargs):
@@ -184,6 +185,7 @@ class QuickReply:
 
     .. versionadded:: 1.2.0
     """
+
     __slots__ = ("type", "_options", "_raw_options")
 
     def __init__(self, type: str = "options"):
@@ -248,6 +250,7 @@ class Geo:
 
     .. versionadded:: 1.3.5
     """
+
     __slots__ = ("_payload", "__bounding_box")
 
     def __init__(self, data: Dict[str, Any]):
@@ -342,6 +345,7 @@ class CTA:
 
     .. versionadded:: 1.3.5
     """
+
     __slots__ = ("_buttons", "_raw_buttons")
 
     def __init__(self):
@@ -410,6 +414,7 @@ class File:
     dm_only: :class:`bool`
         Indicates if the file is use in dm only. Default to False.
     """
+
     __slots__ = ("__path", "_total_bytes", "_mimetype", "dm_only")
 
     def __init__(self, path: str, *, dm_only: bool = False):
@@ -475,6 +480,7 @@ class CustomProfile:
 
     .. versionadded:: 1.3.5
     """
+
     __slots__ = ("_name", "_id", "_timestamp", "_media")
 
     def __init__(

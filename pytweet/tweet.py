@@ -24,7 +24,8 @@ class EmbedsImages:
 
     .. versionadded: 1.1.3
     """
-    __slots__ = ("_payload")
+
+    __slots__ = "_payload"
 
     def __init__(self, data: Dict[str, Any]) -> None:
         self._payload = data
@@ -65,7 +66,8 @@ class Embed:
 
     .. versionadded: 1.1.3
     """
-    __slots__ = ("_payload")
+
+    __slots__ = "_payload"
 
     def __init__(self, data: Dict[str, Any]):
         self._payload = data
@@ -181,6 +183,7 @@ class Tweet(Message):
 
     .. versionadded:: 1.0.0
     """
+
     __slots__ = ("original_payload", "_payload", "_includes", "tweet_metrics", "http_client", "deleted_timestamp")
 
     if TYPE_CHECKING:
