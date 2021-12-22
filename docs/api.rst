@@ -43,9 +43,8 @@ Application
 ApplicationInfo
 ~~~~~~~
 
-.. attributetable:: ApplicationInfo
 
-.. autoclass:: ApplicationInfo
+.. autoclass:: ApplicationInfo()
     :members:
 
 Environment
@@ -54,17 +53,13 @@ Environment
 Webhook
 ~~~~~~~
 
-.. attributetable:: Webhook
-
-.. autoclass:: Webhook
+.. autoclass:: Webhook()
     :members:
 
 Environment
 ~~~~~~~
 
-.. attributetable:: Environment
-
-.. autoclass:: Environment
+.. autoclass:: Environment()
     :members:
 
 
@@ -77,69 +72,57 @@ These following object are not meant to be create as an instance rather its for 
 User
 ~~~~~~~
 
-.. attributetable:: User
-
-.. autoclass:: User
+.. autoclass:: User()
     :members:
 
 ClientAccount
 ~~~~~~~
 
-.. attributetable:: ClientAccount
-
-.. autoclass:: ClientAccount
+.. autoclass:: ClientAccount()
     :members:
+    :inherited-members:
 
 Tweet
 ~~~~~~~
 
-.. attributetable:: Tweet
-
-.. autoclass:: Tweet
+.. autoclass:: Tweet()
     :members:
+    :inherited-members:
 
 Space
 ~~~~~~~
 
-.. attributetable:: Space
-
-.. autoclass:: Space
+.. autoclass:: Space()
     :members:
 
 
 Message
 ~~~~~~~
 
-.. attributetable:: Message
-
-.. autoclass:: Message
+.. autoclass:: Message()
     :members:
 
 DirectMessage
 ~~~~~~~
 
-.. attributetable:: DirectMessage
-
-.. autoclass:: DirectMessage
+.. autoclass:: DirectMessage()
     :members:
+    :inherited-members:
 
 
 WelcomeMessage
 ~~~~~~~
 
 
-.. attributetable:: WelcomeMessage
-
-.. autoclass:: WelcomeMessage
+.. autoclass:: WelcomeMessage()
     :members:
+    :inherited-members:
 
 
 WelcomeMessageRule
 ~~~~~~~
 
-.. attributetable:: WelcomeMessageRule
-
-.. autoclass:: WelcomeMessageRule
+.. autoclass:: WelcomeMessageRule()
     :members:
 
 
@@ -151,8 +134,6 @@ Attachments is a way to attach additional part to a message, this include tweet 
 CustomProfile
 ~~~~~~~
 
-.. attributetable:: CustomProfile
-
 .. autoclass:: CustomProfile
     :members:
     
@@ -160,45 +141,35 @@ CustomProfile
 Poll
 ~~~~~~~
 
-.. attributetable:: Poll
-
-.. autoclass:: Poll
+.. autoclass:: Poll()
     :members:
 
 
 CTA
 ~~~~~~~
 
-.. attributetable:: CTA
-
-.. autoclass:: CTA
+.. autoclass:: CTA()
     :members:
 
 
 QuickReply
 ~~~~~~~
 
-.. attributetable:: QuickReply
-
-.. autoclass:: QuickReply
+.. autoclass:: QuickReply()
     :members:
 
 
 Geo
 ~~~~~~~
 
-.. attributetable:: Geo
-
-.. autoclass:: Geo
+.. autoclass:: Geo()
     :members:
 
 
 File
 ~~~~~~~
 
-.. attributetable:: File
-
-.. autoclass:: File
+.. autoclass:: File()
     :members:
 
 
@@ -212,26 +183,19 @@ Streaming is a way to stream in twitter for tweets! This differ with `on_tweet_c
 Stream
 ~~~~~~~
 
-.. attributetable:: Stream
-
-.. autoclass:: Stream
+.. autoclass:: Stream()
     :members:
 
 
 StreamConnection
 ~~~~~~~
 
-.. attributetable:: StreamConnection
-
-.. autoclass:: StreamConnection
+.. autoclass:: StreamConnection()
     :members:
 
 
 StreamRule
 ~~~~~~~
-
-
-.. attributetable:: StreamRule
 
 .. autoclass:: StreamRule
     :members:
@@ -244,36 +208,28 @@ Relations is an object that returns from a user action or a tweet action. This i
 RelationFollow
 ~~~~~~~
 
-.. attributetable:: RelationFollow
-
-.. autoclass:: RelationFollow
+.. autoclass:: RelationFollow()
     :members:
 
 
 RelationLike
 ~~~~~~~
 
-.. attributetable:: RelationLike
-
-.. autoclass:: RelationLike
+.. autoclass:: RelationLike()
     :members:
 
 
 RelationRetweet
 ~~~~~~~
 
-.. attributetable:: RelationRetweet
-
-.. autoclass:: RelationRetweet
+.. autoclass:: RelationRetweet()
     :members:
 
 
 RelationHide
 ~~~~~~~
 
-.. attributetable:: RelationHide
-
-.. autoclass:: RelationHide
+.. autoclass:: RelationHide()
     :members:
 
 
@@ -285,19 +241,14 @@ The embedded urls object returned by :class:`Tweet.embeds`.
 Embed
 ~~~~~~~
 
-.. attributetable:: Embed
-
-.. autoclass:: Embed
+.. autoclass:: Embed()
     :members:
 
 
 EmbedsImages
 ~~~~~~~
 
-.. attributetable:: EmbedsImages
-
-
-.. autoclass:: EmbedsImages
+.. autoclass:: EmbedsImages()
     :members:
 
 
@@ -309,41 +260,31 @@ Objects derives from entities.py
 Hashtags
 ~~~~~~~
 
-.. attributetable:: Hashtags
-
-.. autoclass:: Hashtags
+.. autoclass:: Hashtags()
     :members:
 
 UserMentions
 ~~~~~~~
 
-.. attributetable:: UserMentions
-
-.. autoclass:: UserMentions
+.. autoclass:: UserMentions()
     :members:
 
 Urls
 ~~~~~~~
 
-.. attributetable:: Urls
-
-.. autoclass:: Urls
+.. autoclass:: Urls(()
     :members:
 
 Symbols
 ~~~~~~~
 
-.. attributetable:: Symbols
-
-.. autoclass:: Symbols
+.. autoclass:: Symbols()
     :members:
 
 Media
 ~~~~~~~
 
-.. attributetable:: Media
-
-.. autoclass:: Media
+.. autoclass:: Media()
     :members:
 
 
@@ -355,98 +296,85 @@ Event objects are objects returned by an event filled with the event data.
 Event
 ~~~~~~~
 
-.. attributetable:: Event
-
-.. autoclass:: Event
+.. autoclass:: Event()
     :members:
 
 DirectMessageEvent
 ~~~~~~~
 
-.. attributetable:: DirectMessageEvent
-
-.. autoclass:: DirectMessageEvent
+.. autoclass:: DirectMessageEvent()
     :members:
+    :inherited-members:
 
 UserActionEvent
 ~~~~~~~
 
-.. attributetable:: UserActionEvent
-
-.. autoclass:: UserActionEvent
+.. autoclass:: UserActionEvent()
     :members:
+    :inherited-members:
 
 DirectMessageTypingEvent
 ~~~~~~~
 
-.. attributetable:: DirectMessageTypingEvent
-
-.. autoclass:: DirectMessageTypingEvent
+.. autoclass:: DirectMessageTypingEvent()
     :members:
+    :inherited-members:
 
 DirectMessageReadEvent
 ~~~~~~~
 
-.. attributetable:: DirectMessageReadEvent
-
-.. autoclass:: DirectMessageReadEvent
+.. autoclass:: DirectMessageReadEvent()
     :members:
+    :inherited-members:
 
 TweetFavoriteActionEvent
 ~~~~~~~
 
-.. attributetable:: TweetFavoriteActionEvent
-
-.. autoclass:: TweetFavoriteActionEvent
+.. autoclass:: TweetFavoriteActionEvent()
     :members:
+    :inherited-members:
 
 UserFollowActionEvent
 ~~~~~~~
 
-.. attributetable:: UserFollowActionEvent
-
-.. autoclass:: UserFollowActionEvent
+.. autoclass:: UserFollowActionEvent()
     :members:
+    :inherited-members:
 
 UserUnfollowActionEvent
 ~~~~~~~
 
-.. attributetable:: UserUnfollowActionEvent
-
-.. autoclass:: UserUnfollowActionEvent
+.. autoclass:: UserUnfollowActionEvent()
     :members:
+    :inherited-members:
 
 UserBlockActionEvent
 ~~~~~~~
 
-.. attributetable:: UserBlockActionEvent
-
-.. autoclass:: UserBlockActionEvent
+.. autoclass:: UserBlockActionEvent()
     :members:
+    :inherited-members:
 
 UserUnblockActionEvent
 ~~~~~~~
 
-.. attributetable:: UserUnblockActionEvent
-
-.. autoclass:: UserUnblockActionEvent
+.. autoclass:: UserUnblockActionEvent()
     :members:
+    :inherited-members:
 
 UserMuteActionEvent
 ~~~~~~~
 
-.. attributetable:: UserMuteActionEvent
-
-.. autoclass:: UserMuteActionEvent
+.. autoclass:: UserMuteActionEvent()
     :members:
+    :inherited-members:
 
 UserUnmuteActionEvent
 ~~~~~~~
 
-.. attributetable:: UserUnmuteActionEvent
-
-.. autoclass:: UserUnmuteActionEvent
+.. autoclass:: UserUnmuteActionEvent()
     :members:
+    :inherited-members:
 
 
 .. _twitter-api-events:

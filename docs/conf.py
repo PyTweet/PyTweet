@@ -20,7 +20,6 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(".."))
-sys.path.append(os.path.abspath("extensions"))
 
 
 # -- Project information -----------------------------------------------------
@@ -37,7 +36,6 @@ author = "TheGenocide & TheFarGG"
 # ones.
 
 extensions = [
-    "attributetable",
     "sphinx.ext.autodoc",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
@@ -92,7 +90,7 @@ default_role = "obj"
 language = None
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
+templates_path = []
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -108,26 +106,21 @@ pygments_style = "friendly"
 # Output file base name for HTML help builder.
 htmlhelp_basename = "pytweet.pydoc"
 
-html_context = {"discord_invite": "https://discord.gg/XHBhg6A4jJ"}
-
-
 # Output is processed with HTML5 writer. Default is False.
 html_experimental_html5_writer = True
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 html_show_sphinx = False
 
-html_search_scorer = "_static/scorer.js"
-
-html_js_files = ["copy.js", "settings.js", "sidebar.js", "custom.js"]
+html_js_files = []
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "basic"
+html_theme = "furo"
 
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+html_static_path = []
