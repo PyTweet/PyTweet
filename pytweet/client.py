@@ -118,8 +118,7 @@ class Client:
         self._account_user = ClientAccount(data, http_client=self.http)
 
     def event(self, func: Callable) -> None:
-        """
-        A decorator for making an event, the event will be register in the client's internal cache.
+        """A decorator for making an event, the event will be register in the client's internal cache.
 
         See the :ref:`Event Reference <twitter-api-events>` for the currently documented events.
 
@@ -625,12 +624,15 @@ class Client:
     ):
         """Listen to upcoming account activity events send by twitter to your webhook url. You can use the rest of Flask arguments like port or host via the kwargs argument.
 
+        .. note::
+            For the time being, we only support Flask for the app argument! If you want to use your own web application url, consider using :meth:`Client.listen_to`.
+
         Parameters
         ------------
         app: :class:`flask.Flask`
             Your flask application.
         url: :class:`str`
-            The webhook url. This completely up to you, e.g https://your-domain.com/webhook/twitter etc.
+            The webhook url. This completely up to you, e.g https://your-website.domain/webhook/twitter.
         env_label: :class:`str`
             The environment's label.
         sleep_for: Union[:class:`int`, :class:`float`]
@@ -645,6 +647,9 @@ class Client:
 
         .. versionadded:: 1.5.0
         """
+        if not isinstance(app, Flask):
+            raise PytweetException("App argument must be an instance of flask.Flask!")
+
         disabled_log: bool = kwargs.pop("disabled_log", False)
         make_new: bool = kwargs.pop("make_new", True)
         environments = self.fetch_all_environments()
@@ -669,15 +674,15 @@ class Client:
             thread = threading.Thread(target=app.run, name="PyTweet: Flask App Thread", kwargs=kwargs)
 
             if not self.webhook and not ngrok:
-                self.webhook_url_path = urlparse(webhook.url).path
+                self.webhook_url_path = urlparse(url).path
 
             elif self.webhook and ngrok:
-                self.webhook_url_path = "THE URL PATH PASSSED BY NGROK"  # TODO add ngrok support
+                ...  # TODO add ngrok support
 
             @app.route(self.webhook_url_path, methods=["POST", "GET"])
             def webhook_receive():
                 if request.method == "GET":
-                    _log.info("Attempting to respond to a CRC.")
+                    _log.info("Attempting to respond a CRC.")
                     crc = request.args["crc_token"]
 
                     validation = hmac.new(
@@ -738,3 +743,80 @@ class Client:
 
         finally:
             _log.debug(f"Stop listening due to internal/external problem!")
+
+    def listen_to(
+        self,
+        url: str,
+        env_label: str,
+        ngrok: bool = False,
+        **kwargs: Any
+    ):
+        """Listen to upcoming account activity events send by twitter to a pre-made web application url. This method differ from :meth:`Client.listen`, this method use a pre-made web application url without using a flask application.
+
+        .. warning::
+            With this method, you have to make your own CRC and event handlers in your web application. For the time being, the documentation doesn't provides informations for the handlers, either go to twitter documentation about account activity api or wait until we write the documentation.
+
+        Parameters
+        ------------
+        url: :class:`str`
+            The webhook url. This completely up to you, e.g https://your-website.domain/webhook/twitter.
+        env_label: :class:`str`
+            The environment's label.
+        ngrok: :class:`bool`
+            indicates to use ngrok for tunneling your localhost. This usually uses for users that use localhost url.
+        make_new: :class:`bool`
+            A kwarg indicates to make a new webhook url when the api can't find the url passed. Default to True.
+
+
+        .. versionadded:: 1.5.0
+        """
+        make_new: bool = kwargs.get("make_new", False)
+        environments = self.fetch_all_environments()
+
+        for env in environments:
+            if env.label == env_label:
+                self.environment = env
+
+            for webhook in env.webhooks:
+                if url == webhook.url:
+                    self.webhook_url_path = urlparse(webhook.url).path
+                    self.webhook = webhook
+                    self.environment = env
+                    break
+
+        if not self.webhook and not ngrok:
+            self.webhook_url_path = urlparse(webhook.url).path
+
+        elif self.webhook and ngrok:
+            ...  # TODO add ngrok support
+
+        check = not self.webhook and self.webhook_url_path
+        if check and make_new:
+            webhook = self.environment.register_webhook(url) # Register a new webhook url if no webhook found also if make_new is True.
+            self.webhook = webhook
+            self.environment = env
+            self.environment.add_my_subscription()
+            ids = self.environment.fetch_all_subscriptions()
+            users = self.http.fetch_users(ids)
+            for user in users:
+                self.http.user_cache[user.id] = user
+
+            _log.debug(
+                f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\n In Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
+            )
+
+        elif check and not make_new:
+            raise PytweetException(
+                f"Cannot find url passed: {url} Invalid url passed, please check the spelling of your url"
+            )
+
+        else:
+            self.webhook.trigger_crc()
+            ids = self.environment.fetch_all_subscriptions()
+            users = self.http.fetch_users(ids)
+            for user in users:
+                self.http.user_cache[user.id] = user
+
+            _log.debug(
+                f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\n In Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
+            )
