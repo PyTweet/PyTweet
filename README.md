@@ -6,15 +6,29 @@
 
 <img alt="PyPI - License" src="https://img.shields.io/pypi/l/PyTweet">
 
+
 <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/PyTweet">
+
 
 <img src="https://img.shields.io/github/commit-activity/m/PyTweet/PyTweet?color=turquoise&logo=github&logoColor=black">
 
+
 <img src="https://img.shields.io/github/issues-pr/PyTweet/PyTweet?color=yellow&label=Pull%20Requests&logo=github&logoColor=black">
+
 
 <img src="https://img.shields.io/discord/858312394236624957?color=blue&label=PyTweet&logo=discord">
 
+
 <img src='https://readthedocs.org/projects/py-tweet/badge/?version=latest' alt='Documentation Status' />
+
+
+<img src="https://img.shields.io/endpoint?url=https%3A%2F%2Ftwbadges.glitch.me%2Fbadges%2Fstandard">
+
+
+<img src="https://img.shields.io/endpoint?url=https%3A%2F%2Ftwbadges.glitch.me%2Fbadges%2Fpremium">
+
+
+<img src="https://img.shields.io/endpoint?url=https%3A%2F%2Ftwbadges.glitch.me%2Fbadges%2Fv2">
 
 </div>
 <br>
