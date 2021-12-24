@@ -141,7 +141,7 @@ class Client:
         self.http.events[func.__name__[3:]] = func
 
     def fetch_user(self, user_id: Union[str, int]) -> Optional[User]:
-        """A method for fetching the user with the user's id.
+        """Fetches a user.
 
         .. warning::
             This method uses API call and might cause ratelimits if used often!
@@ -162,7 +162,7 @@ class Client:
         return self.http.fetch_user(user_id)
 
     def fetch_user_by_username(self, username: str) -> Optional[User]:
-        """A method for fetching the user with the user's username.
+        """Fetches a user by the user's username.
 
         .. warning::
             This method uses API call and might cause ratelimits if used often!
@@ -183,7 +183,7 @@ class Client:
         return self.http.fetch_user_by_username(username)
 
     def fetch_tweet(self, tweet_id: Union[str, int]) -> Tweet:
-        """A method for fetching tweet with the tweet's id.
+        """Fetches a tweet.
 
         .. warning::
             This method uses API call and might cause ratelimits if used often! More recommended is to use get_tweet to get the client's tweet.
@@ -204,7 +204,7 @@ class Client:
         return self.http.fetch_tweet(tweet_id)
 
     def fetch_direct_message(self, event_id: Union[str, int]) -> DirectMessage:
-        """A method for fetching a direct message with the direct message's event ID.
+        """Fetches a direct message.
 
         .. warning::
             This method uses API call and might cause ratelimit if used often! It is more recommended to use `get_message()` method, as it get the message from the client's internal cache.
@@ -319,7 +319,7 @@ class Client:
         return self.http.create_welcome_message(name, text, file=file, quick_reply=quick_reply, cta=cta)
 
     def fetch_welcome_message(self, welcome_message_id: Union[str, int]) -> WelcomeMessage:
-        """Fetches the welcome message with the given welcome message ID argument.
+        """Fetches a welcome message.
 
         Parameters
         ------------
@@ -337,7 +337,7 @@ class Client:
         return self.http.fetch_welcome_message(welcome_message_id)
 
     def fetch_welcome_message_rule(self, welcome_message_rule_id: Union[str, int]) -> WelcomeMessageRule:
-        """A method for fetching a welcome message rule.
+        """Fetches a welcome message rule.
 
         Parameters
         ------------
@@ -355,7 +355,7 @@ class Client:
         return self.http.fetch_welcome_message_rule(welcome_message_rule_id)
 
     def fetch_space(self, space_id: Union[str, int]) -> Space:
-        """A method for fetching a space.
+        """Fetches a space.
 
         Parameters
         ------------
@@ -373,7 +373,7 @@ class Client:
         return self.http.fetch_space(space_id)
 
     def fetch_space_by_title(self, title: str, state: SpaceState = SpaceState.live) -> Space:
-        """Fetch a space using its title.
+        """Fetches a space using its title.
 
         Parameters
         ------------
@@ -599,7 +599,7 @@ class Client:
             print("\nKeyboardInterrupt: Exit stream.")
 
     def fetch_all_environments(self) -> Optional[List[Environment]]:
-        """A method for fetching all the client's envirouments.
+        """Fetches all the client's environments.
 
         Returns
         ---------
