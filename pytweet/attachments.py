@@ -18,15 +18,18 @@ class Poll:
     """Represents a Poll attachment in a tweet.
 
     .. describe:: x == y
+
         Check if one Poll's id is equal to another.
 
 
     .. describe:: x != y
+
         Check if one Poll's id is not equal to another.
 
 
     .. describe:: len(x)
-        returns how many options in the poll.
+
+        returns how many options the poll have.
 
     Parameters
     ------------
