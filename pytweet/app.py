@@ -6,6 +6,7 @@ class ApplicationInfo:
 
     .. versionadded:: 1.5.0
     """
+
     __slots__ = ("__original_payload", "_payload")
 
     def __init__(self, data: Dict[str, Any]):

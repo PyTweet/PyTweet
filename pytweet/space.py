@@ -14,6 +14,7 @@ class Space:
 
     .. versionadded:: 1.3.5
     """
+
     __slots__ = ("original_payload", "_payload", "http_client", "_include")
 
     def __init__(self, data: Dict[str, Any], http_client: object):
@@ -118,8 +119,8 @@ class Space:
         ---------
         :class:`User`
             This method returns a :class`User` object.
-        
-        
+
+
         .. versionadded:: 1.3.5
 
         .. versionchanged:: 1.5.0
@@ -135,7 +136,7 @@ class Space:
         ---------
         Optional[List[:class:`User`]]
             This method returns a list of users or an empty list if not found.
-            
+
 
         .. versionadded:: 1.3.5
 
@@ -180,4 +181,4 @@ class Space:
         .. versionchanged:: 1.5.0
             Made as an alias to :meth:`Space.ticketed`.
         """
-        return self.ticketed    
+        return self.ticketed

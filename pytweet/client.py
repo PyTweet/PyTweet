@@ -744,13 +744,7 @@ class Client:
         finally:
             _log.debug(f"Stop listening due to internal/external problem!")
 
-    def listen_to(
-        self,
-        url: str,
-        env_label: str,
-        ngrok: bool = False,
-        **kwargs: Any
-    ):
+    def listen_to(self, url: str, env_label: str, ngrok: bool = False, **kwargs: Any):
         """Listen to upcoming account activity events send by twitter to a pre-made web application url. This method differ from :meth:`Client.listen`, this method use a pre-made web application url without using a flask application.
 
         .. warning::
@@ -792,7 +786,9 @@ class Client:
 
         check = not self.webhook and self.webhook_url_path
         if check and make_new:
-            webhook = self.environment.register_webhook(url) # Register a new webhook url if no webhook found also if make_new is True.
+            webhook = self.environment.register_webhook(
+                url
+            )  # Register a new webhook url if no webhook found also if make_new is True.
             self.webhook = webhook
             self.environment = env
             self.environment.add_my_subscription()

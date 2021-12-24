@@ -23,7 +23,17 @@ from .errors import (
     Unauthorized,
     FieldsTooLarge,
 )
-from .expansions import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, SPACE_FIELD, TWEET_EXPANSION, SPACE_EXPANSION, TWEET_FIELD, USER_FIELD, TOPIC_FIELD
+from .expansions import (
+    MEDIA_FIELD,
+    PLACE_FIELD,
+    POLL_FIELD,
+    SPACE_FIELD,
+    TWEET_EXPANSION,
+    SPACE_EXPANSION,
+    TWEET_FIELD,
+    USER_FIELD,
+    TOPIC_FIELD,
+)
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser
 from .space import Space
@@ -405,8 +415,8 @@ class HTTPClient(EventMixin):
                 "expansions": SPACE_EXPANSION,
                 "space.fields": SPACE_FIELD,
                 "topic.fields": TOPIC_FIELD,
-                "user.fields": USER_FIELD
-            }
+                "user.fields": USER_FIELD,
+            },
         )
         return Space(res, http_client=self)
 
@@ -420,7 +430,7 @@ class HTTPClient(EventMixin):
                 "state": state.value,
                 "expansions": SPACE_EXPANSION,
                 "space.fields": SPACE_FIELD,
-                "topic.fields": TOPIC_FIELD
+                "topic.fields": TOPIC_FIELD,
             },
         )
         return Space(res, http_client=self)
