@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import Union, Optional
 from ..enums import ButtonType
 
-
 @dataclass
 class Button:
     """Represent a Button object. Button are attachment that you can attach via :class:`CTA`
