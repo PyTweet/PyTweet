@@ -215,7 +215,7 @@ class User:
         )
 
     def fetch_followers(self) -> Optional[List[User]]:
-        """Fetch the user's followers.
+        """Fetches the user's followers.
 
         .. note::
             This method will only returns 100 users unless you have an academic research access. Then it can returns more then 100 users.
@@ -232,7 +232,7 @@ class User:
         return [User(data, http_client=self.http_client) for data in followers["data"]]
 
     def fetch_following(self) -> Optional[List[User]]:
-        """Fetch the user's following.
+        """Fetches the user's following.
 
         .. note::
             This method will only returns 100 users unless you have an academic research access. Then it can returns more then 100 users.
@@ -277,7 +277,7 @@ class User:
         mentioned: bool = False,
         exclude: Optional[str] = None,
     ) -> Union[List[object], List]:
-        """Fetch the user timelines, this can be timelines where the user got mention or a normal tweet timelines.
+        """Fetches the user timelines, this can be timelines where the user got mention or a normal tweet timelines.
 
         Parameters
         ------------
@@ -554,7 +554,7 @@ class ClientAccount(User):
         return UserSettings(**res)
 
     def fetch_settings(self):
-        """Fetch the user settings.
+        """Fetches the user settings.
 
 
         .. versionadded:: 1.5.0
