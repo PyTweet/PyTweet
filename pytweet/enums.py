@@ -57,7 +57,7 @@ class UserActionEventType(Enum):
 
 
 class Timezone(Enum):
-    international_date_line_west = "Etc/GMT+12"
+    international_dateline_west = "Etc/GMT+12"
     midway_island = "Pacific/Midway"
     american_samoa = "Pacific/Pago_Pago"
     hawaii = "Pacific/Honolulu"
