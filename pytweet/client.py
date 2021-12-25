@@ -229,6 +229,7 @@ class Client:
         text: str = None,
         *,
         file: Optional[File] = None,
+        files: Optional[List[File]] = None,
         poll: Optional[Poll] = None,
         geo: Optional[Union[Geo, str]] = None,
         quote_tweet: Optional[Union[str, int]] = None,
@@ -245,7 +246,9 @@ class Client:
         text: :class:`str`
             The tweet's text, it will show up as the main text in a tweet.
         file: Optional[:class:`File`]
-            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
+            Represents a single file attachment. It could be an image, gif, or video. Must be an instance of pytweet.File
+        files: Optional[List[:class:`File`]]
+            Represents multiple file attachments in a list. It could be an image, gif, or video. the item in the list must also be an instance of pytweet.File
         poll: Optional[:class:`Poll`]
             The poll attachment.
         geo: Optional[Union[:class:`Geo`, :class:`str`]]
@@ -253,7 +256,7 @@ class Client:
         quote_tweet: Optional[Union[:class:`str`, :class:`int`]]
             The tweet ID you want to quote.
         direct_message_deep_link: Optional[:class:`str`]
-            The direct message deep link, It will showup as a CTA(call-to-action) with button attachment. Example of direct message deep link:
+            The direct message deep link, It will showup as a CTA(call-to-action) with button attachment.
         reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
             The reply setting that you can set to minimize users that can reply. If None is specified, the default is set to 'everyone' can reply.
         reply_tweet: Optional[Union[:class:`str`, :class:`int`]]
@@ -274,6 +277,7 @@ class Client:
         return self.http.post_tweet(
             text,
             file=file,
+            files=files,
             poll=poll,
             geo=geo,
             quote_tweet=quote_tweet,
@@ -302,7 +306,7 @@ class Client:
         text: Optional[:class:`str`]
             The welcome message's text. Please do not make this empty if you don't want the text to be blank.
         file: Optional[:class:`File`]:
-            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
+            Represents a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
         quick_reply: Optional[:class:`QuickReply`]
             The message's :class:`QuickReply` attachments.
         cta: Optional[:class:`CTA`]
