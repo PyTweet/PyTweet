@@ -290,9 +290,9 @@ class Client:
 
     def create_welcome_message(
         self,
+        *,
         name: Optional[str] = None,
         text: Optional[str] = None,
-        *,
         file: Optional[File] = None,
         quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
@@ -320,7 +320,13 @@ class Client:
 
         .. versionadded:: 1.3.5
         """
-        return self.http.create_welcome_message(name, text, file=file, quick_reply=quick_reply, cta=cta)
+        return self.http.create_welcome_message(
+            name=name, 
+            text=text, 
+            file=file, 
+            quick_reply=quick_reply, 
+            cta=cta
+        )
 
     def fetch_welcome_message(self, welcome_message_id: Union[str, int]) -> WelcomeMessage:
         """Fetches a welcome message.

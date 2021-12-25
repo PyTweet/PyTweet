@@ -729,9 +729,9 @@ class HTTPClient(EventMixin):
 
     def create_welcome_message(
         self,
+        *,
         name: Optional[str] = None,
         text: Optional[str] = None,
-        *,
         file: Optional[File] = None,
         quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
