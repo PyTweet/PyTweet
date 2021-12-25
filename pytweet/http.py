@@ -181,10 +181,18 @@ class HTTPClient(EventMixin):
             f"{response.status_code} {response.reason}\n"
             f"Headers: {response.headers}\n"
             f"Content: {response.content}\n"
+            f"Json-payload: {json}\n"
         )
 
         if code in (201, 202, 204):
-            return
+            if is_json:
+                try:
+                    res = response.json()
+                except JSONDecodeError:
+                    return response.text
+            else:
+                return response.text
+            return res
 
         elif code == 400:
             raise BadRequests(response)
@@ -623,6 +631,7 @@ class HTTPClient(EventMixin):
         text: str = None,
         *,
         file: Optional[File] = None,
+        files: Optional[List[File]] = None,
         poll: Optional[Poll] = None,
         geo: Optional[Union[Geo, str]] = None,
         quote_tweet: Optional[Union[str, int]] = None,
@@ -644,15 +653,27 @@ class HTTPClient(EventMixin):
             payload["media"] = {}
             payload["media"]["media_ids"] = [str(media_id)]
 
+        if files:
+            for file in files:
+                if payload.get("media", None):
+                    media_id = self.upload(file, "INIT")
+                    self.upload(file, "APPEND", media_id=media_id)
+                    self.upload(file, "FINALIZE", media_id=media_id)
+                    payload["media"]["media_ids"].append(str(media_id))
+
+                else:
+                    media_id = self.upload(file, "INIT")
+                    self.upload(file, "APPEND", media_id=media_id)
+                    self.upload(file, "FINALIZE", media_id=media_id)
+                    payload["media"] = {}
+                    payload["media"]["media_ids"] = [str(media_id)]
+
         if poll:
             payload["poll"] = {}
-            payload["poll"]["options"] = [option.label for option in poll.options]
             payload["poll"]["duration_minutes"] = int(poll.duration)
+            payload["poll"]["options"] = [option.label for option in poll.options]
 
         if geo:
-            if not isinstance(geo, Geo) and not isinstance(geo, str):
-                raise TypeError("'geo' must be an instance of pytweet.Geo or str")
-
             payload["geo"] = {}
             payload["geo"]["place_id"] = geo.id if isinstance(geo, Geo) else geo
 
@@ -748,15 +769,63 @@ class HTTPClient(EventMixin):
         )
 
         data = res.get("welcome_message")
-        id = data.get("id")
-        name = res.get("name")
-        timestamp = data.get("created_timestamp")
-        text = data.get("message_data").get("text")
+        message_data = data.get("message_data")
 
         return WelcomeMessage(
-            name,
-            text=text,
-            id=id,
-            timestamp=timestamp,
+            res.get("name"),
+            text=message_data.get("text"),
+            id=data.get("id"),
+            timestamp=data.get("created_timestamp"),
             http_client=self,
+        )
+
+    def update_welcome_message(
+        self,
+        *,
+        text: Optional[str] = None,
+        file: Optional[File] = None,
+        quick_reply: Optional[QuickReply] = None,
+        cta: Optional[CTA] = None
+    ):
+        data = {"message_data": {}}
+        message_data = data["message_data"]
+
+        message_data["text"] = str(text)
+
+        if file:
+            media_id = self.upload(file, "INIT")
+            self.upload(file, "APPEND", media_id=media_id)
+            self.upload(file, "FINALIZE", media_id=media_id)
+            message_data["attachment"] = {}
+            message_data["attachment"]["type"] = "media"
+            message_data["attachment"]["media"] = {}
+            message_data["attachment"]["media"]["id"] = str(media_id)
+
+        if quick_reply:
+            message_data["quick_reply"] = {
+                "type": quick_reply.type,
+                "options": quick_reply.raw_options,
+            }
+
+        if cta:
+            message_data["ctas"] = cta.raw_buttons
+
+        res = self.request(
+            "PUT",
+            "1.1",
+            "/direct_messages/welcome_messages/update.json",
+            params={"id": str(self.id)},
+            json=data,
+            auth=True,
+        )
+
+        welcome_message = res.get("welcome_message")
+        message_data = welcome_message.get("message_data")
+
+        return WelcomeMessage(
+            res.get("name"), 
+            text=message_data.get("text"), 
+            id=welcome_message.get("id"), 
+            timestamp=welcome_message.get("created_timestamp"), 
+            http_client=self
         )
