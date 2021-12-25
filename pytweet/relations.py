@@ -26,6 +26,7 @@ class RelationFollow(Relations):
 
     .. versionadded:: 1.2.0
     """
+
     __slots__ = ("__original_payload", "_payload")
 
     def __init__(self, data: Dict[str, Any]):
@@ -58,6 +59,7 @@ class RelationLike(Relations):
 
     .. versionadded:: 1.2.0
     """
+
     __slots__ = ("__original_payload", "_payload")
 
     def __init__(self, data: Dict[str, Any]):
@@ -82,6 +84,7 @@ class RelationRetweet(Relations):
 
     .. versionadded:: 1.2.0
     """
+
     __slots__ = ("__original_payload", "_payload")
 
     def __init__(self, data: Dict[str, Any]):
@@ -106,6 +109,7 @@ class RelationHide(Relations):
 
     .. versionadded:: 1.2.0
     """
+
     __slots__ = ("__original_payload", "_payload")
 
     def __init__(self, data: Dict[str, Any]):

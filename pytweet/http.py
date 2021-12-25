@@ -785,7 +785,7 @@ class HTTPClient(EventMixin):
         text: Optional[str] = None,
         file: Optional[File] = None,
         quick_reply: Optional[QuickReply] = None,
-        cta: Optional[CTA] = None
+        cta: Optional[CTA] = None,
     ):
         data = {"message_data": {}}
         message_data = data["message_data"]
@@ -823,9 +823,9 @@ class HTTPClient(EventMixin):
         message_data = welcome_message.get("message_data")
 
         return WelcomeMessage(
-            res.get("name"), 
-            text=message_data.get("text"), 
-            id=welcome_message.get("id"), 
-            timestamp=welcome_message.get("created_timestamp"), 
-            http_client=self
+            res.get("name"),
+            text=message_data.get("text"),
+            id=welcome_message.get("id"),
+            timestamp=welcome_message.get("created_timestamp"),
+            http_client=self,
         )

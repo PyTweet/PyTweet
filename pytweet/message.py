@@ -310,7 +310,7 @@ class WelcomeMessage(Message):
         text: Optional[str] = None,
         file: Optional[File] = None,
         quick_reply: Optional[QuickReply] = None,
-        cta: Optional[CTA] = None
+        cta: Optional[CTA] = None,
     ) -> WelcomeMessage:
         """Updates the Welcome Message, you dont need to use set_rule again since this update your default welcome message.
 
@@ -333,12 +333,7 @@ class WelcomeMessage(Message):
 
         .. versionadded:: 1.3.5
         """
-        return self.http_client.update_welcome_message(
-            text=text,
-            file=file,
-            quick_reply=quick_reply,
-            cta=cta
-        )
+        return self.http_client.update_welcome_message(text=text, file=file, quick_reply=quick_reply, cta=cta)
 
     def delete(self):
         """Delete the Welcome Message.
