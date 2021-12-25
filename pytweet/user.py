@@ -517,7 +517,7 @@ class ClientAccount(User):
         end_sleep_time: Optional[:class:`int`]
             The hour that sleep time should end if it is enabled. Must be an instance of datetime.datetime.
         timezone: Optional[:class:`Timezone`]
-            The new timezone replacing the old one. Must be an instance of :class:`Timezone` (e.g :class:`Timezone`.jakarta or :class:`Timezone`.paris)
+            The new timezone replacing the old one. Must be an instance of :class:`Timezone` (e.g :attr:`Timezone.jakarta` or :attr:`Timezone.paris`)
         location: Optional[:class:`int`]
             The Yahoo! Where On Earth ID to use as the user's default trend location. Global information is available by using 1 as the WOEID. Must be an instance of :class:`Location` or the woeid in :class:`int`.
 
