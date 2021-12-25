@@ -16,9 +16,18 @@ class Relations:
 
     .. versionadded:: 1.2.5
     """
+    __slots__ = ("_type")
 
     def __init__(self, type: int):
-        self.type = RelationsTypeEnum(type)
+        self._type = RelationsTypeEnum(type)
+
+    @property
+    def type(self) -> RelationsTypeEnum:
+        """:class:`RelationsTypeEnum`: Returns the relation type.
+        
+        .. versionadded:: 1.5.0
+        """
+        return self._type
 
 
 class RelationFollow(Relations):
