@@ -626,7 +626,7 @@ class Client:
         ngrok: bool = False,
         **kwargs: Any,
     ):
-        """Listen to upcoming account activity events send by twitter to your webhook url. You can use the rest of Flask arguments like port or host via the kwargs argument.
+        """Listen to upcoming account activity events send by twitter to your flask's url. You can use the rest of Flask arguments like port or host via the kwargs argument.
 
         .. note::
             For the time being, we only support Flask for the app argument! If you want to use your own web application url, consider using :meth:`Client.listen_to`.
@@ -636,7 +636,7 @@ class Client:
         app: :class:`flask.Flask`
             Your flask application.
         url: :class:`str`
-            The webhook url. This completely up to you, e.g https://your-website.domain/webhook/twitter.
+            The webhook url aka your flask's web application url. This completely up to you, e.g https://your-website.domain/webhook/twitter.
         env_label: :class:`str`
             The environment's label.
         sleep_for: Union[:class:`int`, :class:`float`]
@@ -748,8 +748,8 @@ class Client:
         finally:
             _log.debug(f"Stop listening due to internal/external problem!")
 
-    def listen_to(self, url: str, env_label: str, ngrok: bool = False, **kwargs: Any):
-        """Listen to upcoming account activity events send by twitter to a pre-made web application url. This method differ from :meth:`Client.listen`, this method use a pre-made web application url without using a flask application.
+    def listen_to(self, url: str, env_label: str, ngrok: bool = False, make_new: bool = True):
+        """Listen to upcoming account activity events send by twitter to a web application url. This method differ from :meth:`Client.listen`, this method doesn't use the flask's web application url, rather your web application url. This is good for people that want to implement their web application outside flask.
 
         .. warning::
             With this method, you have to make your own CRC and event handlers in your web application. For the time being, the documentation doesn't provides informations for the handlers, either go to twitter documentation about account activity api or wait until we write the documentation.
@@ -768,7 +768,6 @@ class Client:
 
         .. versionadded:: 1.5.0
         """
-        make_new: bool = kwargs.get("make_new", False)
         environments = self.fetch_all_environments()
 
         for env in environments:
