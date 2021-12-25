@@ -184,19 +184,19 @@ class Tweet(Message):
     .. versionadded:: 1.0.0
     """
 
-    __slots__ = ("original_payload", "_payload", "_includes", "tweet_metrics", "http_client", "deleted_timestamp")
+    __slots__ = ("__original_payload", "_payload", "_includes", "tweet_metrics", "http_client", "deleted_timestamp")
 
     if TYPE_CHECKING:
         _payload: Dict[Any, Any]
-        original_payload: Dict[str, Any]
+        __original_payload: Dict[str, Any]
         _includes: Any
 
     def __init__(
         self, data: Dict[str, Any], *, deleted_timestamp: Optional[int] = None, http_client: Optional[HTTPClient] = None
     ) -> None:
-        self.original_payload = data
+        self.__original_payload = data
         self._payload = data.get("data") or data
-        self._includes = self.original_payload.get("includes")
+        self._includes = self.__original_payload.get("includes")
         self.tweet_metrics: TweetPublicMetrics = TweetPublicMetrics(self._payload)
         self.http_client = http_client
         self.deleted_timestamp = deleted_timestamp

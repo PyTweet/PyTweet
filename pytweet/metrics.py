@@ -7,14 +7,14 @@ __all__ = (
 
 
 class UserPublicMetrics:
-    __slots__ = ("original_payload", "_public")
+    __slots__ = ("__original_payload", "_public")
 
     def __init__(self, data: Dict[str, Any] = {}):
-        self.original_payload: Dict[str, Any] = data
-        self._public: Dict[Any, Any] = self.original_payload.get("public_metrics")
+        self.__original_payload = data
+        self._public = self.__original_payload.get("public_metrics")
 
     def __repr__(self) -> str:
-        return f"UserPublicMetrics(user={self.original_payload.get('username')} follower_count={self.follower_count} following_count={self.following_count} tweet_count={self.tweet_count})"
+        return f"UserPublicMetrics(user={self.__original_payload.get('username')} follower_count={self.follower_count} following_count={self.following_count} tweet_count={self.tweet_count})"
 
     @property
     def follower_count(self) -> int:
@@ -34,11 +34,11 @@ class UserPublicMetrics:
 
 
 class TweetPublicMetrics:
-    __slots__ = ("original_payload", "_public")
+    __slots__ = ("__original_payload", "_public")
 
     def __init__(self, data: Dict[str, Any] = {}) -> None:
-        self.original_payload = data
-        self._public = data.get("public_metrics")
+        self.__original_payload = data
+        self._public = self.__original_payload.get("public_metrics")
 
     def __repr__(self) -> str:
         return f"TweetPublicMetrics(like_count={self.like_count} retweet_count={self.retweet_count} reply_count={self.reply_count}> quote_count={self.quote_count})"

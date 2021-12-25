@@ -26,10 +26,11 @@ class RelationFollow(Relations):
 
     .. versionadded:: 1.2.0
     """
+    __slots__ = ("__original_payload", "_payload")
 
     def __init__(self, data: Dict[str, Any]):
-        self.original_payload: Dict[str, Any] = data
-        self._payload: Dict[Any, Any] = data.get("data")
+        self.__original_payload = data
+        self._payload = data.get("data")
         super().__init__(1 if self.following else 0)
 
     def __repr__(self) -> str:
@@ -57,10 +58,11 @@ class RelationLike(Relations):
 
     .. versionadded:: 1.2.0
     """
+    __slots__ = ("__original_payload", "_payload")
 
     def __init__(self, data: Dict[str, Any]):
-        self.original_payload: Dict[str, Any] = data
-        self._payload: Dict[Any, Any] = data.get("data")
+        self.__original_payload = data
+        self._payload = data.get("data")
         super().__init__(2 if self.liked else None)
 
     def __repr__(self) -> str:
@@ -80,10 +82,11 @@ class RelationRetweet(Relations):
 
     .. versionadded:: 1.2.0
     """
+    __slots__ = ("__original_payload", "_payload")
 
     def __init__(self, data: Dict[str, Any]):
-        self.original_payload: Dict[str, Any] = data
-        self._payload: Dict[Any, Any] = data.get("data")
+        self.__original_payload = data
+        self._payload = data.get("data")
         super().__init__(3 if self.retweeted else None)
 
     def __repr__(self) -> str:
@@ -103,10 +106,11 @@ class RelationHide(Relations):
 
     .. versionadded:: 1.2.0
     """
+    __slots__ = ("__original_payload", "_payload")
 
     def __init__(self, data: Dict[str, Any]):
-        self.original_payload: Dict[str, Any] = data
-        self._payload: Dict[Any, Any] = data.get("data")
+        self.__original_payload = data
+        self._payload = data.get("data")
         super().__init__(4 if self.hidden else None)
 
     def __repr__(self) -> str:

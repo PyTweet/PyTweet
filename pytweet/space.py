@@ -15,10 +15,10 @@ class Space:
     .. versionadded:: 1.3.5
     """
 
-    __slots__ = ("original_payload", "_payload", "http_client", "_include")
+    __slots__ = ("__original_payload", "_payload", "http_client", "_include")
 
     def __init__(self, data: Dict[str, Any], http_client: object):
-        self.original_payload = data
+        self.__original_payload = data
         self._payload = None
         self.http_client = http_client
 
@@ -28,8 +28,8 @@ class Space:
             else:
                 self._payload = data.get("data")
         except AttributeError:
-            self._payload = self.original_payload
-        self._include = self.original_payload.get("includes")
+            self._payload = self.__original_payload
+        self._include = self.__original_payload.get("includes")
 
     def __repr__(self) -> str:
         return "Space(name={0.title} id={0.id} state={0.state})".format(self)
