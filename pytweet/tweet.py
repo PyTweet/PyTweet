@@ -313,6 +313,7 @@ class Tweet(Message):
         text: str = None,
         *,
         file: Optional[File] = None,
+        files: Optional[List[File]] = None,
         geo: Optional[Union[Geo, str]] = None,
         direct_message_deep_link: Optional[str] = None,
         reply_setting: Optional[Union[ReplySetting, str]] = None,
@@ -329,6 +330,8 @@ class Tweet(Message):
             The tweet's text, it will show up as the main text in a tweet.
         file: Optional[:class:`File`]
             Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
+        files: Optional[List[:class:`File`]]
+            Represents multiple file attachments in a list. It could be an image, gif, or video. the item in the list must also be an instance of pytweet.File
         geo: Optional[Union[:class:`Geo`, :class:`str`]]
             The geo attachment, you can put an object that is an instance of :class:`Geo` or the place ID in a string.
         direct_message_deep_link: Optional[:class:`str`]
@@ -349,6 +352,7 @@ class Tweet(Message):
         tweet = self.http_client.post_tweet(
             text,
             file=file,
+            files=files,
             geo=geo,
             direct_message_deep_link=direct_message_deep_link,
             reply_setting=reply_setting,
