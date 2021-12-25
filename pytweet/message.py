@@ -243,7 +243,7 @@ class DirectMessage(Message):
 
 
 class WelcomeMessage(Message):
-    """Represent a Welcome Message in a Direct Message.
+    """Represents a Welcome Message in a Direct Message.
 
     Parameters
     ------------
@@ -306,20 +306,20 @@ class WelcomeMessage(Message):
 
     def update(
         self,
-        text: str,
         *,
+        text: Optional[str] = None,
         file: Optional[File] = None,
         quick_reply: Optional[QuickReply] = None,
-        cta: Optional[CTA] = None,
+        cta: Optional[CTA] = None
     ) -> WelcomeMessage:
         """Updates the Welcome Message, you dont need to use set_rule again since this update your default welcome message.
 
         Parameters
         -----------
-        text: :class:`str`
+        text: Optional[:class:`str`]
             The welcome message main text
         file: Optional[:class:`File`]:
-            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
+            Represents a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
         quick_reply: Optional[:class:`QuickReply`]
             The message's :class:`QuickReply` attachments.
         cta: Optional[:class:`CTA`]
@@ -333,47 +333,12 @@ class WelcomeMessage(Message):
 
         .. versionadded:: 1.3.5
         """
-        data = {"message_data": {}}
-        message_data = data["message_data"]
-
-        message_data["text"] = str(text)
-
-        if file:
-            media_id = self.http_client.upload(file, "INIT")
-            self.http_client.upload(file, "APPEND", media_id=media_id)
-            self.http_client.upload(file, "FINALIZE", media_id=media_id)
-            message_data["attachment"] = {}
-            message_data["attachment"]["type"] = "media"
-            message_data["attachment"]["media"] = {}
-            message_data["attachment"]["media"]["id"] = str(media_id)
-
-        if quick_reply:
-            message_data["quick_reply"] = {
-                "type": quick_reply.type,
-                "options": quick_reply.raw_options,
-            }
-
-        if cta:
-            message_data["ctas"] = cta.raw_buttons
-
-        res = self.http_client.request(
-            "PUT",
-            "1.1",
-            "/direct_messages/welcome_messages/update.json",
-            params={"id": str(self.id)},
-            json=data,
-            auth=True,
+        return self.http_client.update_welcome_message(
+            text=text,
+            file=file,
+            quick_reply=quick_reply,
+            cta=cta
         )
-
-        welcome_message = res.get("welcome_message")
-        message_data = welcome_message.get("message_data")
-
-        name = res.get("name")
-        id = welcome_message.get("id")
-        timestamp = welcome_message.get("created_timestamp")
-        text = message_data.get("text")
-
-        return WelcomeMessage(name, text=text, id=id, timestamp=timestamp, http_client=self.http_client)
 
     def delete(self):
         """Delete the Welcome Message.
@@ -406,7 +371,7 @@ class WelcomeMessage(Message):
 
 
 class WelcomeMessageRule(Message):
-    """Represent a Welcome Message Rule in a Direct Message. This object is returns by WelcomeMessage.set_rule or client.fetch_welcome_message_rules, it determines which Welcome Message will be shown in a given conversation.
+    """Represents a Welcome Message Rule in a Direct Message. This object is returns by WelcomeMessage.set_rule or client.fetch_welcome_message_rules, it determines which Welcome Message will be shown in a given conversation.
 
     Parameters
     ------------
