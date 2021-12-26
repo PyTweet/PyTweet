@@ -143,6 +143,8 @@ class OauthSession(OAuth1Session):
         consumer_key: Optional[str],
         consumer_secret: Optional[str],
         *,
+        access_token: Optional[str],
+        access_token_secret: Optional[str],
         http_client: object,
         client_id: Optional[str] = None,
         callback: Optional[str] = None,
@@ -153,8 +155,8 @@ class OauthSession(OAuth1Session):
         self.http_client: HTTPClient = http_client
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
-        self.access_token = None
-        self.access_token_secret = None
+        self.access_token = access_token
+        self.access_token_secret = access_token_secret
         self.callback_uri = callback
         self.client_id = client_id
 
@@ -281,13 +283,3 @@ class OauthSession(OAuth1Session):
             callback_uri=self.callback_uri,
             decoding=None,
         )
-
-    def set_access_token(self, key: str, secret: str) -> None:
-        """Set the access token's key and secret."""
-        self.access_token = key
-        self.access_token_secret = secret
-
-    def set_consumer_key(self, consumer_key: str, consumer_secret: str) -> None:
-        """Set a the consumer key and secret"""
-        self.consumer_key = consumer_key
-        self.consumer_secret = consumer_secret
