@@ -7,6 +7,7 @@ from dateutil import parser
 if TYPE_CHECKING:
     from .type import ID
 
+
 def build_object(obj: str) -> Any:
     real_obj = getattr(pytweet, obj)
     if real_obj:

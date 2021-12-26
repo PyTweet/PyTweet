@@ -21,6 +21,7 @@ __all__ = ("Poll", "QuickReply", "Geo", "CTA", "File")
 with open("language.json", "r") as f:
     data = json.load(f)
 
+
 class Poll:
     """Represents a Poll attachment in a tweet.
 
@@ -433,7 +434,15 @@ class File:
 
     __slots__ = ("__path", "_total_bytes", "_mimetype", "dm_only", "alt_text", "subtitle", "subfile", "__media_id")
 
-    def __init__(self, path: str, *, dm_only: bool = False, alt_text: Optional[str] = None, subtitle: Optional[str] = None, subfile: Optional[File] = None):
+    def __init__(
+        self,
+        path: str,
+        *,
+        dm_only: bool = False,
+        alt_text: Optional[str] = None,
+        subtitle: Optional[str] = None,
+        subfile: Optional[File] = None
+    ):
         mimetype_guesser = mimetypes.MimeTypes().guess_type
         self.__path = path
         self._total_bytes = os.path.getsize(path) if isinstance(path, str) else os.path.getsize(path.name)
@@ -450,7 +459,6 @@ class File:
             else:
                 raise PytweetException("Wrong language codes passed! Must be a BCP47 code (e.g. 'en')")
 
-
     def __repr__(self) -> str:
         return "File(filename={0.filename})".format(self)
 
@@ -465,7 +473,7 @@ class File:
     @property
     def media_id(self) -> Optional[int]:
         """Optional[:class:`int`]: Returns the file's media id. Returns None if the file was never uploaded.
-        
+
         .. versionadded:: 1.5.0
         """
         return int(self.__media_id) if self.__media_id else self.__media_id
@@ -473,7 +481,7 @@ class File:
     @property
     def subfile_media_id(self) -> Optional[int]:
         """Optional[:class:`int`]: Returns the file's subtitle file's media id. Returns None if the subfile was never uploaded.
-        
+
         .. versionadded:: 1.5.0
         """
         return int(self.subfile.media_id) if self.subfile.media_id else self.subfile.media_id
@@ -516,6 +524,7 @@ class File:
             return startpoint + "GIF" if not self.dm_only else "dm_gif"
         elif "video" in self.mimetype:
             return startpoint + "VIDEO" if not self.dm_only else "dm_video"
+
 
 class CustomProfile:
     """Represents a CustomProfile attachments that allow a Direct Message author to present a different identity than that of the Twitter account being used.

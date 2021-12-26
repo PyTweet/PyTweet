@@ -224,7 +224,7 @@ class Client:
         .. versionadded:: 1.2.0
         """
         return self.http.fetch_direct_message(event_id)
-    
+
     def tweet(
         self,
         text: str = None,
@@ -239,7 +239,7 @@ class Client:
         reply_tweet: Optional[Union[Tweet, ID]] = None,
         exclude_reply_users: Optional[List[User, ID]] = None,
         media_tagged_users: Optional[List[User, ID]] = None,
-        super_followers_only: bool = False
+        super_followers_only: bool = False,
     ) -> Message:
         """Posts a tweet directly to twitter from the given parameters.
 
@@ -325,13 +325,7 @@ class Client:
 
         .. versionadded:: 1.3.5
         """
-        return self.http.create_welcome_message(
-            name=name, 
-            text=text, 
-            file=file, 
-            quick_reply=quick_reply, 
-            cta=cta
-        )
+        return self.http.create_welcome_message(name=name, text=text, file=file, quick_reply=quick_reply, cta=cta)
 
     def fetch_welcome_message(self, welcome_message_id: ID) -> WelcomeMessage:
         """Fetches a welcome message.

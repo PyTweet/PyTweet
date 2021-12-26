@@ -92,7 +92,15 @@ class HTTPClient(EventMixin):
         self.event_parser = EventParser(self)
         self.base_url = "https://api.twitter.com/"
         self.upload_url = "https://upload.twitter.com/"
-        self._auth = OauthSession(self.consumer_key, self.consumer_secret, access_token=self.access_token, access_token_secret=self.access_token_secret, http_client=self, callback=self.callback_url, client_id=self.client_id)
+        self._auth = OauthSession(
+            self.consumer_key,
+            self.consumer_secret,
+            access_token=self.access_token,
+            access_token_secret=self.access_token_secret,
+            http_client=self,
+            callback=self.callback_url,
+            client_id=self.client_id,
+        )
         self.current_header: Optional[Payload] = None
         self.client_id = client_id
         self.message_cache = {}
@@ -323,12 +331,7 @@ class HTTPClient(EventMixin):
                     "POST",
                     version="1.1",
                     path="/media/metadata/create.json",
-                    json={
-                        "media_id": str(file.media_id),
-                        "alt_text": {
-                            "text": str(file.alt_text)
-                        }
-                    },
+                    json={"media_id": str(file.media_id), "alt_text": {"text": str(file.alt_text)}},
                     auth=True,
                     use_base_url=False,
                 )
@@ -346,10 +349,10 @@ class HTTPClient(EventMixin):
                             {
                                 "media_id": file.subfile.media_id,
                                 "language_code": file.subtitle[0],
-                                "display_name": file.subtitle[1]
+                                "display_name": file.subtitle[1],
                             }
                         ]
-                    }
+                    },
                 }
 
                 self.request(
@@ -666,7 +669,7 @@ class HTTPClient(EventMixin):
         reply_tweet: Optional[Union[Tweet, ID]] = None,
         exclude_reply_users: Optional[List[User, ID]] = None,
         media_tagged_users: Optional[List[User, ID]] = None,
-        super_followers_only: bool = False
+        super_followers_only: bool = False,
     ) -> Optional[Message]:
         payload = {}
         if text:
@@ -714,7 +717,9 @@ class HTTPClient(EventMixin):
 
         if reply_tweet:
             payload["reply"] = {}
-            payload["reply"]["in_reply_to_tweet_id"] = reply_tweet.id if isinstance(reply_tweet, Tweet) else str(reply_tweet)
+            payload["reply"]["in_reply_to_tweet_id"] = (
+                reply_tweet.id if isinstance(reply_tweet, Tweet) else str(reply_tweet)
+            )
 
         if quote_tweet:
             payload["quote_tweet_id"] = quote_tweet.id if isinstance(quote_tweet, Tweet) else str(quote_tweet)
@@ -731,7 +736,9 @@ class HTTPClient(EventMixin):
         if media_tagged_users:
             if not payload.get("media"):
                 raise PytweetException("Cannot tag users without any file!")
-            payload["media"]["tagged_user_ids"] = [str(user.id) if isinstance(user, User) else str(user) for user in media_tagged_users]
+            payload["media"]["tagged_user_ids"] = [
+                str(user.id) if isinstance(user, User) else str(user) for user in media_tagged_users
+            ]
 
         if super_followers_only:
             payload["for_super_followers_only"] = True
