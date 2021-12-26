@@ -472,6 +472,10 @@ class Client:
         res = self.http.request("GET", "1.1", "/trends/available.json", auth=True)
         for data in res:
             data["parent_id"] = data["parentid"]
+            data["place_type"] = data["placeType"]
+            data["country_code"] = data["countryCode"]
+            data.pop("placeType")
+            data.pop("countryCode")
             data.pop("parentid")
 
         return [Location(**data) for data in res]

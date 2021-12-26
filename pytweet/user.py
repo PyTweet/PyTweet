@@ -503,7 +503,8 @@ class ClientAccount(User):
         start_sleep_time: Optional[datetime.datetime] = None,
         end_sleep_time: Optional[datetime.datetime] = None,
         timezone: Optional[Timezone] = None,
-        location: Optional[Location, int] = None,
+        location: Optional[
+        Location, int] = None,
     ):
         """Update the user settings.
 
@@ -544,12 +545,18 @@ class ClientAccount(User):
             res.pop("sleep_time")
 
         if res.get("location"):
-            res["location"] = Location(**res["trend_location"])
+            location = res["trend_location"]
+            location["place_type"] = location["placeType"]
+            location["country_code"] = location["countryCode"]
+            location.pop("placeType")
+            location.pop("countryCode")
+            res["location"] = Location(**location)
 
         if res.get("time_zone"):
-            res["time_zone"]["name_info"] = res["time_zone"]["tzinfo_name"]
-            res["time_zone"].pop("tzinfo_name")
-            res["timezone"] = TimezoneInfo(**res["time_zone"])
+            _timezone=res.get("time_zone")
+            _timezone["name_info"] = _timezone.get("tzinfo_name")
+            _timezone.pop("tzinfo_name")
+            res["timezone"] = TimezoneInfo(**res.get("time_zone"))
             res.pop("time_zone")
 
         return UserSettings(**res)
@@ -566,11 +573,20 @@ class ClientAccount(User):
             res.pop("sleep_time")
 
         if res.get("location"):
-            res["location"] = Location(**res["trend_location"])
+            location = res["trend_location"]
+            location["place_type"] = location["placeType"]
+            location["country_code"] = location["countryCode"]
+            location.pop("placeType")
+            location.pop("countryCode")
+            res["location"] = Location(**location)
 
         if res.get("time_zone"):
-            res["timezone"] = Timezone(**res["timezone"])
+            _timezone=res.get("time_zone")
+            _timezone["name_info"] = _timezone.get("tzinfo_name")
+            _timezone.pop("tzinfo_name")
+            res["timezone"] = TimezoneInfo(**res.get("time_zone"))
             res.pop("time_zone")
+            
 
         return UserSettings(**res)
 
