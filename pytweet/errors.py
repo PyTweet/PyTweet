@@ -54,7 +54,9 @@ class HTTPException(PytweetException):
                 self.detail = res.get("errors")[0].get("detail")
 
             else:
-                self.detail = res.get("detail")
+                self.message = res.get("error")
+                if not self.message:
+                    self.detail = res.get("detail")
 
         except decoder.JSONDecodeError:
             super().__init__(
@@ -63,7 +65,7 @@ class HTTPException(PytweetException):
 
         else:
             super().__init__(
-                f"Request returned an Exception (status code: {self.response.status_code}): {self.message}",
+                f"Request returned an Exception (status code: {self.response.status_code}): {self.message if self.message else self.detail}",
             )
 
     @property
