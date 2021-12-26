@@ -503,8 +503,7 @@ class ClientAccount(User):
         start_sleep_time: Optional[datetime.datetime] = None,
         end_sleep_time: Optional[datetime.datetime] = None,
         timezone: Optional[Timezone] = None,
-        location: Optional[
-        Location, int] = None,
+        location: Optional[Location, int] = None,
     ):
         """Update the user settings.
 
@@ -553,7 +552,7 @@ class ClientAccount(User):
             res["location"] = Location(**location)
 
         if res.get("time_zone"):
-            _timezone=res.get("time_zone")
+            _timezone = res.get("time_zone")
             _timezone["name_info"] = _timezone.get("tzinfo_name")
             _timezone.pop("tzinfo_name")
             res["timezone"] = TimezoneInfo(**res.get("time_zone"))
@@ -581,12 +580,11 @@ class ClientAccount(User):
             res["location"] = Location(**location)
 
         if res.get("time_zone"):
-            _timezone=res.get("time_zone")
+            _timezone = res.get("time_zone")
             _timezone["name_info"] = _timezone.get("tzinfo_name")
             _timezone.pop("tzinfo_name")
             res["timezone"] = TimezoneInfo(**res.get("time_zone"))
             res.pop("time_zone")
-            
 
         return UserSettings(**res)
 
