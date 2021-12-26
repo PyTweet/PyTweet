@@ -25,6 +25,7 @@ from .tweet import Tweet
 from .user import User, ClientAccount
 from .environment import Environment, Webhook
 from .dataclass import Location, Trend
+from .type import ID
 
 __all__ = ("Client",)
 
@@ -140,7 +141,7 @@ class Client:
             raise TypeError("Function passed in event() must NOT be a coroutine function.")
         self.http.events[func.__name__[3:]] = func
 
-    def fetch_user(self, user_id: Union[str, int]) -> Optional[User]:
+    def fetch_user(self, user_id: ID) -> Optional[User]:
         """Fetches a user.
 
         .. warning::
@@ -148,7 +149,7 @@ class Client:
 
         Parameters
         ------------
-        user_id: Union[:class:`str`, :class:`int`]
+        user_id: :class:`ID`
             Represents the user ID that you wish to get info for. If you don't have it you may use `fetch_user_by_username` because it only requires the user's username.
 
         Returns
@@ -182,7 +183,7 @@ class Client:
         """
         return self.http.fetch_user_by_username(username)
 
-    def fetch_tweet(self, tweet_id: Union[str, int]) -> Tweet:
+    def fetch_tweet(self, tweet_id: ID) -> Tweet:
         """Fetches a tweet.
 
         .. warning::
@@ -190,7 +191,7 @@ class Client:
 
         Parameters
         ------------
-        tweet_id: Union[:class:`str`, :class:`int`]
+        tweet_id: :class:`ID`
             Represents the tweet id that you wish to get info about.
 
         Returns
@@ -203,7 +204,7 @@ class Client:
         """
         return self.http.fetch_tweet(tweet_id)
 
-    def fetch_direct_message(self, event_id: Union[str, int]) -> DirectMessage:
+    def fetch_direct_message(self, event_id: ID) -> DirectMessage:
         """Fetches a direct message.
 
         .. warning::
@@ -211,7 +212,7 @@ class Client:
 
         Parameters
         ------------
-        event_id: Union[:class:`str`, :class:`int`]
+        event_id: :class:`ID`
             Represents the event's ID that you wish to fetch with.
 
         Returns
@@ -223,7 +224,7 @@ class Client:
         .. versionadded:: 1.2.0
         """
         return self.http.fetch_direct_message(event_id)
-
+    
     def tweet(
         self,
         text: str = None,
@@ -232,12 +233,13 @@ class Client:
         files: Optional[List[File]] = None,
         poll: Optional[Poll] = None,
         geo: Optional[Union[Geo, str]] = None,
-        quote_tweet: Optional[Union[str, int]] = None,
         direct_message_deep_link: Optional[str] = None,
         reply_setting: Optional[Union[ReplySetting, str]] = None,
-        reply_tweet: Optional[Union[str, int]] = None,
-        exclude_reply_users: Optional[List[Union[str, int]]] = None,
-        super_followers_only: bool = False,
+        quote_tweet: Optional[Union[Tweet, ID]] = None,
+        reply_tweet: Optional[Union[Tweet, ID]] = None,
+        exclude_reply_users: Optional[List[User, ID]] = None,
+        media_tagged_users: Optional[List[User, ID]] = None,
+        super_followers_only: bool = False
     ) -> Message:
         """Posts a tweet directly to twitter from the given parameters.
 
@@ -253,16 +255,18 @@ class Client:
             The poll attachment.
         geo: Optional[Union[:class:`Geo`, :class:`str`]]
             The geo attachment, you can put an object that is an instance of :class:`Geo` or the place ID in a string.
-        quote_tweet: Optional[Union[:class:`str`, :class:`int`]]
-            The tweet ID you want to quote.
         direct_message_deep_link: Optional[:class:`str`]
             The direct message deep link, It will showup as a CTA(call-to-action) with button attachment.
         reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
             The reply setting that you can set to minimize users that can reply. If None is specified, the default is set to 'everyone' can reply.
-        reply_tweet: Optional[Union[:class:`str`, :class:`int`]]
-            The tweet ID you want to reply to. If you have an instance of :class:`Tweet`, you can use the reply() method rather then using this method.
-        exclude_reply_users: Optional[List[Union[:class:`str`, :class:`int`]]]
-            Exclude the users when replying to a tweet, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you don't want to mention.
+        quote_tweet: Optional[:class:`ID`]
+            The tweet or tweet ID you want to quote.
+        reply_tweet: Optional[:class:`Tweet`, :class:`ID`]
+            The tweet or tweet ID you want to reply. If you have an instance of :class:`Tweet`, you can use the :meth:`Tweet.reply` method rather then using this method.
+        exclude_reply_users: Optional[List[:class:`User`, :class:`ID`]]
+            A list of users or user ids to be excluded from the reply :class:`Tweet` thus removing a user from a thread, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you don't want to mention.
+        media_tagged_users: Optional[List[:class:`User`, :class:`ID`]]
+            A list of users or user ids being tagged in the Tweet with Media. If the user you're tagging doesn't have photo-tagging enabled, their names won't show up in the list of tagged users even though the Tweet is successfully created.
         super_followers_only: :class:`bool`
             Allows you to tweet exclusively for super followers.
 
@@ -285,6 +289,7 @@ class Client:
             reply_setting=reply_setting,
             reply_tweet=reply_tweet,
             exclude_reply_users=exclude_reply_users,
+            media_tagged_users=media_tagged_users,
             super_followers_only=super_followers_only,
         )
 
@@ -328,12 +333,12 @@ class Client:
             cta=cta
         )
 
-    def fetch_welcome_message(self, welcome_message_id: Union[str, int]) -> WelcomeMessage:
+    def fetch_welcome_message(self, welcome_message_id: ID) -> WelcomeMessage:
         """Fetches a welcome message.
 
         Parameters
         ------------
-        welcome_message_id: Union[:class:`str`, :class:`int`]
+        welcome_message_id: :class:`ID`
             Represents the welcome message ID that you wish to fetch with.
 
         Returns
@@ -346,12 +351,12 @@ class Client:
         """
         return self.http.fetch_welcome_message(welcome_message_id)
 
-    def fetch_welcome_message_rule(self, welcome_message_rule_id: Union[str, int]) -> WelcomeMessageRule:
+    def fetch_welcome_message_rule(self, welcome_message_rule_id: ID) -> WelcomeMessageRule:
         """Fetches a welcome message rule.
 
         Parameters
         ------------
-        welcome_message_rule_id: Union[:class:`str`, :class:`int`]
+        welcome_message_rule_id: :class:`ID`
             Represents the welcome message rule ID that you wish to fetch with.
 
         Returns
@@ -364,12 +369,12 @@ class Client:
         """
         return self.http.fetch_welcome_message_rule(welcome_message_rule_id)
 
-    def fetch_space(self, space_id: Union[str, int]) -> Space:
+    def fetch_space(self, space_id: ID) -> Space:
         """Fetches a space.
 
         Parameters
         ------------
-        space_id: Union[:class:`str`, :class:`int`]
+        space_id: :class:`ID`
             Represents the space ID that you wish to fetch with.
 
         Returns
@@ -387,7 +392,7 @@ class Client:
 
         Parameters
         ------------
-        title: Union[:class:`str`, :class:`int`]
+        title: :class:`ID`
             The space title that you are going use for fetching the space.
         state: :class:`SpaceState`
             The type of state the space has. There are only 2 types: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host. Default to SpaceState.live
@@ -408,11 +413,11 @@ class Client:
     def search_geo(
         self,
         query: str,
-        max_result: Optional[Union[str, int]] = None,
+        max_result: Optional[ID] = None,
         *,
         lat: Optional[int] = None,
         long: Optional[int] = None,
-        ip: Optional[Union[str, int]] = None,
+        ip: Optional[ID] = None,
         granularity: str = "neighborhood",
     ) -> Geo:  # TODO make enums for granularity
         """Search a geo with the given arguments.
@@ -421,13 +426,13 @@ class Client:
         ------------
         query: :class:`str`
             Free-form text to match against while executing a geo-based query, best suited for finding nearby locations by name. Remember to URL encode the query.
-        max_results: Optional[Union[:class:`str`, :class:`int`]]
+        max_results: Optional[:class:`ID`]
             A hint as to the number of results to return. This does not guarantee that the number of results returned will equal max_results, but instead informs how many "nearby" results to return. Ideally, only pass in the number of places you intend to display to the user here.
         lat: :class:`int`
             The latitude to search around. This parameter will be ignored unless it is inside the range -90.0 to +90.0 (North is positive) inclusive. It will also be ignored if there isn't a corresponding long parameter.
         long: :class:`int`
             The longitude to search around. The valid ranges for longitude are -180.0 to +180.0 (East is positive) inclusive. This parameter will be ignored if outside that range, if it is not a number, if geo_enabled is turned off, or if there is not a corresponding lat parameter.
-        ip: Union[:class:`str`, :class:`int`]
+        ip: :class:`ID`
             An IP address. Used when attempting to fix geolocation based off of the user's IP address.
         granularity: :class:`str`
             This is the minimal granularity of place types to return and must be one of: neighborhood, city, admin or country. If no granularity is provided for the request neighborhood is assumed. Setting this to city, for example, will find places which have a type of city, admin or country.
@@ -442,7 +447,7 @@ class Client:
         """
         return self.http.search_geo(query, max_result, lat=lat, long=long, ip=ip, granularity=granularity)
 
-    def search_trend_with_place(self, woeid: Union[str, int], exclude: Optional[str] = None):
+    def search_trend_with_place(self, woeid: ID, exclude: Optional[str] = None):
         """Search trends with woeid.
 
         .. note::
@@ -450,7 +455,7 @@ class Client:
 
         Parameters
         ------------
-        woeid: Union[:class:`str`, :class:`int`]
+        woeid: :class:`ID`
             "where on earth identifier" or WOEID, which is a legacy identifier created by Yahoo and has been deprecated. Twitter API v1.1 still uses the numeric value to identify town and country trend locations. Example WOEID locations include: Worldwide: 1 UK: 23424975 Brazil: 23424768 Germany: 23424829 Mexico: 23424900 Canada: 23424775 United States: 23424977 New York: 2459115.
         exclude: Optional[:class:`str`]
             Setting this equal to hashtags will remove all hashtags from the trends list.
@@ -494,7 +499,7 @@ class Client:
 
         return [Location(**data) for data in res]
 
-    def get_message(self, event_id: Union[str, int]) -> Optional[DirectMessage]:
+    def get_message(self, event_id: ID) -> Optional[DirectMessage]:
         """Get a direct message through the client message cache. Returns None if the message is not in the cache.
 
         .. note::
@@ -502,7 +507,7 @@ class Client:
 
         Parameters
         ------------
-        event_id: Union[:class:`str`, :class:`int`]
+        event_id: :class:`ID`
             The event ID of the Direct Message event that you want to get.
 
         Returns
@@ -520,7 +525,7 @@ class Client:
 
         return self.http.message_cache.get(event_id)
 
-    def get_tweet(self, tweet_id: Union[str, int]) -> Optional[Tweet]:
+    def get_tweet(self, tweet_id: ID) -> Optional[Tweet]:
         """Gets a tweet through the client internal tweet cache. Return None if the tweet is not in the cache.
 
         .. note::
@@ -528,7 +533,7 @@ class Client:
 
         Parameters
         ------------
-        tweet_id: Union[:class:`str`, :class:`int`]
+        tweet_id: :class:`ID`
             The ID of a tweet that you want to get.
 
         Raises

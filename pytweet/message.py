@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from .app import ApplicationInfo
 from .attachments import CTA, File, QuickReply
@@ -11,6 +11,7 @@ from .user import User
 
 if TYPE_CHECKING:
     from .http import HTTPClient
+    from .type import ID
 
 __all__ = ("Message", "DirectMessage", "WelcomeMessage", "WelcomeMessageRule")
 
@@ -22,7 +23,7 @@ class Message:
     ------------
     text: Optional[:class:`str`]
         The messages's text.
-    id: Union[:class:`str`, :class:`int`]
+    id: `ID`
         The messages's unique ID.
     type: :class:`int`.
         The message's type in int form, it will gets form to MessageTypeEnum.
@@ -35,10 +36,10 @@ class Message:
 
     if TYPE_CHECKING:
         _text: Optional[str]
-        _id: Union[str, int]
+        _id: ID
         _type: int
 
-    def __init__(self, text: Optional[str], id: Union[str, int], type: int):
+    def __init__(self, text: Optional[str], id: ID, type: int):
         self._text = text
         self._id = id
         self._type = type
@@ -251,7 +252,7 @@ class WelcomeMessage(Message):
         A human readable name for the Welcome Message.
     text: :class:`str`
         The welcome message main text.
-    id: Union[:class:`str`, :class:`int`]
+    id: `ID`
         The welcome message unique id.
     timestamp: Optional[:class:`str`]
         The welcome message timestamp.
@@ -269,7 +270,7 @@ class WelcomeMessage(Message):
         name: Optional[str] = None,
         *,
         text: str,
-        id: Union[str, int],
+        id: ID,
         timestamp: str,
         http_client: HTTPClient,
     ):
@@ -370,9 +371,9 @@ class WelcomeMessageRule(Message):
 
     Parameters
     ------------
-    id: Union[:class:`str`, :class:`int`]
+    id: `ID`
         The welcome message rule unique id.
-    welcome_message_id: Union[:class:`str`, :class:`int`]
+    welcome_message_id: `ID`
         The welcome message unique id.
     timestamp: Optional[:class:`str`]
         The welcome message rule created timestamp.
@@ -387,9 +388,9 @@ class WelcomeMessageRule(Message):
 
     def __init__(
         self,
-        id: Union[str, int],
-        welcome_message_id: Union[str, int],
-        timestamp: Union[str, int],
+        id: ID,
+        welcome_message_id: ID,
+        timestamp: ID,
         *,
         http_client: HTTPClient,
     ):
@@ -440,8 +441,8 @@ class WelcomeMessageRule(Message):
         return datetime.datetime.fromtimestamp(int(self._timestamp) / 1000)
 
     @property
-    def welcome_message_id(self) -> Union[str, int]:
-        """Union[:class:`str`, :class:`int`]: Returns the welcome message's id.
+    def welcome_message_id(self) -> ID:
+        """:clasD`: Returns the welcome message's id.
 
         .. versionadded:: 1.3.5
         """

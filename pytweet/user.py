@@ -15,6 +15,7 @@ from .dataclass import UserSettings, SleepTimeSettings, Location, TimezoneInfo
 if TYPE_CHECKING:
     from .http import HTTPClient
     from .message import DirectMessage
+    from .type import ID
 
 
 class User:
@@ -272,8 +273,8 @@ class User:
         *,
         start_time: Optional[datetime.datetime] = None,
         end_time: Optional[datetime.datetime] = None,
-        since_id: Optional[Union[str, int]] = None,
-        until_id: Optional[Union[str, int]] = None,
+        since_id: Optional[ID] = None,
+        until_id: Optional[ID] = None,
         mentioned: bool = False,
         exclude: Optional[str] = None,
     ) -> Union[List[object], List]:
@@ -287,9 +288,9 @@ class User:
             This will make sure the tweets created datetime is after that specific time.
         end_time: Optional[:class:`datetime.datetime`]
             This will make sure the tweets created datetime is before that specific time.
-        since_id: Optional[Union[:class:`str`, :class:`int`]]
+        since_id: Optional[`ID`]
             Returns results with a Tweet ID greater than (that is, more recent than) the specified 'since' Tweet ID. Only the 3200 most recent Tweets are available. The result will exclude the since_id. If the limit of Tweets has occurred since the since_id, the since_id will be forced to the oldest ID available.
-        until_id: Optional[Union[:class:`str`, :class:`int`]]
+        until_id: Optional[`ID`]
             Returns results with a Tweet ID less less than (that is, older than) the specified 'until' Tweet ID. Only the 3200 most recent Tweets are available. The result will exclude the until_id. If the limit of Tweets has occurred since the until_id, the until_id will be forced to the most recent ID available.
         mentioned: :class:`bool`
             Indicates if only mentioned timelines return if set to True, else it will returns a normal tweet timelines. Default to False.

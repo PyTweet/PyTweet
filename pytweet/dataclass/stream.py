@@ -1,5 +1,8 @@
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .type import ID
 
 
 @dataclass
@@ -8,7 +11,6 @@ class StreamRule:
 
     .. versionadded:: 1.3.5
     """
-
     value: str
     tag: Optional[str] = None
-    id: Optional[Union[str, int]] = None
+    id: Optional[ID] = None

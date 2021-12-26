@@ -5,13 +5,16 @@ import datetime
 import io
 import os
 import json
-from typing import Any, Dict, List, NoReturn, Optional, Union
+from typing import Any, Dict, List, NoReturn, Optional, Union, TYPE_CHECKING
 
 from .dataclass import PollOption, Option, Button
 from .entities import Media
 from .enums import ButtonType
 from .utils import time_parse_todt
 from .errors import PytweetException
+
+if TYPE_CHECKING:
+    from .type import ID
 
 __all__ = ("Poll", "QuickReply", "Geo", "CTA", "File")
 
@@ -39,7 +42,7 @@ class Poll:
     ------------
     duration: :class:`int`
         The poll duration in minutes.
-    id: Optional[Union[:class:`str`, :class:`int`]]
+    id: Optional[`ID`]
         The poll's unique ID.
     voting_status: Optional[:class:`str`]
         The poll's voting status.
@@ -53,7 +56,7 @@ class Poll:
     __slots__ = ("_id", "_voting_status", "_end_date", "_duration", "_options", "_raw_options")
 
     def __init__(self, duration: int, **kwargs):
-        self._id: Optional[Union[str, int]] = kwargs.get("id", None)
+        self._id: Optional[ID] = kwargs.get("id", None)
         self._voting_status: Optional[str] = kwargs.get("voting_status", None)
         self._end_date = kwargs.get("end_date", None)
         self._duration = duration
@@ -525,8 +528,8 @@ class CustomProfile:
     def __init__(
         self,
         name: str,
-        id: Union[str, int],
-        timestamp: Union[str, int],
+        id: ID,
+        timestamp: ID,
         media: Dict[str, Any],
     ):
         self._name = name

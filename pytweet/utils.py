@@ -1,9 +1,11 @@
 import datetime
 import pytweet
 
-from typing import Any, Optional, Union
+from typing import Any, Optional, TYPE_CHECKING
 from dateutil import parser
 
+if TYPE_CHECKING:
+    from .type import ID
 
 def build_object(obj: str) -> Any:
     real_obj = getattr(pytweet, obj)
@@ -96,12 +98,12 @@ def compose_user_action(user_id: str, action: str, text: str = None):
     )
 
 
-def compose_tweet_action(tweet_id: Union[str, int], action: str = None):
+def compose_tweet_action(tweet_id: ID, action: str = None):
     """Make a link that let's you interact with a tweet with certain actions.
 
     Parameters
     ------------
-    tweet_id: Union[:class:`str`, :class:`int`]
+    tweet_id: `ID`
         The tweet id you want to compose.
     action: :class:`str`
         The action that's going to get perform when you click the link.

@@ -7,7 +7,7 @@ import time
 import requests
 import base64
 from json import JSONDecodeError
-from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
+from typing import Dict, List, NoReturn, Optional, Union, TYPE_CHECKING
 
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .auth import OauthSession
@@ -19,7 +19,6 @@ from .errors import (
     NotFound,
     NotFoundError,
     PytweetException,
-    TooManyRequests,
     Unauthorized,
     FieldsTooLarge,
 )
@@ -41,14 +40,12 @@ from .stream import Stream
 from .tweet import Tweet
 from .user import User
 from .mixins import EventMixin
-from .type import ID
 
 _log = logging.getLogger(__name__)
 
 
 if TYPE_CHECKING:
-    RequestModel = Dict[str, Any]
-    ResponseModel = Optional[Union[str, RequestModel]]
+    from .type import ID, Payload, ResponsePayload
 
 
 class HTTPClient(EventMixin):
@@ -95,8 +92,8 @@ class HTTPClient(EventMixin):
         self.event_parser = EventParser(self)
         self.base_url = "https://api.twitter.com/"
         self.upload_url = "https://upload.twitter.com/"
-        self._auth: Optional[OauthSession] = None  # Set in request method.
-        self.current_header: Optional[RequestModel] = None
+        self._auth = OauthSession(self.consumer_key, self.consumer_secret, access_token=self.access_token, access_token_secret=self.access_token_secret, http_client=self, callback=self.callback_url, client_id=self.client_id)
+        self.current_header: Optional[Payload] = None
         self.client_id = client_id
         self.message_cache = {}
         self.tweet_cache = {}
@@ -106,8 +103,8 @@ class HTTPClient(EventMixin):
             self.stream.connection.http_client = self
 
     @property
-    def access_level(self):
-        return self.current_header.get("x-access-levels").split("-")
+    def access_level(self) -> Optional[list]:
+        return self.current_header.get("x-access-levels").split("-") if self.current_header else None
 
     def request(
         self,
@@ -115,31 +112,20 @@ class HTTPClient(EventMixin):
         version: str,
         path: str,
         *,
-        headers: RequestModel = {},
-        params: RequestModel = {},
-        json: RequestModel = {},
-        data: RequestModel = {},
-        files: RequestModel = {},
+        headers: Payload = {},
+        params: Payload = {},
+        json: Payload = {},
+        data: Payload = {},
+        files: Payload = {},
         auth: bool = False,
         is_json: bool = True,
         use_base_url: bool = True,
         basic_auth: bool = False,
-    ) -> ResponseModel:
+    ) -> ResponsePayload:
         if use_base_url:
             url = self.base_url + version + path
         else:
             url = self.upload_url + version + path
-
-        if self._auth is None:
-            auth_session = OauthSession(
-                self.consumer_key,
-                self.consumer_secret,
-                http_client=self,
-                callback=self.callback_url,
-                client_id=self.client_id,
-            )
-            auth_session.set_access_token(self.access_token, self.access_token_secret)
-            self._auth = auth_session
 
         user_agent = "Py-Tweet (https://github.com/PyTweet/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
         if "Authorization" not in headers.keys():
@@ -239,12 +225,6 @@ class HTTPClient(EventMixin):
 
     def upload(self, file: File, command: str, *, subtitle_file: bool = False):
         assert command.upper() in ("INIT", "APPEND", "FINALIZE", "STATUS")
-        if self._auth is None:
-            auth_session = OauthSession(
-                self.consumer_key, self.consumer_secret, http_client=self, callback=self.callback_url
-            )
-            auth_session.set_access_token(self.access_token, self.access_token_secret)
-            self._auth = auth_session
 
         def CheckStatus(processing_info, media_id):
             if not processing_info:
@@ -489,7 +469,7 @@ class HTTPClient(EventMixin):
         )
         return Space(res, http_client=self)
 
-    def handle_events(self, payload: RequestModel):
+    def handle_events(self, payload: Payload):
         keys = payload.keys()
         if "direct_message_events" in keys:
             self.event_parser.parse_direct_message_create(payload)
