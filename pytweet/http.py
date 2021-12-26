@@ -41,6 +41,7 @@ from .stream import Stream
 from .tweet import Tweet
 from .user import User
 from .mixins import EventMixin
+from .type import ID
 
 _log = logging.getLogger(__name__)
 
@@ -93,7 +94,7 @@ class HTTPClient(EventMixin):
         self.callback_url = callback_url
         self.event_parser = EventParser(self)
         self.base_url = "https://api.twitter.com/"
-        self.upload_url = "https://upload.twitter.com/1.1/media/upload.json"
+        self.upload_url = "https://upload.twitter.com/"
         self._auth: Optional[OauthSession] = None  # Set in request method.
         self.current_header: Optional[RequestModel] = None
         self.client_id = client_id
@@ -127,7 +128,7 @@ class HTTPClient(EventMixin):
         if use_base_url:
             url = self.base_url + version + path
         else:
-            url = path
+            url = self.upload_url + version + path
 
         if self._auth is None:
             auth_session = OauthSession(
@@ -236,7 +237,7 @@ class HTTPClient(EventMixin):
 
         return res
 
-    def upload(self, file: File, command: str, *, media_id=None):
+    def upload(self, file: File, command: str, *, subtitle_file: bool = False):
         assert command.upper() in ("INIT", "APPEND", "FINALIZE", "STATUS")
         if self._auth is None:
             auth_session = OauthSession(
@@ -264,8 +265,8 @@ class HTTPClient(EventMixin):
 
             res = self.request(
                 "GET",
-                version=None,
-                path=self.base_url,
+                version="1.1",
+                path="/media/upload.json",
                 params={"command": "STATUS", "media_id": media_id},
                 auth=True,
                 use_base_url=False,
@@ -279,18 +280,20 @@ class HTTPClient(EventMixin):
                 "command": "INIT",
                 "media_type": file.mimetype,
                 "total_bytes": file.total_bytes,
-                "media_category": file.media_category,
+                "media_category": file.media_category if not subtitle_file else "Subtitles",
                 "shared": file.dm_only,
             }
+
             res = self.request(
                 "POST",
-                version=None,
-                path=self.upload_url,
+                version="1.1",
+                path="/media/upload.json",
                 data=data,
                 auth=True,
                 use_base_url=False,
             )
 
+            file._File__media_id = res["media_id"]
             return res["media_id"]
 
         elif command.upper() == "APPEND":
@@ -302,17 +305,17 @@ class HTTPClient(EventMixin):
             else:
                 open_file = open(path, "rb")
 
-            if not media_id:
+            if not file.media_id:
                 raise ValueError("'media_id' is None! Please specified it.")
 
             while bytes_sent < file.total_bytes:
-                res = self.request(
+                self.request(
                     "POST",
-                    version=None,
-                    path=self.upload_url,
+                    version="1.1",
+                    path="/media/upload.json",
                     data={
                         "command": "APPEND",
-                        "media_id": media_id,
+                        "media_id": file.media_id,
                         "segment_index": segment_id,
                     },
                     files={"media": open_file.read(4 * 1024 * 1024)},
@@ -326,14 +329,57 @@ class HTTPClient(EventMixin):
         elif command.upper() == "FINALIZE":
             res = self.request(
                 "POST",
-                version=None,
-                path=self.upload_url,
-                data={"command": "FINALIZE", "media_id": media_id},
+                version="1.1",
+                path="/media/upload.json",
+                data={"command": "FINALIZE", "media_id": file.media_id},
                 auth=True,
                 use_base_url=False,
             )
 
-            CheckStatus(res.get("processing_info", None), media_id)
+            CheckStatus(res.get("processing_info", None), file.media_id)
+
+            if file.alt_text:
+                self.request(
+                    "POST",
+                    version="1.1",
+                    path="/media/metadata/create.json",
+                    json={
+                        "media_id": str(file.media_id),
+                        "alt_text": {
+                            "text": str(file.alt_text)
+                        }
+                    },
+                    auth=True,
+                    use_base_url=False,
+                )
+
+            if file.subfile:
+                self.upload(file.subfile, "INIT", subtitle_file=True)
+                self.upload(file.subfile, "APPEND")
+                self.upload(file.subfile, "FINALIZE")
+
+                subtitle_data = {
+                    "media_id": file.media_id,
+                    "media_category": file.media_category,
+                    "subtitle_info": {
+                        "subtitles": [
+                            {
+                                "media_id": file.subfile.media_id,
+                                "language_code": file.subtitle[0],
+                                "display_name": file.subtitle[1]
+                            }
+                        ]
+                    }
+                }
+
+                self.request(
+                    "POST",
+                    version="1.1",
+                    path="/media/subtitles/create.json",
+                    json=subtitle_data,
+                    auth=True,
+                    use_base_url=False,
+                )
 
     def fetch_user(self, user_id: Union[str, int]) -> Optional[User]:
         try:
@@ -508,14 +554,14 @@ class HTTPClient(EventMixin):
         message_data["text"] = str(text)
 
         if file:
-            media_id = self.upload(file, "INIT")
-            self.upload(file, "APPEND", media_id=media_id)
-            self.upload(file, "FINALIZE", media_id=media_id)
+            self.upload(file, "INIT")
+            self.upload(file, "APPEND")
+            self.upload(file, "FINALIZE")
 
             message_data["attachment"] = {}
             message_data["attachment"]["type"] = "media"
             message_data["attachment"]["media"] = {}
-            message_data["attachment"]["media"]["id"] = str(media_id)
+            message_data["attachment"]["media"]["id"] = str(file.media_id)
 
         if custom_profile:
             message_data["custom_profile_id"] = str(custom_profile.id)
@@ -542,7 +588,7 @@ class HTTPClient(EventMixin):
         user = self.fetch_user(user_id)
         res["event"]["message_create"]["target"]["recipient"] = user
 
-        msg = DirectMessage(res, http_client=self or self)
+        msg = DirectMessage(res, http_client=self)
         self.message_cache[msg.id] = msg
         return msg
 
@@ -634,39 +680,40 @@ class HTTPClient(EventMixin):
         files: Optional[List[File]] = None,
         poll: Optional[Poll] = None,
         geo: Optional[Union[Geo, str]] = None,
-        quote_tweet: Optional[Union[str, int]] = None,
         direct_message_deep_link: Optional[str] = None,
-        reply_setting: Optional[str] = None,
-        reply_tweet: Optional[Union[str, int]] = None,
-        exclude_reply_users: Optional[List[Union[str, int]]] = None,
-        super_followers_only: Optional[bool] = None,
+        reply_setting: Optional[Union[ReplySetting, str]] = None,
+        quote_tweet: Optional[Union[Tweet, ID]] = None,
+        reply_tweet: Optional[Union[Tweet, ID]] = None,
+        exclude_reply_users: Optional[List[User, ID]] = None,
+        media_tagged_users: Optional[List[User, ID]] = None,
+        super_followers_only: bool = False
     ) -> Optional[Message]:
         payload = {}
         if text:
             payload["text"] = text
 
         if file:
-            media_id = self.upload(file, "INIT")
-            self.upload(file, "APPEND", media_id=media_id)
-            self.upload(file, "FINALIZE", media_id=media_id)
+            self.upload(file, "INIT")
+            self.upload(file, "APPEND")
+            self.upload(file, "FINALIZE")
 
             payload["media"] = {}
-            payload["media"]["media_ids"] = [str(media_id)]
+            payload["media"]["media_ids"] = [str(file.media_id)]
 
         if files:
             for file in files:
                 if payload.get("media", None):
-                    media_id = self.upload(file, "INIT")
-                    self.upload(file, "APPEND", media_id=media_id)
-                    self.upload(file, "FINALIZE", media_id=media_id)
-                    payload["media"]["media_ids"].append(str(media_id))
+                    self.upload(file, "INIT")
+                    self.upload(file, "APPEND")
+                    self.upload(file, "FINALIZE")
+                    payload["media"]["media_ids"].append(str(file.media_id))
 
                 else:
-                    media_id = self.upload(file, "INIT")
-                    self.upload(file, "APPEND", media_id=media_id)
-                    self.upload(file, "FINALIZE", media_id=media_id)
+                    self.upload(file, "INIT")
+                    self.upload(file, "APPEND")
+                    self.upload(file, "FINALIZE")
                     payload["media"] = {}
-                    payload["media"]["media_ids"] = [str(media_id)]
+                    payload["media"]["media_ids"] = [str(file.media_id)]
 
         if poll:
             payload["poll"] = {}
@@ -677,9 +724,6 @@ class HTTPClient(EventMixin):
             payload["geo"] = {}
             payload["geo"]["place_id"] = geo.id if isinstance(geo, Geo) else geo
 
-        if quote_tweet:
-            payload["quote_tweet_id"] = str(quote_tweet)
-
         if direct_message_deep_link:
             payload["direct_message_deep_link"] = direct_message_deep_link
 
@@ -688,17 +732,26 @@ class HTTPClient(EventMixin):
                 reply_setting.value if isinstance(reply_setting, ReplySetting) else reply_setting
             )
 
-        if reply_tweet or exclude_reply_users:
-            if reply_tweet:
-                payload["reply"] = {}
-                payload["reply"]["in_reply_to_tweet_id"] = str(reply_tweet)
+        if reply_tweet:
+            payload["reply"] = {}
+            payload["reply"]["in_reply_to_tweet_id"] = reply_tweet.id if isinstance(reply_tweet, Tweet) else str(reply_tweet)
 
-            if exclude_reply_users:
-                if "reply" in payload.keys():
-                    payload["reply"]["exclude_reply_user_ids"] = [str(id) for id in exclude_reply_users]
-                else:
-                    payload["reply"] = {}
-                    payload["reply"]["exclude_reply_user_ids"] = [str(id) for id in exclude_reply_users]
+        if quote_tweet:
+            payload["quote_tweet_id"] = quote_tweet.id if isinstance(quote_tweet, Tweet) else str(quote_tweet)
+
+        if exclude_reply_users:
+            ids = [str(user.id) if isinstance(user, User) else str(user) for user in exclude_reply_users]
+
+            if "reply" in payload.keys():
+                payload["reply"]["exclude_reply_user_ids"] = ids
+            else:
+                payload["reply"] = {}
+                payload["reply"]["exclude_reply_user_ids"] = ids
+
+        if media_tagged_users:
+            if not payload.get("media"):
+                raise PytweetException("Cannot tag users without any file!")
+            payload["media"]["tagged_user_ids"] = [str(user.id) if isinstance(user, User) else str(user) for user in media_tagged_users]
 
         if super_followers_only:
             payload["for_super_followers_only"] = True
@@ -711,11 +764,11 @@ class HTTPClient(EventMixin):
         if not isinstance(file, File):
             raise PytweetException("'file' argument must be an instance of pytweet.File")
 
-        media_id = self.upload(file, "INIT")
-        self.upload(file, "APPEND", media_id=media_id)
-        self.upload(file, "FINALIZE", media_id=media_id)
+        self.upload(file, "INIT")
+        self.upload(file, "APPEND")
+        self.upload(file, "FINALIZE")
 
-        data = {"custom_profile": {"name": name, "avatar": {"media": {"id": media_id}}}}
+        data = {"custom_profile": {"name": name, "avatar": {"media": {"id": file.media_id}}}}
 
         res = self.request("POST", "1.1", "/custom_profiles/new.json", json=data, auth=True)
         data = res.get("custom_profile")
@@ -743,13 +796,14 @@ class HTTPClient(EventMixin):
         message_data["text"] = str(text)
 
         if file:
-            media_id = self.upload(file, "INIT")
-            self.upload(file, "APPEND", media_id=media_id)
-            self.upload(file, "FINALIZE", media_id=media_id)
+            self.upload(file, "INIT")
+            self.upload(file, "APPEND", media_id=file.media_id)
+            self.upload(file, "FINALIZE", media_id=file.media_id)
+
             message_data["attachment"] = {}
             message_data["attachment"]["type"] = "media"
             message_data["attachment"]["media"] = {}
-            message_data["attachment"]["media"]["id"] = str(media_id)
+            message_data["attachment"]["media"]["id"] = str(file.media_id)
 
         if quick_reply:
             message_data["quick_reply"] = {
@@ -793,13 +847,13 @@ class HTTPClient(EventMixin):
         message_data["text"] = str(text)
 
         if file:
-            media_id = self.upload(file, "INIT")
-            self.upload(file, "APPEND", media_id=media_id)
-            self.upload(file, "FINALIZE", media_id=media_id)
+            self.upload(file, "INIT")
+            self.upload(file, "APPEND", media_id=file.media_id)
+            self.upload(file, "FINALIZE", media_id=file.media_id)
             message_data["attachment"] = {}
             message_data["attachment"]["type"] = "media"
             message_data["attachment"]["media"] = {}
-            message_data["attachment"]["media"]["id"] = str(media_id)
+            message_data["attachment"]["media"]["id"] = str(file.media_id)
 
         if quick_reply:
             message_data["quick_reply"] = {

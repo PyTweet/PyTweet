@@ -4,15 +4,19 @@ import mimetypes
 import datetime
 import io
 import os
+import json
 from typing import Any, Dict, List, NoReturn, Optional, Union
-from .dataclass import PollOption, Option, Button
 
+from .dataclass import PollOption, Option, Button
 from .entities import Media
 from .enums import ButtonType
 from .utils import time_parse_todt
+from .errors import PytweetException
 
 __all__ = ("Poll", "QuickReply", "Geo", "CTA", "File")
 
+with open("language.json", "r") as f:
+    data = json.load(f)
 
 class Poll:
     """Represents a Poll attachment in a tweet.
@@ -416,16 +420,33 @@ class File:
         The file's path.
     dm_only: :class:`bool`
         Indicates if the file is use in dm only. Default to False.
+    alt_text: Optional[:class:`str`]
+        The image's alt text, if None specified the image wont have an alt text. Default to None.
+    subtitle: :class:`bool`
+        Indicates if the image should get subtitle.
+
+    .. versionadded:: 1.3.5
     """
 
-    __slots__ = ("__path", "_total_bytes", "_mimetype", "dm_only")
+    __slots__ = ("__path", "_total_bytes", "_mimetype", "dm_only", "alt_text", "subtitle", "subfile", "__media_id")
 
-    def __init__(self, path: str, *, dm_only: bool = False):
+    def __init__(self, path: str, *, dm_only: bool = False, alt_text: Optional[str] = None, subtitle: Optional[str] = None, subfile: Optional[File] = None):
         mimetype_guesser = mimetypes.MimeTypes().guess_type
         self.__path = path
         self._total_bytes = os.path.getsize(path) if isinstance(path, str) else os.path.getsize(path.name)
         self._mimetype = mimetype_guesser(path) if isinstance(path, str) else mimetype_guesser(path.name)
         self.dm_only = dm_only
+        self.alt_text = alt_text
+        self.__media_id = None
+        self.subtitle = subtitle
+        self.subfile = subfile
+        if subtitle:
+            subtitle_check = data.get(subtitle)
+            if subtitle_check:
+                self.subtitle = (subtitle, subtitle_check)
+            else:
+                raise PytweetException("Wrong language codes passed! Must be a BCP47 code (e.g. 'en')")
+
 
     def __repr__(self) -> str:
         return "File(filename={0.filename})".format(self)
@@ -437,6 +458,22 @@ class File:
         .. versionadded:: 1.3.5
         """
         return self.__path
+
+    @property
+    def media_id(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the file's media id. Returns None if the file was never uploaded.
+        
+        .. versionadded:: 1.5.0
+        """
+        return int(self.__media_id) if self.__media_id else self.__media_id
+
+    @property
+    def subfile_media_id(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the file's subtitle file's media id. Returns None if the subfile was never uploaded.
+        
+        .. versionadded:: 1.5.0
+        """
+        return int(self.subfile.media_id) if self.subfile.media_id else self.subfile.media_id
 
     @property
     def mimetype(self) -> str:
@@ -476,7 +513,6 @@ class File:
             return startpoint + "GIF" if not self.dm_only else "dm_gif"
         elif "video" in self.mimetype:
             return startpoint + "VIDEO" if not self.dm_only else "dm_video"
-
 
 class CustomProfile:
     """Represents a CustomProfile attachments that allow a Direct Message author to present a different identity than that of the Twitter account being used.
