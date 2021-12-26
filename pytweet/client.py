@@ -49,7 +49,7 @@ class Client:
         The Access Token Secret of the app.
     stream: Optional[Stream]
         The client's stream. Must be an instance of :class:`Stream`.
-    callback: Optional[:class:`str`]
+    callback_url: Optional[:class:`str`]
         The oauth callback url, default to None.
 
     Attributes
