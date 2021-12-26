@@ -381,7 +381,7 @@ class HTTPClient(EventMixin):
                     use_base_url=False,
                 )
 
-    def fetch_user(self, user_id: Union[str, int]) -> Optional[User]:
+    def fetch_user(self, user_id: ID) -> Optional[User]:
         try:
             int(user_id)
         except ValueError:
@@ -401,7 +401,7 @@ class HTTPClient(EventMixin):
         except NotFoundError:
             return None
 
-    def fetch_users(self, ids: List[Union[str, int]]) -> List[User]:
+    def fetch_users(self, ids: List[ID]) -> List[User]:
         str_ids = []
         for id in ids:
             try:
@@ -439,7 +439,7 @@ class HTTPClient(EventMixin):
         except NotFoundError:
             return None
 
-    def fetch_tweet(self, tweet_id: Union[str, int]) -> Optional[Tweet]:
+    def fetch_tweet(self, tweet_id: ID) -> Optional[Tweet]:
         try:
             res = self.request(
                 "GET",
@@ -520,7 +520,7 @@ class HTTPClient(EventMixin):
 
     def send_message(
         self,
-        user_id: Union[str, int],
+        user_id: ID,
         text: str,
         *,
         file: Optional[File] = None,
@@ -592,7 +592,7 @@ class HTTPClient(EventMixin):
         self.message_cache[msg.id] = msg
         return msg
 
-    def fetch_direct_message(self, event_id: Union[str, int]) -> Optional[DirectMessage]:
+    def fetch_direct_message(self, event_id: ID) -> Optional[DirectMessage]:
         try:
             event_id = str(event_id)
         except ValueError:
@@ -607,7 +607,7 @@ class HTTPClient(EventMixin):
 
         return DirectMessage(res, http_client=self)
 
-    def fetch_welcome_message(self, welcome_message_id: Union[str, int]) -> Optional[WelcomeMessage]:
+    def fetch_welcome_message(self, welcome_message_id: ID) -> Optional[WelcomeMessage]:
         try:
             welcome_message_id = str(welcome_message_id)
         except ValueError:
@@ -645,11 +645,11 @@ class HTTPClient(EventMixin):
     def search_geo(
         self,
         query: str,
-        max_result: Optional[Union[str, int]] = None,
+        max_result: Optional[ID] = None,
         *,
         lat: Optional[int] = None,
         long: Optional[int] = None,
-        ip: Optional[Union[str, int]] = None,
+        ip: Optional[ID] = None,
         granularity: str = "neighborhood",
     ) -> Optional[Geo]:
         if query:
