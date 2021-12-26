@@ -89,6 +89,7 @@ class HTTPClient(EventMixin):
         self.access_token_secret: Optional[str] = access_token_secret
         self.stream = stream
         self.callback_url = callback_url
+        self.client_id = client_id
         self.event_parser = EventParser(self)
         self.base_url = "https://api.twitter.com/"
         self.upload_url = "https://upload.twitter.com/"

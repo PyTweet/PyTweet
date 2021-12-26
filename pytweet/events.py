@@ -1,11 +1,9 @@
 import datetime
-from typing import Any, Dict, Union, Optional, TYPE_CHECKING
+from typing import Union, Optional
 from .user import User
 from .tweet import Tweet
 from .enums import ActionEventType, UserActionEventType
-
-if TYPE_CHECKING:
-    from .type import Payload
+from .type import Payload
 
 # Events type
 

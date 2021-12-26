@@ -3,9 +3,7 @@ import pytweet
 
 from typing import Any, Optional, TYPE_CHECKING
 from dateutil import parser
-
-if TYPE_CHECKING:
-    from .type import ID
+from .type import ID
 
 
 def build_object(obj: str) -> Any:

@@ -1,5 +1,4 @@
 from .events import (
-    EventPayload,
     DirectMessageTypingEvent,
     DirectMessageReadEvent,
     TweetFavoriteActionEvent,
@@ -14,10 +13,10 @@ from .message import Message, DirectMessage
 from .user import User
 from .app import ApplicationInfo
 from .tweet import Tweet
-
+from .type import Payload
 
 class PayloadParser:
-    def parse_user_payload(self, payload: EventPayload):
+    def parse_user_payload(self, payload: Payload):
         copy = payload.copy()
         copy["public_metrics"] = {
             "followers_count": copy.get("followers_count"),
@@ -34,7 +33,7 @@ class PayloadParser:
             copy["profile_image_url"] = copy.get("profile_image_url_https")
         return copy
 
-    def parse_tweet_payload(self, payload: EventPayload):
+    def parse_tweet_payload(self, payload: Payload):
         copy = payload.copy()
         copy["public_metrics"] = {
             "quote_count": payload.get("quote_count"),
@@ -62,7 +61,7 @@ class EventParser:
         self.http_client = http_client
         self.client_id = int(self.http_client.access_token.partition("-")[0])
 
-    def parse_direct_message_create(self, direct_message_payload: EventPayload):
+    def parse_direct_message_create(self, direct_message_payload: Payload):
         event_payload = {"event": direct_message_payload.get("direct_message_events")[0]}
         users = direct_message_payload.get("users")
 
@@ -94,7 +93,7 @@ class EventParser:
         self.http_client.message_cache[direct_message.id] = direct_message
         self.http_client.dispatch("direct_message", direct_message)
 
-    def parse_direct_message_typing(self, typing_payload: EventPayload):
+    def parse_direct_message_typing(self, typing_payload: Payload):
         event_payload = typing_payload.get("direct_message_indicate_typing_events")[0]
         users = typing_payload.get("users")
 
@@ -115,7 +114,7 @@ class EventParser:
         payload = DirectMessageTypingEvent(event_payload, http_client=self.http_client)
         self.http_client.dispatch("typing", payload)
 
-    def parse_direct_message_read(self, read_payload: EventPayload):
+    def parse_direct_message_read(self, read_payload: Payload):
         event_payload = read_payload.get("direct_message_mark_read_events")[0]
         users = read_payload.get("users")
 
@@ -136,7 +135,7 @@ class EventParser:
         payload = DirectMessageReadEvent(event_payload, http_client=self.http_client)
         self.http_client.dispatch("read", payload)
 
-    def parse_user_action(self, action_payload: EventPayload, action_type):
+    def parse_user_action(self, action_payload: Payload, action_type):
         action_payload = action_payload.copy()
         event_payload = action_payload.get(action_type)[0]
         action_type = event_payload.get("type")
@@ -176,13 +175,13 @@ class EventParser:
             action = UserUnmuteActionEvent(action_payload)
             self.http_client.dispatch("user_unmute", action)
 
-    def parse_tweet_create(self, tweet_payload: EventPayload):
+    def parse_tweet_create(self, tweet_payload: Payload):
         tweet_payload = self.payload_parser.parse_tweet_payload(tweet_payload.get("tweet_create_events")[0])
         tweet = Tweet(tweet_payload, http_client=self.http_client)
         self.http_client.tweet_cache[tweet.id] = tweet
         self.http_client.dispatch("tweet_create", tweet)
 
-    def parse_tweet_delete(self, tweet_payload: EventPayload):
+    def parse_tweet_delete(self, tweet_payload: Payload):
         event_payload = tweet_payload.get("tweet_delete_events")[0]
         tweet_id = event_payload.get("status").get("id")
         tweet = self.http_client.tweet_cache.get(int(tweet_id))
@@ -198,7 +197,7 @@ class EventParser:
             tweet.deleted_timestamp = int(event_payload.get("timestamp_ms"))
             self.http_client.dispatch("tweet_delete", tweet)
 
-    def parse_favorite_tweet(self, favorite_payload: EventPayload):
+    def parse_favorite_tweet(self, favorite_payload: Payload):
         action_payload = favorite_payload.copy()
         event_payload = favorite_payload.get("favorite_events")[0]
         tweet = Tweet(self.payload_parser.parse_tweet_payload(event_payload.get("favorited_status")))
