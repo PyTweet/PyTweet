@@ -4,4 +4,4 @@ include *.py
 exclude *.replit
 include pytweet/py.typed
 include requirements.txt
-include langauge.json
+include language.json
