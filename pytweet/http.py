@@ -350,7 +350,7 @@ class HTTPClient(EventMixin):
                             {
                                 "media_id": file.subfile.media_id,
                                 "language_code": file.subtitle_language_code,
-                                "display_name": file.subtitle_language
+                                "display_name": file.subtitle_language,
                             }
                         ]
                     },

@@ -435,7 +435,17 @@ class File:
     .. versionadded:: 1.3.5
     """
 
-    __slots__ = ("__path", "_total_bytes", "_mimetype", "dm_only", "alt_text", "subtitle_language_code", "subfile", "subtitle_language", "__media_id")
+    __slots__ = (
+        "__path",
+        "_total_bytes",
+        "_mimetype",
+        "dm_only",
+        "alt_text",
+        "subtitle_language_code",
+        "subfile",
+        "subtitle_language",
+        "__media_id",
+    )
 
     def __init__(
         self,
@@ -444,7 +454,7 @@ class File:
         dm_only: bool = False,
         alt_text: Optional[str] = None,
         subtitle_language_code: Optional[str] = None,
-        subfile: Optional[File] = None
+        subfile: Optional[File] = None,
     ):
         mimetype_guesser = mimetypes.MimeTypes().guess_type
         self.__path = path
