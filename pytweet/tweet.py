@@ -12,6 +12,7 @@ from .metrics import TweetPublicMetrics
 from .relations import RelationHide, RelationLike, RelationRetweet
 from .user import User
 from .utils import time_parse_todt
+from .type import ID
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -317,7 +318,8 @@ class Tweet(Message):
         geo: Optional[Union[Geo, str]] = None,
         direct_message_deep_link: Optional[str] = None,
         reply_setting: Optional[Union[ReplySetting, str]] = None,
-        exclude_reply_users: Optional[List[Union[str, int]]] = None,
+        exclude_reply_users: Optional[List[User, ID]] = None,
+        media_tagged_users: Optional[List[User, ID]] = None
     ) -> Union[Tweet, Message]:
         """Post a tweet to reply to the tweet present by the tweet's id. Returns a :class:`Tweet` object or :class:`Message` if the tweet is not found in the cache.
 
@@ -338,8 +340,10 @@ class Tweet(Message):
             The direct message deep link, It will showup as a CTA(call-to-action) with button attachment. Example of direct message deep link:
         reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
             The reply setting that you can set to minimize users that can reply. If None is specified, the default is set to 'everyone' can reply.
-        exclude_reply_users: Optional[List[Union[:class:`str`, :class:`int`]]]
-            Exclude the users when replying to a tweet, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you don't want to mention.
+        exclude_reply_users: Optional[List[:class:`User`]]
+            A list of users or user ids to be excluded from the reply :class:`Tweet` thus removing a user from a thread, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you don't want to mention.
+        media_tagged_users: Optional[List[:class:`User`]]
+            A list of users or user ids being tagged in the Tweet with Media. If the user you're tagging doesn't have photo-tagging enabled, their names won't show up in the list of tagged users even though the Tweet is successfully created.
 
         Returns
         ---------
@@ -358,6 +362,7 @@ class Tweet(Message):
             reply_setting=reply_setting,
             reply_tweet=self.id,
             exclude_reply_users=exclude_reply_users,
+            media_tagged_users=media_tagged_users
         )
         return self.http_client.tweet_cache.get(tweet.id, tweet)
 
