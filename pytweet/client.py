@@ -47,6 +47,8 @@ class Client:
         The Access Token of the app.
     access_token_secret: Optional[:class:`str`]
         The Access Token Secret of the app.
+    client_id: Optional[str]
+        The client's OAuth 2.0 Client ID from keys and tokens page.
     stream: Optional[Stream]
         The client's stream. Must be an instance of :class:`Stream`.
     callback_url: Optional[:class:`str`]
@@ -54,14 +56,12 @@ class Client:
 
     Attributes
     ------------
-    http: Optional[:class:`HTTPClient`]
-        Returns the HTTPClient,  the HTTPClient is responsible for making most of the Requests.
     webhook: Optional[:class:`Webhook`]
-        Returns the client's main webhook, if there is None it returns None
+        Returns the client's main webhook, Returns None if not found.
     environment: Optional[:class:`Environment`]
-        Returns the client's main Environment, if there is None it returns None
+        Returns the client's main Environment, Returns None if not found.
     webhook_url_path: Optional[:class:`str`]
-        Returns the webhook url path, if there is None it returns None
+        Returns the webhook url path, Returns None if not found.
 
 
     .. versionadded:: 1.0.0
@@ -75,9 +75,9 @@ class Client:
         consumer_secret: Optional[str] = None,
         access_token: Optional[str] = None,
         access_token_secret: Optional[str] = None,
-        stream: Optional[Stream] = None,
-        callback_url: Optional[str] = None,
         client_id: Optional[str] = None,
+        stream: Optional[Stream] = None,
+        callback_url: Optional[str] = None
     ) -> None:
         self.http = HTTPClient(
             bearer_token,
