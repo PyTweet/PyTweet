@@ -1352,7 +1352,7 @@ Oauth is a way to authenticate a twitter user account. You can do this with 3 le
 OauthSession
 ~~~~~~~
 
-.. attributetable:: OauthSession
+.. /attributetable:: OauthSession
 
 
 .. autoclass:: OauthSession

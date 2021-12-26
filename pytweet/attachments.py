@@ -12,13 +12,14 @@ from .entities import Media
 from .enums import ButtonType
 from .utils import time_parse_todt
 from .errors import PytweetException
+from . import __path__
 
 if TYPE_CHECKING:
     from .type import ID
 
 __all__ = ("Poll", "QuickReply", "Geo", "CTA", "File")
 
-with open("language.json", "r") as f:
+with open(f"{__path__[0]}/language.json", "r") as f:
     data = json.load(f)
 
 
@@ -426,13 +427,15 @@ class File:
         Indicates if the file is use in dm only. Default to False.
     alt_text: Optional[:class:`str`]
         The image's alt text, if None specified the image wont have an alt text. Default to None.
-    subtitle: :class:`bool`
-        Indicates if the image should get subtitle.
+    subtitle_language_code: :class:`str`
+        The language code should be a BCP47 code (e.g. "en").
+    subfile: :class:`File`
+        The subtitle's source file. Must be a .srt file with the correct timestamps and contents.
 
     .. versionadded:: 1.3.5
     """
 
-    __slots__ = ("__path", "_total_bytes", "_mimetype", "dm_only", "alt_text", "subtitle", "subfile", "__media_id")
+    __slots__ = ("__path", "_total_bytes", "_mimetype", "dm_only", "alt_text", "subtitle_language_code", "subfile", "subtitle_language", "__media_id")
 
     def __init__(
         self,
@@ -440,7 +443,7 @@ class File:
         *,
         dm_only: bool = False,
         alt_text: Optional[str] = None,
-        subtitle: Optional[str] = None,
+        subtitle_language_code: Optional[str] = None,
         subfile: Optional[File] = None
     ):
         mimetype_guesser = mimetypes.MimeTypes().guess_type
@@ -450,12 +453,12 @@ class File:
         self.dm_only = dm_only
         self.alt_text = alt_text
         self.__media_id = None
-        self.subtitle = subtitle
+        self.subtitle_language_code = subtitle_language_code
         self.subfile = subfile
-        if subtitle:
-            subtitle_check = data.get(subtitle)
-            if subtitle_check:
-                self.subtitle = (subtitle, subtitle_check)
+        if self.subtitle_language_code:
+            fullname = data.get(subtitle_language_code)
+            if fullname:
+                self.subtitle_language = fullname
             else:
                 raise PytweetException("Wrong language codes passed! Must be a BCP47 code (e.g. 'en')")
 

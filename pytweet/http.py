@@ -349,8 +349,8 @@ class HTTPClient(EventMixin):
                         "subtitles": [
                             {
                                 "media_id": file.subfile.media_id,
-                                "language_code": file.subtitle[0],
-                                "display_name": file.subtitle[1],
+                                "language_code": file.subtitle_language_code,
+                                "display_name": file.subtitle_language
                             }
                         ]
                     },
