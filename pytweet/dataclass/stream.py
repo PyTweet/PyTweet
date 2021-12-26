@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
-from ..type import ID 
+from ..type import ID
 
 
 @dataclass

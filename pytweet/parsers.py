@@ -15,6 +15,7 @@ from .app import ApplicationInfo
 from .tweet import Tweet
 from .type import Payload
 
+
 class PayloadParser:
     def parse_user_payload(self, payload: Payload):
         copy = payload.copy()
