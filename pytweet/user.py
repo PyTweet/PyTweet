@@ -218,7 +218,7 @@ class User:
 
     def fetch_followers(self) -> Optional[List[User]]:
         """Fetches users from the user's followers list then paginate it .
-        
+
         Returns
         ---------
         Optional[:class:`Pagination`]
@@ -231,11 +231,7 @@ class User:
             "GET",
             "2",
             f"/users/{self.id}/followers",
-            params={
-                "expansions": "pinned_tweet_id",
-                "user.fields": USER_FIELD,
-                "tweet.fields": TWEET_FIELD
-            },
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
         )
 
         if not following:
@@ -244,7 +240,7 @@ class User:
 
     def fetch_following(self) -> Optional[Pagination]:
         """Fetches users from the user's following list then paginate it.
-        
+
         Returns
         ---------
         Optional[:class:`Pagination`]
@@ -257,17 +253,12 @@ class User:
             "GET",
             "2",
             f"/users/{self.id}/following",
-            params={
-                "expansions": "pinned_tweet_id",
-                "user.fields": USER_FIELD,
-                "tweet.fields": TWEET_FIELD
-            },
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
         )
 
         if not following:
             return []
         return Pagination(following, User, f"/users/{self.id}/following", http_client=self.http_client)
-        
 
     def fetch_blockers(self) -> Optional[Pagination]:
         """Fetches users from the user's block list then paginate it.
@@ -284,12 +275,8 @@ class User:
             "GET",
             "2",
             f"/users/{self.id}/blocking",
-            params={
-                "expansions": "pinned_tweet_id",
-                "user.fields": USER_FIELD,
-                "tweet.fields": TWEET_FIELD
-            },
-            auth=True
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            auth=True,
         )
 
         if not blockers:
@@ -311,12 +298,8 @@ class User:
             "GET",
             "2",
             f"/users/{self.id}/muting",
-            params={
-                "expansions": "pinned_tweet_id",
-                "user.fields": USER_FIELD,
-                "tweet.fields": TWEET_FIELD
-            },
-            auth=True
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            auth=True,
         )
 
         if not muters:

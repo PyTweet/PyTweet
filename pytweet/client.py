@@ -77,7 +77,7 @@ class Client:
         access_token_secret: Optional[str] = None,
         client_id: Optional[str] = None,
         stream: Optional[Stream] = None,
-        callback_url: Optional[str] = None
+        callback_url: Optional[str] = None,
     ) -> None:
         self.http = HTTPClient(
             bearer_token,

@@ -166,10 +166,12 @@ class UnKnownSpaceState(APIException):
     def __init__(self, given_state):
         super().__init__(message="Unknown state passed: %s" % given_state)
 
+
 class NoPageAvailable(APIException):
     """This error class inherits :class:`APIException`. This error is raises when a user try to lookup a new page in :class:`PaginationIterator` that does not exist.
 
     .. versionadded:: 1.5.0
     """
+
     def __init__(self):
         super().__init__(message="Pagination have no more page avalaible!")

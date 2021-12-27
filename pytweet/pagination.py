@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from .http import HTTPClient
     from .type import Payload
 
+
 class Pagination:
     """Represents a pagination object, some endpoints returns more objects but limits it to some pages. Using :class:`Pagination`, you can change page and manage objects easily. Example:
 
@@ -19,10 +20,11 @@ class Pagination:
         print("Page 2 :", pagination.content)
         pagination.previous_page() #Change page to the previous page
         print("Page 1 :", pagination.content)
-    
+
     .. versionadded:: 1.5.0
     """
-    def __init__(self, data: Payload, item_type: Any, endpoint_request: str, *,http_client: HTTPClient):
+
+    def __init__(self, data: Payload, item_type: Any, endpoint_request: str, *, http_client: HTTPClient):
         self.__original_payload = data
         self._payload = self.__original_payload.get("data")
         self._meta = self.__original_payload.get("meta")
@@ -33,12 +35,12 @@ class Pagination:
         self.item_type = item_type
         self.endpoint_request = endpoint_request
         self.http_client = http_client
-        self.pages_cache = {1: {user.id:user for user in self.content}}
+        self.pages_cache = {1: {user.id: user for user in self.content}}
 
     @property
     def content(self) -> list:
         """:class:`list`: Returns a list of objects.
-        
+
         .. versionadded:: 1.5.0
         """
         return [self.item_type(data, http_client=self.http_client) for data in self._payload]
@@ -46,7 +48,7 @@ class Pagination:
     @property
     def paginate_over(self) -> int:
         """:class:`int`: Returns how many pages you change over the pagination.
-        
+
         .. versionadded:: 1.5.0
         """
         return self._paginate_over
@@ -60,7 +62,7 @@ class Pagination:
             for page_number, page_content in pagination.pages:
                 ... #do something
 
-        
+
         .. versionadded:: 1.5.0
         """
         return zip(range(1, len(self.pages_cache) + 1), list(self.pages_cache.values()))
@@ -70,7 +72,7 @@ class Pagination:
 
         .. note::
             Note that, if the page_number is 0 it automatically would returns None. Specify number 1 or above.
-        
+
 
         .. versionadded:: 1.5.0
         """
@@ -87,7 +89,7 @@ class Pagination:
         :class:`NoPageAvailable`
             Raises when no page available to change.
 
-        
+
         .. versionadded:: 1.5.0
         """
         if not self._next_token:
@@ -102,8 +104,8 @@ class Pagination:
                 "expansions": "pinned_tweet_id",
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
-                "pagination_token": self._next_token
-            }
+                "pagination_token": self._next_token,
+            },
         )
         previous_content = self.content
 
@@ -115,7 +117,7 @@ class Pagination:
         self._count = 0
 
         if not previous_content[0] == self.content[0]:
-            self.pages_cache[len(self.pages_cache) + 1] = {user.id:user for user in self.content}
+            self.pages_cache[len(self.pages_cache) + 1] = {user.id: user for user in self.content}
 
     def previous_page(self):
         """Change page to the previous page.
@@ -125,7 +127,7 @@ class Pagination:
         :class:`NoPageAvailable`
             Raises when no page available to change.
 
-        
+
         .. versionadded:: 1.5.0
         """
         if not self._previous_token:
@@ -140,8 +142,8 @@ class Pagination:
                 "expansions": "pinned_tweet_id",
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
-                "pagination_token": self._previous_token
-            }
+                "pagination_token": self._previous_token,
+            },
         )
         previous_content = self.content
 
@@ -153,4 +155,4 @@ class Pagination:
         self._count = 0
 
         if not previous_content[0] == self.content[0]:
-            self.pages_cache[len(self.pages_cache) + 1] = {user.id:user for user in self.content}
+            self.pages_cache[len(self.pages_cache) + 1] = {user.id: user for user in self.content}
