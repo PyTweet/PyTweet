@@ -4,7 +4,7 @@ from json import decoder
 
 
 class PytweetException(Exception):
-    """Exception: This is the base class of all exceptions.
+    """This is the base class of all exceptions raise by PyTweet. This inherits :class:`Exception`.
 
     .. versionadded:: 1.2.0
     """
@@ -18,7 +18,7 @@ class PytweetException(Exception):
 
 
 class APIException(PytweetException):
-    """:class:`PytweetException`: raises when an error is incurred during a request with HTTP Status code 200.
+    """raises when an error is incurred during a request with HTTP Status code 200. This inherits :class:`PytweetException`.
 
     .. versionadded:: 1.2.0
     """
@@ -34,7 +34,7 @@ class APIException(PytweetException):
 
 
 class HTTPException(PytweetException):
-    """:class:`PytweetException`: A custom error that will be raises whenever a request returns an HTTP status code above 200.
+    """A custom error that will be raises whenever a request returns an HTTP status code above 200. This inherits :class:`PytweetException`.
 
     .. versionadded:: 1.2.0
     """
@@ -165,3 +165,11 @@ class UnKnownSpaceState(APIException):
 
     def __init__(self, given_state):
         super().__init__(message="Unknown state passed: %s" % given_state)
+
+class NoPageAvailable(APIException):
+    """This error class inherits :class:`APIException`. This error is raises when a user try to lookup a new page in :class:`PaginationIterator` that does not exist.
+
+    .. versionadded:: 1.5.0
+    """
+    def __init__(self):
+        super().__init__(message="Pagination have no more page avalaible!")
