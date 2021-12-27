@@ -11,6 +11,7 @@ from .relations import RelationFollow
 from .utils import build_object, time_parse_todt
 from .enums import Timezone
 from .dataclass import UserSettings, SleepTimeSettings, Location, TimezoneInfo
+from .pagination import Pagination
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -216,27 +217,38 @@ class User:
         )
 
     def fetch_followers(self) -> Optional[List[User]]:
-        """Fetches the user's followers.
-
-        .. note::
-            This method will only returns 100 users unless you have an academic research access. Then it can returns more then 100 users.
+        """Fetches users from the user's followers list then paginate it .
+        
+        Returns
+        ---------
+        Optional[:class:`Pagination`]
+            This method returns a :class:`Pagination` object.
 
 
         .. versionadded:: 1.3.5
         """
-        followers = self.http_client.request(
+        following = self.http_client.request(
             "GET",
             "2",
             f"/users/{self.id}/followers",
-            params={"user.fields": USER_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD
+            },
         )
-        return [User(data, http_client=self.http_client) for data in followers["data"]]
 
-    def fetch_following(self) -> Optional[List[User]]:
-        """Fetches the user's following.
+        if not following:
+            return []
+        return Pagination(following, User, f"/users/{self.id}/followers", http_client=self.http_client)
 
-        .. note::
-            This method will only returns 100 users unless you have an academic research access. Then it can returns more then 100 users.
+    def fetch_following(self) -> Optional[Pagination]:
+        """Fetches users from the user's following list then paginate it.
+        
+        Returns
+        ---------
+        Optional[:class:`Pagination`]
+            This method returns a :class:`Pagination` object.
 
 
         .. versionadded:: 1.3.5
@@ -245,13 +257,72 @@ class User:
             "GET",
             "2",
             f"/users/{self.id}/following",
-            params={"user.fields": USER_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD
+            },
         )
 
-        try:
-            return [User(data, http_client=self.http_client) for data in following["data"]]
-        except TypeError:
-            return following
+        if not following:
+            return []
+        return Pagination(following, User, f"/users/{self.id}/following", http_client=self.http_client)
+        
+
+    def fetch_blockers(self) -> Optional[Pagination]:
+        """Fetches users from the user's block list then paginate it.
+
+        Returns
+        ---------
+        Optional[:class:`Pagination`]
+            This method returns a :class:`Pagination` object.
+
+
+        .. versionadded:: 1.5.0
+        """
+        blockers = self.http_client.request(
+            "GET",
+            "2",
+            f"/users/{self.id}/blocking",
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD
+            },
+            auth=True
+        )
+
+        if not blockers:
+            return []
+        return Pagination(blockers, User, f"/users/{self.id}/blocking", http_client=self.http_client)
+
+    def fetch_muters(self) -> Optional[List[User]]:
+        """Fetches users from the user's mute list then paginate it.
+
+        Returns
+        ---------
+        Optional[:class:`Pagination`]
+            This method returns a :class:`Pagination` object.
+
+
+        .. versionadded:: 1.5.0
+        """
+        muters = self.http_client.request(
+            "GET",
+            "2",
+            f"/users/{self.id}/muting",
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD
+            },
+            auth=True
+        )
+
+        if not muters:
+            return []
+
+        return Pagination(muters, User, f"/users/{self.id}/muting", http_client=self.http_client)
 
     def fetch_pinned_tweet(self) -> Optional[Any]:
         """Returns the user's pinned tweet.
