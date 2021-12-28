@@ -11,10 +11,10 @@ from .metrics import TweetPublicMetrics
 from .relations import RelationHide, RelationLike, RelationRetweet
 from .user import User
 from .utils import time_parse_todt
+from .message import Message
 
 if TYPE_CHECKING:
     from .http import HTTPClient
-    from .message import Message
     from .type import ID
 
 __all__ = ("EmbedsImages", "Embed", "Tweet")
