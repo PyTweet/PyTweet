@@ -113,7 +113,7 @@ class Client:
     @property
     def me(self) -> Optional[User]:
         """Optional[:class:`User`]: An alias to :meth:`Client.account`
-        
+
         .. versionadded:: 1.5.0
         """
         return self.account
