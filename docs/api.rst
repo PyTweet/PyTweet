@@ -1356,6 +1356,18 @@ OauthSession
     :members:
 
 
+Pagination
+-------------
+
+Object uses for easy pagination handling.
+
+Pagination
+~~~~~~~
+
+.. autoclass:: Pagination
+    :members:
+
+
 Errors
 -------
 
@@ -1384,3 +1396,7 @@ Error raised by pytweet.
 
 
 .. autoexception:: NotFound 
+
+.. autoexception:: UnKnownSpaceState
+
+.. autoexception:: NoPageAvailable 
