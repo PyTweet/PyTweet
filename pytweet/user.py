@@ -4,12 +4,10 @@ import io
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
-from .attachments import Geo, CTA, CustomProfile, File, QuickReply
 from .expansions import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_EXPANSION, TWEET_FIELD, USER_FIELD
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import time_parse_todt
-from .enums import Timezone
 from .dataclass import UserSettings, SleepTimeSettings, Location, TimezoneInfo
 from .pagination import Pagination
 
@@ -18,6 +16,8 @@ if TYPE_CHECKING:
     from .message import DirectMessage
     from .type import ID
     from .tweet import Tweet
+    from .enums import Timezone
+    from .attachments import Geo, CTA, CustomProfile, File, QuickReply
 
 
 class User:
@@ -609,7 +609,7 @@ class ClientAccount(User):
                 "sleep_time_enabled": enabled_sleep_time,
                 "start_sleep_time": start_sleep_time,
                 "end_sleep_time": end_sleep_time,
-                "time_zone": timezone.value,
+                "time_zone": timezone.value if isinstance(timezone, Timezone) else timezone,
                 "trend_location_woeid": location.woeid if isinstance(location, Location) else location,
                 "lang": lang,
             },
@@ -683,7 +683,7 @@ class ClientAccount(User):
         description: Optional[:class:`str`]
             The new description that you want to replace with the old version.
         image: Optional[:class:`File`]
-            The new image that you want to replace with the old version. Must be an instance of :class:`File`.
+            The new profile image that you want to replace with the old version. Must be an instance of :class:`File`.
         location: Optional[:class:`Geo`]
             The new location you want to replace with the old version. Must be an instance of :class:`Geo` or the fullname of geo. You use :meth:`Geo.fullname` to get the fullname.
         profile_url: Optional[:class:`str`]
