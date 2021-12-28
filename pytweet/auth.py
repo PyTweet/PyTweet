@@ -110,14 +110,9 @@ class Scope:
         value = ""
         for attr in dir(self):
             if "_read" in attr or "_write" in attr or "_access" in attr:
-                try:
-                    e = getattr(self, attr)
-                    if e:
-                        value += f"{e}%20"
-                except Exception:
-                    continue
+                value += f"{attr}%20"
 
-        return value.rstrip("%20")
+        return value.rstrip("%20") # Only remove the last %20.
 
 
 class OauthSession(OAuth1Session):
