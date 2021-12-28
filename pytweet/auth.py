@@ -8,10 +8,10 @@ import datetime
 from random import randint
 from typing import Tuple, Optional, TYPE_CHECKING
 from requests_oauthlib import OAuth1, OAuth1Session
-from .utils import build_object
 
 if TYPE_CHECKING:
     from .client import Client
+    from .http import HTTPClient
 
 __all__ = ("OauthSession", "Scope")
 
@@ -129,10 +129,16 @@ class OauthSession(OAuth1Session):
         The application's consumer key.
     consumer_secret: Optional[:class:`str`]
         The application's consumer secret.
-    callback: Optional[:class:`str`]
-        The callback url, the user will get redirect to the callback url after they authorize. Default to None.
+    access_token: Optional[:class:`str`]
+        The application's access token.   
+    access_token_secret: Optional[:class:`str`]
+        The application's access token secret.
+    http_client: :class:`HTTPClient
+        The :class:`HTTPClient` for making requests.
     client_id: Optional[:class:`str`]
-        The client's unique ID.
+        The client's unique ID.    
+    callback_url: Optional[:class:`str`]
+        The callback url, the user will get redirect to the callback url after they authorize. Default to None.
 
 
     .. versionadded:: 1.2.0
@@ -145,19 +151,18 @@ class OauthSession(OAuth1Session):
         *,
         access_token: Optional[str],
         access_token_secret: Optional[str],
-        http_client: object,
+        http_client: HTTPClient,
         client_id: Optional[str] = None,
-        callback: Optional[str] = None,
+        callback_url: Optional[str] = None,
     ) -> None:
-        super().__init__(consumer_key, client_secret=consumer_secret, callback_uri=callback)
-        HTTPClient = build_object("HTTPClient")
+        super().__init__(consumer_key, client_secret=consumer_secret, callback_uri=callback_url)
 
         self.http_client: HTTPClient = http_client
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
         self.access_token = access_token
         self.access_token_secret = access_token_secret
-        self.callback_uri = callback
+        self.callback_uri = callback_url
         self.client_id = client_id
 
     @staticmethod

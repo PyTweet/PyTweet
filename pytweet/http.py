@@ -99,7 +99,7 @@ class HTTPClient(EventMixin):
             access_token=self.access_token,
             access_token_secret=self.access_token_secret,
             http_client=self,
-            callback=self.callback_url,
+            callback_url=self.callback_url,
             client_id=self.client_id,
         )
         self.current_header: Optional[Payload] = None
