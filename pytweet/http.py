@@ -365,6 +365,21 @@ class HTTPClient(EventMixin):
                     use_base_url=False,
                 )
 
+    def fetch_me(self):
+        data = self.request(
+            "GET",
+            "2",
+            f"/users/me",
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD
+            },
+            auth=True,
+        )
+
+        return User(data, http_client=self)
+
     def fetch_user(self, user_id: ID) -> Optional[User]:
         try:
             int(user_id)
@@ -376,8 +391,11 @@ class HTTPClient(EventMixin):
                 "GET",
                 "2",
                 f"/users/{user_id}",
-                headers={"Authorization": f"Bearer {self.bearer_token}"},
-                params={"user.fields": USER_FIELD},
+                params={
+                    "expansions": "pinned_tweet_id",
+                    "user.fields": USER_FIELD,
+                    "tweet.fields": TWEET_FIELD
+                },
                 auth=True,
             )
 
@@ -400,7 +418,11 @@ class HTTPClient(EventMixin):
             "GET",
             "2",
             f"/users?ids={ids}",
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id", 
+                "user.fields": USER_FIELD, 
+                "tweet.fields": TWEET_FIELD
+            },
             auth=True,
         )
 
@@ -415,8 +437,11 @@ class HTTPClient(EventMixin):
                 "GET",
                 "2",
                 f"/users/by/username/{username}",
-                headers={"Authorization": f"Bearer {self.bearer_token}"},
-                params={"user.fields": USER_FIELD},
+                params={
+                    "expansions": "pinned_tweet_id",
+                    "user.fields": USER_FIELD,
+                    "tweet.fields": TWEET_FIELD
+                },
                 auth=True,
             )
             return User(data, http_client=self)
