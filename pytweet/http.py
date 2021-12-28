@@ -370,11 +370,7 @@ class HTTPClient(EventMixin):
             "GET",
             "2",
             f"/users/me",
-            params={
-                "expansions": "pinned_tweet_id",
-                "user.fields": USER_FIELD,
-                "tweet.fields": TWEET_FIELD
-            },
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
             auth=True,
         )
 
@@ -391,11 +387,7 @@ class HTTPClient(EventMixin):
                 "GET",
                 "2",
                 f"/users/{user_id}",
-                params={
-                    "expansions": "pinned_tweet_id",
-                    "user.fields": USER_FIELD,
-                    "tweet.fields": TWEET_FIELD
-                },
+                params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
                 auth=True,
             )
 
@@ -418,11 +410,7 @@ class HTTPClient(EventMixin):
             "GET",
             "2",
             f"/users?ids={ids}",
-            params={
-                "expansions": "pinned_tweet_id", 
-                "user.fields": USER_FIELD, 
-                "tweet.fields": TWEET_FIELD
-            },
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
             auth=True,
         )
 
@@ -437,11 +425,7 @@ class HTTPClient(EventMixin):
                 "GET",
                 "2",
                 f"/users/by/username/{username}",
-                params={
-                    "expansions": "pinned_tweet_id",
-                    "user.fields": USER_FIELD,
-                    "tweet.fields": TWEET_FIELD
-                },
+                params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
                 auth=True,
             )
             return User(data, http_client=self)
