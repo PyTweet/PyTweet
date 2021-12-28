@@ -205,10 +205,7 @@ class Tweet(Message):
 
     def __repr__(self) -> str:
         return "Tweet(text={0.text} id={0.id} author={0.author})".format(self)
-
-    def __str__(self) -> str:
-        return self.text
-
+        
     def __eq__(self, other: Tweet) -> Union[bool, NoReturn]:
         if not isinstance(other, Tweet):
             raise ValueError("== operation cannot be done with one of the element not a valid Tweet object")
@@ -218,6 +215,194 @@ class Tweet(Message):
         if not isinstance(other, Tweet):
             raise ValueError("!= operation cannot be done with one of the element not a valid User object")
         return self.id != other.id
+
+    @property
+    def author(self) -> Optional[User]:
+        """Optional[:class:`User`]: Return a user (object) who posted the tweet.
+
+        .. versionadded: 1.0.0
+        """
+        if self._includes and self._includes.get("users"):
+            return User(self._includes.get("users")[0], http_client=self.http_client)
+        return None
+
+    @property
+    def possibly_sensitive(self) -> bool:
+        """:class`bool`: Return True if the tweet is possible sensitive to some users, else False.
+
+        .. versionadded: 1.0.0
+        """
+        return self._payload.get("possibly_sensitive")
+
+    @property
+    def sensitive(self) -> bool:
+        """:class`bool`: An alias to :meth:`Tweet.possibly_sensitive`.
+
+        .. versionadded: 1.5.0
+        """
+        return self.possibly_sensitive
+
+    @property
+    def created_at(self) -> datetime.datetime:
+        """:class:`datetime.datetime`: Return a :class:`datetime.datetime` object when the tweet was created.
+
+        .. versionadded: 1.0.0
+        """
+        if self._payload.get("timestamp", None):
+            return datetime.datetime.fromtimestamp(int(self._payload.get("timestamp", None)) / 1000)
+        return time_parse_todt(self._payload.get("created_at"))
+
+    @property
+    def deleted_at(self) -> Optional[datetime.datetime]:
+        """Optional[:class:`datetime.datetime`]: Return a :class:`datetime.datetime` object when the tweet was deleted. Returns None when the tweet is not deleted.
+
+        .. note::
+            This property can only be access through `on_tweet_delete` event and if the tweet was not deleted or it isn't in the client tweet cache, it returns None.
+
+        .. versionadded: 1.5.0
+        """
+        if not self.deleted_timestamp:
+            return None
+        return datetime.datetime.fromtimestamp(self.deleted_timestamp / 1000)
+
+    @property
+    def source(self) -> str:
+        """:class:`str`: Return the source of the tweet. e.g if you post a tweet from a website, the source is gonna be 'Twitter Web App'
+
+        .. versionadded: 1.0.0
+        """
+        return self._payload.get("source")
+
+    @property
+    def raw_reply_setting(self) -> str:
+        """:class:`str`: Return the raw reply setting value. If everyone can replied, this method return 'Everyone'.
+
+        .. versionadded: 1.0.0
+        """
+        return self._payload.get("reply_settings")
+
+    @property
+    def reply_setting(self) -> ReplySetting:
+        """:class:`ReplySetting`: Return a :class:`ReplySetting` object with the tweet's reply setting. If everyone can reply, this method return :class:`replySetting.everyone`.
+
+        .. versionadded: 1.3.5
+        """
+        return ReplySetting(self._payload.get("reply_settings"))
+
+    @property
+    def lang(self) -> str:
+        """:class:`str`: Return the tweet's lang, if its english it return en.
+
+        .. versionadded: 1.0.0
+        """
+        return self._payload.get("lang")
+
+    @property
+    def conversation_id(self) -> Optional[int]:
+        """Optional[:class:`int`]: All replied are bind to the original tweet, this property returns the tweet's id if the tweet count as reply tweet else it returns None.
+
+        .. versionadded: 1.0.0
+        """
+        try:
+            return int(self._payload.get("conversation_id"))
+        except ValueError:
+            return None
+
+    @property
+    def url(self) -> Optional[str]:
+        """Optional[:class:`str`]: Get the tweet's url.
+
+        .. versionadded:: 1.1.0
+
+        .. versionchanged:: 1.5.0
+            Returns None if the author is invalid or the tweet doesn't have id.
+        """
+        try:
+            return f"https://twitter.com/{self.author.username.split('@', 1)[1]}/status/{self.id}"
+        except TypeError:
+            return None
+
+    @property
+    def mentions(self) -> Optional[List[str]]:
+        """Optional[List[:class:`str`]]: Return the mentioned user's username.
+
+        .. versionadded:: 1.1.3
+        """
+        if self._includes and self._includes.get("mentions"):
+            return [user for user in self._includes.get("mentions")]
+        return None
+
+    @property
+    def poll(self) -> Optional[Poll]:
+        """:class:`Poll`: Return a Poll object with the tweet's poll.
+
+        .. versionadded:: 1.1.0
+        """
+        if self._includes:
+            if self._includes.get("polls"):
+                data = self._includes.get("polls")[0]
+                poll = Poll(
+                    data.get("duration_minutes"),
+                    id=data.get("id"),
+                    voting_status=data.get("voting_status"),
+                    end_date=data.get("end_datetime"),
+                )
+                for option in data.get("options"):
+                    poll.add_option(**option)
+                return poll
+        return None
+
+    @property
+    def media(self) -> Optional[Media]:
+        """List[:class:`Media`]: Return a list of media(s) in a tweet.
+
+        .. versionadded:: 1.1.0
+        """
+        if self._includes and self._includes.get("media"):
+            return [Media(img) for img in self._includes.get("media")]
+        return None
+
+    @property
+    def embeds(self) -> Optional[List[Embed]]:
+        """List[:class:`Embed`]: Return a list of Embedded url from that tweet
+
+        .. versionadded:: 1.1.3
+        """
+        if self._payload.get("entities") and self._payload.get("entities").get("urls"):
+            return [Embed(url) for url in self._payload.get("entities").get("urls")]
+        return None
+
+    @property
+    def like_count(self) -> int:
+        """:class:`int`: Return the total of likes in a tweet.
+
+        .. versionadded: 1.1.0
+        """
+        return self.tweet_metrics.like_count
+
+    @property
+    def retweet_count(self) -> int:
+        """:class:`int`: Return the total of retweetes in a tweet.
+
+        .. versionadded: 1.1.0
+        """
+        return self.tweet_metrics.retweet_count
+
+    @property
+    def reply_count(self) -> int:
+        """:class:`int`: Return the total of replies in a tweet.
+
+        .. versionadded: 1.1.0
+        """
+        return self.tweet_metrics.reply_count
+
+    @property
+    def quote_count(self) -> int:
+        """:class:`int`: Return the total of quotes in a tweet.
+
+        .. versionadded: 1.1.0
+        """
+        return self.tweet_metrics.quote_count
 
     def like(self) -> Optional[RelationLike]:
         """Like the tweet.
@@ -459,191 +644,3 @@ class Tweet(Message):
             if self._payload.get("in_reply_to_user_id")
             else None
         )
-
-    @property
-    def author(self) -> Optional[User]:
-        """Optional[:class:`User`]: Return a user (object) who posted the tweet.
-
-        .. versionadded: 1.0.0
-        """
-        if self._includes and self._includes.get("users"):
-            return User(self._includes.get("users")[0], http_client=self.http_client)
-        return None
-
-    @property
-    def possibly_sensitive(self) -> bool:
-        """:class`bool`: Return True if the tweet is possible sensitive to some users, else False.
-
-        .. versionadded: 1.0.0
-        """
-        return self._payload.get("possibly_sensitive")
-
-    @property
-    def sensitive(self) -> bool:
-        """:class`bool`: An alias to :meth:`Tweet.possibly_sensitive`.
-
-        .. versionadded: 1.5.0
-        """
-        return self.possibly_sensitive
-
-    @property
-    def created_at(self) -> datetime.datetime:
-        """:class:`datetime.datetime`: Return a :class:`datetime.datetime` object when the tweet was created.
-
-        .. versionadded: 1.0.0
-        """
-        if self._payload.get("timestamp", None):
-            return datetime.datetime.fromtimestamp(int(self._payload.get("timestamp", None)) / 1000)
-        return time_parse_todt(self._payload.get("created_at"))
-
-    @property
-    def deleted_at(self) -> Optional[datetime.datetime]:
-        """Optional[:class:`datetime.datetime`]: Return a :class:`datetime.datetime` object when the tweet was deleted. Returns None when the tweet is not deleted.
-
-        .. note::
-            This property can only be access through `on_tweet_delete` event and if the tweet was not deleted or it isn't in the client tweet cache, it returns None.
-
-        .. versionadded: 1.5.0
-        """
-        if not self.deleted_timestamp:
-            return None
-        return datetime.datetime.fromtimestamp(self.deleted_timestamp / 1000)
-
-    @property
-    def source(self) -> str:
-        """:class:`str`: Return the source of the tweet. e.g if you post a tweet from a website, the source is gonna be 'Twitter Web App'
-
-        .. versionadded: 1.0.0
-        """
-        return self._payload.get("source")
-
-    @property
-    def raw_reply_setting(self) -> str:
-        """:class:`str`: Return the raw reply setting value. If everyone can replied, this method return 'Everyone'.
-
-        .. versionadded: 1.0.0
-        """
-        return self._payload.get("reply_settings")
-
-    @property
-    def reply_setting(self) -> ReplySetting:
-        """:class:`ReplySetting`: Return a :class:`ReplySetting` object with the tweet's reply setting. If everyone can reply, this method return :class:`replySetting.everyone`.
-
-        .. versionadded: 1.3.5
-        """
-        return ReplySetting(self._payload.get("reply_settings"))
-
-    @property
-    def lang(self) -> str:
-        """:class:`str`: Return the tweet's lang, if its english it return en.
-
-        .. versionadded: 1.0.0
-        """
-        return self._payload.get("lang")
-
-    @property
-    def conversation_id(self) -> Optional[int]:
-        """Optional[:class:`int`]: All replied are bind to the original tweet, this property returns the tweet's id if the tweet count as reply tweet else it returns None.
-
-        .. versionadded: 1.0.0
-        """
-        try:
-            return int(self._payload.get("conversation_id"))
-        except ValueError:
-            return None
-
-    @property
-    def link(self) -> Optional[str]:
-        """Optional[:class:`str`]: Get the tweet's link.
-
-        .. versionadded:: 1.1.0
-
-        .. versionchanged:: 1.5.0
-            Returns None if the author is invalid or the tweet doesn't have id.
-        """
-        try:
-            return f"https://twitter.com/{self.author.username.split('@', 1)[1]}/status/{self.id}"
-        except TypeError:
-            return None
-
-    @property
-    def mentions(self) -> Optional[List[str]]:
-        """Optional[List[:class:`str`]]: Return the mentioned user's username.
-
-        .. versionadded:: 1.1.3
-        """
-        if self._includes and self._includes.get("mentions"):
-            return [user for user in self._includes.get("mentions")]
-        return None
-
-    @property
-    def poll(self) -> Optional[Poll]:
-        """:class:`Poll`: Return a Poll object with the tweet's poll.
-
-        .. versionadded:: 1.1.0
-        """
-        if self._includes:
-            if self._includes.get("polls"):
-                data = self._includes.get("polls")[0]
-                poll = Poll(
-                    data.get("duration_minutes"),
-                    id=data.get("id"),
-                    voting_status=data.get("voting_status"),
-                    end_date=data.get("end_datetime"),
-                )
-                for option in data.get("options"):
-                    poll.add_option(**option)
-                return poll
-        return None
-
-    @property
-    def media(self) -> Optional[Media]:
-        """List[:class:`Media`]: Return a list of media(s) in a tweet.
-
-        .. versionadded:: 1.1.0
-        """
-        if self._includes and self._includes.get("media"):
-            return [Media(img) for img in self._includes.get("media")]
-        return None
-
-    @property
-    def embeds(self) -> Optional[List[Embed]]:
-        """List[:class:`Embed`]: Return a list of Embedded url from that tweet
-
-        .. versionadded:: 1.1.3
-        """
-        if self._payload.get("entities") and self._payload.get("entities").get("urls"):
-            return [Embed(url) for url in self._payload.get("entities").get("urls")]
-        return None
-
-    @property
-    def like_count(self) -> int:
-        """:class:`int`: Return the total of likes in a tweet.
-
-        .. versionadded: 1.1.0
-        """
-        return self.tweet_metrics.like_count
-
-    @property
-    def retweet_count(self) -> int:
-        """:class:`int`: Return the total of retweetes in a tweet.
-
-        .. versionadded: 1.1.0
-        """
-        return self.tweet_metrics.retweet_count
-
-    @property
-    def reply_count(self) -> int:
-        """:class:`int`: Return the total of replies in a tweet.
-
-        .. versionadded: 1.1.0
-        """
-        return self.tweet_metrics.reply_count
-
-    @property
-    def quote_count(self) -> int:
-        """:class:`int`: Return the total of quotes in a tweet.
-
-        .. versionadded: 1.1.0
-        """
-        return self.tweet_metrics.quote_count
