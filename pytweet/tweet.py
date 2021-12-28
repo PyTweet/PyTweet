@@ -7,15 +7,15 @@ from .attachments import Poll, Geo, File
 from .entities import Media
 from .enums import ReplySetting
 from .expansions import USER_FIELD
-from .message import Message
 from .metrics import TweetPublicMetrics
 from .relations import RelationHide, RelationLike, RelationRetweet
 from .user import User
 from .utils import time_parse_todt
-from .type import ID
 
 if TYPE_CHECKING:
     from .http import HTTPClient
+    from .message import Message
+    from .type import ID
 
 __all__ = ("EmbedsImages", "Embed", "Tweet")
 
@@ -205,7 +205,7 @@ class Tweet(Message):
 
     def __repr__(self) -> str:
         return "Tweet(text={0.text} id={0.id} author={0.author})".format(self)
-        
+
     def __eq__(self, other: Tweet) -> Union[bool, NoReturn]:
         if not isinstance(other, Tweet):
             raise ValueError("== operation cannot be done with one of the element not a valid Tweet object")

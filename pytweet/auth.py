@@ -130,13 +130,13 @@ class OauthSession(OAuth1Session):
     consumer_secret: Optional[:class:`str`]
         The application's consumer secret.
     access_token: Optional[:class:`str`]
-        The application's access token.   
+        The application's access token.
     access_token_secret: Optional[:class:`str`]
         The application's access token secret.
     http_client: :class:`HTTPClient
         The :class:`HTTPClient` for making requests.
     client_id: Optional[:class:`str`]
-        The client's unique ID.    
+        The client's unique ID.
     callback_url: Optional[:class:`str`]
         The callback url, the user will get redirect to the callback url after they authorize. Default to None.
 
