@@ -36,17 +36,15 @@ from .expansions import (
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser
 from .space import Space
-from .stream import Stream
 from .tweet import Tweet
 from .user import User
 from .mixins import EventMixin
 
-_log = logging.getLogger(__name__)
-
-
 if TYPE_CHECKING:
     from .type import ID, Payload, ResponsePayload
+    from .stream import Stream
 
+_log = logging.getLogger(__name__)
 
 class HTTPClient(EventMixin):
     def __init__(
