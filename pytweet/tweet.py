@@ -205,7 +205,7 @@ class Tweet(Message):
 
     def __repr__(self) -> str:
         return "Tweet(text={0.text} id={0.id} author={0.author})".format(self)
-        
+
     def __eq__(self, other: Tweet) -> Union[bool, NoReturn]:
         if not isinstance(other, Tweet):
             raise ValueError("== operation cannot be done with one of the element not a valid Tweet object")

@@ -46,6 +46,7 @@ if TYPE_CHECKING:
 
 _log = logging.getLogger(__name__)
 
+
 class HTTPClient(EventMixin):
     def __init__(
         self,

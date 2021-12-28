@@ -85,11 +85,11 @@ class User:
     @property
     def pinned_tweet(self) -> Optional[Tweet]:
         """Optional[:class:`Tweet`]: Returns the user's pinned tweet. Returns None if the user dont have one.
-        
+
         .. versionadded:: 1.5.0
         """
-        from .tweet import Tweet #Avoid circular import error.
-        
+        from .tweet import Tweet  # Avoid circular import error.
+
         if self._includes and self._includes.get("tweets"):
             data = {}
             data["data"] = self._includes.get("tweets")[0]
@@ -515,7 +515,7 @@ class User:
 
         .. versionadded:: 1.3.5
         """
-        from .tweet import Tweet #Avoid circular import error.
+        from .tweet import Tweet  # Avoid circular import error.
 
         if (
             not isinstance(start_time, datetime.datetime)
@@ -564,6 +564,7 @@ class User:
             return [Tweet(data, http_client=self.http_client) for data in fulldata]
         except (TypeError, KeyError):
             return []
+
 
 class ClientAccount(User):
     """Represents the client's account. This inherits :class:`User` object. This class unlock methods that you can only use for the authenticated user (the client).
