@@ -99,11 +99,10 @@ class Client:
 
     @property
     def account(self) -> Optional[User]:
-        """Optional[:class:`User`]: Returns the client's account information. The callback is a User object.
+        """Optional[:class:`User`]: Returns a user object presenting the client's account.
 
         .. versionadded:: 1.2.0
         """
-
         account_user = self._account_user
         if account_user is None:
             self._set_account_user()
@@ -111,11 +110,19 @@ class Client:
             # The account_user does not change when the function is called. That is why we are returning this.
         return account_user
 
+    @property
+    def me(self) -> Optional[User]:
+        """Optional[:class:`User`]: An alias to :meth:`Client.account`
+        
+        .. versionadded:: 1.5.0
+        """
+        return self.account
+
     def _set_account_user(self) -> None:
         if not self.http.access_token:
             return None
 
-        data = self.fetch_user(self.http.access_token.partition("-")[0])._User__original_payload
+        data = self.http.fetch_me()._User__original_payload
         self._account_user = ClientAccount(data, http_client=self.http)
 
     def event(self, func: Callable) -> None:
