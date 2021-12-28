@@ -15,12 +15,14 @@ client = pytweet.Client(
 
 client.webapp = Flask(__name__)
 
+
 @client.event
 def on_direct_message(message: pytweet.DirectMessage):
     if message.author == client.account:
-        return #To avoid the client talking to itself.
+        return  # To avoid the client talking to itself.
 
     if message.text.lower() == "hello":
         message.author.send(f"Hello {message.author.username}!")
+
 
 client.listen(client.webapp, "YOUR_WEBAPP_URL", "YOUR_ENV_LABEL")
