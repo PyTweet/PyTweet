@@ -302,6 +302,9 @@ class OauthSession:
 
         .. versionadded:: 1.3.5
         """
+        if not self.callback_url:
+            raise PytweetException("'callback_url' argument is missing in your client instance")
+
         auth_access_type = auth_access_type.lower()
         assert auth_access_type in ("read", "write", "direct_messages")
         request_tokens = self.http_client.request(
@@ -364,6 +367,9 @@ class OauthSession:
 
         .. versionadded:: 1.5.0
         """
+        if not self.callback_url:
+            raise PytweetException("'callback_url' argument is missing in your client instance")
+
         code_challenge_method = code_challenge_method.lower()
         assert code_challenge_method in [
             "plain",
