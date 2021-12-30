@@ -101,7 +101,7 @@ class Scope:
 
     @classmethod
     def read_only(cls, *, offline_access: bool = False):
-        """A classmethod that enables only read scopes.
+        """A classmethod that enables only read scopes. offline_access scope is optional, you can set it true or not. Defaults to False.
 
         Parameters
         ------------
@@ -125,7 +125,7 @@ class Scope:
 
     @classmethod
     def write_only(cls, *, offline_access: bool = False):
-        """A classmethod that enables only write scopes. This includes tweet_moderate_write scope.
+        """A classmethod that enables only write scopes. This includes tweet_moderate_write scope. offline_access scope is optional, you can set it true or not. Defaults to False.
 
         Parameters
         ------------
@@ -148,7 +148,7 @@ class Scope:
 
     @classmethod
     def all(cls, *, offline_access: bool = False):
-        """A classmethod that enables all scopes. offline_access scope is optional, you cnac set it true or not. Defaults to False.
+        """A classmethod that enables all scopes. offline_access scope is optional, you can set it true or not. Defaults to False.
 
         Parameters
         ------------
