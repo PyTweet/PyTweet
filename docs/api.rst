@@ -30,7 +30,7 @@ Clients
 ----------------
 
 Client
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Client
     :members:
@@ -39,7 +39,7 @@ Application
 ----------------
 
 ApplicationInfo
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 .. autoclass:: ApplicationInfo()
@@ -49,13 +49,13 @@ Environment
 ----------------
 
 Webhook
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Webhook()
     :members:
 
 Environment
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Environment()
     :members:
@@ -68,40 +68,40 @@ These following object are not meant to be create as an instance rather its for 
 
 
 User
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: User()
     :members:
 
 ClientAccount
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: ClientAccount()
     :members:
     :inherited-members:
 
 Tweet
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Tweet()
     :members:
     :inherited-members:
 
 Space
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Space()
     :members:
 
 
 Message
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Message()
     :members:
 
 DirectMessage
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: DirectMessage()
     :members:
@@ -109,7 +109,7 @@ DirectMessage
 
 
 WelcomeMessage
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 .. autoclass:: WelcomeMessage()
@@ -118,7 +118,7 @@ WelcomeMessage
 
 
 WelcomeMessageRule
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: WelcomeMessageRule()
     :members:
@@ -130,42 +130,42 @@ Attachments
 Attachments is a way to attach additional part to a message, this include tweet and direct message. You may contruct this following objects except :class:`CustomProfile` and :class:`Geo`. Consider using :class:`Client.create_custom_profile` for making a custom profile attachment and :class:`Client.search_geo` for searching a geo-location.
 
 CustomProfile
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: CustomProfile
     :members:
     
 
 Poll
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Poll()
     :members:
 
 
 CTA
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: CTA()
     :members:
 
 
 QuickReply
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: QuickReply()
     :members:
 
 
 Geo
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Geo()
     :members:
 
 
 File
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: File()
     :members:
@@ -179,21 +179,21 @@ Streaming
 Streaming is a way to stream in twitter for tweets! This differ with `on_tweet_create`, Stream can detech global tweets while `on_tweet_create` only detech tweets from subscription users.
 
 Stream
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Stream()
     :members:
 
 
 StreamConnection
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: StreamConnection()
     :members:
 
 
 StreamRule
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: StreamRule
     :members:
@@ -204,28 +204,28 @@ Relations
 Relations is an object that returns from a user action or a tweet action. This include but not limited to: :class:`Tweet.like`, :class:`Tweet.retweet`, :class:`Tweet.hide`, and :class:`User.follow`.
 
 RelationFollow
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: RelationFollow()
     :members:
 
 
 RelationLike
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: RelationLike()
     :members:
 
 
 RelationRetweet
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: RelationRetweet()
     :members:
 
 
 RelationHide
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: RelationHide()
     :members:
@@ -237,14 +237,14 @@ Embeds
 The embedded urls object returned by :class:`Tweet.embeds`.
 
 Embed
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Embed()
     :members:
 
 
 EmbedsImages
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: EmbedsImages()
     :members:
@@ -256,31 +256,31 @@ Entities
 Objects derives from entities.py
 
 Hashtag
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Hashtag()
     :members:
 
 UserMention
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserMention()
     :members:
 
 Url
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Url()
     :members:
 
 Symbol
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Symbol()
     :members:
 
 Media
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Media()
     :members:
@@ -292,83 +292,83 @@ Event Objects
 Event objects are objects returned by an event filled with the event data.
 
 Event
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Event()
     :members:
 
 DirectMessageEvent
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: DirectMessageEvent()
     :members:
     :inherited-members:
 
 UserActionEvent
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserActionEvent()
     :members:
     :inherited-members:
 
 DirectMessageTypingEvent
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: DirectMessageTypingEvent()
     :members:
     :inherited-members:
 
 DirectMessageReadEvent
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: DirectMessageReadEvent()
     :members:
     :inherited-members:
 
 TweetFavoriteActionEvent
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: TweetFavoriteActionEvent()
     :members:
     :inherited-members:
 
 UserFollowActionEvent
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserFollowActionEvent()
     :members:
     :inherited-members:
 
 UserUnfollowActionEvent
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserUnfollowActionEvent()
     :members:
     :inherited-members:
 
 UserBlockActionEvent
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserBlockActionEvent()
     :members:
     :inherited-members:
 
 UserUnblockActionEvent
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserUnblockActionEvent()
     :members:
     :inherited-members:
 
 UserMuteActionEvent
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserMuteActionEvent()
     :members:
     :inherited-members:
 
 UserUnmuteActionEvent
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserUnmuteActionEvent()
     :members:
@@ -1349,8 +1349,15 @@ Oauth
 
 Oauth is a way to authenticate a twitter user account. You can do this with 3 legged authentication via :meth:`OauthSession.generate_oauth_url` to generate an oauth url and :meth:`OauthSession.post_oauth_token` to post an oauth token and verifier. This also required in every request you've made for identification!
 
+Scope
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Scope
+    :members:
+
+
 OauthSession
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: OauthSession
     :members:
@@ -1362,7 +1369,7 @@ Pagination
 Object uses for easy pagination handling.
 
 Pagination
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Pagination
     :members:
