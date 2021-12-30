@@ -174,4 +174,4 @@ class NoPageAvailable(APIException):
     """
 
     def __init__(self):
-        super().__init__(message="Pagination have no more page avalaible!")
+        super().__init__(message="Pagination have no more page available!")

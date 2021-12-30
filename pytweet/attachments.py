@@ -456,7 +456,7 @@ class File:
     dm_only: :class:`bool`
         Indicates if the file is use in dm only. Default to False.
     alt_text: Optional[:class:`str`]
-        The image's alt text, if None specified the image wont have an alt text. Default to None.
+        The image's alt text, if None specified the image won't have an alt text. Default to None.
     subtitle_language_code: :class:`str`
         The language code should be a BCP47 code (e.g. "en").
     subfile: :class:`File`

@@ -772,7 +772,7 @@ class Client:
         """Listen to upcoming account activity events send by twitter to a web application url. This method differ from :meth:`Client.listen`, this method doesn't use the flask's web application url, rather your web application url. This is good for people that want to implement their web application outside flask.
 
         .. warning::
-            With this method, you have to make your own CRC and event handlers in your web application. For the time being, the documentation doesn't provides informations for the handlers, either go to twitter documentation about account activity api or wait until we write the documentation.
+            With this method, you have to make your own CRC and event handlers in your web application. For the time being, the documentation doesn't provides information for the handlers, either go to twitter documentation about account activity api or wait until we write the documentation.
 
         Parameters
         ------------
