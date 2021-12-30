@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 
 __all__ = ("Poll", "QuickReply", "Geo", "CTA", "File")
 
+
 def guess_mimetype(byts: bytes):
     if byts[6:10] == b"\x1a\n\x00\x00":
         return "image/png"

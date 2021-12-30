@@ -827,5 +827,5 @@ LANGUAGES_CODES = {
     "dje": "Zarma",
     "dje-NE": "Zarma - Niger",
     "zu": "Zulu",
-    "zu-ZA": "Zulu - South Africa"
+    "zu-ZA": "Zulu - South Africa",
 }
