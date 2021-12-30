@@ -217,10 +217,12 @@ class OauthSession:
         The application's access token secret.
     http_client: :class:`HTTPClient
         The :class:`HTTPClient` for making requests.
-    client_id: Optional[:class:`str`]
-        The client's unique ID.
     callback_url: Optional[:class:`str`]
         The callback url, the user will get redirect to the callback url after they authorize. Default to None.
+    client_id: Optional[:class:`str`]
+        The client's OAuth 2.0 Client ID from keys and tokens page.
+    client_secret: Optional[:class:`str`]
+        The client's OAuth 2.0 Client Secret from keys and tokens page.
 
 
     .. versionadded:: 1.2.0
