@@ -57,10 +57,11 @@ class Scope:
             - Accounts you’ve blocked.
         *   - block.write
             - Block and unblock accounts for you.
-    
-    
+
+
     .. versionadded:: 1.5.0
     """
+
     def __init__(
         self,
         *,
@@ -99,7 +100,7 @@ class Scope:
         self.block_write = "block.write" if block_write else None
 
     @classmethod
-    def read_only(cls, *,offline_access: bool = False):
+    def read_only(cls, *, offline_access: bool = False):
         """A classmethod that enables only read scopes.
 
         Parameters
@@ -107,7 +108,7 @@ class Scope:
         offline_access: :class:`bool`
             Indicates to stay connected to your account until you revoke access.
 
-        
+
         .. versionadded:: 1.5.0
         """
         return cls(
@@ -123,7 +124,7 @@ class Scope:
         )
 
     @classmethod
-    def write_only(cls, *,offline_access: bool = False):
+    def write_only(cls, *, offline_access: bool = False):
         """A classmethod that enables only write scopes. This includes tweet_moderate_write scope.
 
         Parameters
@@ -131,7 +132,7 @@ class Scope:
         offline_access: :class:`bool`
             Indicates to stay connected to your account until you revoke access.
 
-        
+
         .. versionadded:: 1.5.0
         """
         return cls(
@@ -146,7 +147,7 @@ class Scope:
         )
 
     @classmethod
-    def all(cls, *,offline_access: bool = False):
+    def all(cls, *, offline_access: bool = False):
         """A classmethod that enables all scopes. offline_access scope is optional, you cnac set it true or not. Defaults to False.
 
         Parameters
@@ -154,7 +155,7 @@ class Scope:
         offline_access: :class:`bool`
             Indicates to stay connected to your account until you revoke access.
 
-        
+
         .. versionadded:: 1.5.0
         """
         return cls(
@@ -179,7 +180,7 @@ class Scope:
     @property
     def values(self) -> str:
         """:class:`str`: Returns the scope url encoded value. Example:
-        
+
         .. code-block:: py
 
             import pytweet
@@ -188,7 +189,7 @@ class Scope:
             print(scope.value)
             #>>> This will returns: tweet.read%20tweet.write
 
-        
+
         .. versionadded:: 1.5.0
         """
         value = ""
@@ -198,7 +199,7 @@ class Scope:
                 if scope:
                     value += f"{scope}%20"
 
-        return value.rstrip("%20") # Only remove the last %20.
+        return value.rstrip("%20")  # Only remove the last %20.
 
 
 class OauthSession:
@@ -235,7 +236,7 @@ class OauthSession:
         http_client: HTTPClient,
         callback_url: Optional[str] = None,
         client_id: Optional[str] = None,
-        client_secret: Optional[str] = None
+        client_secret: Optional[str] = None,
     ) -> None:
         self.http_client: HTTPClient = http_client
         self.consumer_key = consumer_key
@@ -271,7 +272,7 @@ class OauthSession:
             raise PytweetException("'client_id' and 'client_secret' argument is missing in your client instance!")
 
         return base64.b64encode(bytes(f"{self.client_id}:{self.client_secret}", "utf-8")).decode()
-    
+
     def invalidate_access_token(self) -> None:
         """Invalidate the access token and access token secret of yout client.
 
@@ -357,7 +358,7 @@ class OauthSession:
             The code challenge method, must be tiher plain or s256. Default to plain.
         state: Optional[:class:`str`]
             A random string you provide to verify against CSRF attacks. If none specified, the method will generates one.
-        
+
 
         .. versionadded:: 1.5.0
         """
@@ -386,7 +387,7 @@ class OauthSession:
 
     def post_auth_code(self, code: str, code_challenge: str):
         """Posts the authorize code and code challenge. This is The 2nd step of using OAuth 2.0 Authorization Code Flow with PKCE. In this method, the client will make a request and create a new bearer token. With this, you can make request on behalf of users.
-        
+
         Parameters
         ------------
         code: :class:`str`
@@ -402,10 +403,7 @@ class OauthSession:
             "2",
             "/oauth2/token",
             data=f"code={code}&grant_type=authorization_code&client_id={self.client_id}&redirect_uri={self.callback_url}&code_verifier={code_challenge}",
-            headers={
-                "Authorization": f"Basic {self.basic_auth}",
-                "Content-Type": "application/x-www-form-urlencoded"
-            }
+            headers={"Authorization": f"Basic {self.basic_auth}", "Content-Type": "application/x-www-form-urlencoded"},
         )
 
         return res

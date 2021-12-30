@@ -80,7 +80,7 @@ class Client:
         stream: Optional[Stream] = None,
         callback_url: Optional[str] = None,
         client_id: Optional[str] = None,
-        client_secret: Optional[str] = None
+        client_secret: Optional[str] = None,
     ) -> None:
         self.http = HTTPClient(
             bearer_token,
@@ -91,7 +91,7 @@ class Client:
             stream=stream,
             callback_url=callback_url,
             client_id=client_id,
-            client_secret=client_secret
+            client_secret=client_secret,
         )
         self._account_user: Optional[User] = None  # set in account property.
         self.webhook: Optional[Webhook] = None

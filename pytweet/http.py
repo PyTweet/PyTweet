@@ -59,7 +59,7 @@ class HTTPClient(EventMixin):
         stream: Optional[Stream] = None,
         callback_url: Optional[str] = None,
         client_id: Optional[str] = None,
-        client_secret: Optional[str] = None
+        client_secret: Optional[str] = None,
     ) -> Union[None, NoReturn]:
         self.credentials: Dict[str, Optional[str]] = {
             "bearer_token": bearer_token,
@@ -102,7 +102,7 @@ class HTTPClient(EventMixin):
             http_client=self,
             callback_url=self.callback_url,
             client_id=self.client_id,
-            client_secret=self.client_secret
+            client_secret=self.client_secret,
         )
         self.current_header: Optional[Payload] = None
         self.client_id = client_id
