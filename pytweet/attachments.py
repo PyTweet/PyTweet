@@ -12,16 +12,12 @@ from .entities import Media
 from .enums import ButtonType
 from .utils import time_parse_todt
 from .errors import PytweetException
-from . import __path__
+from .constant import LANGUAGES_CODES
 
 if TYPE_CHECKING:
     from .type import ID
 
 __all__ = ("Poll", "QuickReply", "Geo", "CTA", "File")
-
-with open(f"pytweet/language.json", "r") as f:
-    data = json.load(f)
-
 
 def guess_mimetype(byts: bytes):
     if byts[6:10] == b"\x1a\n\x00\x00":
@@ -30,11 +26,11 @@ def guess_mimetype(byts: bytes):
     elif byts[6:10] == b"JFIF":
         return "image/jpeg"
 
-    elif byts.startswith((b"\x47\x49\x46\x38\x37\x61", b"\x47\x49\x46\x38\x39\x61")):
-        return "image/gif"
-
     elif byts[6:10] == b"ypis":
         return "video/mp4"
+
+    elif byts.startswith((b"\x47\x49\x46\x38\x37\x61", b"\x47\x49\x46\x38\x39\x61")):
+        return "image/gif"
 
     else:
         return "text/plain"
@@ -500,7 +496,7 @@ class File:
         self.subtitle_language_code = subtitle_language_code
         self.subfile = subfile
         if self.subtitle_language_code:
-            fullname = data.get(subtitle_language_code)
+            fullname = LANGUAGES_CODES.get(subtitle_language_code)
             if fullname:
                 self.subtitle_language = fullname
             else:
