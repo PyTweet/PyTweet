@@ -38,21 +38,23 @@ class Client:
     Parameters
     ------------
     bearer_token: Optional[:class:`str`]
-        The Bearer Token of the app. The most important one, because this makes most of the requests for Twitter's api version 2.
+        The Bearer Token of the app. Uses for twitter version 2 endpoints.
     consumer_key: Optional[:class:`str`]
-        The Consumer Key of the app.
+        The Consumer Key of the app. Users for twitter version 1.1 endpoints.
     consumer_secret: Optional[:class:`str`]
-        The Consumer Key Secret of the app.
+        The Consumer Key Secret of the app. Users for twitter version 1.1 endpoints.
     access_token: Optional[:class:`str`]
-        The Access Token of the app.
+        The Access Token of the app. Users for twitter version 1.1 endpoints.
     access_token_secret: Optional[:class:`str`]
-        The Access Token Secret of the app.
-    client_id: Optional[str]
-        The client's OAuth 2.0 Client ID from keys and tokens page.
+        The Access Token Secret of the app. Users for twitter version 1.1 endpoints.
     stream: Optional[Stream]
         The client's stream. Must be an instance of :class:`Stream`.
     callback_url: Optional[:class:`str`]
         The oauth callback url, default to None.
+    client_id: Optional[str]
+        The client's OAuth 2.0 Client ID from keys and tokens page.
+    client_secret: Optional[str]
+        The client's OAuth 2.0 Client Secret from keys and tokens page.
 
     Attributes
     ------------
@@ -75,9 +77,10 @@ class Client:
         consumer_secret: Optional[str] = None,
         access_token: Optional[str] = None,
         access_token_secret: Optional[str] = None,
-        client_id: Optional[str] = None,
         stream: Optional[Stream] = None,
         callback_url: Optional[str] = None,
+        client_id: Optional[str] = None,
+        client_secret: Optional[str] = None
     ) -> None:
         self.http = HTTPClient(
             bearer_token,
@@ -88,6 +91,7 @@ class Client:
             stream=stream,
             callback_url=callback_url,
             client_id=client_id,
+            client_secret=client_secret
         )
         self._account_user: Optional[User] = None  # set in account property.
         self.webhook: Optional[Webhook] = None

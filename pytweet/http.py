@@ -59,6 +59,7 @@ class HTTPClient(EventMixin):
         stream: Optional[Stream] = None,
         callback_url: Optional[str] = None,
         client_id: Optional[str] = None,
+        client_secret: Optional[str] = None
     ) -> Union[None, NoReturn]:
         self.credentials: Dict[str, Optional[str]] = {
             "bearer_token": bearer_token,
@@ -89,6 +90,7 @@ class HTTPClient(EventMixin):
         self.stream = stream
         self.callback_url = callback_url
         self.client_id = client_id
+        self.client_secret = client_secret
         self.event_parser = EventParser(self)
         self.base_url = "https://api.twitter.com/"
         self.upload_url = "https://upload.twitter.com/"
@@ -100,6 +102,7 @@ class HTTPClient(EventMixin):
             http_client=self,
             callback_url=self.callback_url,
             client_id=self.client_id,
+            client_secret=self.client_secret
         )
         self.current_header: Optional[Payload] = None
         self.client_id = client_id
@@ -482,107 +485,32 @@ class HTTPClient(EventMixin):
         return Space(res, http_client=self)
 
     def handle_events(self, payload: Payload):
-        keys = payload.keys()
-        if "direct_message_events" in keys:
+        if payload.get("direct_message_events"):
             self.event_parser.parse_direct_message_create(payload)
 
-        elif "direct_message_indicate_typing_events" in keys:
+        elif payload.get("direct_message_indicate_typing_events"):
             self.event_parser.parse_direct_message_typing(payload)
 
-        elif "direct_message_mark_read_events" in keys:
+        elif payload.get("direct_message_mark_read_events"):
             self.event_parser.parse_direct_message_read(payload)
 
-        elif "favorite_events" in keys:
+        elif payload.get("favorite_events"):
             self.event_parser.parse_favorite_tweet(payload)
 
-        elif "follow_events" in keys:
+        elif payload.get("follow_events"):
             self.event_parser.parse_user_action(payload, "follow_events")
 
-        elif "block_events" in keys:
+        elif payload.get("block_events"):
             self.event_parser.parse_user_action(payload, "block_events")
 
-        elif "mute_events" in keys:
+        elif payload.get("mute_events"):
             self.event_parser.parse_user_action(payload, "mute_events")
 
-        elif "tweet_create_events" in keys:
+        elif payload.get("tweet_create_events"):
             self.event_parser.parse_tweet_create(payload)
 
-        elif "tweet_delete_events" in keys:
+        elif payload.get("tweet_delete_events"):
             self.event_parser.parse_tweet_delete(payload)
-
-    def send_message(
-        self,
-        user_id: ID,
-        text: str,
-        *,
-        file: Optional[File] = None,
-        custom_profile: Optional[CustomProfile] = None,
-        quick_reply: Optional[QuickReply] = None,
-        cta: Optional[CTA] = None,
-    ) -> Optional[NoReturn]:
-        data = {
-            "event": {
-                "type": "message_create",
-                "message_create": {
-                    "target": {"recipient_id": str(user_id)},
-                    "message_data": {},
-                },
-            }
-        }
-
-        if file and (not isinstance(file, File)):
-            raise PytweetException("'file' argument must be an instance of pytweet.File")
-
-        if custom_profile and (not isinstance(custom_profile, CustomProfile)):
-            raise PytweetException("'custom_profile' argument must be an instance of pytweet.CustomProfile")
-
-        if quick_reply and (not isinstance(quick_reply, QuickReply)):
-            raise PytweetException("'quick_reply' must be an instance of pytweet.QuickReply")
-
-        if cta and (not isinstance(cta, CTA)):
-            raise PytweetException("'cta' argument must be an instance of pytweet.CTA")
-
-        message_data = data["event"]["message_create"]["message_data"]
-        message_data["text"] = str(text)
-
-        if file:
-            self.upload(file, "INIT")
-            self.upload(file, "APPEND")
-            self.upload(file, "FINALIZE")
-
-            message_data["attachment"] = {}
-            message_data["attachment"]["type"] = "media"
-            message_data["attachment"]["media"] = {}
-            message_data["attachment"]["media"]["id"] = str(file.media_id)
-
-        if custom_profile:
-            message_data["custom_profile_id"] = str(custom_profile.id)
-
-        if quick_reply:
-            message_data["quick_reply"] = {
-                "type": quick_reply.type,
-                "options": quick_reply.raw_options,
-            }
-
-        if cta:
-            message_data["ctas"] = cta.raw_buttons
-
-        res = self.request(
-            "POST",
-            "1.1",
-            "/direct_messages/events/new.json",
-            json=data,
-            auth=True,
-        )
-
-        message_create = res.get("event").get("message_create")
-        user_id = message_create.get("target").get("recipient_id")
-        user = self.fetch_user(user_id)
-        res["event"]["message_create"]["target"]["recipient"] = user
-
-        msg = DirectMessage(res, http_client=self)
-        self.message_cache[msg.id] = msg
-        return msg
 
     def fetch_direct_message(self, event_id: ID) -> Optional[DirectMessage]:
         try:
@@ -663,6 +591,80 @@ class HTTPClient(EventMixin):
         )
 
         return [Geo(data) for data in data.get("result").get("places")]
+
+    def send_message(
+        self,
+        user_id: ID,
+        text: str,
+        *,
+        file: Optional[File] = None,
+        custom_profile: Optional[CustomProfile] = None,
+        quick_reply: Optional[QuickReply] = None,
+        cta: Optional[CTA] = None,
+    ) -> Optional[NoReturn]:
+        data = {
+            "event": {
+                "type": "message_create",
+                "message_create": {
+                    "target": {"recipient_id": str(user_id)},
+                    "message_data": {},
+                },
+            }
+        }
+
+        if file and (not isinstance(file, File)):
+            raise PytweetException("'file' argument must be an instance of pytweet.File")
+
+        if custom_profile and (not isinstance(custom_profile, CustomProfile)):
+            raise PytweetException("'custom_profile' argument must be an instance of pytweet.CustomProfile")
+
+        if quick_reply and (not isinstance(quick_reply, QuickReply)):
+            raise PytweetException("'quick_reply' must be an instance of pytweet.QuickReply")
+
+        if cta and (not isinstance(cta, CTA)):
+            raise PytweetException("'cta' argument must be an instance of pytweet.CTA")
+
+        message_data = data["event"]["message_create"]["message_data"]
+        message_data["text"] = str(text)
+
+        if file:
+            self.upload(file, "INIT")
+            self.upload(file, "APPEND")
+            self.upload(file, "FINALIZE")
+
+            message_data["attachment"] = {}
+            message_data["attachment"]["type"] = "media"
+            message_data["attachment"]["media"] = {}
+            message_data["attachment"]["media"]["id"] = str(file.media_id)
+
+        if custom_profile:
+            message_data["custom_profile_id"] = str(custom_profile.id)
+
+        if quick_reply:
+            message_data["quick_reply"] = {
+                "type": quick_reply.type,
+                "options": quick_reply.raw_options,
+            }
+
+        if cta:
+            message_data["ctas"] = cta.raw_buttons
+
+        res = self.request(
+            "POST",
+            "1.1",
+            "/direct_messages/events/new.json",
+            json=data,
+            auth=True,
+        )
+
+        message_create = res.get("event").get("message_create")
+        user_id = message_create.get("target").get("recipient_id")
+        user = self.fetch_user(user_id)
+        res["event"]["message_create"]["target"]["recipient"] = user
+
+        msg = DirectMessage(res, http_client=self)
+        self.message_cache[msg.id] = msg
+        return msg
 
     def post_tweet(
         self,
