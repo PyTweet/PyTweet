@@ -19,8 +19,25 @@ if TYPE_CHECKING:
 
 __all__ = ("Poll", "QuickReply", "Geo", "CTA", "File")
 
-with open(f"{__path__[0]}/language.json", "r") as f:
+with open(f"pytweet/language.json", "r") as f:
     data = json.load(f)
+
+
+def guess_mimetype(byts: bytes):
+    if byts[6:10] == b"\x1a\n\x00\x00":
+        return "image/png"
+
+    elif byts[6:10] == b"JFIF":
+        return "image/jpeg"
+
+    elif byts.startswith((b"\x47\x49\x46\x38\x37\x61", b"\x47\x49\x46\x38\x39\x61")):
+        return "image/gif"
+
+    elif byts[6:10] == b"ypis":
+        return "video/mp4"
+
+    else:
+        return "text/plain"
 
 
 class Poll:
@@ -55,7 +72,14 @@ class Poll:
     .. versionadded:: 1.1.0
     """
 
-    __slots__ = ("_id", "_voting_status", "_end_date", "_duration", "_options", "_raw_options")
+    __slots__ = (
+        "_id",
+        "_voting_status",
+        "_end_date",
+        "_duration",
+        "_options",
+        "_raw_options",
+    )
 
     def __init__(self, duration: int, **kwargs):
         self._id: Optional[ID] = kwargs.get("id", None)
@@ -206,7 +230,11 @@ class QuickReply:
         self._raw_options: List[dict] = []
 
     def add_option(
-        self, *, label: str, description: Optional[str] = None, metadata: Optional[str] = None
+        self,
+        *,
+        label: str,
+        description: Optional[str] = None,
+        metadata: Optional[str] = None,
     ) -> QuickReply:
         """Method for adding an option in your quick reply instance.
 
@@ -365,7 +393,12 @@ class CTA:
         self._raw_buttons = []
 
     def add_button(
-        self, *, label: str, url: str, type: Union[ButtonType, str] = ButtonType.web_url, tco_url: Optional[str] = None
+        self,
+        *,
+        label: str,
+        url: str,
+        type: Union[ButtonType, str] = ButtonType.web_url,
+        tco_url: Optional[str] = None,
     ) -> CTA:
         """Add a button in your CTA instance.
 
@@ -456,10 +489,11 @@ class File:
         subtitle_language_code: Optional[str] = None,
         subfile: Optional[File] = None,
     ):
-        mimetype_guesser = mimetypes.MimeTypes().guess_type
         self.__path = path
         self._total_bytes = os.path.getsize(path) if isinstance(path, str) else os.path.getsize(path.name)
-        self._mimetype = mimetype_guesser(path) if isinstance(path, str) else mimetype_guesser(path.name)
+        self._mimetype = (
+            guess_mimetype(open(path, "rb").read()) if isinstance(path, str) else guess_mimetype(path.read())
+        )
         self.dm_only = dm_only
         self.alt_text = alt_text
         self.__media_id = None
@@ -505,7 +539,7 @@ class File:
 
         .. versionadded:: 1.3.5
         """
-        return self._mimetype[0]
+        return self._mimetype
 
     @property
     def filename(self) -> str:
@@ -531,11 +565,12 @@ class File:
         .. versionadded:: 1.3.5
         """
         startpoint = "TWEET_"
-        if "image" in self.mimetype and not "gif" in self.mimetype:
+        mimetype = self._mimetype
+        if mimetype in ("image/jpeg", "image/png"):
             return startpoint + "IMAGE" if not self.dm_only else "dm_image"
-        elif "gif" in self.mimetype:
+        elif mimetype == "image/gif":
             return startpoint + "GIF" if not self.dm_only else "dm_gif"
-        elif "video" in self.mimetype:
+        elif mimetype == "video/mp4":
             return startpoint + "VIDEO" if not self.dm_only else "dm_video"
 
 
