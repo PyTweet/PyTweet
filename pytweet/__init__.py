@@ -24,6 +24,7 @@ from .http import *
 from .message import *
 from .metrics import *
 from .mixins import *
+from .pagination import *
 from .parsers import *
 from .relations import *
 from .space import *
