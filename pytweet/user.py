@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import io
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, NoReturn, Optional, Union
 
 from .expansions import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_EXPANSION, TWEET_FIELD, USER_FIELD
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import time_parse_todt
 from .dataclass import UserSettings, SleepTimeSettings, Location, TimezoneInfo
-from .pagination import Pagination
+from .pagination import UserPagination, TweetPagination
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -372,7 +372,7 @@ class User:
             params={"user_id": str(self.id), "perform_block": block},
         )
 
-    def fetch_followers(self) -> Optional[List[User]]:
+    def fetch_followers(self) -> Optional[UserPagination]:
         """Fetches users from the user's followers list then paginate it .
 
         Returns
@@ -387,14 +387,18 @@ class User:
             "GET",
             "2",
             f"/users/{self.id}/followers",
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id", 
+                "user.fields": USER_FIELD, 
+                "tweet.fields": TWEET_FIELD
+            },
         )
 
         if not following:
             return []
-        return Pagination(following, User, f"/users/{self.id}/followers", http_client=self.http_client)
+        return UserPagination(following, User, f"/users/{self.id}/followers", http_client=self.http_client, params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD})
 
-    def fetch_following(self) -> Optional[Pagination]:
+    def fetch_following(self) -> Optional[UserPagination]:
         """Fetches users from the user's following list then paginate it.
 
         Returns
@@ -414,9 +418,9 @@ class User:
 
         if not following:
             return []
-        return Pagination(following, User, f"/users/{self.id}/following", http_client=self.http_client)
+        return UserPagination(following, User, f"/users/{self.id}/following", http_client=self.http_client, params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD})
 
-    def fetch_blockers(self) -> Optional[Pagination]:
+    def fetch_blockers(self) -> Optional[UserPagination]:
         """Fetches users from the user's block list then paginate it.
 
         Returns
@@ -437,9 +441,9 @@ class User:
 
         if not blockers:
             return []
-        return Pagination(blockers, User, f"/users/{self.id}/blocking", http_client=self.http_client)
+        return UserPagination(blockers, User, f"/users/{self.id}/blocking", http_client=self.http_client, params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD})
 
-    def fetch_muters(self) -> Optional[List[User]]:
+    def fetch_muters(self) -> Optional[UserPagination]:
         """Fetches users from the user's mute list then paginate it.
 
         Returns
@@ -461,25 +465,10 @@ class User:
         if not muters:
             return []
 
-        return Pagination(muters, User, f"/users/{self.id}/muting", http_client=self.http_client)
-
-    def fetch_pinned_tweet(self) -> Optional[Tweet]:
-        """Returns the user's pinned tweet.
-
-        Returns
-        ---------
-        Optional[:class:`Tweet`]
-            This method returns a :class:`Tweet` object.
-
-
-        .. versionadded: 1.1.3
-        """
-        id = self._payload.get("pinned_tweet_id")
-        return self.http_client.fetch_tweet(int(id)) if id else None
+        return UserPagination(muters, User, f"/users/{self.id}/muting", http_client=self.http_client, params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD})
 
     def fetch_timelines(
         self,
-        max_results: int = 10,
         *,
         start_time: Optional[datetime.datetime] = None,
         end_time: Optional[datetime.datetime] = None,
@@ -487,13 +476,11 @@ class User:
         until_id: Optional[ID] = None,
         mentioned: bool = False,
         exclude: Optional[str] = None,
-    ) -> Union[List[Tweet], List]:
+    ) -> Union[TweetPagination, list]:
         """Fetches the user timelines, this can be timelines where the user got mention or a normal tweet timelines.
 
         Parameters
         ------------
-        max_results: :class:`int`
-            Specified how many tweets should be return.
         start_time: Optional[:class:`datetime.datetime`]
             This will make sure the tweets created datetime is after that specific time.
         end_time: Optional[:class:`datetime.datetime`]
@@ -509,8 +496,8 @@ class User:
 
         Returns
         ---------
-        Union[List[:class:`Tweet`], List]
-            This method returns a list of :class:`Tweet` objects or an empty list if none founded.
+        Union[:class:`TweetPagination`, :class:`list`]
+            This method returns a :class:`TweetPagination` objects or an empty :class:`list` if none founded.
 
 
         .. versionadded:: 1.3.5
@@ -534,7 +521,6 @@ class User:
             "tweet.fields": TWEET_FIELD,
         }
 
-        params["max_results"] = max_results
         if start_time:
             params["start_time"] = start_time.isoformat()
         if end_time:
@@ -553,17 +539,23 @@ class User:
             params=params,
         )
 
-        try:
-            fulldata = []
-            for index, data in enumerate(res["data"]):
-                fulldata.append({})
-                fulldata[index]["data"] = data
-                fulldata[index]["includes"] = {}
-                fulldata[index]["includes"]["users"] = [self.__original_payload]
-
-            return [Tweet(data, http_client=self.http_client) for data in fulldata]
-        except (TypeError, KeyError):
+        if not res:
             return []
+        return TweetPagination(res, Tweet, f"/users/{self.id}/tweets" if not mentioned else f"/users/{self.id}", http_client=self.http_client, params=params)
+
+    def fetch_pinned_tweet(self) -> Optional[Tweet]:
+        """Returns the user's pinned tweet.
+
+        Returns
+        ---------
+        Optional[:class:`Tweet`]
+            This method returns a :class:`Tweet` object.
+
+
+        .. versionadded: 1.1.3
+        """
+        id = self._payload.get("pinned_tweet_id")
+        return self.http_client.fetch_tweet(int(id)) if id else None
 
 
 class ClientAccount(User):
