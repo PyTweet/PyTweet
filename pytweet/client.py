@@ -25,6 +25,7 @@ from .tweet import Tweet
 from .user import User, ClientAccount
 from .environment import Environment, Webhook
 from .dataclass import Location, Trend
+from .type import ID
 
 __all__ = ("Client",)
 
@@ -37,30 +38,32 @@ class Client:
     Parameters
     ------------
     bearer_token: Optional[:class:`str`]
-        The Bearer Token of the app. The most important one, because this makes most of the requests for Twitter's api version 2.
+        The Bearer Token of the app. Uses for twitter version 2 endpoints.
     consumer_key: Optional[:class:`str`]
-        The Consumer Key of the app.
+        The Consumer Key of the app. Users for twitter version 1.1 endpoints.
     consumer_secret: Optional[:class:`str`]
-        The Consumer Key Secret of the app.
+        The Consumer Key Secret of the app. Users for twitter version 1.1 endpoints.
     access_token: Optional[:class:`str`]
-        The Access Token of the app.
+        The Access Token of the app. Users for twitter version 1.1 endpoints.
     access_token_secret: Optional[:class:`str`]
-        The Access Token Secret of the app.
+        The Access Token Secret of the app. Users for twitter version 1.1 endpoints.
     stream: Optional[Stream]
         The client's stream. Must be an instance of :class:`Stream`.
-    callback: Optional[:class:`str`]
+    callback_url: Optional[:class:`str`]
         The oauth callback url, default to None.
+    client_id: Optional[:class:`str`]
+        The client's OAuth 2.0 Client ID from keys and tokens page.
+    client_secret: Optional[:class:`str`]
+        The client's OAuth 2.0 Client Secret from keys and tokens page.
 
     Attributes
     ------------
-    http: Optional[:class:`HTTPClient`]
-        Returns the HTTPClient,  the HTTPClient is responsible for making most of the Requests.
     webhook: Optional[:class:`Webhook`]
-        Returns the client's main webhook, if there is None it returns None
+        Returns the client's main webhook, Returns None if not found.
     environment: Optional[:class:`Environment`]
-        Returns the client's main Environment, if there is None it returns None
+        Returns the client's main Environment, Returns None if not found.
     webhook_url_path: Optional[:class:`str`]
-        Returns the webhook url path, if there is None it returns None
+        Returns the webhook url path, Returns None if not found.
 
 
     .. versionadded:: 1.0.0
@@ -77,6 +80,7 @@ class Client:
         stream: Optional[Stream] = None,
         callback_url: Optional[str] = None,
         client_id: Optional[str] = None,
+        client_secret: Optional[str] = None,
     ) -> None:
         self.http = HTTPClient(
             bearer_token,
@@ -87,6 +91,7 @@ class Client:
             stream=stream,
             callback_url=callback_url,
             client_id=client_id,
+            client_secret=client_secret,
         )
         self._account_user: Optional[User] = None  # set in account property.
         self.webhook: Optional[Webhook] = None
@@ -98,11 +103,10 @@ class Client:
 
     @property
     def account(self) -> Optional[User]:
-        """Optional[:class:`User`]: Returns the client's account information. The callback is a User object.
+        """Optional[:class:`User`]: Returns a user object presenting the client's account.
 
         .. versionadded:: 1.2.0
         """
-
         account_user = self._account_user
         if account_user is None:
             self._set_account_user()
@@ -110,16 +114,23 @@ class Client:
             # The account_user does not change when the function is called. That is why we are returning this.
         return account_user
 
+    @property
+    def me(self) -> Optional[User]:
+        """Optional[:class:`User`]: An alias to :meth:`Client.account`
+
+        .. versionadded:: 1.5.0
+        """
+        return self.account
+
     def _set_account_user(self) -> None:
         if not self.http.access_token:
             return None
 
-        data = self.fetch_user(self.http.access_token.partition("-")[0])._User__original_payload
+        data = self.http.fetch_me()._User__original_payload
         self._account_user = ClientAccount(data, http_client=self.http)
 
     def event(self, func: Callable) -> None:
-        """
-        A decorator for making an event, the event will be register in the client's internal cache.
+        """A decorator for making an event, the event will be register in the client's internal cache.
 
         See the :ref:`Event Reference <twitter-api-events>` for the currently documented events.
 
@@ -141,15 +152,15 @@ class Client:
             raise TypeError("Function passed in event() must NOT be a coroutine function.")
         self.http.events[func.__name__[3:]] = func
 
-    def fetch_user(self, user_id: Union[str, int]) -> Optional[User]:
-        """A method for fetching the user with the user's id.
+    def fetch_user(self, user_id: ID) -> Optional[User]:
+        """Fetches a user.
 
         .. warning::
             This method uses API call and might cause ratelimits if used often!
 
         Parameters
         ------------
-        user_id: Union[:class:`str`, :class:`int`]
+        user_id: :class:`ID`
             Represents the user ID that you wish to get info for. If you don't have it you may use `fetch_user_by_username` because it only requires the user's username.
 
         Returns
@@ -163,7 +174,7 @@ class Client:
         return self.http.fetch_user(user_id)
 
     def fetch_user_by_username(self, username: str) -> Optional[User]:
-        """A method for fetching the user with the user's username.
+        """Fetches a user by the user's username.
 
         .. warning::
             This method uses API call and might cause ratelimits if used often!
@@ -183,15 +194,15 @@ class Client:
         """
         return self.http.fetch_user_by_username(username)
 
-    def fetch_tweet(self, tweet_id: Union[str, int]) -> Tweet:
-        """A method for fetching tweet with the tweet's id.
+    def fetch_tweet(self, tweet_id: ID) -> Tweet:
+        """Fetches a tweet.
 
         .. warning::
             This method uses API call and might cause ratelimits if used often! More recommended is to use get_tweet to get the client's tweet.
 
         Parameters
         ------------
-        tweet_id: Union[:class:`str`, :class:`int`]
+        tweet_id: :class:`ID`
             Represents the tweet id that you wish to get info about.
 
         Returns
@@ -204,15 +215,15 @@ class Client:
         """
         return self.http.fetch_tweet(tweet_id)
 
-    def fetch_direct_message(self, event_id: Union[str, int]) -> DirectMessage:
-        """A method for fetching a direct message with the direct message's event ID.
+    def fetch_direct_message(self, event_id: ID) -> DirectMessage:
+        """Fetches a direct message.
 
         .. warning::
             This method uses API call and might cause ratelimit if used often! It is more recommended to use `get_message()` method, as it get the message from the client's internal cache.
 
         Parameters
         ------------
-        event_id: Union[:class:`str`, :class:`int`]
+        event_id: :class:`ID`
             Represents the event's ID that you wish to fetch with.
 
         Returns
@@ -230,13 +241,15 @@ class Client:
         text: str = None,
         *,
         file: Optional[File] = None,
+        files: Optional[List[File]] = None,
         poll: Optional[Poll] = None,
         geo: Optional[Union[Geo, str]] = None,
-        quote_tweet: Optional[Union[str, int]] = None,
         direct_message_deep_link: Optional[str] = None,
         reply_setting: Optional[Union[ReplySetting, str]] = None,
-        reply_tweet: Optional[Union[str, int]] = None,
-        exclude_reply_users: Optional[List[Union[str, int]]] = None,
+        quote_tweet: Optional[Union[Tweet, ID]] = None,
+        reply_tweet: Optional[Union[Tweet, ID]] = None,
+        exclude_reply_users: Optional[List[User, ID]] = None,
+        media_tagged_users: Optional[List[User, ID]] = None,
         super_followers_only: bool = False,
     ) -> Message:
         """Posts a tweet directly to twitter from the given parameters.
@@ -246,21 +259,25 @@ class Client:
         text: :class:`str`
             The tweet's text, it will show up as the main text in a tweet.
         file: Optional[:class:`File`]
-            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
+            Represents a single file attachment. It could be an image, gif, or video. Must be an instance of pytweet.File
+        files: Optional[List[:class:`File`]]
+            Represents multiple file attachments in a list. It could be an image, gif, or video. the item in the list must also be an instance of pytweet.File
         poll: Optional[:class:`Poll`]
             The poll attachment.
         geo: Optional[Union[:class:`Geo`, :class:`str`]]
             The geo attachment, you can put an object that is an instance of :class:`Geo` or the place ID in a string.
-        quote_tweet: Optional[Union[:class:`str`, :class:`int`]]
-            The tweet ID you want to quote.
         direct_message_deep_link: Optional[:class:`str`]
-            The direct message deep link, It will showup as a CTA(call-to-action) with button attachment. Example of direct message deep link:
+            The direct message deep link, It will showup as a CTA(call-to-action) with button attachment.
         reply_setting: Optional[Union[:class:`ReplySetting`, :class:`str`]]
             The reply setting that you can set to minimize users that can reply. If None is specified, the default is set to 'everyone' can reply.
-        reply_tweet: Optional[Union[:class:`str`, :class:`int`]]
-            The tweet ID you want to reply to. If you have an instance of :class:`Tweet`, you can use the reply() method rather then using this method.
-        exclude_reply_users: Optional[List[Union[:class:`str`, :class:`int`]]]
-            Exclude the users when replying to a tweet, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you don't want to mention.
+        quote_tweet: Optional[:class:`ID`]
+            The tweet or tweet ID you want to quote.
+        reply_tweet: Optional[:class:`Tweet`, :class:`ID`]
+            The tweet or tweet ID you want to reply. If you have an instance of :class:`Tweet`, you can use the :meth:`Tweet.reply` method rather then using this method.
+        exclude_reply_users: Optional[List[:class:`User`, :class:`ID`]]
+            A list of users or user ids to be excluded from the reply :class:`Tweet` thus removing a user from a thread, if you dont want to mention a reply with 3 mentions, You can use this argument and provide the user id you don't want to mention.
+        media_tagged_users: Optional[List[:class:`User`, :class:`ID`]]
+            A list of users or user ids being tagged in the Tweet with Media. If the user you're tagging doesn't have photo-tagging enabled, their names won't show up in the list of tagged users even though the Tweet is successfully created.
         super_followers_only: :class:`bool`
             Allows you to tweet exclusively for super followers.
 
@@ -275,6 +292,7 @@ class Client:
         return self.http.post_tweet(
             text,
             file=file,
+            files=files,
             poll=poll,
             geo=geo,
             quote_tweet=quote_tweet,
@@ -282,14 +300,15 @@ class Client:
             reply_setting=reply_setting,
             reply_tweet=reply_tweet,
             exclude_reply_users=exclude_reply_users,
+            media_tagged_users=media_tagged_users,
             super_followers_only=super_followers_only,
         )
 
     def create_welcome_message(
         self,
+        *,
         name: Optional[str] = None,
         text: Optional[str] = None,
-        *,
         file: Optional[File] = None,
         quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
@@ -303,7 +322,7 @@ class Client:
         text: Optional[:class:`str`]
             The welcome message's text. Please do not make this empty if you don't want the text to be blank.
         file: Optional[:class:`File`]:
-            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
+            Represents a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
         quick_reply: Optional[:class:`QuickReply`]
             The message's :class:`QuickReply` attachments.
         cta: Optional[:class:`CTA`]
@@ -317,14 +336,14 @@ class Client:
 
         .. versionadded:: 1.3.5
         """
-        return self.http.create_welcome_message(name, text, file=file, quick_reply=quick_reply, cta=cta)
+        return self.http.create_welcome_message(name=name, text=text, file=file, quick_reply=quick_reply, cta=cta)
 
-    def fetch_welcome_message(self, welcome_message_id: Union[str, int]) -> WelcomeMessage:
-        """Fetches the welcome message with the given welcome message ID argument.
+    def fetch_welcome_message(self, welcome_message_id: ID) -> WelcomeMessage:
+        """Fetches a welcome message.
 
         Parameters
         ------------
-        welcome_message_id: Union[:class:`str`, :class:`int`]
+        welcome_message_id: :class:`ID`
             Represents the welcome message ID that you wish to fetch with.
 
         Returns
@@ -337,12 +356,12 @@ class Client:
         """
         return self.http.fetch_welcome_message(welcome_message_id)
 
-    def fetch_welcome_message_rule(self, welcome_message_rule_id: Union[str, int]) -> WelcomeMessageRule:
-        """A method for fetching a welcome message rule.
+    def fetch_welcome_message_rule(self, welcome_message_rule_id: ID) -> WelcomeMessageRule:
+        """Fetches a welcome message rule.
 
         Parameters
         ------------
-        welcome_message_rule_id: Union[:class:`str`, :class:`int`]
+        welcome_message_rule_id: :class:`ID`
             Represents the welcome message rule ID that you wish to fetch with.
 
         Returns
@@ -355,12 +374,12 @@ class Client:
         """
         return self.http.fetch_welcome_message_rule(welcome_message_rule_id)
 
-    def fetch_space(self, space_id: Union[str, int]) -> Space:
-        """A method for fetching a space.
+    def fetch_space(self, space_id: ID) -> Space:
+        """Fetches a space.
 
         Parameters
         ------------
-        space_id: Union[:class:`str`, :class:`int`]
+        space_id: :class:`ID`
             Represents the space ID that you wish to fetch with.
 
         Returns
@@ -374,11 +393,11 @@ class Client:
         return self.http.fetch_space(space_id)
 
     def fetch_space_by_title(self, title: str, state: SpaceState = SpaceState.live) -> Space:
-        """Fetch a space using its title.
+        """Fetches a space using its title.
 
         Parameters
         ------------
-        title: Union[:class:`str`, :class:`int`]
+        title: :class:`ID`
             The space title that you are going use for fetching the space.
         state: :class:`SpaceState`
             The type of state the space has. There are only 2 types: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host. Default to SpaceState.live
@@ -399,11 +418,11 @@ class Client:
     def search_geo(
         self,
         query: str,
-        max_result: Optional[Union[str, int]] = None,
+        max_result: Optional[ID] = None,
         *,
         lat: Optional[int] = None,
         long: Optional[int] = None,
-        ip: Optional[Union[str, int]] = None,
+        ip: Optional[ID] = None,
         granularity: str = "neighborhood",
     ) -> Geo:  # TODO make enums for granularity
         """Search a geo with the given arguments.
@@ -412,13 +431,13 @@ class Client:
         ------------
         query: :class:`str`
             Free-form text to match against while executing a geo-based query, best suited for finding nearby locations by name. Remember to URL encode the query.
-        max_results: Optional[Union[:class:`str`, :class:`int`]]
+        max_results: Optional[:class:`ID`]
             A hint as to the number of results to return. This does not guarantee that the number of results returned will equal max_results, but instead informs how many "nearby" results to return. Ideally, only pass in the number of places you intend to display to the user here.
         lat: :class:`int`
             The latitude to search around. This parameter will be ignored unless it is inside the range -90.0 to +90.0 (North is positive) inclusive. It will also be ignored if there isn't a corresponding long parameter.
         long: :class:`int`
             The longitude to search around. The valid ranges for longitude are -180.0 to +180.0 (East is positive) inclusive. This parameter will be ignored if outside that range, if it is not a number, if geo_enabled is turned off, or if there is not a corresponding lat parameter.
-        ip: Union[:class:`str`, :class:`int`]
+        ip: :class:`ID`
             An IP address. Used when attempting to fix geolocation based off of the user's IP address.
         granularity: :class:`str`
             This is the minimal granularity of place types to return and must be one of: neighborhood, city, admin or country. If no granularity is provided for the request neighborhood is assumed. Setting this to city, for example, will find places which have a type of city, admin or country.
@@ -433,7 +452,7 @@ class Client:
         """
         return self.http.search_geo(query, max_result, lat=lat, long=long, ip=ip, granularity=granularity)
 
-    def search_trend_with_place(self, woeid: Union[str, int], exclude: Optional[str] = None):
+    def search_trend_with_place(self, woeid: ID, exclude: Optional[str] = None):
         """Search trends with woeid.
 
         .. note::
@@ -441,7 +460,7 @@ class Client:
 
         Parameters
         ------------
-        woeid: Union[:class:`str`, :class:`int`]
+        woeid: :class:`ID`
             "where on earth identifier" or WOEID, which is a legacy identifier created by Yahoo and has been deprecated. Twitter API v1.1 still uses the numeric value to identify town and country trend locations. Example WOEID locations include: Worldwide: 1 UK: 23424975 Brazil: 23424768 Germany: 23424829 Mexico: 23424900 Canada: 23424775 United States: 23424977 New York: 2459115.
         exclude: Optional[:class:`str`]
             Setting this equal to hashtags will remove all hashtags from the trends list.
@@ -464,6 +483,10 @@ class Client:
         res = self.http.request("GET", "1.1", "/trends/available.json", auth=True)
         for data in res:
             data["parent_id"] = data["parentid"]
+            data["place_type"] = data["placeType"]
+            data["country_code"] = data["countryCode"]
+            data.pop("placeType")
+            data.pop("countryCode")
             data.pop("parentid")
 
         return [Location(**data) for data in res]
@@ -485,7 +508,7 @@ class Client:
 
         return [Location(**data) for data in res]
 
-    def get_message(self, event_id: Union[str, int]) -> Optional[DirectMessage]:
+    def get_message(self, event_id: ID) -> Optional[DirectMessage]:
         """Get a direct message through the client message cache. Returns None if the message is not in the cache.
 
         .. note::
@@ -493,7 +516,7 @@ class Client:
 
         Parameters
         ------------
-        event_id: Union[:class:`str`, :class:`int`]
+        event_id: :class:`ID`
             The event ID of the Direct Message event that you want to get.
 
         Returns
@@ -511,7 +534,7 @@ class Client:
 
         return self.http.message_cache.get(event_id)
 
-    def get_tweet(self, tweet_id: Union[str, int]) -> Optional[Tweet]:
+    def get_tweet(self, tweet_id: ID) -> Optional[Tweet]:
         """Gets a tweet through the client internal tweet cache. Return None if the tweet is not in the cache.
 
         .. note::
@@ -519,7 +542,7 @@ class Client:
 
         Parameters
         ------------
-        tweet_id: Union[:class:`str`, :class:`int`]
+        tweet_id: :class:`ID`
             The ID of a tweet that you want to get.
 
         Raises
@@ -600,7 +623,7 @@ class Client:
             print("\nKeyboardInterrupt: Exit stream.")
 
     def fetch_all_environments(self) -> Optional[List[Environment]]:
-        """A method for fetching all the client's envirouments.
+        """Fetches all the client's environments.
 
         Returns
         ---------
@@ -623,14 +646,17 @@ class Client:
         ngrok: bool = False,
         **kwargs: Any,
     ):
-        """Listen to upcoming account activity events send by twitter to your webhook url. You can use the rest of Flask arguments like port or host via the kwargs argument.
+        """Listen to upcoming account activity events send by twitter to your flask's url. You can use the rest of Flask arguments like port or host via the kwargs argument.
+
+        .. note::
+            For the time being, we only support Flask for the app argument! If you want to use your own web application url, consider using :meth:`Client.listen_to`.
 
         Parameters
         ------------
         app: :class:`flask.Flask`
             Your flask application.
         url: :class:`str`
-            The webhook url. This completely up to you, e.g https://your-domain.com/webhook/twitter etc.
+            The webhook url aka your flask's web application url. This completely up to you, e.g https://your-website.domain/webhook/twitter.
         env_label: :class:`str`
             The environment's label.
         sleep_for: Union[:class:`int`, :class:`float`]
@@ -645,6 +671,9 @@ class Client:
 
         .. versionadded:: 1.5.0
         """
+        if not isinstance(app, Flask):
+            raise PytweetException("App argument must be an instance of flask.Flask!")
+
         disabled_log: bool = kwargs.pop("disabled_log", False)
         make_new: bool = kwargs.pop("make_new", True)
         environments = self.fetch_all_environments()
@@ -669,15 +698,15 @@ class Client:
             thread = threading.Thread(target=app.run, name="PyTweet: Flask App Thread", kwargs=kwargs)
 
             if not self.webhook and not ngrok:
-                self.webhook_url_path = urlparse(webhook.url).path
+                self.webhook_url_path = urlparse(url).path
 
             elif self.webhook and ngrok:
-                self.webhook_url_path = "THE URL PATH PASSSED BY NGROK"  # TODO add ngrok support
+                ...  # TODO add ngrok support
 
             @app.route(self.webhook_url_path, methods=["POST", "GET"])
             def webhook_receive():
                 if request.method == "GET":
-                    _log.info("Attempting to respond to a CRC.")
+                    _log.info("Attempting to respond a CRC.")
                     crc = request.args["crc_token"]
 
                     validation = hmac.new(
@@ -738,3 +767,75 @@ class Client:
 
         finally:
             _log.debug(f"Stop listening due to internal/external problem!")
+
+    def listen_to(self, url: str, env_label: str, ngrok: bool = False, make_new: bool = True):
+        """Listen to upcoming account activity events send by twitter to a web application url. This method differ from :meth:`Client.listen`, this method doesn't use the flask's web application url, rather your web application url. This is good for people that want to implement their web application outside flask.
+
+        .. warning::
+            With this method, you have to make your own CRC and event handlers in your web application. For the time being, the documentation doesn't provides information for the handlers, either go to twitter documentation about account activity api or wait until we write the documentation.
+
+        Parameters
+        ------------
+        url: :class:`str`
+            The webhook url. This completely up to you, e.g https://your-website.domain/webhook/twitter.
+        env_label: :class:`str`
+            The environment's label.
+        ngrok: :class:`bool`
+            indicates to use ngrok for tunneling your localhost. This usually uses for users that use localhost url.
+        make_new: :class:`bool`
+            A kwarg indicates to make a new webhook url when the api can't find the url passed. Default to True.
+
+
+        .. versionadded:: 1.5.0
+        """
+        environments = self.fetch_all_environments()
+
+        for env in environments:
+            if env.label == env_label:
+                self.environment = env
+
+            for webhook in env.webhooks:
+                if url == webhook.url:
+                    self.webhook_url_path = urlparse(webhook.url).path
+                    self.webhook = webhook
+                    self.environment = env
+                    break
+
+        if not self.webhook and not ngrok:
+            self.webhook_url_path = urlparse(webhook.url).path
+
+        elif self.webhook and ngrok:
+            ...  # TODO add ngrok support
+
+        check = not self.webhook and self.webhook_url_path
+        if check and make_new:
+            webhook = self.environment.register_webhook(
+                url
+            )  # Register a new webhook url if no webhook found also if make_new is True.
+            self.webhook = webhook
+            self.environment = env
+            self.environment.add_my_subscription()
+            ids = self.environment.fetch_all_subscriptions()
+            users = self.http.fetch_users(ids)
+            for user in users:
+                self.http.user_cache[user.id] = user
+
+            _log.debug(
+                f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\n In Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
+            )
+
+        elif check and not make_new:
+            raise PytweetException(
+                f"Cannot find url passed: {url} Invalid url passed, please check the spelling of your url"
+            )
+
+        else:
+            self.webhook.trigger_crc()
+            ids = self.environment.fetch_all_subscriptions()
+            users = self.http.fetch_users(ids)
+            for user in users:
+                self.http.user_cache[user.id] = user
+
+            _log.debug(
+                f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\n In Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
+            )

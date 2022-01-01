@@ -49,26 +49,27 @@ class StreamConnection:
 
     @property
     def closed(self) -> Optional[bool]:
-        """ "Optional[:class:`bool`]: Returns True if the connection is closed, else False.
+        """Optional[:class:`bool`]: Returns True if the connection is closed, else False.
 
         .. versionadded:: 1.3.5
         """
         return not self.running
 
     def is_close(self) -> Optional[bool]:
-        """ "An alias to :class:`StreamConnection.closed`.
+        """An alias to :class:`StreamConnection.closed`.
 
         Returns
         ---------
         Optional[:class:`bool`]:
             This method returns a :class:`bool` object.
 
+
         .. versionadded:: 1.3.5
         """
         return self.closed
 
     def close(self) -> None:
-        """ "Close the stream connection.
+        """Close the stream connection.
 
         Returns
         ---------
@@ -84,11 +85,11 @@ class StreamConnection:
         self.running = False
 
     def connect(self) -> Optional[Any]:
-        """ "Connect to the current stream connection.
+        """Connect to the current stream connection.
+
 
         .. versionadded:: 1.3.5
         """
-
         self.running = True
         http = self.http_client
         while self.running:
@@ -265,7 +266,7 @@ class Stream:
             rules = self.http_client.request("POST", "2", "/tweets/search/stream/rules", json=data)
 
     def fetch_rules(self) -> Optional[List[StreamRule]]:
-        """Fetch the stream's rules.
+        """Fetches the stream's rules.
 
         Returns
         ---------
@@ -296,12 +297,6 @@ class Stream:
         ------------
         dry_run: :class:`bool`
             Indicates if you want to debug your rule's operator syntax.
-
-        Returns
-        ---------
-        :class:`NoneType`:
-            This method returns None.
-
 
         .. versionadded:: 1.3.5
         """
@@ -337,11 +332,6 @@ class Stream:
         ------------
         dry_run: :class:`bool`
             Indicates if you want to debug your rule's operator syntax. Default to None.
-
-        Returns
-        ---------
-        :class:`NoneType`:
-            This method returns None.
 
 
         .. versionadded:: 1.3.5

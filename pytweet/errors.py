@@ -4,7 +4,7 @@ from json import decoder
 
 
 class PytweetException(Exception):
-    """Exception: This is the base class of all exceptions.
+    """This is the base class of all exceptions raise by PyTweet. This inherits :class:`Exception`.
 
     .. versionadded:: 1.2.0
     """
@@ -18,7 +18,7 @@ class PytweetException(Exception):
 
 
 class APIException(PytweetException):
-    """:class:`PytweetException`: raises when an error is incurred during a request with HTTP Status code 200.
+    """raises when an error is incurred during a request with HTTP Status code 200. This inherits :class:`PytweetException`.
 
     .. versionadded:: 1.2.0
     """
@@ -34,7 +34,7 @@ class APIException(PytweetException):
 
 
 class HTTPException(PytweetException):
-    """:class:`PytweetException`: A custom error that will be raises whenever a request returns an HTTP status code above 200.
+    """A custom error that will be raises whenever a request returns an HTTP status code above 200. This inherits :class:`PytweetException`.
 
     .. versionadded:: 1.2.0
     """
@@ -54,7 +54,9 @@ class HTTPException(PytweetException):
                 self.detail = res.get("errors")[0].get("detail")
 
             else:
-                self.detail = res.get("detail")
+                self.message = res.get("error")
+                if not self.message:
+                    self.detail = res.get("detail")
 
         except decoder.JSONDecodeError:
             super().__init__(
@@ -63,7 +65,7 @@ class HTTPException(PytweetException):
 
         else:
             super().__init__(
-                f"Request returned an Exception (status code: {self.response.status_code}): {self.message}",
+                f"Request returned an Exception (status code: {self.response.status_code}): {self.message if self.message else self.detail}",
             )
 
     @property
@@ -163,3 +165,13 @@ class UnKnownSpaceState(APIException):
 
     def __init__(self, given_state):
         super().__init__(message="Unknown state passed: %s" % given_state)
+
+
+class NoPageAvailable(APIException):
+    """This error class inherits :class:`APIException`. This error is raises when a user try to lookup a new page in :class:`PaginationIterator` that does not exist.
+
+    .. versionadded:: 1.5.0
+    """
+
+    def __init__(self):
+        super().__init__(message="Pagination have no more page available!")

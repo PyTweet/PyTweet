@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from .app import ApplicationInfo
 from .attachments import CTA, File, QuickReply
@@ -11,6 +11,7 @@ from .user import User
 
 if TYPE_CHECKING:
     from .http import HTTPClient
+    from .type import ID
 
 __all__ = ("Message", "DirectMessage", "WelcomeMessage", "WelcomeMessageRule")
 
@@ -22,7 +23,7 @@ class Message:
     ------------
     text: Optional[:class:`str`]
         The messages's text.
-    id: Union[:class:`str`, :class:`int`]
+    id: `ID`
         The messages's unique ID.
     type: :class:`int`.
         The message's type in int form, it will gets form to MessageTypeEnum.
@@ -35,10 +36,10 @@ class Message:
 
     if TYPE_CHECKING:
         _text: Optional[str]
-        _id: Union[str, int]
+        _id: ID
         _type: int
 
-    def __init__(self, text: Optional[str], id: Union[str, int], type: int):
+    def __init__(self, text: Optional[str], id: ID, type: int):
         self._text = text
         self._id = id
         self._type = type
@@ -243,7 +244,7 @@ class DirectMessage(Message):
 
 
 class WelcomeMessage(Message):
-    """Represent a Welcome Message in a Direct Message.
+    """Represents a Welcome Message in a Direct Message.
 
     Parameters
     ------------
@@ -251,7 +252,7 @@ class WelcomeMessage(Message):
         A human readable name for the Welcome Message.
     text: :class:`str`
         The welcome message main text.
-    id: Union[:class:`str`, :class:`int`]
+    id: `ID`
         The welcome message unique id.
     timestamp: Optional[:class:`str`]
         The welcome message timestamp.
@@ -269,7 +270,7 @@ class WelcomeMessage(Message):
         name: Optional[str] = None,
         *,
         text: str,
-        id: Union[str, int],
+        id: ID,
         timestamp: str,
         http_client: HTTPClient,
     ):
@@ -306,8 +307,8 @@ class WelcomeMessage(Message):
 
     def update(
         self,
-        text: str,
         *,
+        text: Optional[str] = None,
         file: Optional[File] = None,
         quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
@@ -316,10 +317,10 @@ class WelcomeMessage(Message):
 
         Parameters
         -----------
-        text: :class:`str`
+        text: Optional[:class:`str`]
             The welcome message main text
         file: Optional[:class:`File`]:
-            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
+            Represents a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
         quick_reply: Optional[:class:`QuickReply`]
             The message's :class:`QuickReply` attachments.
         cta: Optional[:class:`CTA`]
@@ -333,47 +334,7 @@ class WelcomeMessage(Message):
 
         .. versionadded:: 1.3.5
         """
-        data = {"message_data": {}}
-        message_data = data["message_data"]
-
-        message_data["text"] = str(text)
-
-        if file:
-            media_id = self.http_client.upload(file, "INIT")
-            self.http_client.upload(file, "APPEND", media_id=media_id)
-            self.http_client.upload(file, "FINALIZE", media_id=media_id)
-            message_data["attachment"] = {}
-            message_data["attachment"]["type"] = "media"
-            message_data["attachment"]["media"] = {}
-            message_data["attachment"]["media"]["id"] = str(media_id)
-
-        if quick_reply:
-            message_data["quick_reply"] = {
-                "type": quick_reply.type,
-                "options": quick_reply.raw_options,
-            }
-
-        if cta:
-            message_data["ctas"] = cta.raw_buttons
-
-        res = self.http_client.request(
-            "PUT",
-            "1.1",
-            "/direct_messages/welcome_messages/update.json",
-            params={"id": str(self.id)},
-            json=data,
-            auth=True,
-        )
-
-        welcome_message = res.get("welcome_message")
-        message_data = welcome_message.get("message_data")
-
-        name = res.get("name")
-        id = welcome_message.get("id")
-        timestamp = welcome_message.get("created_timestamp")
-        text = message_data.get("text")
-
-        return WelcomeMessage(name, text=text, id=id, timestamp=timestamp, http_client=self.http_client)
+        return self.http_client.update_welcome_message(text=text, file=file, quick_reply=quick_reply, cta=cta)
 
     def delete(self):
         """Delete the Welcome Message.
@@ -406,13 +367,13 @@ class WelcomeMessage(Message):
 
 
 class WelcomeMessageRule(Message):
-    """Represent a Welcome Message Rule in a Direct Message. This object is returns by WelcomeMessage.set_rule or client.fetch_welcome_message_rules, it determines which Welcome Message will be shown in a given conversation.
+    """Represents a Welcome Message Rule in a Direct Message. This object is returns by WelcomeMessage.set_rule or client.fetch_welcome_message_rules, it determines which Welcome Message will be shown in a given conversation.
 
     Parameters
     ------------
-    id: Union[:class:`str`, :class:`int`]
+    id: `ID`
         The welcome message rule unique id.
-    welcome_message_id: Union[:class:`str`, :class:`int`]
+    welcome_message_id: `ID`
         The welcome message unique id.
     timestamp: Optional[:class:`str`]
         The welcome message rule created timestamp.
@@ -427,9 +388,9 @@ class WelcomeMessageRule(Message):
 
     def __init__(
         self,
-        id: Union[str, int],
-        welcome_message_id: Union[str, int],
-        timestamp: Union[str, int],
+        id: ID,
+        welcome_message_id: ID,
+        timestamp: ID,
         *,
         http_client: HTTPClient,
     ):
@@ -480,8 +441,8 @@ class WelcomeMessageRule(Message):
         return datetime.datetime.fromtimestamp(int(self._timestamp) / 1000)
 
     @property
-    def welcome_message_id(self) -> Union[str, int]:
-        """Union[:class:`str`, :class:`int`]: Returns the welcome message's id.
+    def welcome_message_id(self) -> ID:
+        """:clasD`: Returns the welcome message's id.
 
         .. versionadded:: 1.3.5
         """

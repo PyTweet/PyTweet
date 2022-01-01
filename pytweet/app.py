@@ -7,10 +7,12 @@ class ApplicationInfo:
     .. versionadded:: 1.5.0
     """
 
+    __slots__ = ("__original_payload", "_payload")
+
     def __init__(self, data: Dict[str, Any]):
-        self.original_payload = data
-        app_id = list(self.original_payload.get("apps").keys())[0]
-        self._payload = self.original_payload.get("apps", {}).get(app_id, {})
+        self.__original_payload = data
+        app_id = list(self.__original_payload.get("apps").keys())[0]
+        self._payload = self.__original_payload.get("apps", {}).get(app_id, {})
 
     @property
     def name(self) -> str:

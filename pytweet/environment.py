@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import logging
 import datetime
-from typing import Any, List, Dict, Union, TYPE_CHECKING
+from typing import Any, List, Dict, TYPE_CHECKING
 from .utils import time_parse_todt
 
 if TYPE_CHECKING:
     from .client import Client
+    from .type import ID
 
 _log = logging.getLogger(__name__)
 
@@ -38,7 +39,7 @@ class Webhook:
         return self._id
 
     @id.setter
-    def id(self, obj: Union[str, int]) -> None:
+    def id(self, obj: ID) -> None:
         self._id = obj
 
     @property

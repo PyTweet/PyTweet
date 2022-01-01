@@ -1,10 +1,9 @@
 import datetime
-from typing import Any, Dict, Union, Optional
+from typing import Union, Optional
 from .user import User
 from .tweet import Tweet
 from .enums import ActionEventType, UserActionEventType
-
-EventPayload = Dict[str, Any]
+from .type import Payload
 
 # Events type
 
@@ -17,7 +16,7 @@ class Event:
 
     __slots__ = ("_payload", "_type")
 
-    def __init__(self, data: EventPayload):
+    def __init__(self, data: Payload):
         self._type = list(data.keys())[1]
         self._payload = data.get(self._type)[0]
 
@@ -33,7 +32,7 @@ class Event:
             return UserActionEventType(self._type)
 
     @property
-    def payload(self) -> EventPayload:
+    def payload(self) -> Payload:
         """Returns the event payload.
 
         .. versionadded:: 1.5.0
@@ -81,7 +80,7 @@ class UserActionEvent(Event):
 
 
 class DirectMessageEvent(Event):
-    def __init__(self, data: EventPayload, *, http_client: object):
+    def __init__(self, data: Payload, *, http_client: object):
         super().__init__(data)
         self.http_client = http_client
 

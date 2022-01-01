@@ -11,10 +11,10 @@ class PlaceType:
 @dataclass
 class Location:
     country: str
-    countryCode: str
+    country_code: str
     name: str
     parent_id: int
-    placeType: PlaceType
+    place_type: PlaceType
     url: str
     woeid: int
 

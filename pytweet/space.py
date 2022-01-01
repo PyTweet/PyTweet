@@ -3,6 +3,8 @@ from typing import Any, Dict, List, Optional
 
 from .enums import SpaceState
 from .utils import time_parse_todt
+from .user import User
+from .dataclass import SpaceTopic
 
 __all__ = ("Space",)
 
@@ -13,11 +15,12 @@ class Space:
     .. versionadded:: 1.3.5
     """
 
-    __slots__ = ("original_payload", "_payload")
+    __slots__ = ("__original_payload", "_payload", "http_client", "_include")
 
-    def __init__(self, data: Dict[str, Any]):
-        self.original_payload = data
+    def __init__(self, data: Dict[str, Any], http_client: object):
+        self.__original_payload = data
         self._payload = None
+        self.http_client = http_client
 
         try:
             if isinstance(data.get("data"), list):
@@ -25,7 +28,8 @@ class Space:
             else:
                 self._payload = data.get("data")
         except AttributeError:
-            self._payload = self.original_payload
+            self._payload = self.__original_payload
+        self._include = self.__original_payload.get("includes")
 
     def __repr__(self) -> str:
         return "Space(name={0.title} id={0.id} state={0.state})".format(self)
@@ -71,40 +75,12 @@ class Space:
         return self._payload.get("lang")
 
     @property
-    def creator_id(self) -> int:
-        """:class:`str`: Returns the creator's id.
-
-        .. versionadded:: 1.3.5
-        """
-        return self._payload.get("creator_id")
-
-    @property
     def created_at(self) -> datetime.datetime:
         """:class:`datetime.datetime`: Returns a datetime.datetime object with the space's created datetime.
 
         .. versionadded:: 1.3.5
         """
         return time_parse_todt(self._payload.get("created_at"))
-
-    @property
-    def hosts_id(self) -> Optional[List[int]]:
-        """Optional[List[:class:`int`]]: Returns a list of the hosts id.
-
-        .. versionadded:: 1.3.5
-        """
-        if self._payload.get("host_ids"):
-            return [int(id) for id in self._payload.get("host_ids")]
-        return None
-
-    @property
-    def invited_users(self) -> Optional[List[int]]:
-        """Optional[List[:class:`int`]]: Returns the a list of users id. Usually, users in this list are invited to speak via the Invite user option and have a Speaker role when the Space starts. Returns None if there isn't invited users.
-
-        .. versionadded:: 1.3.5
-        """
-        if self._payload.get("invited_users"):
-            return [int(id) for id in self._payload.get("invited_users")]
-        return None
 
     @property
     def started_at(self) -> Optional[datetime.datetime]:
@@ -131,9 +107,65 @@ class Space:
         :class:`bool`
             This method returns a :class:`bool` object.
 
+
         .. versionadded:: 1.5.0
         """
         return self._payload.get("is_ticketed")
+
+    def fetch_creator(self) -> User:
+        """Fetches the creator's using the id.
+
+        Returns
+        ---------
+        :class:`User`
+            This method returns a :class`User` object.
+
+
+        .. versionadded:: 1.3.5
+
+        .. versionchanged:: 1.5.0
+            Made as a function that returns :class:`User`.
+        """
+        id = int(self._payload.get("creator_id"))
+        return self.http_client.fetch_user(id)
+
+    def fetch_invited_users(self) -> Optional[List[User]]:
+        """Fetches the invited users. Usually, users in this list are invited to speak via the Invite user option and have a Speaker role when the Space starts. Returns None if there isn't invited users.
+
+        Returns
+        ---------
+        Optional[List[:class:`User`]]
+            This method returns a list of users or an empty list if not found.
+
+
+        .. versionadded:: 1.3.5
+
+        .. versionchanged:: 1.5.0
+            Made as a function that returns a list of :class:`User`.
+        """
+        if self._payload.get("invited_users"):
+            ids = [int(id) for id in self._payload.get("invited_users")]
+            return self.http_client.fetch_users(ids)
+        return None
+
+    def fetch_hosts(self) -> Optional[List[User]]:
+        """Fetches the space's hosts.
+
+        Returns
+        ---------
+        Optional[List[:class:`User`]]
+            Returns a list of :class:`User`.
+
+
+        .. versionadded:: 1.3.5
+
+        .. versionchanged:: 1.5.0
+            Made as a function that returns a list of :class:`User`.
+        """
+        if self._payload.get("host_ids"):
+            ids = [int(id) for id in self._payload.get("host_ids")]
+            return self.http_client.fetch_users(ids)
+        return None
 
     def is_ticketed(self) -> bool:
         """An alias to :meth:`Space.ticketed`.

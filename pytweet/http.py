@@ -7,7 +7,7 @@ import time
 import requests
 import base64
 from json import JSONDecodeError
-from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
+from typing import Dict, List, NoReturn, Optional, Union, TYPE_CHECKING
 
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .auth import OauthSession
@@ -19,25 +19,32 @@ from .errors import (
     NotFound,
     NotFoundError,
     PytweetException,
-    TooManyRequests,
     Unauthorized,
     FieldsTooLarge,
 )
-from .expansions import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, SPACE_FIELD, TWEET_EXPANSION, TWEET_FIELD, USER_FIELD
+from .expansions import (
+    MEDIA_FIELD,
+    PLACE_FIELD,
+    POLL_FIELD,
+    SPACE_FIELD,
+    TWEET_EXPANSION,
+    SPACE_EXPANSION,
+    TWEET_FIELD,
+    USER_FIELD,
+    TOPIC_FIELD,
+)
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser
 from .space import Space
-from .stream import Stream
 from .tweet import Tweet
 from .user import User
 from .mixins import EventMixin
 
-_log = logging.getLogger(__name__)
-
-
 if TYPE_CHECKING:
-    RequestModel = Dict[str, Any]
-    ResponseModel = Optional[Union[str, RequestModel]]
+    from .type import ID, Payload, ResponsePayload
+    from .stream import Stream
+
+_log = logging.getLogger(__name__)
 
 
 class HTTPClient(EventMixin):
@@ -52,6 +59,7 @@ class HTTPClient(EventMixin):
         stream: Optional[Stream] = None,
         callback_url: Optional[str] = None,
         client_id: Optional[str] = None,
+        client_secret: Optional[str] = None,
     ) -> Union[None, NoReturn]:
         self.credentials: Dict[str, Optional[str]] = {
             "bearer_token": bearer_token,
@@ -81,11 +89,22 @@ class HTTPClient(EventMixin):
         self.access_token_secret: Optional[str] = access_token_secret
         self.stream = stream
         self.callback_url = callback_url
+        self.client_id = client_id
+        self.client_secret = client_secret
         self.event_parser = EventParser(self)
         self.base_url = "https://api.twitter.com/"
-        self.upload_url = "https://upload.twitter.com/1.1/media/upload.json"
-        self._auth: Optional[OauthSession] = None  # Set in request method.
-        self.current_header: Optional[RequestModel] = None
+        self.upload_url = "https://upload.twitter.com/"
+        self._auth = OauthSession(
+            self.consumer_key,
+            self.consumer_secret,
+            access_token=self.access_token,
+            access_token_secret=self.access_token_secret,
+            http_client=self,
+            callback_url=self.callback_url,
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+        )
+        self.current_header: Optional[Payload] = None
         self.client_id = client_id
         self.message_cache = {}
         self.tweet_cache = {}
@@ -95,8 +114,8 @@ class HTTPClient(EventMixin):
             self.stream.connection.http_client = self
 
     @property
-    def access_level(self):
-        return self.current_header.get("x-access-levels").split("-")
+    def access_level(self) -> Optional[list]:
+        return self.current_header.get("x-access-levels").split("-") if self.current_header else None
 
     def request(
         self,
@@ -104,31 +123,20 @@ class HTTPClient(EventMixin):
         version: str,
         path: str,
         *,
-        headers: RequestModel = {},
-        params: RequestModel = {},
-        json: RequestModel = {},
-        data: RequestModel = {},
-        files: RequestModel = {},
+        headers: Payload = {},
+        params: Payload = {},
+        json: Payload = {},
+        data: Payload = {},
+        files: Payload = {},
         auth: bool = False,
         is_json: bool = True,
         use_base_url: bool = True,
         basic_auth: bool = False,
-    ) -> ResponseModel:
+    ) -> ResponsePayload:
         if use_base_url:
             url = self.base_url + version + path
         else:
-            url = path
-
-        if self._auth is None:
-            auth_session = OauthSession(
-                self.consumer_key,
-                self.consumer_secret,
-                http_client=self,
-                callback=self.callback_url,
-                client_id=self.client_id,
-            )
-            auth_session.set_access_token(self.access_token, self.access_token_secret)
-            self._auth = auth_session
+            url = self.upload_url + version + path
 
         user_agent = "Py-Tweet (https://github.com/PyTweet/PyTweet/) Python/{0[0]}.{0[1]}.{0[2]} requests/{1}"
         if "Authorization" not in headers.keys():
@@ -171,10 +179,18 @@ class HTTPClient(EventMixin):
             f"{response.status_code} {response.reason}\n"
             f"Headers: {response.headers}\n"
             f"Content: {response.content}\n"
+            f"Json-payload: {json}\n"
         )
 
         if code in (201, 202, 204):
-            return
+            if is_json:
+                try:
+                    res = response.json()
+                except JSONDecodeError:
+                    return response.text
+            else:
+                return response.text
+            return res
 
         elif code == 400:
             raise BadRequests(response)
@@ -218,14 +234,8 @@ class HTTPClient(EventMixin):
 
         return res
 
-    def upload(self, file: File, command: str, *, media_id=None):
+    def upload(self, file: File, command: str, *, subtitle_file: bool = False):
         assert command.upper() in ("INIT", "APPEND", "FINALIZE", "STATUS")
-        if self._auth is None:
-            auth_session = OauthSession(
-                self.consumer_key, self.consumer_secret, http_client=self, callback=self.callback_url
-            )
-            auth_session.set_access_token(self.access_token, self.access_token_secret)
-            self._auth = auth_session
 
         def CheckStatus(processing_info, media_id):
             if not processing_info:
@@ -246,8 +256,8 @@ class HTTPClient(EventMixin):
 
             res = self.request(
                 "GET",
-                version=None,
-                path=self.base_url,
+                version="1.1",
+                path="/media/upload.json",
                 params={"command": "STATUS", "media_id": media_id},
                 auth=True,
                 use_base_url=False,
@@ -261,18 +271,20 @@ class HTTPClient(EventMixin):
                 "command": "INIT",
                 "media_type": file.mimetype,
                 "total_bytes": file.total_bytes,
-                "media_category": file.media_category,
+                "media_category": file.media_category if not subtitle_file else "Subtitles",
                 "shared": file.dm_only,
             }
+
             res = self.request(
                 "POST",
-                version=None,
-                path=self.upload_url,
+                version="1.1",
+                path="/media/upload.json",
                 data=data,
                 auth=True,
                 use_base_url=False,
             )
 
+            file._File__media_id = res["media_id"]
             return res["media_id"]
 
         elif command.upper() == "APPEND":
@@ -284,17 +296,17 @@ class HTTPClient(EventMixin):
             else:
                 open_file = open(path, "rb")
 
-            if not media_id:
+            if not file.media_id:
                 raise ValueError("'media_id' is None! Please specified it.")
 
             while bytes_sent < file.total_bytes:
-                res = self.request(
+                self.request(
                     "POST",
-                    version=None,
-                    path=self.upload_url,
+                    version="1.1",
+                    path="/media/upload.json",
                     data={
                         "command": "APPEND",
-                        "media_id": media_id,
+                        "media_id": file.media_id,
                         "segment_index": segment_id,
                     },
                     files={"media": open_file.read(4 * 1024 * 1024)},
@@ -308,16 +320,65 @@ class HTTPClient(EventMixin):
         elif command.upper() == "FINALIZE":
             res = self.request(
                 "POST",
-                version=None,
-                path=self.upload_url,
-                data={"command": "FINALIZE", "media_id": media_id},
+                version="1.1",
+                path="/media/upload.json",
+                data={"command": "FINALIZE", "media_id": file.media_id},
                 auth=True,
                 use_base_url=False,
             )
 
-            CheckStatus(res.get("processing_info", None), media_id)
+            CheckStatus(res.get("processing_info", None), file.media_id)
 
-    def fetch_user(self, user_id: Union[str, int]) -> Optional[User]:
+            if file.alt_text:
+                self.request(
+                    "POST",
+                    version="1.1",
+                    path="/media/metadata/create.json",
+                    json={"media_id": str(file.media_id), "alt_text": {"text": str(file.alt_text)}},
+                    auth=True,
+                    use_base_url=False,
+                )
+
+            if file.subfile:
+                self.upload(file.subfile, "INIT", subtitle_file=True)
+                self.upload(file.subfile, "APPEND")
+                self.upload(file.subfile, "FINALIZE")
+
+                subtitle_data = {
+                    "media_id": file.media_id,
+                    "media_category": file.media_category,
+                    "subtitle_info": {
+                        "subtitles": [
+                            {
+                                "media_id": file.subfile.media_id,
+                                "language_code": file.subtitle_language_code,
+                                "display_name": file.subtitle_language,
+                            }
+                        ]
+                    },
+                }
+
+                self.request(
+                    "POST",
+                    version="1.1",
+                    path="/media/subtitles/create.json",
+                    json=subtitle_data,
+                    auth=True,
+                    use_base_url=False,
+                )
+
+    def fetch_me(self):
+        data = self.request(
+            "GET",
+            "2",
+            f"/users/me",
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            auth=True,
+        )
+
+        return User(data, http_client=self)
+
+    def fetch_user(self, user_id: ID) -> Optional[User]:
         try:
             int(user_id)
         except ValueError:
@@ -328,8 +389,7 @@ class HTTPClient(EventMixin):
                 "GET",
                 "2",
                 f"/users/{user_id}",
-                headers={"Authorization": f"Bearer {self.bearer_token}"},
-                params={"user.fields": USER_FIELD},
+                params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
                 auth=True,
             )
 
@@ -337,7 +397,7 @@ class HTTPClient(EventMixin):
         except NotFoundError:
             return None
 
-    def fetch_users(self, ids: List[Union[str, int]]) -> List[User]:
+    def fetch_users(self, ids: List[ID]) -> List[User]:
         str_ids = []
         for id in ids:
             try:
@@ -367,15 +427,14 @@ class HTTPClient(EventMixin):
                 "GET",
                 "2",
                 f"/users/by/username/{username}",
-                headers={"Authorization": f"Bearer {self.bearer_token}"},
-                params={"user.fields": USER_FIELD},
+                params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
                 auth=True,
             )
             return User(data, http_client=self)
         except NotFoundError:
             return None
 
-    def fetch_tweet(self, tweet_id: Union[str, int]) -> Optional[Tweet]:
+    def fetch_tweet(self, tweet_id: ID) -> Optional[Tweet]:
         try:
             res = self.request(
                 "GET",
@@ -401,9 +460,14 @@ class HTTPClient(EventMixin):
             "GET",
             "2",
             f"/spaces/{str(space_id)}",
-            params={"space.fields": SPACE_FIELD},
+            params={
+                "expansions": SPACE_EXPANSION,
+                "space.fields": SPACE_FIELD,
+                "topic.fields": TOPIC_FIELD,
+                "user.fields": USER_FIELD,
+            },
         )
-        return Space(res)
+        return Space(res, http_client=self)
 
     def fetch_space_bytitle(self, title: str, state: SpaceState = SpaceState.live) -> Space:
         res = self.request(
@@ -413,115 +477,42 @@ class HTTPClient(EventMixin):
             params={
                 "query": title,
                 "state": state.value,
+                "expansions": SPACE_EXPANSION,
                 "space.fields": SPACE_FIELD,
+                "topic.fields": TOPIC_FIELD,
             },
         )
-        return Space(res)
+        return Space(res, http_client=self)
 
-    def handle_events(self, payload: RequestModel):
-        keys = payload.keys()
-        if "direct_message_events" in keys:
+    def handle_events(self, payload: Payload):
+        if payload.get("direct_message_events"):
             self.event_parser.parse_direct_message_create(payload)
 
-        elif "direct_message_indicate_typing_events" in keys:
+        elif payload.get("direct_message_indicate_typing_events"):
             self.event_parser.parse_direct_message_typing(payload)
 
-        elif "direct_message_mark_read_events" in keys:
+        elif payload.get("direct_message_mark_read_events"):
             self.event_parser.parse_direct_message_read(payload)
 
-        elif "favorite_events" in keys:
+        elif payload.get("favorite_events"):
             self.event_parser.parse_favorite_tweet(payload)
 
-        elif "follow_events" in keys:
+        elif payload.get("follow_events"):
             self.event_parser.parse_user_action(payload, "follow_events")
 
-        elif "block_events" in keys:
+        elif payload.get("block_events"):
             self.event_parser.parse_user_action(payload, "block_events")
 
-        elif "mute_events" in keys:
+        elif payload.get("mute_events"):
             self.event_parser.parse_user_action(payload, "mute_events")
 
-        elif "tweet_create_events" in keys:
+        elif payload.get("tweet_create_events"):
             self.event_parser.parse_tweet_create(payload)
 
-        elif "tweet_delete_events" in keys:
+        elif payload.get("tweet_delete_events"):
             self.event_parser.parse_tweet_delete(payload)
 
-    def send_message(
-        self,
-        user_id: Union[str, int],
-        text: str,
-        *,
-        file: Optional[File] = None,
-        custom_profile: Optional[CustomProfile] = None,
-        quick_reply: Optional[QuickReply] = None,
-        cta: Optional[CTA] = None,
-    ) -> Optional[NoReturn]:
-        data = {
-            "event": {
-                "type": "message_create",
-                "message_create": {
-                    "target": {"recipient_id": str(user_id)},
-                    "message_data": {},
-                },
-            }
-        }
-
-        if file and (not isinstance(file, File)):
-            raise PytweetException("'file' argument must be an instance of pytweet.File")
-
-        if custom_profile and (not isinstance(custom_profile, CustomProfile)):
-            raise PytweetException("'custom_profile' argument must be an instance of pytweet.CustomProfile")
-
-        if quick_reply and (not isinstance(quick_reply, QuickReply)):
-            raise PytweetException("'quick_reply' must be an instance of pytweet.QuickReply")
-
-        if cta and (not isinstance(cta, CTA)):
-            raise PytweetException("'cta' argument must be an instance of pytweet.CTA")
-
-        message_data = data["event"]["message_create"]["message_data"]
-        message_data["text"] = str(text)
-
-        if file:
-            media_id = self.upload(file, "INIT")
-            self.upload(file, "APPEND", media_id=media_id)
-            self.upload(file, "FINALIZE", media_id=media_id)
-
-            message_data["attachment"] = {}
-            message_data["attachment"]["type"] = "media"
-            message_data["attachment"]["media"] = {}
-            message_data["attachment"]["media"]["id"] = str(media_id)
-
-        if custom_profile:
-            message_data["custom_profile_id"] = str(custom_profile.id)
-
-        if quick_reply:
-            message_data["quick_reply"] = {
-                "type": quick_reply.type,
-                "options": quick_reply.raw_options,
-            }
-
-        if cta:
-            message_data["ctas"] = cta.raw_buttons
-
-        res = self.request(
-            "POST",
-            "1.1",
-            "/direct_messages/events/new.json",
-            json=data,
-            auth=True,
-        )
-
-        message_create = res.get("event").get("message_create")
-        user_id = message_create.get("target").get("recipient_id")
-        user = self.fetch_user(user_id)
-        res["event"]["message_create"]["target"]["recipient"] = user
-
-        msg = DirectMessage(res, http_client=self or self)
-        self.message_cache[msg.id] = msg
-        return msg
-
-    def fetch_direct_message(self, event_id: Union[str, int]) -> Optional[DirectMessage]:
+    def fetch_direct_message(self, event_id: ID) -> Optional[DirectMessage]:
         try:
             event_id = str(event_id)
         except ValueError:
@@ -536,7 +527,7 @@ class HTTPClient(EventMixin):
 
         return DirectMessage(res, http_client=self)
 
-    def fetch_welcome_message(self, welcome_message_id: Union[str, int]) -> Optional[WelcomeMessage]:
+    def fetch_welcome_message(self, welcome_message_id: ID) -> Optional[WelcomeMessage]:
         try:
             welcome_message_id = str(welcome_message_id)
         except ValueError:
@@ -574,11 +565,11 @@ class HTTPClient(EventMixin):
     def search_geo(
         self,
         query: str,
-        max_result: Optional[Union[str, int]] = None,
+        max_result: Optional[ID] = None,
         *,
         lat: Optional[int] = None,
         long: Optional[int] = None,
-        ip: Optional[Union[str, int]] = None,
+        ip: Optional[ID] = None,
         granularity: str = "neighborhood",
     ) -> Optional[Geo]:
         if query:
@@ -601,46 +592,131 @@ class HTTPClient(EventMixin):
 
         return [Geo(data) for data in data.get("result").get("places")]
 
+    def send_message(
+        self,
+        user_id: ID,
+        text: str,
+        *,
+        file: Optional[File] = None,
+        custom_profile: Optional[CustomProfile] = None,
+        quick_reply: Optional[QuickReply] = None,
+        cta: Optional[CTA] = None,
+    ) -> Optional[NoReturn]:
+        data = {
+            "event": {
+                "type": "message_create",
+                "message_create": {
+                    "target": {"recipient_id": str(user_id)},
+                    "message_data": {},
+                },
+            }
+        }
+
+        if file and (not isinstance(file, File)):
+            raise PytweetException("'file' argument must be an instance of pytweet.File")
+
+        if custom_profile and (not isinstance(custom_profile, CustomProfile)):
+            raise PytweetException("'custom_profile' argument must be an instance of pytweet.CustomProfile")
+
+        if quick_reply and (not isinstance(quick_reply, QuickReply)):
+            raise PytweetException("'quick_reply' must be an instance of pytweet.QuickReply")
+
+        if cta and (not isinstance(cta, CTA)):
+            raise PytweetException("'cta' argument must be an instance of pytweet.CTA")
+
+        message_data = data["event"]["message_create"]["message_data"]
+        message_data["text"] = str(text)
+
+        if file:
+            self.upload(file, "INIT")
+            self.upload(file, "APPEND")
+            self.upload(file, "FINALIZE")
+
+            message_data["attachment"] = {}
+            message_data["attachment"]["type"] = "media"
+            message_data["attachment"]["media"] = {}
+            message_data["attachment"]["media"]["id"] = str(file.media_id)
+
+        if custom_profile:
+            message_data["custom_profile_id"] = str(custom_profile.id)
+
+        if quick_reply:
+            message_data["quick_reply"] = {
+                "type": quick_reply.type,
+                "options": quick_reply.raw_options,
+            }
+
+        if cta:
+            message_data["ctas"] = cta.raw_buttons
+
+        res = self.request(
+            "POST",
+            "1.1",
+            "/direct_messages/events/new.json",
+            json=data,
+            auth=True,
+        )
+
+        message_create = res.get("event").get("message_create")
+        user_id = message_create.get("target").get("recipient_id")
+        user = self.fetch_user(user_id)
+        res["event"]["message_create"]["target"]["recipient"] = user
+
+        msg = DirectMessage(res, http_client=self)
+        self.message_cache[msg.id] = msg
+        return msg
+
     def post_tweet(
         self,
         text: str = None,
         *,
         file: Optional[File] = None,
+        files: Optional[List[File]] = None,
         poll: Optional[Poll] = None,
         geo: Optional[Union[Geo, str]] = None,
-        quote_tweet: Optional[Union[str, int]] = None,
         direct_message_deep_link: Optional[str] = None,
-        reply_setting: Optional[str] = None,
-        reply_tweet: Optional[Union[str, int]] = None,
-        exclude_reply_users: Optional[List[Union[str, int]]] = None,
-        super_followers_only: Optional[bool] = None,
+        reply_setting: Optional[Union[ReplySetting, str]] = None,
+        quote_tweet: Optional[Union[Tweet, ID]] = None,
+        reply_tweet: Optional[Union[Tweet, ID]] = None,
+        exclude_reply_users: Optional[List[User, ID]] = None,
+        media_tagged_users: Optional[List[User, ID]] = None,
+        super_followers_only: bool = False,
     ) -> Optional[Message]:
         payload = {}
         if text:
             payload["text"] = text
 
         if file:
-            media_id = self.upload(file, "INIT")
-            self.upload(file, "APPEND", media_id=media_id)
-            self.upload(file, "FINALIZE", media_id=media_id)
+            self.upload(file, "INIT")
+            self.upload(file, "APPEND")
+            self.upload(file, "FINALIZE")
 
             payload["media"] = {}
-            payload["media"]["media_ids"] = [str(media_id)]
+            payload["media"]["media_ids"] = [str(file.media_id)]
+
+        if files:
+            for file in files:
+                if payload.get("media", None):
+                    self.upload(file, "INIT")
+                    self.upload(file, "APPEND")
+                    self.upload(file, "FINALIZE")
+                    payload["media"]["media_ids"].append(str(file.media_id))
+
+                else:
+                    self.upload(file, "INIT")
+                    self.upload(file, "APPEND")
+                    self.upload(file, "FINALIZE")
+                    payload["media"] = {}
+                    payload["media"]["media_ids"] = [str(file.media_id)]
 
         if poll:
             payload["poll"] = {}
-            payload["poll"]["options"] = [option.label for option in poll.options]
             payload["poll"]["duration_minutes"] = int(poll.duration)
+            payload["poll"]["options"] = [option.label for option in poll.options]
 
         if geo:
-            if not isinstance(geo, Geo) and not isinstance(geo, str):
-                raise TypeError("'geo' must be an instance of pytweet.Geo or str")
-
             payload["geo"] = {}
             payload["geo"]["place_id"] = geo.id if isinstance(geo, Geo) else geo
-
-        if quote_tweet:
-            payload["quote_tweet_id"] = str(quote_tweet)
 
         if direct_message_deep_link:
             payload["direct_message_deep_link"] = direct_message_deep_link
@@ -650,17 +726,30 @@ class HTTPClient(EventMixin):
                 reply_setting.value if isinstance(reply_setting, ReplySetting) else reply_setting
             )
 
-        if reply_tweet or exclude_reply_users:
-            if reply_tweet:
-                payload["reply"] = {}
-                payload["reply"]["in_reply_to_tweet_id"] = str(reply_tweet)
+        if reply_tweet:
+            payload["reply"] = {}
+            payload["reply"]["in_reply_to_tweet_id"] = (
+                reply_tweet.id if isinstance(reply_tweet, Tweet) else str(reply_tweet)
+            )
 
-            if exclude_reply_users:
-                if "reply" in payload.keys():
-                    payload["reply"]["exclude_reply_user_ids"] = [str(id) for id in exclude_reply_users]
-                else:
-                    payload["reply"] = {}
-                    payload["reply"]["exclude_reply_user_ids"] = [str(id) for id in exclude_reply_users]
+        if quote_tweet:
+            payload["quote_tweet_id"] = quote_tweet.id if isinstance(quote_tweet, Tweet) else str(quote_tweet)
+
+        if exclude_reply_users:
+            ids = [str(user.id) if isinstance(user, User) else str(user) for user in exclude_reply_users]
+
+            if "reply" in payload.keys():
+                payload["reply"]["exclude_reply_user_ids"] = ids
+            else:
+                payload["reply"] = {}
+                payload["reply"]["exclude_reply_user_ids"] = ids
+
+        if media_tagged_users:
+            if not payload.get("media"):
+                raise PytweetException("Cannot tag users without any file!")
+            payload["media"]["tagged_user_ids"] = [
+                str(user.id) if isinstance(user, User) else str(user) for user in media_tagged_users
+            ]
 
         if super_followers_only:
             payload["for_super_followers_only"] = True
@@ -673,11 +762,11 @@ class HTTPClient(EventMixin):
         if not isinstance(file, File):
             raise PytweetException("'file' argument must be an instance of pytweet.File")
 
-        media_id = self.upload(file, "INIT")
-        self.upload(file, "APPEND", media_id=media_id)
-        self.upload(file, "FINALIZE", media_id=media_id)
+        self.upload(file, "INIT")
+        self.upload(file, "APPEND")
+        self.upload(file, "FINALIZE")
 
-        data = {"custom_profile": {"name": name, "avatar": {"media": {"id": media_id}}}}
+        data = {"custom_profile": {"name": name, "avatar": {"media": {"id": file.media_id}}}}
 
         res = self.request("POST", "1.1", "/custom_profiles/new.json", json=data, auth=True)
         data = res.get("custom_profile")
@@ -691,9 +780,9 @@ class HTTPClient(EventMixin):
 
     def create_welcome_message(
         self,
+        *,
         name: Optional[str] = None,
         text: Optional[str] = None,
-        *,
         file: Optional[File] = None,
         quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
@@ -705,13 +794,14 @@ class HTTPClient(EventMixin):
         message_data["text"] = str(text)
 
         if file:
-            media_id = self.upload(file, "INIT")
-            self.upload(file, "APPEND", media_id=media_id)
-            self.upload(file, "FINALIZE", media_id=media_id)
+            self.upload(file, "INIT")
+            self.upload(file, "APPEND", media_id=file.media_id)
+            self.upload(file, "FINALIZE", media_id=file.media_id)
+
             message_data["attachment"] = {}
             message_data["attachment"]["type"] = "media"
             message_data["attachment"]["media"] = {}
-            message_data["attachment"]["media"]["id"] = str(media_id)
+            message_data["attachment"]["media"]["id"] = str(file.media_id)
 
         if quick_reply:
             message_data["quick_reply"] = {
@@ -731,15 +821,63 @@ class HTTPClient(EventMixin):
         )
 
         data = res.get("welcome_message")
-        id = data.get("id")
-        name = res.get("name")
-        timestamp = data.get("created_timestamp")
-        text = data.get("message_data").get("text")
+        message_data = data.get("message_data")
 
         return WelcomeMessage(
-            name,
-            text=text,
-            id=id,
-            timestamp=timestamp,
+            res.get("name"),
+            text=message_data.get("text"),
+            id=data.get("id"),
+            timestamp=data.get("created_timestamp"),
+            http_client=self,
+        )
+
+    def update_welcome_message(
+        self,
+        *,
+        text: Optional[str] = None,
+        file: Optional[File] = None,
+        quick_reply: Optional[QuickReply] = None,
+        cta: Optional[CTA] = None,
+    ):
+        data = {"message_data": {}}
+        message_data = data["message_data"]
+
+        message_data["text"] = str(text)
+
+        if file:
+            self.upload(file, "INIT")
+            self.upload(file, "APPEND", media_id=file.media_id)
+            self.upload(file, "FINALIZE", media_id=file.media_id)
+            message_data["attachment"] = {}
+            message_data["attachment"]["type"] = "media"
+            message_data["attachment"]["media"] = {}
+            message_data["attachment"]["media"]["id"] = str(file.media_id)
+
+        if quick_reply:
+            message_data["quick_reply"] = {
+                "type": quick_reply.type,
+                "options": quick_reply.raw_options,
+            }
+
+        if cta:
+            message_data["ctas"] = cta.raw_buttons
+
+        res = self.request(
+            "PUT",
+            "1.1",
+            "/direct_messages/welcome_messages/update.json",
+            params={"id": str(self.id)},
+            json=data,
+            auth=True,
+        )
+
+        welcome_message = res.get("welcome_message")
+        message_data = welcome_message.get("message_data")
+
+        return WelcomeMessage(
+            res.get("name"),
+            text=message_data.get("text"),
+            id=welcome_message.get("id"),
+            timestamp=welcome_message.get("created_timestamp"),
             http_client=self,
         )

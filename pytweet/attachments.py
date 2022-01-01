@@ -4,35 +4,61 @@ import mimetypes
 import datetime
 import io
 import os
-from typing import Any, Dict, List, NoReturn, Optional, Union
-from .dataclass import PollOption, Option, Button
+import json
+from typing import Any, Dict, List, NoReturn, Optional, Union, TYPE_CHECKING
 
+from .dataclass import PollOption, Option, Button
 from .entities import Media
 from .enums import ButtonType
 from .utils import time_parse_todt
+from .errors import PytweetException
+from .constant import LANGUAGES_CODES
+
+if TYPE_CHECKING:
+    from .type import ID
 
 __all__ = ("Poll", "QuickReply", "Geo", "CTA", "File")
+
+
+def guess_mimetype(byts: bytes):
+    if byts[6:10] == b"\x1a\n\x00\x00":
+        return "image/png"
+
+    elif byts[6:10] == b"JFIF":
+        return "image/jpeg"
+
+    elif byts[6:10] == b"ypis":
+        return "video/mp4"
+
+    elif byts.startswith((b"\x47\x49\x46\x38\x37\x61", b"\x47\x49\x46\x38\x39\x61")):
+        return "image/gif"
+
+    else:
+        return "text/plain"
 
 
 class Poll:
     """Represents a Poll attachment in a tweet.
 
     .. describe:: x == y
+
         Check if one Poll's id is equal to another.
 
 
     .. describe:: x != y
+
         Check if one Poll's id is not equal to another.
 
 
     .. describe:: len(x)
-        returns how many options in the poll.
+
+        returns how many options the poll have.
 
     Parameters
     ------------
     duration: :class:`int`
         The poll duration in minutes.
-    id: Optional[Union[:class:`str`, :class:`int`]]
+    id: Optional[`ID`]
         The poll's unique ID.
     voting_status: Optional[:class:`str`]
         The poll's voting status.
@@ -43,10 +69,17 @@ class Poll:
     .. versionadded:: 1.1.0
     """
 
-    __slots__ = ("_id", "_voting_status", "_end_date", "_duration", "_options", "_raw_options")
+    __slots__ = (
+        "_id",
+        "_voting_status",
+        "_end_date",
+        "_duration",
+        "_options",
+        "_raw_options",
+    )
 
     def __init__(self, duration: int, **kwargs):
-        self._id: Optional[Union[str, int]] = kwargs.get("id", None)
+        self._id: Optional[ID] = kwargs.get("id", None)
         self._voting_status: Optional[str] = kwargs.get("voting_status", None)
         self._end_date = kwargs.get("end_date", None)
         self._duration = duration
@@ -194,7 +227,11 @@ class QuickReply:
         self._raw_options: List[dict] = []
 
     def add_option(
-        self, *, label: str, description: Optional[str] = None, metadata: Optional[str] = None
+        self,
+        *,
+        label: str,
+        description: Optional[str] = None,
+        metadata: Optional[str] = None,
     ) -> QuickReply:
         """Method for adding an option in your quick reply instance.
 
@@ -353,7 +390,12 @@ class CTA:
         self._raw_buttons = []
 
     def add_button(
-        self, *, label: str, url: str, type: Union[ButtonType, str] = ButtonType.web_url, tco_url: Optional[str] = None
+        self,
+        *,
+        label: str,
+        url: str,
+        type: Union[ButtonType, str] = ButtonType.web_url,
+        tco_url: Optional[str] = None,
     ) -> CTA:
         """Add a button in your CTA instance.
 
@@ -413,16 +455,53 @@ class File:
         The file's path.
     dm_only: :class:`bool`
         Indicates if the file is use in dm only. Default to False.
+    alt_text: Optional[:class:`str`]
+        The image's alt text, if None specified the image won't have an alt text. Default to None.
+    subtitle_language_code: :class:`str`
+        The language code should be a BCP47 code (e.g. "en").
+    subfile: :class:`File`
+        The subtitle's source file. Must be a .srt file with the correct timestamps and contents.
+
+    .. versionadded:: 1.3.5
     """
 
-    __slots__ = ("__path", "_total_bytes", "_mimetype", "dm_only")
+    __slots__ = (
+        "__path",
+        "_total_bytes",
+        "_mimetype",
+        "dm_only",
+        "alt_text",
+        "subtitle_language_code",
+        "subfile",
+        "subtitle_language",
+        "__media_id",
+    )
 
-    def __init__(self, path: str, *, dm_only: bool = False):
-        mimetype_guesser = mimetypes.MimeTypes().guess_type
+    def __init__(
+        self,
+        path: str,
+        *,
+        dm_only: bool = False,
+        alt_text: Optional[str] = None,
+        subtitle_language_code: Optional[str] = None,
+        subfile: Optional[File] = None,
+    ):
         self.__path = path
         self._total_bytes = os.path.getsize(path) if isinstance(path, str) else os.path.getsize(path.name)
-        self._mimetype = mimetype_guesser(path) if isinstance(path, str) else mimetype_guesser(path.name)
+        self._mimetype = (
+            guess_mimetype(open(path, "rb").read()) if isinstance(path, str) else guess_mimetype(path.read())
+        )
         self.dm_only = dm_only
+        self.alt_text = alt_text
+        self.__media_id = None
+        self.subtitle_language_code = subtitle_language_code
+        self.subfile = subfile
+        if self.subtitle_language_code:
+            fullname = LANGUAGES_CODES.get(subtitle_language_code)
+            if fullname:
+                self.subtitle_language = fullname
+            else:
+                raise PytweetException("Wrong language codes passed! Must be a BCP47 code (e.g. 'en')")
 
     def __repr__(self) -> str:
         return "File(filename={0.filename})".format(self)
@@ -436,12 +515,28 @@ class File:
         return self.__path
 
     @property
+    def media_id(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the file's media id. Returns None if the file was never uploaded.
+
+        .. versionadded:: 1.5.0
+        """
+        return int(self.__media_id) if self.__media_id else self.__media_id
+
+    @property
+    def subfile_media_id(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the file's subtitle file's media id. Returns None if the subfile was never uploaded.
+
+        .. versionadded:: 1.5.0
+        """
+        return int(self.subfile.media_id) if self.subfile.media_id else self.subfile.media_id
+
+    @property
     def mimetype(self) -> str:
         """:class:`str`: Returns the file's mimetype.
 
         .. versionadded:: 1.3.5
         """
-        return self._mimetype[0]
+        return self._mimetype
 
     @property
     def filename(self) -> str:
@@ -467,11 +562,12 @@ class File:
         .. versionadded:: 1.3.5
         """
         startpoint = "TWEET_"
-        if "image" in self.mimetype and not "gif" in self.mimetype:
+        mimetype = self._mimetype
+        if mimetype in ("image/jpeg", "image/png"):
             return startpoint + "IMAGE" if not self.dm_only else "dm_image"
-        elif "gif" in self.mimetype:
+        elif mimetype == "image/gif":
             return startpoint + "GIF" if not self.dm_only else "dm_gif"
-        elif "video" in self.mimetype:
+        elif mimetype == "video/mp4":
             return startpoint + "VIDEO" if not self.dm_only else "dm_video"
 
 
@@ -486,8 +582,8 @@ class CustomProfile:
     def __init__(
         self,
         name: str,
-        id: Union[str, int],
-        timestamp: Union[str, int],
+        id: ID,
+        timestamp: ID,
         media: Dict[str, Any],
     ):
         self._name = name

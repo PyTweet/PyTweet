@@ -24,6 +24,7 @@ from .http import *
 from .message import *
 from .metrics import *
 from .mixins import *
+from .pagination import *
 from .parsers import *
 from .relations import *
 from .space import *
@@ -33,7 +34,7 @@ from .user import *
 from .utils import *
 
 __title__ = "PyTweet"
-__version__ = "1.5.0a1"
+__version__ = "1.5.0a5"
 __author__ = "TheFarGG & TheGenocides"
 __license__ = "MIT"
 __copyright__ = "Copyright 2021 TheFarGG & TheGenocides"
@@ -47,7 +48,7 @@ class VersionInfo(NamedTuple):
     serial: int
 
 
-version_info: VersionInfo = VersionInfo(major=1, minor=5, micro=0, releaselevel="alpha", serial=3)
+version_info: VersionInfo = VersionInfo(major=1, minor=5, micro=0, releaselevel="alpha", serial=5)
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
