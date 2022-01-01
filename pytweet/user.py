@@ -66,160 +66,6 @@ class User:
     def __ne__(self, other: User) -> Union[bool, NoReturn]:
         return not self.__eq__(other)
 
-    @property
-    def name(self) -> str:
-        """:class:`str`: Return the user's name.
-
-        .. versionadded: 1.0.0
-        """
-        return self._payload.get("name")
-
-    @property
-    def username(self) -> str:
-        """:class:`str`: Return the user's username, this usually start with '@' follow by their username.
-
-        .. versionadded: 1.0.0
-        """
-        return "@" + self._payload.get("username")
-
-    @property
-    def pinned_tweet(self) -> Optional[Tweet]:
-        """Optional[:class:`Tweet`]: Returns the user's pinned tweet. Returns None if the user dont have one.
-
-        .. versionadded:: 1.5.0
-        """
-        from .tweet import Tweet  # Avoid circular import error.
-
-        if self._includes and self._includes.get("tweets"):
-            data = {}
-            data["data"] = self._includes.get("tweets")[0]
-            data["includes"] = {}
-            data["includes"]["users"] = [self.__original_payload]
-            return Tweet(data, http_client=self.http_client)
-        return None
-
-    @property
-    def id(self) -> int:
-        """:class:`int`: Return the user's id.
-
-        .. versionadded: 1.0.0
-        """
-        return int(self._payload.get("id"))
-
-    @property
-    def description(self) -> str:
-        """:class:`str`: Return the user's bio.
-
-        .. versionadded: 1.0.0
-        """
-        return self._payload.get("description")
-
-    @property
-    def bio(self) -> str:
-        """:class:`str`: an alias to :meth:`User.description`
-
-        .. versionadded: 1.0.0
-        """
-        return self.bio
-
-    @property
-    def profile_url(self) -> str:
-        """:class:`str`: Return the user's profile url.
-
-        .. versionadded: 1.0.0
-        """
-        return f"https://twitter.com/{self.username.replace('@', '', 1)}"
-
-    @property
-    def profile_image_url(self) -> Optional[str]:
-        """Optional[:class:`str`] Return the user profile image.
-
-        .. versionadded: 1.0.0
-        """
-        return self._payload.get("profile_image_url", "")
-
-    @property
-    def url(self) -> Optional[str]:
-        """:class:`str`: Return url that associated with the user profile.
-
-        .. versionadded: 1.0.0
-        """
-        return self._payload.get("url", "")
-
-    @property
-    def verified(self) -> bool:
-        """:class:`bool`: Return True if the user is verified account, else False.
-
-        .. versionadded: 1.0.0
-        """
-        return self._payload.get("verified")
-
-    @property
-    def protected(self) -> bool:
-        """:class:`bool`: Return True if the user is protected, else False.
-
-        .. versionadded: 1.0.0
-        """
-        return self._payload.get("protected")
-
-    @property
-    def private(self) -> bool:
-        """:class:`bool`: An alias to :class:`User.protected`.
-
-        .. versionadded: 1.3.5
-        """
-        return self.protected
-
-    @property
-    def location(self) -> Optional[str]:
-        """:class:`str`: Return the user's location
-
-        .. versionadded: 1.0.0
-        """
-        return self._payload.get("location", "")
-
-    @property
-    def created_at(self) -> datetime.datetime:
-        """Optional[:class:`datetime.datetime`]: Returns a datetime.datetime object with the user's account date.
-
-        .. versionadded: 1.0.0
-        """
-        if isinstance(self._payload.get("created_at"), str):
-            return datetime.datetime.fromtimestamp(int(self._payload.get("created_at")) / 1000)
-        return time_parse_todt(self._payload.get("created_at"))
-
-    @property
-    def follower_count(self) -> int:
-        """:class:`int`: Return total of followers that a user has.
-
-        .. versionadded: 1.1.0
-        """
-        return self._metrics.follower_count
-
-    @property
-    def following_count(self) -> int:
-        """:class:`int`: Return total of following that a user has.
-
-        .. versionadded: 1.1.0
-        """
-        return self._metrics.following_count
-
-    @property
-    def tweet_count(self) -> int:
-        """:class:`int`: Return total of tweet that a user has.
-
-        .. versionadded: 1.1.0
-        """
-        return self._metrics.tweet_count
-
-    @property
-    def listed_count(self) -> int:
-        """:class:`int`: Return total of listed that a user has.
-
-        .. versionadded: 1.1.0
-        """
-        return self._metrics.listed_count
-
     def send(
         self,
         text: str,
@@ -583,6 +429,168 @@ class User:
         id = self._payload.get("pinned_tweet_id")
         return self.http_client.fetch_tweet(int(id)) if id else None
 
+    @property
+    def name(self) -> str:
+        """:class:`str`: Return the user's name.
+
+        .. versionadded: 1.0.0
+        """
+        return self._payload.get("name")
+
+    @property
+    def username(self) -> str:
+        """:class:`str`: Return the user's username.
+
+        .. versionadded: 1.0.0
+        """
+        return self._payload.get("username")
+
+    @property
+    def id(self) -> int:
+        """:class:`int`: Return the user's id.
+
+        .. versionadded: 1.0.0
+        """
+        return int(self._payload.get("id"))
+
+    @property
+    def description(self) -> str:
+        """:class:`str`: Return the user's description.
+
+        .. versionadded: 1.0.0
+        """
+        return self._payload.get("description")
+
+    @property
+    def bio(self) -> str:
+        """:class:`str`: an alias to :meth:`User.description`.
+
+        .. versionadded: 1.0.0
+        """
+        return self.description
+
+    @property
+    def mention(self) -> str:
+        """:class:`str`: Return the user mention format.
+
+        .. versionadded: 1.5.0
+        """
+        return "@" + self.username
+
+    @property
+    def pinned_tweet(self) -> Optional[Tweet]:
+        """Optional[:class:`Tweet`]: Returns the user's pinned tweet. Returns None if the user dont have one.
+
+        .. versionadded:: 1.5.0
+        """
+        from .tweet import Tweet  # Avoid circular import error.
+
+        if self._includes and self._includes.get("tweets"):
+            data = {}
+            data["data"] = self._includes.get("tweets")[0]
+            data["includes"] = {}
+            data["includes"]["users"] = [self.__original_payload]
+            return Tweet(data, http_client=self.http_client)
+        return None
+
+    @property
+    def url(self) -> Optional[str]:
+        """:class:`str`: Return url that associated with the user profile.
+
+        .. versionadded: 1.0.0
+        """
+        return self._payload.get("url", None)
+
+    @property
+    def profile_url(self) -> str:
+        """:class:`str`: Return the user's profile url.
+
+        .. versionadded: 1.0.0
+        """
+        return f"https://twitter.com/{self.username}"
+
+    @property
+    def profile_image_url(self) -> Optional[str]:
+        """Optional[:class:`str`] Return the user profile image.
+
+        .. versionadded: 1.0.0
+        """
+        return self._payload.get("profile_image_url", None)
+
+    @property
+    def verified(self) -> bool:
+        """:class:`bool`: Return True if the user is verified account, else False.
+
+        .. versionadded: 1.0.0
+        """
+        return self._payload.get("verified")
+
+    @property
+    def protected(self) -> bool:
+        """:class:`bool`: Return True if the user is protected, else False.
+
+        .. versionadded: 1.0.0
+        """
+        return self._payload.get("protected")
+
+    @property
+    def private(self) -> bool:
+        """:class:`bool`: An alias to :class:`User.protected`.
+
+        .. versionadded: 1.3.5
+        """
+        return self.protected
+
+    @property
+    def location(self) -> Optional[str]:
+        """:class:`str`: Return the user's location
+
+        .. versionadded: 1.0.0
+        """
+        return self._payload.get("location", "")
+
+    @property
+    def created_at(self) -> datetime.datetime:
+        """Optional[:class:`datetime.datetime`]: Returns a datetime.datetime object with the user's account date.
+
+        .. versionadded: 1.0.0
+        """
+        if isinstance(self._payload.get("created_at"), str):
+            return datetime.datetime.fromtimestamp(int(self._payload.get("created_at")) / 1000)
+        return time_parse_todt(self._payload.get("created_at"))
+
+    @property
+    def follower_count(self) -> int:
+        """:class:`int`: Return total of followers that a user has.
+
+        .. versionadded: 1.1.0
+        """
+        return self._metrics.follower_count
+
+    @property
+    def following_count(self) -> int:
+        """:class:`int`: Return total of following that a user has.
+
+        .. versionadded: 1.1.0
+        """
+        return self._metrics.following_count
+
+    @property
+    def tweet_count(self) -> int:
+        """:class:`int`: Return total of tweet that a user has.
+
+        .. versionadded: 1.1.0
+        """
+        return self._metrics.tweet_count
+
+    @property
+    def listed_count(self) -> int:
+        """:class:`int`: Return total of listed that a user has.
+
+        .. versionadded: 1.1.0
+        """
+        return self._metrics.listed_count
+
 
 class ClientAccount(User):
     """Represents the client's account. This inherits :class:`User` object. This class unlock methods that you can only use for the authenticated user (the client).
@@ -614,7 +622,7 @@ class ClientAccount(User):
             The hour that sleep time should end if it is enabled. Must be an instance of datetime.datetime.
         timezone: Optional[:class:`Timezone`]
             The new timezone replacing the old one. Must be an instance of :class:`Timezone` (e.g :attr:`Timezone.jakarta` or :attr:`Timezone.paris`)
-        location: Optional[:class:`int`]
+        location: Optional[:class:`Location`, :class:`int`]
             The Yahoo! Where On Earth ID to use as the user's default trend location. Global information is available by using 1 as the WOEID. Must be an instance of :class:`Location` or the woeid in :class:`int`.
 
 
