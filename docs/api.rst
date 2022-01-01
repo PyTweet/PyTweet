@@ -48,16 +48,16 @@ ApplicationInfo
 Environment
 ----------------
 
-Webhook
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: Webhook()
-    :members:
-
 Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Environment()
+    :members:
+
+Webhook
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Webhook()
     :members:
 
 
@@ -197,6 +197,63 @@ StreamRule
 
 .. autoclass:: StreamRule
     :members:
+
+
+Oauth
+-------------
+
+Oauth is a way to authenticate a twitter user account. You can do this with 3 legged authentication via :meth:`OauthSession.generate_oauth_url` to generate an oauth url and :meth:`OauthSession.post_oauth_token` to post an oauth token and verifier. This also required in every request you've made for identification! This section will show you what you can do with oauth, You can use `Client.http.oauth_session` to get the client's `OauthSession`.
+
+OauthSession
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: OauthSession
+    :members:
+
+Scope
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Scope
+    :members:
+
+
+Pagination
+-------------
+
+Some endpoints returns more objects but limits it to some pages. Using pagination classes like `UserPagination` and `TweetPagination`, you can change page and manage objects easily. Example:
+
+.. code-block:: py
+
+    user = client.fetch_user(ID)
+    pagination = user.fetch_following()
+    print("Page 1, object 1:", pagination.content[0])
+    pagination.next_page() #Change page to the next page
+    print("Page 2, object 2:", pagination.content[1])
+    pagination.previous_page() #Change page to the previous page
+    print("Page 1, object 3:", pagination.content[2])
+
+
+Pagination
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Pagination
+    :members:
+
+UserPagination
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: UserPagination
+    :members:
+    :inherited-members:
+
+TweetPagination
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: TweetPagination
+    :members:
+    :inherited-members:
+
+
 
 Relations
 ----------------
@@ -1343,37 +1400,6 @@ All these enums are a subclass of :class:`enum.Enum`
 
         A timezone for Pacific/Apia.
         
-
-Oauth
--------------
-
-Oauth is a way to authenticate a twitter user account. You can do this with 3 legged authentication via :meth:`OauthSession.generate_oauth_url` to generate an oauth url and :meth:`OauthSession.post_oauth_token` to post an oauth token and verifier. This also required in every request you've made for identification!
-
-Scope
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: Scope
-    :members:
-
-
-OauthSession
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: OauthSession
-    :members:
-
-
-Pagination
--------------
-
-Object uses for easy pagination handling.
-
-Pagination
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: Pagination
-    :members:
-
 
 Errors
 -------
