@@ -7,7 +7,6 @@ if TYPE_CHECKING:
     from .type import Payload
 
 
-
 class Pagination:
     """Represents the base class of all pagination objects.
 
@@ -40,7 +39,7 @@ class Pagination:
 
     @property
     def paginate_over(self) -> int:
-        """:class:`int`: Returns how many times you change page over the pagination. 
+        """:class:`int`: Returns how many times you change page over the pagination.
 
         .. versionadded:: 1.5.0
         """
@@ -49,7 +48,7 @@ class Pagination:
     @property
     def current_page_number(self) -> int:
         """:class:`int`: Returns the current page number.
-        
+
         .. versionadded:: 1.5.0
         """
         return self._current_page_number
@@ -104,10 +103,11 @@ class UserPagination(Pagination):
     * :meth:`User.fetch_followers`
     * :meth:`User.fetch_muters`
     * :meth:`User.fetch_blockers`
-    
-    
+
+
     .. versionadded:: 1.5.0
     """
+
     def next_page(self):
         """Change page to the next page.
 
@@ -179,10 +179,11 @@ class UserPagination(Pagination):
 
 class TweetPagination(Pagination):
     """A pagination that handles tweets object. This inherits :class:`Pagination`. Only :meth:`User.fetch_timelines` returns this Pagination object.
-    
-    
+
+
     .. versionadded:: 1.5.0
     """
+
     @property
     def __original_payload(self):
         return self._Pagination__original_payload
@@ -198,7 +199,7 @@ class TweetPagination(Pagination):
             fulldata[index]["data"] = data
             fulldata[index]["includes"] = {}
             fulldata[index]["includes"]["users"] = [self.__original_payload.get("includes", {}).get("users", [None])[0]]
-    
+
         return [self.item_type(data, http_client=self.http_client) for data in fulldata]
 
     @property
@@ -207,7 +208,7 @@ class TweetPagination(Pagination):
 
         .. versionadded:: 1.5.0
         """
-        
+
         return self._insert_author()
 
     def next_page(self):

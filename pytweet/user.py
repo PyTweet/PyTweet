@@ -387,16 +387,18 @@ class User:
             "GET",
             "2",
             f"/users/{self.id}/followers",
-            params={
-                "expansions": "pinned_tweet_id", 
-                "user.fields": USER_FIELD, 
-                "tweet.fields": TWEET_FIELD
-            },
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
         )
 
         if not following:
             return []
-        return UserPagination(following, User, f"/users/{self.id}/followers", http_client=self.http_client, params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD})
+        return UserPagination(
+            following,
+            User,
+            f"/users/{self.id}/followers",
+            http_client=self.http_client,
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+        )
 
     def fetch_following(self) -> Optional[UserPagination]:
         """Fetches users from the user's following list then paginate it.
@@ -418,7 +420,13 @@ class User:
 
         if not following:
             return []
-        return UserPagination(following, User, f"/users/{self.id}/following", http_client=self.http_client, params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD})
+        return UserPagination(
+            following,
+            User,
+            f"/users/{self.id}/following",
+            http_client=self.http_client,
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+        )
 
     def fetch_blockers(self) -> Optional[UserPagination]:
         """Fetches users from the user's block list then paginate it.
@@ -441,7 +449,13 @@ class User:
 
         if not blockers:
             return []
-        return UserPagination(blockers, User, f"/users/{self.id}/blocking", http_client=self.http_client, params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD})
+        return UserPagination(
+            blockers,
+            User,
+            f"/users/{self.id}/blocking",
+            http_client=self.http_client,
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+        )
 
     def fetch_muters(self) -> Optional[UserPagination]:
         """Fetches users from the user's mute list then paginate it.
@@ -465,7 +479,13 @@ class User:
         if not muters:
             return []
 
-        return UserPagination(muters, User, f"/users/{self.id}/muting", http_client=self.http_client, params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD})
+        return UserPagination(
+            muters,
+            User,
+            f"/users/{self.id}/muting",
+            http_client=self.http_client,
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+        )
 
     def fetch_timelines(
         self,
@@ -541,7 +561,13 @@ class User:
 
         if not res:
             return []
-        return TweetPagination(res, Tweet, f"/users/{self.id}/tweets" if not mentioned else f"/users/{self.id}", http_client=self.http_client, params=params)
+        return TweetPagination(
+            res,
+            Tweet,
+            f"/users/{self.id}/tweets" if not mentioned else f"/users/{self.id}",
+            http_client=self.http_client,
+            params=params,
+        )
 
     def fetch_pinned_tweet(self) -> Optional[Tweet]:
         """Returns the user's pinned tweet.
