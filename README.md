@@ -8,9 +8,6 @@
 
 <img alt="Total Downloads" src="https://pepy.tech/badge/pytweet">
 
-<img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/PyTweet">
-
-
 <img src="https://img.shields.io/github/commit-activity/m/PyTweet/PyTweet?color=turquoise&logo=github&logoColor=black">
 
 
