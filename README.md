@@ -6,9 +6,7 @@
 
 <img alt="PyPI - License" src="https://img.shields.io/pypi/l/PyTweet">
 
-
-<img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/PyTweet">
-
+<img alt="Total Downloads" src="https://pepy.tech/badge/pytweet">
 
 <img src="https://img.shields.io/github/commit-activity/m/PyTweet/PyTweet?color=turquoise&logo=github&logoColor=black">
 
