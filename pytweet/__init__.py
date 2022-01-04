@@ -4,7 +4,7 @@ PyTweet
 
 PyTweet is a Synchronous python API wrapper for Twitter's API!
 
-:copyright: (c) 2021 TheFarGG & TheGenocides
+:copyright: (c) 2022 TheFarGG & TheGenocides
 :license: MIT, see LICENSE for more details.
 """
 import logging
@@ -37,7 +37,7 @@ __title__ = "PyTweet"
 __version__ = "1.5.0a5"
 __author__ = "TheFarGG & TheGenocides"
 __license__ = "MIT"
-__copyright__ = "Copyright 2021 TheFarGG & TheGenocides"
+__copyright__ = "Copyright 2022 TheFarGG & TheGenocides"
 
 
 class VersionInfo(NamedTuple):
