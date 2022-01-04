@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.abspath(".."))
 # -- Project information -----------------------------------------------------
 
 project = "PyTweet"
-copyright = "2021, TheGenocide, TheFarGG"
+copyright = "2022, TheGenocide, TheFarGG"
 author = "TheGenocide & TheFarGG"
 
 
