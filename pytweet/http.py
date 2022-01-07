@@ -114,8 +114,12 @@ class HTTPClient(EventMixin):
             self.stream.connection.http_client = self
 
     @property
-    def access_level(self) -> Optional[list]:
+    def access_levels(self) -> Optional[list]:
         return self.current_header.get("x-access-levels").split("-") if self.current_header else None
+
+    @property
+    def oauth_session(self):
+        return self._auth
 
     def request(
         self,
@@ -145,10 +149,10 @@ class HTTPClient(EventMixin):
         headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
 
         if auth:
-            auth = self._auth.oauth1
+            auth = self.oauth_session.oauth1
             for k, v in self.credentials.items():
                 if v is None:
-                    raise PytweetException(f"{k} is a required credential for this action.")
+                    raise PytweetException(f"{k} is a required credential for authorization.")
 
         if basic_auth:
             encoded = base64.b64encode(f"{self.client_id}:{self.consumer_secret}".encode())
