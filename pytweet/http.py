@@ -5,7 +5,6 @@ import logging
 import sys
 import time
 import requests
-import base64
 from json import JSONDecodeError
 from typing import Dict, List, NoReturn, Optional, Union, TYPE_CHECKING
 
@@ -60,6 +59,7 @@ class HTTPClient(EventMixin):
         callback_url: Optional[str] = None,
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
+        use_bearer_only: bool = False
     ) -> Union[None, NoReturn]:
         self.credentials: Dict[str, Optional[str]] = {
             "bearer_token": bearer_token,
@@ -91,7 +91,9 @@ class HTTPClient(EventMixin):
         self.callback_url = callback_url
         self.client_id = client_id
         self.client_secret = client_secret
+        self.use_bearer_only = use_bearer_only 
         self.event_parser = EventParser(self)
+        self.payload_parser = self.event_parser.payload_parser
         self.base_url = "https://api.twitter.com/"
         self.upload_url = "https://upload.twitter.com/"
         self._auth = OauthSession(
@@ -118,7 +120,7 @@ class HTTPClient(EventMixin):
         return self.current_header.get("x-access-levels").split("-") if self.current_header else None
 
     @property
-    def oauth_session(self):
+    def oauth_session(self) -> OauthSession:
         return self._auth
 
     def request(
@@ -148,15 +150,19 @@ class HTTPClient(EventMixin):
 
         headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
 
-        if auth:
-            auth = self.oauth_session.oauth1
-            for k, v in self.credentials.items():
-                if v is None:
-                    raise PytweetException(f"{k} is a required credential for authorization.")
+        if not self.use_bearer_only:
+            if auth:
+                auth = self.oauth_session.oauth1
+                for k, v in self.credentials.items():
+                    if v is None:
+                        raise PytweetException(f"{k} is a required credential for authorization.")
 
-        if basic_auth:
-            encoded = base64.b64encode(f"{self.client_id}:{self.consumer_secret}".encode())
-            headers["Authorization"] = f"Basic {encoded.decode()}"
+            if basic_auth:
+                headers["Authorization"] = f"Basic {self.oauth_session.basic_auth}"
+
+        else:
+            auth=None
+            basic_auth=None
 
         if data:
             json = None
@@ -423,7 +429,7 @@ class HTTPClient(EventMixin):
         return [User(data, http_client=self) for data in res["data"]]
 
     def fetch_user_by_username(self, username: str) -> Optional[User]:
-        if "@" in username:
+        if username.startswith("@"):
             username = username.replace("@", "", 1)
 
         try:

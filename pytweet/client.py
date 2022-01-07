@@ -55,6 +55,8 @@ class Client:
         The client's OAuth 2.0 Client ID from keys and tokens page.
     client_secret: Optional[:class:`str`]
         The client's OAuth 2.0 Client Secret from keys and tokens page.
+    use_bearer_only: bool
+        Indicates to only use bearer token for all methods. This meant some methods are unavailable to use such as fetching trends and location, environment fetching methods, and features such as events.
 
     Attributes
     ------------
@@ -81,6 +83,7 @@ class Client:
         callback_url: Optional[str] = None,
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
+        use_bearer_only: bool = False
     ) -> None:
         self.http = HTTPClient(
             bearer_token,
@@ -92,6 +95,7 @@ class Client:
             callback_url=callback_url,
             client_id=client_id,
             client_secret=client_secret,
+            use_bearer_only=use_bearer_only
         )
         self._account_user: Optional[User] = None  # set in account property.
         self.webhook: Optional[Webhook] = None
@@ -153,7 +157,7 @@ class Client:
         self.http.events[func.__name__[3:]] = func
 
     def fetch_user(self, user_id: ID) -> Optional[User]:
-        """Fetches a user.
+        """Fetches a twitter user.
 
         .. warning::
             This method uses API call and might cause ratelimits if used often!
@@ -174,7 +178,7 @@ class Client:
         return self.http.fetch_user(user_id)
 
     def fetch_user_by_username(self, username: str) -> Optional[User]:
-        """Fetches a user by the user's username.
+        """Fetches a twitter user by the user's username.
 
         .. warning::
             This method uses API call and might cause ratelimits if used often!
