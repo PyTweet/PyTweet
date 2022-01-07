@@ -1,17 +1,11 @@
-import datetime
-import pytweet
+from __future__ import annotations
 
+import datetime
 from typing import Any, Optional, TYPE_CHECKING
 from dateutil import parser
-from .type import ID
 
-
-def build_object(obj: str) -> Any:
-    real_obj = getattr(pytweet, obj)
-    if real_obj:
-        return real_obj
-    return None
-
+if TYPE_CHECKING:
+    from .type import ID
 
 def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
     """Parse time return from twitter to datetime object!
