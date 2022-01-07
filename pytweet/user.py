@@ -704,23 +704,13 @@ class ClientAccount(User):
         """
         res = self.http_client.request("GET", "1.1", "/account/settings.json", auth=True)
         if res.get("sleep_time"):
-            res["sleep_time_setting"] = SleepTimeSettings(**res["sleep_time"])
-            res.pop("sleep_time")
+            res = self.http_client.event_parser.payload_parser.parse_sleep_time_payload(res)
 
         if res.get("location"):
-            location = res["trend_location"]
-            location["place_type"] = location["placeType"]
-            location["country_code"] = location["countryCode"]
-            location.pop("placeType")
-            location.pop("countryCode")
-            res["location"] = Location(**location)
+            res = self.http_client.event_parser_payload_parser.parse_trend_location_payload(res)
 
         if res.get("time_zone"):
-            _timezone = res.get("time_zone")
-            _timezone["name_info"] = _timezone.get("tzinfo_name")
-            _timezone.pop("tzinfo_name")
-            res["timezone"] = TimezoneInfo(**res.get("time_zone"))
-            res.pop("time_zone")
+            res = self.http_client.event_parser_payload_parser.parse_time_zone_payload(res)
 
         return UserSettings(**res)
 
