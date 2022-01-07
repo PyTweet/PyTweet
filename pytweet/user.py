@@ -108,7 +108,7 @@ class User:
         )
 
     def follow(self) -> RelationFollow:
-        """Method to follow the User.
+        """Follows the User.
 
         Returns
         ---------
@@ -129,7 +129,7 @@ class User:
         return RelationFollow(res)
 
     def unfollow(self) -> RelationFollow:
-        """Method to unfollow the User.
+        """Unfollows the User.
 
         Returns
         ---------
@@ -144,7 +144,7 @@ class User:
         return RelationFollow(res)
 
     def block(self) -> None:
-        """Method to block the user.
+        """Blocks the user.
 
         .. versionadded:: 1.2.0
         """
@@ -158,7 +158,7 @@ class User:
         )
 
     def unblock(self) -> None:
-        """Method to unblock the user.
+        """Unblocks the user.
 
         .. versionadded:: 1.2.0
         """
@@ -166,7 +166,7 @@ class User:
         self.http_client.request("DELETE", "2", f"/users/{my_id}/blocking/{self.id}", auth=True)
 
     def mute(self) -> None:
-        """Method to mute the user.
+        """Mutes the user.
 
         .. versionadded:: 1.2.5
         """
@@ -180,28 +180,15 @@ class User:
         )
 
     def unmute(self) -> None:
-        """Method to unmute the user.
+        """Unmutes the user.
 
         .. versionadded:: 1.2.5
         """
         my_id = self.http_client.access_token.partition("-")[0]
         self.http_client.request("DELETE", "2", f"/users/{my_id}/muting/{self.id}", auth=True)
 
-    def trigger_typing(self):
-        """Trigger the typing animation in the user's dm.
-
-        .. versionadded:: 1.3.5
-        """
-        self.http_client.request(
-            "POST",
-            "1.1",
-            "/direct_messages/indicate_typing.json",
-            params={"recipient_id": str(self.id)},
-            auth=True,
-        )
-
-    def report(self, block: bool = True):
-        """Report the user as a spam account to twitter.
+    def report(self, *,block: bool = True):
+        """Reports the user as a spam account to twitter.
 
         Parameters
         -----------
@@ -216,6 +203,19 @@ class User:
             "1.1",
             "/users/report_spam.json",
             params={"user_id": str(self.id), "perform_block": block},
+        )
+
+    def trigger_typing(self):
+        """Trigger the typing animation in the user's dm. W ill stop when the client decide to send a message when the typing animation is playing or in couple of seconds.
+
+        .. versionadded:: 1.3.5
+        """
+        self.http_client.request(
+            "POST",
+            "1.1",
+            "/direct_messages/indicate_typing.json",
+            params={"recipient_id": str(self.id)},
+            auth=True,
         )
 
     def fetch_followers(self) -> Optional[UserPagination]:
@@ -415,8 +415,41 @@ class User:
             params=params,
         )
 
+    def fetch_liked_tweets(self) -> TweetPagination:
+        """Fetches tweets thats been liked by the user.
+        
+        .. versionadded:: 1.5.0
+        """
+        from .tweet import Tweet  # Avoid circular import error.
+
+        params = {
+            "expansions": TWEET_EXPANSION,
+            "user.fields": USER_FIELD,
+            "media.fields": MEDIA_FIELD,
+            "place.fields": PLACE_FIELD,
+            "poll.fields": POLL_FIELD,
+            "tweet.fields": TWEET_FIELD,
+        }
+
+        res = self.http_client.request(
+            "GET",
+            "2",
+            f"/users/{self.id}/liked_tweets",
+            params=params,
+        )
+
+        if not res:
+            return []
+        return TweetPagination(
+            res,
+            Tweet,
+            f"/users/{self.id}/liked_tweets",
+            http_client=self.http_client,
+            params=params,
+        )
+
     def fetch_pinned_tweet(self) -> Optional[Tweet]:
-        """Returns the user's pinned tweet.
+        """Fetches the user's pinned tweet if :meth:`User.pinned_tweet` returns None.
 
         Returns
         ---------
@@ -511,7 +544,7 @@ class User:
 
     @property
     def profile_image_url(self) -> Optional[str]:
-        """Optional[:class:`str`] Return the user profile image.
+        """Optional[:class:`str`] Return the user profile image url.
 
         .. versionadded: 1.0.0
         """
@@ -535,7 +568,7 @@ class User:
 
     @property
     def private(self) -> bool:
-        """:class:`bool`: An alias to :class:`User.protected`.
+        """:class:`bool`: An alias to :meth:`User.protected`.
 
         .. versionadded: 1.3.5
         """
@@ -543,11 +576,11 @@ class User:
 
     @property
     def location(self) -> Optional[str]:
-        """:class:`str`: Return the user's location
+        """:class:`str`: Return the user's location.
 
         .. versionadded: 1.0.0
         """
-        return self._payload.get("location", "")
+        return self._payload.get("location", None)
 
     @property
     def created_at(self) -> datetime.datetime:
@@ -608,7 +641,7 @@ class ClientAccount(User):
         timezone: Optional[Timezone] = None,
         location: Optional[Location, int] = None,
     ):
-        """Update the user settings.
+        """Updates the user settings.
 
         Parameters
         ------------
@@ -700,7 +733,7 @@ class ClientAccount(User):
         location: Optional[Union[Geo, str]] = None,
         profile_url: Optional[str] = None,
         profile_link_color: Optional[int] = None,
-    ):
+    ) -> ClientAccount:
         """Updates the client profile information from the given arguments.
 
         Parameters
@@ -717,6 +750,11 @@ class ClientAccount(User):
             URL associated with the profile. Will be prepended with http:// if not present.
         profile_link_color: Optional[:class:`str`]
             Sets a hex value that controls the color scheme of links used on the authenticating user's profile page on twitter.com. This must be a valid hexadecimal value, and may be either three or six characters (ex: F00 or FF0000 in string). If you instead use int, the process will use hex() function to change the int value to a hex value.
+
+        Returns
+        ---------
+        :class:`ClientAccount`
+            Returns a updated client's account object.
 
 
         .. versionadded:: 1.5.0
@@ -757,7 +795,7 @@ class ClientAccount(User):
             auth=True,
         )
         data = self.http_client.event_parser.payload_parser.parse_user_payload(res)
-        return data
+        return ClientAccount(data, http_client=self.http_client)
 
     def update_profile_banner(
         self, *, banner: File, width: int = 0, height: int = 0, offset_left: int = 0, offset_top: int = 0
