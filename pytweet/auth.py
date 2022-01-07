@@ -15,7 +15,6 @@ if TYPE_CHECKING:
 
 __all__ = ("OauthSession", "Scope")
 
-
 class Scope:
     """Scopes allow you to set granular access for your App so that your App only has the permissions that it needs. Here are the full documented scopes!
 
@@ -265,6 +264,10 @@ class OauthSession:
         )
 
     @property
+    def request_session(self):
+        return self.http_client._HTTPClient__session
+
+    @property
     def basic_auth(self) -> str:
         """:class:`str`: The decoded base64 encoded client id and secret.
 
@@ -286,13 +289,17 @@ class OauthSession:
         """
         self.http_client.request("POST", "1.1", "/oauth/invalidate_token", auth=True)
 
-    def generate_oauth_url(self, auth_access_type: str = "write") -> Optional[str]:
+    def generate_oauth_url(self, access_type: str = "write", *,force_login: bool = False, screen_name: Optional[str] = None) -> Optional[str]:
         """Generates an oauth url with an access type. The callback after pressing authorize button is your callback url that you passed in your :class:`Client`. The oauth_token and oauth_verifier will automatically appended in the callback url. If you are setting up a sign up button in your website to lookup the user's profile information, You have to setup a system where if the oauth_token or oauth_verifier is present in the url then, it will use :meth:`OauthSession.post_oauth_token` to post an oauth token and verifier to exchange with the user's access token and secret. If its for personal uses then just copy the result and passed in :meth:`OauthSession.post_oauth_token`.
 
         Parameters
         ------------
-        auth_access_type: :class:`str`
+        access_type: :class:`str`
             Must be either read, write, direct_messages. read for reading twitter info only, write will have the same as read and also write permission this includes but not limited to post & delete a :class:`Tweet`, and direct_messages is for read & write and sending & deleting :class:`DirectMessages`.
+        force_login: :class:`bool`
+            Forces the user to enter their credentials to ensure the correct users account is authorized.
+        screen_name: :class:`str`
+            Prefills the username input box of the OAuth login screen with the given value.
 
         Returns
         ---------
@@ -305,24 +312,25 @@ class OauthSession:
         if not self.callback_url:
             raise PytweetException("'callback_url' argument is missing in your client instance")
 
-        auth_access_type = auth_access_type.lower()
-        assert auth_access_type in ("read", "write", "direct_messages")
+        access_type = access_type.lower()
+        assert access_type in ("read", "write", "direct_messages")
         request_tokens = self.http_client.request(
             "POST",
             "",
             "oauth/request_token",
             params={
                 "oauth_callback": self.callback_url,
-                "x_auth_access_type": auth_access_type,
+                "x_auth_access_type": access_type,
             },
             auth=True,
         )
-        (
-            oauth_token,
-            oauth_token_secret,
-            oauth_callback_confirmed,
-        ) = request_tokens.split("&")
+        oauth_token, oauth_token_secret, oauth_callback_confirmed, = request_tokens.split("&")
         url = "https://api.twitter.com/oauth/authorize" + f"?{oauth_token}"
+        if force_login:
+            url += "?force_login=true"
+        
+        if screen_name:
+            url += f"?screen_name={screen_name}"        
         return url
 
     def post_oauth_token(self, oauth_token: str, oauth_verifier: str) -> Optional[Tuple[str]]:
