@@ -59,7 +59,7 @@ class HTTPClient(EventMixin):
         callback_url: Optional[str] = None,
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
-        use_bearer_only: bool = False
+        use_bearer_only: bool = False,
     ) -> Union[None, NoReturn]:
         self.credentials: Dict[str, Optional[str]] = {
             "bearer_token": bearer_token,
@@ -91,7 +91,7 @@ class HTTPClient(EventMixin):
         self.callback_url = callback_url
         self.client_id = client_id
         self.client_secret = client_secret
-        self.use_bearer_only = use_bearer_only 
+        self.use_bearer_only = use_bearer_only
         self.event_parser = EventParser(self)
         self.payload_parser = self.event_parser.payload_parser
         self.base_url = "https://api.twitter.com/"
@@ -161,8 +161,8 @@ class HTTPClient(EventMixin):
                 headers["Authorization"] = f"Basic {self.oauth_session.basic_auth}"
 
         else:
-            auth=None
-            basic_auth=None
+            auth = None
+            basic_auth = None
 
         if data:
             json = None

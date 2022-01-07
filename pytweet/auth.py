@@ -291,7 +291,11 @@ class OauthSession:
         self.http_client.request("POST", "1.1", "/oauth/invalidate_token", auth=True)
 
     def generate_oauth_url(
-        self, access_type: Literal["read", "write", "direct_messages"] = "write", *, force_login: bool = False, screen_name: Optional[str] = None
+        self,
+        access_type: Literal["read", "write", "direct_messages"] = "write",
+        *,
+        force_login: bool = False,
+        screen_name: Optional[str] = None,
     ) -> Optional[str]:
         """Generates an oauth url with an access type. The callback after pressing authorize button is your callback url that you passed in your :class:`Client`. The oauth_token and oauth_verifier will automatically appended in the callback url. If you are setting up a sign up button in your website to lookup the user's profile information, You have to setup a system where if the oauth_token or oauth_verifier is present in the url then, it will use :meth:`OauthSession.post_oauth_token` to post an oauth token and verifier to exchange with the user's access token and secret. If its for personal uses then just copy the result and passed in :meth:`OauthSession.post_oauth_token`.
 

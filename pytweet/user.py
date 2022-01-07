@@ -187,7 +187,7 @@ class User:
         my_id = self.http_client.access_token.partition("-")[0]
         self.http_client.request("DELETE", "2", f"/users/{my_id}/muting/{self.id}", auth=True)
 
-    def report(self, *,block: bool = True):
+    def report(self, *, block: bool = True):
         """Reports the user as a spam account to twitter.
 
         Parameters
@@ -417,7 +417,7 @@ class User:
 
     def fetch_liked_tweets(self) -> TweetPagination:
         """Fetches tweets thats been liked by the user.
-        
+
         .. versionadded:: 1.5.0
         """
         from .tweet import Tweet  # Avoid circular import error.

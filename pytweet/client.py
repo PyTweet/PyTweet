@@ -83,7 +83,7 @@ class Client:
         callback_url: Optional[str] = None,
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
-        use_bearer_only: bool = False
+        use_bearer_only: bool = False,
     ) -> None:
         self.http = HTTPClient(
             bearer_token,
@@ -95,7 +95,7 @@ class Client:
             callback_url=callback_url,
             client_id=client_id,
             client_secret=client_secret,
-            use_bearer_only=use_bearer_only
+            use_bearer_only=use_bearer_only,
         )
         self._account_user: Optional[User] = None  # set in account property.
         self.webhook: Optional[Webhook] = None
