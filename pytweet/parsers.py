@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from .events import (
     DirectMessageTypingEvent,
     DirectMessageReadEvent,
@@ -13,7 +16,10 @@ from .message import Message, DirectMessage
 from .user import User
 from .app import ApplicationInfo
 from .tweet import Tweet
-from .type import Payload
+from .dataclass import TimezoneInfo, Location, SleepTimeSettings
+
+if TYPE_CHECKING:
+    from .type import Payload
 
 
 class PayloadParser:
@@ -51,6 +57,30 @@ class PayloadParser:
         if "user" in payload.keys():
             copy["includes"]["users"] = [self.parse_user_payload(payload.get("user"))]
 
+        return copy
+
+    def parse_time_zone_payload(self, payload: Payload):
+        copy = payload.copy
+        _timezone = copy.get("time_zone")
+        _timezone["name_info"] = _timezone.get("tzinfo_name")
+        _timezone.pop("tzinfo_name")
+        copy["timezone"] = TimezoneInfo(**copy.get("time_zone"))
+        copy.pop("time_zone")
+        return copy
+
+    def parse_trend_location_payload(self, payload: Payload):
+        copy = payload.copy()["trend_location"]
+        copy["place_type"] = copy["placeType"]
+        copy["country_code"] = copy["countryCode"]
+        copy.pop("placeType")
+        copy.pop("countryCode")
+        copy["location"] = Location(**copy)
+        return copy
+
+    def parse_sleep_time_payload(self, payload: Payload):
+        copy = payload.copy()
+        copy["sleep_time_setting"] = SleepTimeSettings(**copy["sleep_time"])
+        copy.pop("sleep_time")
         return copy
 
 
