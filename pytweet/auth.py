@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
 __all__ = ("OauthSession", "Scope")
 
+
 class Scope:
     """Scopes allow you to set granular access for your App so that your App only has the permissions that it needs. Here are the full documented scopes!
 
@@ -289,7 +290,9 @@ class OauthSession:
         """
         self.http_client.request("POST", "1.1", "/oauth/invalidate_token", auth=True)
 
-    def generate_oauth_url(self, access_type: str = "write", *,force_login: bool = False, screen_name: Optional[str] = None) -> Optional[str]:
+    def generate_oauth_url(
+        self, access_type: str = "write", *, force_login: bool = False, screen_name: Optional[str] = None
+    ) -> Optional[str]:
         """Generates an oauth url with an access type. The callback after pressing authorize button is your callback url that you passed in your :class:`Client`. The oauth_token and oauth_verifier will automatically appended in the callback url. If you are setting up a sign up button in your website to lookup the user's profile information, You have to setup a system where if the oauth_token or oauth_verifier is present in the url then, it will use :meth:`OauthSession.post_oauth_token` to post an oauth token and verifier to exchange with the user's access token and secret. If its for personal uses then just copy the result and passed in :meth:`OauthSession.post_oauth_token`.
 
         Parameters
@@ -324,13 +327,17 @@ class OauthSession:
             },
             auth=True,
         )
-        oauth_token, oauth_token_secret, oauth_callback_confirmed, = request_tokens.split("&")
+        (
+            oauth_token,
+            oauth_token_secret,
+            oauth_callback_confirmed,
+        ) = request_tokens.split("&")
         url = "https://api.twitter.com/oauth/authorize" + f"?{oauth_token}"
         if force_login:
             url += "?force_login=true"
-        
+
         if screen_name:
-            url += f"?screen_name={screen_name}"        
+            url += f"?screen_name={screen_name}"
         return url
 
     def post_oauth_token(self, oauth_token: str, oauth_verifier: str) -> Optional[Tuple[str]]:
