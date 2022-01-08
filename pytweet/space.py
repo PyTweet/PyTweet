@@ -1,10 +1,10 @@
 import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Union, Dict, List, Optional
 
 from .enums import SpaceState
 from .utils import time_parse_todt
 from .user import User
-from .dataclass import SpaceTopic
+from .expansions import EXPANSION, USER_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_FIELD
 
 __all__ = ("Space",)
 
@@ -182,3 +182,25 @@ class Space:
             Made as an alias to :meth:`Space.ticketed`.
         """
         return self.ticketed
+
+    def fetch_buyers(self) -> Union[List[User], list]:
+        """Fetches users who purchased a ticket to the space. This requires you to authenticate the request using the Access Token of the creator of the requested Space aka OAuth 2.0 Authorization Code with PKCE.
+        
+        .. versionadded:: 1.5.0
+        """
+        res = self.http_client.request(
+            "GET",
+            "2",
+            f"/spaces/{self.id}/buyers",
+            params={
+                "expansions": EXPANSION,
+                "user.fields": USER_FIELD,
+                "media.fields": MEDIA_FIELD,
+                "place.fields": PLACE_FIELD,
+                "poll.fields": POLL_FIELD,
+                "tweet.fields": TWEET_FIELD
+            }
+        )
+        if not res:
+            return []
+        return [User(data, http_client=self.http_client) for data in res.get("data")]
