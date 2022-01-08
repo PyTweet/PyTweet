@@ -13,16 +13,11 @@ Dataclass
 PollOption
 ~~~~~~~
 
-
-.. attributetable:: PollOption
-
 .. autoclass:: PollOption
     :members:
 
 Option
 ~~~~~~~~
-
-.. attributetable:: Option
 
 .. autoclass:: Option
     :members:
@@ -30,8 +25,6 @@ Option
 
 Button
 ~~~~~~~~
-
-.. attributetable:: Button
 
 .. autoclass:: Button
     :members:

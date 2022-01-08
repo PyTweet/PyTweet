@@ -164,13 +164,18 @@ Geo
     :members:
 
 
-File
+Files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: File()
     :members:
 
 
+SubFile
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: SubFile()
+    :members:
 
 
 Streaming
