@@ -467,14 +467,13 @@ class File:
 
     __slots__ = (
         "__path",
+        "__media_id",
+        "__subfile",
+        "__subfiles",
         "_total_bytes",
         "_mimetype",
         "dm_only",
         "alt_text",
-        "subtitle_language_code",
-        "subfile",
-        "subtitle_language",
-        "__media_id",
     )
 
     def __init__(
@@ -483,25 +482,20 @@ class File:
         *,
         dm_only: bool = False,
         alt_text: Optional[str] = None,
-        subtitle_language_code: Optional[str] = None,
-        subfile: Optional[File] = None,
+        subfile: Optional[SubFile] = None,
+        subfiles: Optional[List[SubFile]] = None
     ):
         self.__path = path
+        self.__media_id = None
+        self.__subfile = subfile
+        self.__subfiles = subfiles
         self._total_bytes = os.path.getsize(path) if isinstance(path, str) else os.path.getsize(path.name)
         self._mimetype = (
             guess_mimetype(open(path, "rb").read()) if isinstance(path, str) else guess_mimetype(path.read())
         )
         self.dm_only = dm_only
         self.alt_text = alt_text
-        self.__media_id = None
-        self.subtitle_language_code = subtitle_language_code
-        self.subfile = subfile
-        if self.subtitle_language_code:
-            fullname = LANGUAGES_CODES.get(subtitle_language_code)
-            if fullname:
-                self.subtitle_language = fullname
-            else:
-                raise PytweetException("Wrong language codes passed! Must be a BCP47 code (e.g. 'en')")
+        
 
     def __repr__(self) -> str:
         return "File(filename={0.filename})".format(self)
@@ -570,6 +564,50 @@ class File:
         elif mimetype == "video/mp4":
             return startpoint + "VIDEO" if not self.dm_only else "dm_video"
 
+    @property
+    def subfile(self) -> Optional[SubFile]:
+        """Optional[:class:`SubFile`]: Returns the file's subfile.
+        
+        .. versionadded:: 1.5.0
+        """
+        return self.__subfile
+
+    @property
+    def subfiles(self) -> Optional[List[SubFile]]:
+        """Optional[List[:class:`SubFile`]]: Returns a list of the file's subfile.
+        
+        .. versionadded:: 1.5.0
+        """
+        return self.__subfiles
+
+class SubFile(File):
+    """Represents a subtitle File for :class:`File. You can attach one or more subfile in :class:`File` via subfile and subfiles arguments.
+    
+    .. versionadded:: 1.5.0
+    """
+    def __init__(
+        self,
+        path: str,
+        *,
+        language_code: Optional[str] = None
+    ):
+        self._language_code = language_code
+        if self.language_code:
+            fullname = LANGUAGES_CODES.get(language_code)
+            if fullname:
+                self._language = fullname
+            else:
+                raise PytweetException("Wrong language codes passed! Must be a BCP47 code (e.g. 'en')")
+        super().__init__(path)
+
+    @property
+    def language_code(self):
+        return self._language_code
+
+    @property
+    def language(self):
+        return self._language
+    
 
 class CustomProfile:
     """Represents a CustomProfile attachments that allow a Direct Message author to present a different identity than that of the Twitter account being used.
