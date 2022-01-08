@@ -5,7 +5,6 @@ import hashlib
 import hmac
 import json
 import logging
-import threading
 import time
 
 from urllib.parse import urlparse
@@ -56,7 +55,7 @@ class Client:
     client_secret: Optional[:class:`str`]
         The client's OAuth 2.0 Client Secret from keys and tokens page.
     use_bearer_only: bool
-        Indicates to only use bearer token for all methods. This meant some methods are unavailable to use such as fetching trends and location, environment fetching methods, and features such as events.
+        Indicates to only use bearer token for all methods. This means some methods are unavailable to use such as fetching trends and location, environment fetching methods, and features such as events.
 
     Attributes
     ------------
@@ -160,7 +159,7 @@ class Client:
         """Fetches a twitter user.
 
         .. warning::
-            This method uses API call and might cause ratelimits if used often!
+            This method uses API call and might cause ratelimits if used often! There is always an alternative like :meth:`Client.get_user` from the client's internal cache.
 
         Parameters
         ------------
@@ -181,7 +180,7 @@ class Client:
         """Fetches a twitter user by the user's username.
 
         .. warning::
-            This method uses API call and might cause ratelimits if used often!
+            This method uses API call and might cause ratelimits if used often! There is always an alternative like :meth:`Client.get_user` from the client's internal cache.
 
         Parameters
         ------------
@@ -202,7 +201,7 @@ class Client:
         """Fetches a tweet.
 
         .. warning::
-            This method uses API call and might cause ratelimits if used often! More recommended is to use get_tweet to get the client's tweet.
+            This method uses API call and might cause ratelimits if used often! There is always an alternative like :meth:`Client.get_tweet` from the client's internal cache.
 
         Parameters
         ------------
@@ -223,7 +222,7 @@ class Client:
         """Fetches a direct message.
 
         .. warning::
-            This method uses API call and might cause ratelimit if used often! It is more recommended to use `get_message()` method, as it get the message from the client's internal cache.
+            This method uses API call and might cause ratelimits if used often! There is always an alternative like :meth:`Client.get_direct_message` from the client's internal cache.
 
         Parameters
         ------------
@@ -644,6 +643,7 @@ class Client:
     def listen(
         self,
         app: Flask,
+        *,
         url: str,
         env_label: str,
         sleep_for: Union[int, float] = 0.50,
@@ -660,13 +660,13 @@ class Client:
         app: :class:`flask.Flask`
             Your flask application.
         url: :class:`str`
-            The webhook url aka your flask's web application url. This completely up to you, e.g https://your-website.domain/webhook/twitter.
+            a kwarg that the webhook url aka your flask's web application url. This completely up to you, e.g https://your-website.domain/webhook/twitter.
         env_label: :class:`str`
-            The environment's label.
+            a kwarg that the environment's label.
         sleep_for: Union[:class:`int`, :class:`float`]
-            Ensure the flask application is running before triggering a CRC by sleeping after starting a thread. Default to 0.50.
+            a kwarg that ensure the flask application is running before triggering a CRC by sleeping after starting a thread. Default to 0.50.
         ngrok: :class:`bool`
-            indicates to use ngrok for tunneling your localhost. This usually uses for users that use localhost url.
+            a kwarg that indicates to use ngrok for tunneling your localhost. This usually uses for users that use localhost url.
         disabled_log: :class:`bool`
             A kwarg that indicates to disable flask's log so it does not print the request process in your terminal, this also will disable `werkzeug` log.
         make_new: :class:`bool`
@@ -699,7 +699,11 @@ class Client:
                     break
 
         try:
-            thread = threading.Thread(target=app.run, name="PyTweet: Flask App Thread", kwargs=kwargs)
+            thread = self.http.threading.Thread(
+                target=app.run, 
+                name="client-listen-method:thread_session=LISTEN-SESSION", 
+                kwargs=kwargs
+            )
 
             if not self.webhook and not ngrok:
                 self.webhook_url_path = urlparse(url).path
@@ -744,7 +748,7 @@ class Client:
                     self.http.user_cache[user.id] = user
 
                 _log.debug(
-                    f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\n In Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
+                    f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\n In Environment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
                 )
 
             elif check and not make_new:
@@ -762,7 +766,7 @@ class Client:
                     self.http.user_cache[user.id] = user
 
                 _log.debug(
-                    f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\n In Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
+                    f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\n In Environment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
                 )
             thread.join()
         except Exception as e:
@@ -772,7 +776,7 @@ class Client:
         finally:
             _log.debug(f"Stop listening due to internal/external problem!")
 
-    def listen_to(self, url: str, env_label: str, ngrok: bool = False, make_new: bool = True):
+    def listen_to(self, url: str, *,env_label: str, ngrok: bool = False, make_new: bool = True):
         """Listen to upcoming account activity events send by twitter to a web application url. This method differ from :meth:`Client.listen`, this method doesn't use the flask's web application url, rather your web application url. This is good for people that want to implement their web application outside flask.
 
         .. warning::
@@ -825,7 +829,7 @@ class Client:
                 self.http.user_cache[user.id] = user
 
             _log.debug(
-                f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\n In Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
+                f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\n In Environment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
             )
 
         elif check and not make_new:
@@ -841,5 +845,5 @@ class Client:
                 self.http.user_cache[user.id] = user
 
             _log.debug(
-                f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\n In Envinronment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
+                f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\n In Environment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
             )
