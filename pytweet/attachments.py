@@ -579,7 +579,7 @@ class File:
         return self.__subfiles
 
 class SubFile(File):
-    """Represents a subtitle File for :class:`File. You can attach one subfile in :class:`File` via subfile arguments. This method inherits :class:`File`.
+    """Represents a subtitle File for :class:`File`. You can attach one subfile in :class:`File` via subfile arguments. This method inherits :class:`File`.
     
 
     .. versionadded:: 1.5.0
