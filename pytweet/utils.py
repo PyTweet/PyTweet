@@ -7,6 +7,7 @@ from dateutil import parser
 if TYPE_CHECKING:
     from .type import ID
 
+
 def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
     """Parse time return from twitter to datetime object!
 

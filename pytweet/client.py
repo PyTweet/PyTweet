@@ -700,9 +700,7 @@ class Client:
 
         try:
             thread = self.http.threading.Thread(
-                target=app.run, 
-                name="client-listen-method:thread_session=LISTEN-SESSION", 
-                kwargs=kwargs
+                target=app.run, name="client-listen-method:thread_session=LISTEN-SESSION", kwargs=kwargs
             )
 
             if not self.webhook and not ngrok:
@@ -776,7 +774,7 @@ class Client:
         finally:
             _log.debug(f"Stop listening due to internal/external problem!")
 
-    def listen_to(self, url: str, *,env_label: str, ngrok: bool = False, make_new: bool = True):
+    def listen_to(self, url: str, *, env_label: str, ngrok: bool = False, make_new: bool = True):
         """Listen to upcoming account activity events send by twitter to a web application url. This method differ from :meth:`Client.listen`, this method doesn't use the flask's web application url, rather your web application url. This is good for people that want to implement their web application outside flask.
 
         .. warning::

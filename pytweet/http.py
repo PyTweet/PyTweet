@@ -129,7 +129,7 @@ class HTTPClient(EventMixin):
         return self._auth
 
     def generate_thread_session(self):
-        return ''.join((random.sample(string.ascii_lowercase, 10)))
+        return "".join((random.sample(string.ascii_lowercase, 10)))
 
     def request(
         self,
@@ -146,7 +146,7 @@ class HTTPClient(EventMixin):
         basic_auth: bool = False,
         thread_name: bool = False,
         use_base_url: bool = True,
-        is_json: bool = True
+        is_json: bool = True,
     ) -> ResponsePayload:
         if use_base_url:
             url = self.base_url + version + path
@@ -184,23 +184,12 @@ class HTTPClient(EventMixin):
             thread = self.threading.Thread(
                 name=thread_name,
                 target=self.request,
-                args=(
-                    method, 
-                    version,
-                    path
-                ),
-                kwargs=get_kwargs(
-                    headers=headers,
-                    params=params,
-                    data=data,
-                    json=json,
-                    files=files,
-                    auth=auth
-                )
+                args=(method, version, path),
+                kwargs=get_kwargs(headers=headers, params=params, data=data, json=json, files=files, auth=auth),
             )
             thread.start()
             return thread
-        
+
         else:
             response = self.__session.request(
                 method,
@@ -375,22 +364,17 @@ class HTTPClient(EventMixin):
                     "POST",
                     "1.1",
                     "/media/metadata/create.json",
-                    json={
-                        "media_id": str(file.media_id), 
-                        "alt_text": {
-                            "text": str(file.alt_text)
-                        }
-                    },
+                    json={"media_id": str(file.media_id), "alt_text": {"text": str(file.alt_text)}},
                     auth=True,
                     use_base_url=False,
-                    thread_name=f"alt-text-request:FILE-MEDIA-ID={file.media_id}:thread_session={thread_session}"
+                    thread_name=f"alt-text-request:FILE-MEDIA-ID={file.media_id}:thread_session={thread_session}",
                 )
 
             if file.subfile:
                 self.threading.Thread(
                     target=self.quick_upload,
                     name=f"upload-subfile-request:FILE-MEDIA-ID={file.media_id}:SUBFILE-MEDIA-ID={file.subfile.media_id}:thread_session={thread_session}",
-                    args=(file.subfile,)
+                    args=(file.subfile,),
                 ).start()
 
                 for thread in self.threading.enumerate():
@@ -405,7 +389,7 @@ class HTTPClient(EventMixin):
                             {
                                 "media_id": str(file.subfile.media_id),
                                 "display_name": file.subfile.language,
-                                "language_code": file.subfile.language_code
+                                "language_code": file.subfile.language_code,
                             }
                         ]
                     },
@@ -418,7 +402,7 @@ class HTTPClient(EventMixin):
                     json=subtitle_data,
                     auth=True,
                     use_base_url=False,
-                    thread_name=f"subfile-request:FILE-MEDIA-ID={file.media_id}:SUBFILE-MEDIA-ID={file.subfile.media_id}:thread_session={thread_session}"
+                    thread_name=f"subfile-request:FILE-MEDIA-ID={file.media_id}:SUBFILE-MEDIA-ID={file.subfile.media_id}:thread_session={thread_session}",
                 )
 
             for thread in self.threading.enumerate():
@@ -762,7 +746,7 @@ class HTTPClient(EventMixin):
                     self.threading.Thread(
                         name=f"post-tweet-files-request:thread_session={thread_session}",
                         target=self.quick_upload,
-                        args=(file,)
+                        args=(file,),
                     ).start()
 
                 else:
@@ -877,7 +861,7 @@ class HTTPClient(EventMixin):
             self.threading.Thread(
                 name=f"update-welcome-message-file-request:FILE-MEDIA-ID={file.media_id}:thread_session={thread_session}",
                 target=self.quick_upload,
-                args=(file,)
+                args=(file,),
             ).start()
 
         if quick_reply:
@@ -935,7 +919,7 @@ class HTTPClient(EventMixin):
             self.threading.Thread(
                 name=f"update-welcome-message-file-request:FILE-MEDIA-ID={file.media_id}:thread_session={thread_session}",
                 target=self.quick_upload,
-                args=(file,)
+                args=(file,),
             ).start()
 
         if quick_reply:

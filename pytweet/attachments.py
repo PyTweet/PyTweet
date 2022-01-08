@@ -482,7 +482,7 @@ class File:
         dm_only: bool = False,
         alt_text: Optional[str] = None,
         subfile: Optional[SubFile] = None,
-        subfiles: Optional[List[SubFile]] = None
+        subfiles: Optional[List[SubFile]] = None,
     ):
         self.__path = path
         self.__media_id = None
@@ -494,7 +494,6 @@ class File:
         )
         self.dm_only = dm_only
         self.alt_text = alt_text
-        
 
     def __repr__(self) -> str:
         return "File(filename={0.filename})".format(self)
@@ -565,7 +564,7 @@ class File:
     @property
     def subfile(self) -> Optional[SubFile]:
         """Optional[:class:`SubFile`]: Returns the file's subfile.
-        
+
         .. versionadded:: 1.5.0
         """
         return self.__subfile
@@ -573,28 +572,22 @@ class File:
     @property
     def subfiles(self) -> Optional[List[SubFile]]:
         """Optional[List[:class:`SubFile`]]: Returns a list of the file's subfile.
-        
+
         .. versionadded:: 1.5.0
         """
         return self.__subfiles
 
+
 class SubFile(File):
     """Represents a subtitle File for :class:`File`. You can attach one subfile in :class:`File` via subfile arguments. This method inherits :class:`File`.
-    
+
 
     .. versionadded:: 1.5.0
     """
-    __slots__ = (
-        "_language_code",
-        "_language"
-    )
 
-    def __init__(
-        self,
-        path: str,
-        *,
-        language_code: Optional[str]
-    ):
+    __slots__ = ("_language_code", "_language")
+
+    def __init__(self, path: str, *, language_code: Optional[str]):
         self._language_code = language_code
         if self.language_code:
             fullname = LANGUAGES_CODES.get(language_code)
@@ -626,7 +619,7 @@ class SubFile(File):
     @property
     def language(self) -> str:
         """:class:`str`: Returns the SubFile's language.
-        
+
         .. versionadded:: 1.5.0
         """
         return self._language
@@ -634,7 +627,7 @@ class SubFile(File):
     @property
     def language_code(self) -> str:
         """:class:`str`: Returns the SubFile's language code.
-        
+
         .. versionadded:: 1.5.0
         """
         return self._language_code
@@ -670,7 +663,7 @@ class SubFile(File):
         .. versionadded:: 1.5.0
         """
         return "Subtitles"
-    
+
 
 class CustomProfile:
     """Represents a CustomProfile attachments that allow a Direct Message author to present a different identity than that of the Twitter account being used.
