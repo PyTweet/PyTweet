@@ -277,11 +277,6 @@ class Geo:
     """Represents the Geo location in twitter.
     You can use this as attachment in a tweet or for searching a location
 
-    Parameters
-    ------------
-    data: Dict[:class:`str`, :class:`Any`]
-        The Geo data in a dictionary.
-
 
     .. versionadded:: 1.3.5
     """
