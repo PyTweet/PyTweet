@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import mimetypes
 import datetime
 import io
 import os
-import json
 from typing import Any, Dict, List, NoReturn, Optional, Union, TYPE_CHECKING
 
 from .dataclass import PollOption, Option, Button
@@ -459,8 +457,9 @@ class File:
         The image's alt text, if None specified the image won't have an alt text. Default to None.
     subtitle_language_code: :class:`str`
         The language code should be a BCP47 code (e.g. "en").
-    subfile: :class:`File`
-        The subtitle's source file. Must be a .srt file with the correct timestamps and contents.
+    subfile: :class:`SubFile`
+        The subtitle's source file. Must be a .srt file with the correct formats.
+
 
     .. versionadded:: 1.3.5
     """
@@ -538,8 +537,7 @@ class File:
 
         .. versionadded:: 1.3.5
         """
-        path = self.__path
-        return path.name if isinstance(path, io.IOBase) else os.path.basename(path)
+        return self.path.name if isinstance(self.path, io.IOBase) else os.path.basename(self.path)
 
     @property
     def total_bytes(self) -> int:
@@ -581,15 +579,21 @@ class File:
         return self.__subfiles
 
 class SubFile(File):
-    """Represents a subtitle File for :class:`File. You can attach one or more subfile in :class:`File` via subfile and subfiles arguments.
+    """Represents a subtitle File for :class:`File. You can attach one subfile in :class:`File` via subfile arguments. This method inherits :class:`File`.
     
+
     .. versionadded:: 1.5.0
     """
+    __slots__ = (
+        "_language_code",
+        "_language"
+    )
+
     def __init__(
         self,
         path: str,
         *,
-        language_code: Optional[str] = None
+        language_code: Optional[str]
     ):
         self._language_code = language_code
         if self.language_code:
@@ -600,13 +604,72 @@ class SubFile(File):
                 raise PytweetException("Wrong language codes passed! Must be a BCP47 code (e.g. 'en')")
         super().__init__(path)
 
+    def __repr__(self) -> str:
+        return "SubFile(filename={0.filename} language={0.language} language_code={0.language_code})".format(self)
+
     @property
-    def language_code(self):
+    def filename(self) -> str:
+        """:class:`str`: Returns the SubFile's filename.
+
+        .. versionadded:: 1.5.0
+        """
+        return self.path.name if isinstance(self.path, io.IOBase) else os.path.basename(self.path)
+
+    @property
+    def path(self) -> str:
+        """:class:`str`: Returns the SubFile's path.
+
+        .. versionadded:: 1.3.5
+        """
+        return self._File__path
+
+    @property
+    def language(self) -> str:
+        """:class:`str`: Returns the SubFile's language.
+        
+        .. versionadded:: 1.5.0
+        """
+        return self._language
+
+    @property
+    def language_code(self) -> str:
+        """:class:`str`: Returns the SubFile's language code.
+        
+        .. versionadded:: 1.5.0
+        """
         return self._language_code
 
     @property
-    def language(self):
-        return self._language
+    def media_id(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the SubFile's media id. Returns None if the file was never uploaded.
+
+        .. versionadded:: 1.5.0
+        """
+        return int(self._File__media_id) if self._File__media_id else self._File__media_id
+
+    @property
+    def total_bytes(self) -> int:
+        """:class:`int`: Returns an integer value that represents the size of the specified path in bytes.
+
+        .. versionadded:: 1.5.0
+        """
+        return self._total_bytes
+
+    @property
+    def mimetype(self) -> str:
+        """:class:`str`: Returns the subfile's media category. This always going to be text/srt as the subtitle format.
+
+        .. versionadded:: 1.5.0
+        """
+        return "text/srt"
+
+    @property
+    def media_category(self) -> str:
+        """:class:`str`: Returns the subfile's media category. This always going to return 'Subtitles'
+
+        .. versionadded:: 1.5.0
+        """
+        return "Subtitles"
     
 
 class CustomProfile:
