@@ -55,7 +55,7 @@ class Client:
     client_secret: Optional[:class:`str`]
         The client's OAuth 2.0 Client Secret from keys and tokens page.
     use_bearer_only: bool
-        Indicates to only use bearer token for all methods. This mean the client is now a twitter-api-client v2 interface. Some methods are unavailable to use such as fetching trends and location, environment fetching methods, and features such as events. Some methods can be recover with OAuth 2 authorization code flow with PKCE with the correct scopes or permissions. Like users.read scope for reading users info which some methods provide a way like :meth:`Client.fetch_user`. 
+        Indicates to only use bearer token for all methods. This mean the client is now a twitter-api-client v2 interface. Some methods are unavailable to use such as fetching trends and location, environment fetching methods, and features such as events. Some methods can be recover with OAuth 2 authorization code flow with PKCE with the correct scopes or permissions. Like users.read scope for reading users info which some methods provide a way like :meth:`Client.fetch_user`.
 
     Attributes
     ------------

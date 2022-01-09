@@ -185,7 +185,7 @@ class Space:
 
     def fetch_buyers(self) -> Union[List[User], list]:
         """Fetches users who purchased a ticket to the space. This requires you to authenticate the request using the Access Token of the creator of the requested Space aka OAuth 2.0 Authorization Code with PKCE.
-        
+
         .. versionadded:: 1.5.0
         """
         res = self.http_client.request(
@@ -198,8 +198,8 @@ class Space:
                 "media.fields": MEDIA_FIELD,
                 "place.fields": PLACE_FIELD,
                 "poll.fields": POLL_FIELD,
-                "tweet.fields": TWEET_FIELD
-            }
+                "tweet.fields": TWEET_FIELD,
+            },
         )
         if not res:
             return []

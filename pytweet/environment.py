@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 _log = logging.getLogger(__name__)
 
+
 class Environment:
     """Represents a dev environment to use one of the subscription APIs (Account Activity API or events etc)
 
@@ -104,6 +105,7 @@ class Environment:
         res = self.client.http.request("GET", "1.1", f"/account_activity/all/{self.label}/subscriptions/list.json")
 
         return [int(subscription.get("user_id")) for subscription in res.get("subscriptions")]
+
 
 class Webhook:
     """Represents a webhook for an environment. This webhook belongs to an environment and have a webhook url for sending account activity events.
