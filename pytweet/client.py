@@ -704,7 +704,6 @@ class Client:
             thread = threading.Thread(
                 target=app.run, name="client-listen-method:thread_session=LISTEN-SESSION", kwargs=kwargs
             )
-            
 
             if not self.webhook and not ngrok:
                 self.webhook_url_path = urlparse(url).path

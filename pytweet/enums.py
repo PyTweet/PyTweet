@@ -61,7 +61,7 @@ class Granularity(Enum):
     city = "city"
     admin = "admin"
     country = "country"
-    
+
 
 class Timezone(Enum):
     international_dateline_west = "Etc/GMT+12"

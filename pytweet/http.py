@@ -183,19 +183,18 @@ class HTTPClient(EventMixin):
 
         method = method.upper()
         if thread_session:
-            executor = self.thread_manager.create_new_executor(
-                thread_name=thread_name,
-                session_id=thread_session
-            )
+            executor = self.thread_manager.create_new_executor(thread_name=thread_name, session_id=thread_session)
             future = executor.submit(
-                self.request, 
-                method, version, path,
-                headers=headers, 
-                params=params, 
-                data=data, 
-                json=json, 
-                files=files, 
-                auth=auth
+                self.request,
+                method,
+                version,
+                path,
+                headers=headers,
+                params=params,
+                data=data,
+                json=json,
+                files=files,
+                auth=auth,
             )
             return future
 
@@ -381,11 +380,10 @@ class HTTPClient(EventMixin):
                 )
 
             if file.subfile:
-                executor = self.thread_manager.create_new_executor(thread_name=f"upload-subfile-request", session_id=thread_session)
-                executor.submit(
-                    self.quick_upload,
-                    file.subfile
-                ).result()
+                executor = self.thread_manager.create_new_executor(
+                    thread_name=f"upload-subfile-request", session_id=thread_session
+                )
+                executor.submit(self.quick_upload, file.subfile).result()
 
                 subtitle_data = {
                     "media_id": str(file.media_id),
@@ -666,19 +664,14 @@ class HTTPClient(EventMixin):
             }
         }
 
-
         executor = self.thread_manager.create_new_executor(
-            thread_name="post-tweet-file-request",
-            session_id=thread_session
+            thread_name="post-tweet-file-request", session_id=thread_session
         )
         message_data = data["event"]["message_create"]["message_data"]
         message_data["text"] = str(text)
 
         if file:
-            future = executor.submit(
-                self.quick_upload,
-                file
-            )
+            future = executor.submit(self.quick_upload, file)
 
         if custom_profile:
             message_data["custom_profile_id"] = str(custom_profile.id)
@@ -742,23 +735,17 @@ class HTTPClient(EventMixin):
         if file:
             payload["media"] = {}
             payload["media"]["media_ids"] = []
-            file_future = executor.submit(
-                self.quick_upload,
-                file
-            )
+            file_future = executor.submit(self.quick_upload, file)
             executor.futures.append(file_future)
 
         if files:
             if len(files) + 1 if file else len(files) > 4:
                 raise BadRequests(message="Cannot upload more then 4 files!")
-                
+
             payload["media"] = {}
             payload["media"]["media_ids"] = []
             for file in files:
-                future = executor.submit(
-                    self.quick_upload,
-                    file
-                )
+                future = executor.submit(self.quick_upload, file)
                 executor.futures.append(future)
 
         if poll:
@@ -838,17 +825,16 @@ class HTTPClient(EventMixin):
         cta: Optional[CTA] = None,
     ) -> Optional[WelcomeMessage]:
         thread_session = self.generate_thread_session()
-        executor = self.thread_manager.create_new_executor(thread_name="create-welcome-message-file-request", session_id=thread_session)
+        executor = self.thread_manager.create_new_executor(
+            thread_name="create-welcome-message-file-request", session_id=thread_session
+        )
         data = {"welcome_message": {"message_data": {}}}
         message_data = data["welcome_message"]["message_data"]
         data["welcome_message"]["name"] = str(name)
         message_data["text"] = str(text)
 
         if file:
-            file_future = executor.submit(
-                self.quick_upload,
-                file
-            )
+            file_future = executor.submit(self.quick_upload, file)
 
         if quick_reply:
             message_data["quick_reply"] = {
@@ -894,16 +880,15 @@ class HTTPClient(EventMixin):
         cta: Optional[CTA] = None,
     ):
         thread_session = self.generate_thread_session()
-        executor=self.thread_manager.create_new_executor(thread_name="update-welcome-message-file-request", session_id=thread_session)
+        executor = self.thread_manager.create_new_executor(
+            thread_name="update-welcome-message-file-request", session_id=thread_session
+        )
         data = {"message_data": {}}
         message_data = data["message_data"]
         message_data["text"] = str(text)
 
         if file:
-            file_future = executor.submit(
-                self.quick_upload,
-                file
-            )
+            file_future = executor.submit(self.quick_upload, file)
 
         if quick_reply:
             message_data["quick_reply"] = {
