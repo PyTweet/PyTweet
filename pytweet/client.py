@@ -6,6 +6,7 @@ import hmac
 import json
 import logging
 import time
+import threading
 
 from urllib.parse import urlparse
 from asyncio import iscoroutinefunction
@@ -100,7 +101,7 @@ class Client:
         self.webhook: Optional[Webhook] = None
         self.environment: Optional[Environment] = None
         self.webhook_url_path: Optional[str] = None
-        self.threading = self.http.threading
+        self.thread_manager = self.http.thread_manager
 
     def __repr__(self) -> str:
         return "Client(bearer_token=SECRET consumer_key=SECRET consumer_secret=SECRET access_token=SECRET access_token_secret=SECRET)"
@@ -700,9 +701,10 @@ class Client:
                     break
 
         try:
-            thread = self.threading.Thread(
+            thread = threading.Thread(
                 target=app.run, name="client-listen-method:thread_session=LISTEN-SESSION", kwargs=kwargs
             )
+            
 
             if not self.webhook and not ngrok:
                 self.webhook_url_path = urlparse(url).path
