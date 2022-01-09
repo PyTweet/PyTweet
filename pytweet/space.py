@@ -4,7 +4,7 @@ from typing import Any, Union, Dict, List, Optional
 from .enums import SpaceState
 from .utils import time_parse_todt
 from .user import User
-from .expansions import EXPANSION, USER_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_FIELD
+from .expansions import TWEET_EXPANSION, USER_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_FIELD
 
 __all__ = ("Space",)
 
@@ -193,7 +193,7 @@ class Space:
             "2",
             f"/spaces/{self.id}/buyers",
             params={
-                "expansions": EXPANSION,
+                "expansions": TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "media.fields": MEDIA_FIELD,
                 "place.fields": PLACE_FIELD,
