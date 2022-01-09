@@ -56,6 +56,13 @@ class UserActionEventType(Enum):
     unmute = "mute_events"
 
 
+class Granularity(Enum):
+    neighborhood = "neighborhood"
+    city = "city"
+    admin = "admin"
+    country = "country"
+    
+
 class Timezone(Enum):
     international_dateline_west = "Etc/GMT+12"
     midway_island = "Pacific/Midway"
