@@ -11,6 +11,99 @@ if TYPE_CHECKING:
 
 _log = logging.getLogger(__name__)
 
+class Environment:
+    """Represents a dev environment to use one of the subscription APIs (Account Activity API or events etc)
+
+    .. versionadded:: 1.5.0
+    """
+
+    __slots__ = ("_payload", "client")
+
+    def __init__(self, data: Dict[str, Any], *, client: Client):
+        self._payload = data
+        self.client = client
+
+    def __repr__(self) -> str:
+        return f"Environment(name={self.name})"
+
+    @property
+    def name(self) -> str:
+        """:class:`str`: The environment name/label.
+
+        .. versionadded:: 1.5.0
+        """
+        return self._payload.get("environment_name")
+
+    @property
+    def label(self) -> str:
+        """:class:`str`: An alias to :meth:`Environment.name`
+
+        .. versionadded:: 1.5.0
+        """
+        return self.name
+
+    @property
+    def webhooks(self) -> List[Webhook]:
+        """List[:class:`Webhook`]: Returns a list of webhooks.
+
+        .. versionadded:: 1.5.0
+        """
+        return [Webhook(data, environment=self, client=self.client) for data in self._payload.get("webhooks")]
+
+    def add_user_subscription(self, client: Client) -> None:
+        """Add a new user subscription to the environment, which is the client (that you passed in the argument) itself.
+
+        .. note::
+            If you want to add other user subscription, use :class:`OauthSession.generate_oauth_url` to generate an oauth url and get the oauth token and verifier, then use :class:`OauthSession.post_oauth_token` to post the oauth token.
+
+
+        .. versionadded:: 1.5.0
+        """
+        client.http.request("POST", "1.1", f"/account_activity/all/{self.label}/subscriptions.json", auth=True)
+
+    def add_my_subscription(self) -> None:
+        """Add a new user subscription to the environment, which is the client WHO made the environment request. Use :meth:`add_user_subscription` to add other user subscription. This method only add the client WHO made the fetch environment request.
+
+
+        .. versionadded:: 1.5.0
+        """
+        self.client.http.request("POST", "1.1", f"/account_activity/all/{self.label}/subscriptions.json", auth=True)
+
+    def register_webhook(self, url: str) -> Webhook:
+        """Register your WebHook with your WebApp's url that you develop. Before this, you need to develop, deploy and host a WebApp that will receive Twitter webhook events. You also need to perform a Twitter Challenge Response Check (CRC) GET request and responds with a properly formatted JSON response.
+
+        Parameters
+        ------------
+        url: :class:`str`
+            Your WebApp url that you want to register as the WebHook url. Twitter will send account events to this url as an http post request.'
+
+        Returns
+        ---------
+        :class:`Webhook`
+            This method returns a :class:`Webhook` object.
+
+
+        .. versionadded:: 1.5.0
+        """
+        res = self.client.http.request(
+            "POST", "1.1", f"/account_activity/all/{self.label}/webhooks.json", auth=True, params={"url": url}
+        )
+        return Webhook(res, environment=self, client=self)
+
+    def fetch_all_subscriptions(self) -> List[int]:
+        """Returns a list of the the current users subscriptions from the environment.
+
+        Returns
+        ---------
+        List[:class:`int`]
+            This method returns a list of :class:`int` object.
+
+
+        .. versionadded:: 1.5.0
+        """
+        res = self.client.http.request("GET", "1.1", f"/account_activity/all/{self.label}/subscriptions/list.json")
+
+        return [int(subscription.get("user_id")) for subscription in res.get("subscriptions")]
 
 class Webhook:
     """Represents a webhook for an environment. This webhook belongs to an environment and have a webhook url for sending account activity events.
@@ -20,15 +113,15 @@ class Webhook:
 
     __slots__ = ("_id", "_url", "_valid", "_env", "client")
 
-    def __init__(self, data: Dict[str, Any], env: Environment, *, client: Client):
+    def __init__(self, data: Dict[str, Any], *, environment: Environment, client: Client):
         self._id = data.get("id")
         self._url = data.get("url")
         self._valid = data.get("valid")
-        self._env = env
+        self._environment = environment
         self.client = client
 
     def __repr__(self) -> str:
-        return f"Webhook(id={self.id} url={self.url} valid={self.valid} environment={self.env})"
+        return f"Webhook(id={self.id} url={self.url} valid={self.valid} environment={self.environment})"
 
     @property
     def id(self) -> int:
@@ -74,7 +167,7 @@ class Webhook:
 
         .. versionadded:: 1.5.0
         """
-        return self._env
+        return self._environment
 
     @property
     def env(self):
@@ -131,98 +224,3 @@ class Webhook:
         )
         _log.info("Successfully triggered a CRC.")
         return True
-
-
-class Environment:
-    """Represents a dev environment to use one of the subscription APIs (Account Activity API or events etc)
-
-    .. versionadded:: 1.5.0
-    """
-
-    __slots__ = ("_payload", "client")
-
-    def __init__(self, data: Dict[str, Any], *, client: Client):
-        self._payload = data
-        self.client = client
-
-    def __repr__(self) -> str:
-        return f"Environment(name={self.name})"
-
-    @property
-    def name(self) -> str:
-        """:class:`str`: The environment name/label.
-
-        .. versionadded:: 1.5.0
-        """
-        return self._payload.get("environment_name")
-
-    @property
-    def label(self) -> str:
-        """:class:`str`: An alias to :meth:`Environment.name`
-
-        .. versionadded:: 1.5.0
-        """
-        return self.name
-
-    @property
-    def webhooks(self) -> List[Webhook]:
-        """List[:class:`Webhook`]: Returns a list of webhooks.
-
-        .. versionadded:: 1.5.0
-        """
-        return [Webhook(data, self, client=self.client) for data in self._payload.get("webhooks")]
-
-    def add_user_subscription(self, client: Client) -> None:
-        """Add a new user subscription to the environment, which is the client (that you passed in the argument) itself.
-
-        .. note::
-            If you want to add other user subscription, use :class:`OauthSession.generate_oauth_url` to generate an oauth url and get the oauth token and verifier, then use :class:`OauthSession.post_oauth_token` to post the oauth token.
-
-
-        .. versionadded:: 1.5.0
-        """
-        client.http.request("POST", "1.1", f"/account_activity/all/{self.label}/subscriptions.json", auth=True)
-
-    def add_my_subscription(self) -> None:
-        """Add a new user subscription to the environment, which is the client WHO made the environment request. Use :meth:`add_user_subscription` to add other user subscription. This method only add the client WHO made the fetch environment request.
-
-
-        .. versionadded:: 1.5.0
-        """
-        self.client.http.request("POST", "1.1", f"/account_activity/all/{self.label}/subscriptions.json", auth=True)
-
-    def register_webhook(self, url: str) -> Webhook:
-        """Register your WebHook with your WebApp's url that you develop. Before this, you need to develop, deploy and host a WebApp that will receive Twitter webhook events. You also need to perform a Twitter Challenge Response Check (CRC) GET request and responds with a properly formatted JSON response.
-
-        Parameters
-        ------------
-        url: :class:`str`
-            Your WebApp url that you want to register as the WebHook url. Twitter will send account events to this url as an http post request.'
-
-        Returns
-        ---------
-        :class:`Webhook`
-            This method returns a :class:`Webhook` object.
-
-
-        .. versionadded:: 1.5.0
-        """
-        res = self.client.http.request(
-            "POST", "1.1", f"/account_activity/all/{self.label}/webhooks.json", auth=True, params={"url": url}
-        )
-        return Webhook(res, self, client=self)
-
-    def fetch_all_subscriptions(self) -> List[int]:
-        """Returns a list of the the current users subscriptions from the environment.
-
-        Returns
-        ---------
-        List[:class:`int`]
-            This method returns a list of :class:`int` object.
-
-
-        .. versionadded:: 1.5.0
-        """
-        res = self.client.http.request("GET", "1.1", f"/account_activity/all/{self.label}/subscriptions/list.json")
-
-        return [int(subscription.get("user_id")) for subscription in res.get("subscriptions")]
