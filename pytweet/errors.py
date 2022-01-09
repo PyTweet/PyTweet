@@ -47,25 +47,31 @@ class HTTPException(PytweetException):
         self.response = response
         self.message = message
         self.detail = None
-        try:
-            res = self.response.json()
-            if res.get("errors"):
-                self.message = res.get("errors")[0].get("message") if not message else message
-                self.detail = res.get("errors")[0].get("detail")
+        if response:
+            try:
+                res = self.response.json()
+                if res.get("errors"):
+                    self.message = res.get("errors")[0].get("message") if not message else message
+                    self.detail = res.get("errors")[0].get("detail")
+
+                else:
+                    self.message = res.get("error")
+                    if not self.message:
+                        self.detail = res.get("detail")
+
+            except decoder.JSONDecodeError:
+                super().__init__(
+                    f"Request returned an Exception (status code: {self.response.status_code}): {self.response.text}",
+                )
 
             else:
-                self.message = res.get("error")
-                if not self.message:
-                    self.detail = res.get("detail")
-
-        except decoder.JSONDecodeError:
-            super().__init__(
-                f"Request returned an Exception (status code: {self.response.status_code}): {self.response.text}",
-            )
+                super().__init__(
+                    f"Request returned an Exception (status code: {self.response.status_code}): {self.message if self.message else self.detail}",
+                )
 
         else:
             super().__init__(
-                f"Request returned an Exception (status code: {self.response.status_code}): {self.message if self.message else self.detail}",
+                f"Exception Raised BadRequests: {self.message}",
             )
 
     @property
