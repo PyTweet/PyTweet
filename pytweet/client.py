@@ -14,7 +14,7 @@ from typing import Callable, List, Optional, Union, Any
 from flask import Flask, request
 
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
-from .enums import ReplySetting, SpaceState
+from .enums import ReplySetting, SpaceState, Granularity
 from .errors import PytweetException, UnKnownSpaceState
 from .http import HTTPClient
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
@@ -427,7 +427,7 @@ class Client:
         lat: Optional[int] = None,
         long: Optional[int] = None,
         ip: Optional[ID] = None,
-        granularity: str = "neighborhood",
+        granularity: Granularity = Granularity.neighborhood,
     ) -> Geo:  # TODO make enums for granularity
         """Search a geo with the given arguments.
 

@@ -13,7 +13,7 @@ from typing import Dict, List, NoReturn, Optional, Union, TYPE_CHECKING
 
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .auth import OauthSession
-from .enums import ReplySetting, SpaceState
+from .enums import ReplySetting, SpaceState, Granularity
 from .errors import (
     BadRequests,
     Conflict,
@@ -618,7 +618,7 @@ class HTTPClient(EventMixin):
         lat: Optional[int] = None,
         long: Optional[int] = None,
         ip: Optional[ID] = None,
-        granularity: str = "neighborhood",
+        granularity: Granularity = Granularity.neighborhood,
     ) -> Optional[Geo]:
         if query:
             query = query.replace(" ", "%20")
@@ -632,7 +632,7 @@ class HTTPClient(EventMixin):
                 "lat": lat,
                 "long": long,
                 "ip": ip,
-                "granularity": granularity,
+                "granularity": granularity.value,
                 "max_results": max_result,
             },
             auth=True,
