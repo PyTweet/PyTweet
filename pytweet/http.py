@@ -11,30 +11,11 @@ import string
 from json import JSONDecodeError
 from typing import Dict, List, NoReturn, Optional, Union, TYPE_CHECKING
 
-from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply, SubFile
+from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .auth import OauthSession
 from .enums import ReplySetting, SpaceState
-from .errors import (
-    BadRequests,
-    Conflict,
-    Forbidden,
-    NotFound,
-    NotFoundError,
-    PytweetException,
-    Unauthorized,
-    FieldsTooLarge,
-)
-from .expansions import (
-    MEDIA_FIELD,
-    PLACE_FIELD,
-    POLL_FIELD,
-    SPACE_FIELD,
-    TWEET_EXPANSION,
-    SPACE_EXPANSION,
-    TWEET_FIELD,
-    USER_FIELD,
-    TOPIC_FIELD,
-)
+from .errors import BadRequests, Conflict, Forbidden, NotFound, NotFoundError, PytweetException, Unauthorized, FieldsTooLarge
+from .expansions import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, SPACE_FIELD, TWEET_EXPANSION, SPACE_EXPANSION, TWEET_FIELD, USER_FIELD, TOPIC_FIELD
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser
 from .space import Space
@@ -48,7 +29,6 @@ if TYPE_CHECKING:
 
 _log = logging.getLogger(__name__)
 get_kwargs = lambda **kwargs: kwargs
-
 
 class HTTPClient(EventMixin):
     def __init__(
@@ -97,8 +77,8 @@ class HTTPClient(EventMixin):
         self.client_secret = client_secret
         self.use_bearer_only = use_bearer_only
         self.event_parser = EventParser(self)
-        self.threading = threading
         self.payload_parser = self.event_parser.payload_parser
+        self.threading = threading
         self.base_url = "https://api.twitter.com/"
         self.upload_url = "https://upload.twitter.com/"
         self._auth = OauthSession(
@@ -642,7 +622,7 @@ class HTTPClient(EventMixin):
 
     def send_message(
         self,
-        user_id: ID,
+        recipient_id: ID,
         text: str,
         *,
         file: Optional[File] = None,
@@ -655,7 +635,7 @@ class HTTPClient(EventMixin):
             "event": {
                 "type": "message_create",
                 "message_create": {
-                    "target": {"recipient_id": str(user_id)},
+                    "target": {"recipient_id": str(recipient_id)},
                     "message_data": {},
                 },
             }
@@ -824,7 +804,7 @@ class HTTPClient(EventMixin):
             name=f"create-custom-profile-file-request:thread_session={thread_session}",
             target=self.quick_upload,
             args=(file,),
-        )
+        ).start()
 
         for thread in self.threading.enumerate():
             if thread_session in thread.name:
