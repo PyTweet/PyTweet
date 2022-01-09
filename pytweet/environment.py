@@ -113,7 +113,7 @@ class Webhook:
     .. versionadded:: 1.5.0
     """
 
-    __slots__ = ("_id", "_url", "_valid", "_env", "client")
+    __slots__ = ("_id", "_url", "_valid", "_environment", "client")
 
     def __init__(self, data: Dict[str, Any], *, environment: Environment, client: Client):
         self._id = data.get("id")
