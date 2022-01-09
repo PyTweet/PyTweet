@@ -55,7 +55,7 @@ class Client:
     client_secret: Optional[:class:`str`]
         The client's OAuth 2.0 Client Secret from keys and tokens page.
     use_bearer_only: bool
-        Indicates to only use bearer token for all methods. This means some methods are unavailable to use such as fetching trends and location, environment fetching methods, and features such as events.
+        Indicates to only use bearer token for all methods. This mean the client is now a twitter-api-client v2 interface. Some methods are unavailable to use such as fetching trends and location, environment fetching methods, and features such as events. Some methods can be recover with OAuth 2 authorization code flow with PKCE with the correct scopes or permissions. Like users.read scope for reading users info which some methods provide a way like :meth:`Client.fetch_user`. 
 
     Attributes
     ------------
@@ -100,6 +100,7 @@ class Client:
         self.webhook: Optional[Webhook] = None
         self.environment: Optional[Environment] = None
         self.webhook_url_path: Optional[str] = None
+        self.threading = self.http.threading
 
     def __repr__(self) -> str:
         return "Client(bearer_token=SECRET consumer_key=SECRET consumer_secret=SECRET access_token=SECRET access_token_secret=SECRET)"
@@ -699,7 +700,7 @@ class Client:
                     break
 
         try:
-            thread = self.http.threading.Thread(
+            thread = self.threading.Thread(
                 target=app.run, name="client-listen-method:thread_session=LISTEN-SESSION", kwargs=kwargs
             )
 
