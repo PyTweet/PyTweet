@@ -41,6 +41,7 @@ from .space import Space
 from .tweet import Tweet
 from .user import User, ClientAccount
 from .mixins import EventMixin
+from .threads import ThreadManager
 
 if TYPE_CHECKING:
     from .type import ID, Payload, ResponsePayload
@@ -98,7 +99,7 @@ class HTTPClient(EventMixin):
         self.use_bearer_only = use_bearer_only
         self.event_parser = EventParser(self)
         self.payload_parser = self.event_parser.payload_parser
-        self.threading = threading
+        self.thread_manager = ThreadManager()
         self.base_url = "https://api.twitter.com/"
         self.upload_url = "https://upload.twitter.com/"
         self._auth = OauthSession(
@@ -144,7 +145,8 @@ class HTTPClient(EventMixin):
         files: Payload = {},
         auth: bool = False,
         basic_auth: bool = False,
-        thread_name: bool = False,
+        thread_name: Optional[str] = None,
+        thread_session: bool = False,
         use_base_url: bool = True,
         is_json: bool = True,
     ) -> ResponsePayload:
@@ -180,15 +182,22 @@ class HTTPClient(EventMixin):
             data = None
 
         method = method.upper()
-        if thread_name:
-            thread = self.threading.Thread(
-                name=thread_name,
-                target=self.request,
-                args=(method, version, path),
-                kwargs=get_kwargs(headers=headers, params=params, data=data, json=json, files=files, auth=auth),
+        if thread_session:
+            executor = self.thread_manager.create_new_executor(
+                thread_name=thread_name,
+                session_id=thread_session
             )
-            thread.start()
-            return thread
+            future = executor.submit(
+                self.request, 
+                method, version, path,
+                headers=headers, 
+                params=params, 
+                data=data, 
+                json=json, 
+                files=files, 
+                auth=auth
+            )
+            return future
 
         else:
             response = self.__session.request(
@@ -360,26 +369,23 @@ class HTTPClient(EventMixin):
 
             check_status(res.get("processing_info", None), file.media_id)
             if file.alt_text:
-                self.request(
+                alt_text_future = self.request(
                     "POST",
                     "1.1",
                     "/media/metadata/create.json",
                     json={"media_id": str(file.media_id), "alt_text": {"text": str(file.alt_text)}},
                     auth=True,
                     use_base_url=False,
-                    thread_name=f"alt-text-request:FILE-MEDIA-ID={file.media_id}:thread_session={thread_session}",
+                    thread_name="alt-text-file-request",
+                    thread_session=thread_session,
                 )
 
             if file.subfile:
-                self.threading.Thread(
-                    target=self.quick_upload,
-                    name=f"upload-subfile-request:FILE-MEDIA-ID={file.media_id}:SUBFILE-MEDIA-ID={file.subfile.media_id}:thread_session={thread_session}",
-                    args=(file.subfile,),
-                ).start()
-
-                for thread in self.threading.enumerate():
-                    if "upload-subfile-request" in thread.name:
-                        thread.join()
+                executor = self.thread_manager.create_new_executor(thread_name=f"upload-subfile-request", session_id=thread_session)
+                executor.submit(
+                    self.quick_upload,
+                    file.subfile
+                ).result()
 
                 subtitle_data = {
                     "media_id": str(file.media_id),
@@ -405,9 +411,8 @@ class HTTPClient(EventMixin):
                     thread_name=f"subfile-request:FILE-MEDIA-ID={file.media_id}:SUBFILE-MEDIA-ID={file.subfile.media_id}:thread_session={thread_session}",
                 )
 
-            for thread in self.threading.enumerate():
-                if thread_session in thread.name:
-                    thread.join()
+            if file.alt_text:
+                alt_text_future.result()
 
     def quick_upload(self, file: File) -> File:
         self.upload(file, "INIT")
@@ -661,15 +666,19 @@ class HTTPClient(EventMixin):
             }
         }
 
+
+        executor = self.thread_manager.create_new_executor(
+            thread_name="post-tweet-file-request",
+            session_id=thread_session
+        )
         message_data = data["event"]["message_create"]["message_data"]
         message_data["text"] = str(text)
 
         if file:
-            self.threading.Thread(
-                name=f"post-tweet-file-request:thread_session={thread_session}",
-                target=self.quick_upload,
-                args=(file,),
-            ).start()
+            future = executor.submit(
+                self.quick_upload,
+                file
+            )
 
         if custom_profile:
             message_data["custom_profile_id"] = str(custom_profile.id)
@@ -683,13 +692,12 @@ class HTTPClient(EventMixin):
         if cta:
             message_data["ctas"] = cta.raw_buttons
 
-        for thread in self.threading.enumerate():
-            if thread_session in thread.name:
-                thread.join()
-                message_data["attachment"] = {}
-                message_data["attachment"]["type"] = "media"
-                message_data["attachment"]["media"] = {}
-                message_data["attachment"]["media"]["id"] = str(file.media_id)
+        if file:
+            file = future.result()
+            message_data["attachment"] = {}
+            message_data["attachment"]["type"] = "media"
+            message_data["attachment"]["media"] = {}
+            message_data["attachment"]["media"]["id"] = str(file.media_id)
 
         res = self.request(
             "POST",
@@ -724,37 +732,34 @@ class HTTPClient(EventMixin):
         media_tagged_users: Optional[List[User, ID]] = None,
         super_followers_only: bool = False,
     ) -> Optional[Message]:
-        payload = {}
         thread_session = self.generate_thread_session()
+        executor = self.thread_manager.create_new_executor(thread_name="post-tweet-request", session_id=thread_session)
+
+        payload = {}
         if text:
             payload["text"] = text
 
         if file:
             payload["media"] = {}
             payload["media"]["media_ids"] = []
-            self.threading.Thread(
-                name=f"post-tweet-file-request:thread_session={thread_session}",
-                target=self.quick_upload,
-                args=(file,),
-            ).start()
+            file_future = executor.submit(
+                self.quick_upload,
+                file
+            )
+            executor.futures.append(file_future)
 
         if files:
+            if len(files) + 1 if file else len(files) > 4:
+                raise BadRequests(message="Cannot upload more then 4 files!")
+                
             payload["media"] = {}
             payload["media"]["media_ids"] = []
             for file in files:
-                if payload.get("media", None):
-                    self.threading.Thread(
-                        name=f"post-tweet-files-request:thread_session={thread_session}",
-                        target=self.quick_upload,
-                        args=(file,),
-                    ).start()
-
-                else:
-                    self.threading.Thread(
-                        name=f"post-tweet-files-request:thread_session={thread_session}",
-                        target=self.quick_upload,
-                        args=(file,),
-                    ).start()
+                future = executor.submit(
+                    self.quick_upload,
+                    file
+                )
+                executor.futures.append(future)
 
         if poll:
             payload["poll"] = {}
@@ -801,35 +806,16 @@ class HTTPClient(EventMixin):
         if super_followers_only:
             payload["for_super_followers_only"] = True
 
-        for thread in self.threading.enumerate():
-            if thread_session in thread.name:
-                thread.join()
-                if "file-request" in thread.name:
-                    payload["media"]["media_ids"] = [str(file.media_id)]
-
-                elif "files-request" in thread.name:
-                    if payload.get("media", None):
-                        payload["media"]["media_ids"].append(str(file.media_id))
-                    else:
-                        payload["media"] = {}
-                        payload["media"]["media_ids"] = [str(file.media_id)]
+        for future in executor.futures:
+            file = future.result()
+            payload["media"]["media_ids"].append(str(file.media_id))
 
         res = self.request("POST", "2", "/tweets", json=payload, auth=True)
         data = res.get("data")
         return Message(data.get("text"), data.get("id"), 1)
 
     def create_custom_profile(self, name: str, file: File) -> Optional[CustomProfile]:
-        thread_session = self.create_thread_session()
-        self.threading.Thread(
-            name=f"create-custom-profile-file-request:thread_session={thread_session}",
-            target=self.quick_upload,
-            args=(file,),
-        ).start()
-
-        for thread in self.threading.enumerate():
-            if thread_session in thread.name:
-                thread.join()
-
+        file = self.quick_upload(file)
         data = {"custom_profile": {"name": name, "avatar": {"media": {"id": file.media_id}}}}
 
         res = self.request("POST", "1.1", "/custom_profiles/new.json", json=data, auth=True)
@@ -852,17 +838,17 @@ class HTTPClient(EventMixin):
         cta: Optional[CTA] = None,
     ) -> Optional[WelcomeMessage]:
         thread_session = self.generate_thread_session()
+        executor = self.thread_manager.create_new_executor(thread_name="create-welcome-message-file-request", session_id=thread_session)
         data = {"welcome_message": {"message_data": {}}}
         message_data = data["welcome_message"]["message_data"]
         data["welcome_message"]["name"] = str(name)
         message_data["text"] = str(text)
 
         if file:
-            self.threading.Thread(
-                name=f"update-welcome-message-file-request:FILE-MEDIA-ID={file.media_id}:thread_session={thread_session}",
-                target=self.quick_upload,
-                args=(file,),
-            ).start()
+            file_future = executor.submit(
+                self.quick_upload,
+                file
+            )
 
         if quick_reply:
             message_data["quick_reply"] = {
@@ -873,14 +859,11 @@ class HTTPClient(EventMixin):
         if cta:
             message_data["ctas"] = cta.raw_buttons
 
-        for thread in self.threading.enumerate():
-            if thread_session in thread.name:
-                thread.join()
-                message_data["attachment"] = {}
-                message_data["attachment"]["type"] = "media"
-                message_data["attachment"]["media"] = {}
-                message_data["attachment"]["media"]["id"] = str(file.media_id)
-                break
+        if file:
+            message_data["attachment"] = {}
+            message_data["attachment"]["type"] = "media"
+            message_data["attachment"]["media"] = {}
+            message_data["attachment"]["media"]["id"] = str(file_future.result().media_id)
 
         res = self.request(
             "POST",
@@ -911,16 +894,16 @@ class HTTPClient(EventMixin):
         cta: Optional[CTA] = None,
     ):
         thread_session = self.generate_thread_session()
+        executor=self.thread_manager.create_new_executor(thread_name="update-welcome-message-file-request", session_id=thread_session)
         data = {"message_data": {}}
         message_data = data["message_data"]
         message_data["text"] = str(text)
 
         if file:
-            self.threading.Thread(
-                name=f"update-welcome-message-file-request:FILE-MEDIA-ID={file.media_id}:thread_session={thread_session}",
-                target=self.quick_upload,
-                args=(file,),
-            ).start()
+            file_future = executor.submit(
+                self.quick_upload,
+                file
+            )
 
         if quick_reply:
             message_data["quick_reply"] = {
@@ -931,14 +914,11 @@ class HTTPClient(EventMixin):
         if cta:
             message_data["ctas"] = cta.raw_buttons
 
-        for thread in self.threading.enumerate():
-            if thread_session in thread.name:
-                thread.join()
-                message_data["attachment"] = {}
-                message_data["attachment"]["type"] = "media"
-                message_data["attachment"]["media"] = {}
-                message_data["attachment"]["media"]["id"] = str(file.media_id)
-                break
+        if file:
+            message_data["attachment"] = {}
+            message_data["attachment"]["type"] = "media"
+            message_data["attachment"]["media"] = {}
+            message_data["attachment"]["media"]["id"] = str(file_future.result().media_id)
 
         res = self.request(
             "PUT",
