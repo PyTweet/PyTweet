@@ -27,8 +27,8 @@ class Media:
         return self._preview_image_url
 
     @property
-    def media_key(self) -> str:
-        """:class:`str`: Returns the image's media key"""
+    def key(self) -> str:
+        """:class:`str`: Returns the media's key"""
         return self._media_key
 
     @property
