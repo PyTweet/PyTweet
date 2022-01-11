@@ -47,7 +47,7 @@ class HTTPException(PytweetException):
         self.response = response
         self.message = message
         self.detail = None
-        if response:
+        if response is not None:
             try:
                 res = self.response.json()
                 if res.get("errors"):
@@ -71,7 +71,7 @@ class HTTPException(PytweetException):
 
         else:
             super().__init__(
-                f"Exception Raised BadRequests: {self.message}",
+                f"Exception Raise: {self.message}",
             )
 
     @property
