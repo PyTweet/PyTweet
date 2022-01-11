@@ -53,13 +53,15 @@ setup(
     project_urls={
         "Documentation": "https://py-tweet.readthedocs.io/",
         "HomePage/Github": "https://github.com/PyTweet/PyTweet/",
+        "Discord": "https://discord.gg/XHBhg6A4jJ",
+        "Issue tracker": "https://github.com/PyTweet/PyTweet/issues"
     },
     description="A Synchronous python API wrapper for twitter's api",
     long_description=readme,
     long_description_content_type="text/markdown",
     install_requires=requirements,
     extras_require=extras_require,
-    keywords="PyTweet, pytweet, twitter, tweet.py twitter.py",
+    keywords=["PyTweet", "pytweet", "twitter", "tweet.py", "twitter.py"],
     python_requires=">=3.7.0",
     classifiers=classifiers,
 )
