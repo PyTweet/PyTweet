@@ -4,7 +4,7 @@ import threading
 import random
 import string
 from concurrent.futures import ThreadPoolExecutor, wait
-from ..constant import FIRST_COMPLETED
+from ..constants import FIRST_COMPLETED
 
 
 def wait_for_futures(*futures, timeout=None, return_when=FIRST_COMPLETED):

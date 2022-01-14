@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 from .attachments import Poll, Geo, File
 from .entities import Media
 from .enums import ReplySetting
-from .expansions import USER_FIELD
+from .constants import USER_FIELD
 from .metrics import TweetPublicMetrics
 from .relations import RelationHide, RelationLike, RelationRetweet
 from .user import User
@@ -516,7 +516,7 @@ class Tweet(Message):
         text: :class:`str`
             The tweet's text, it will show up as the main text in a tweet.
         file: Optional[:class:`File`]
-            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
+            Represents a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
         files: Optional[List[:class:`File`]]
             Represents multiple file attachments in a list. It could be an image, gif, or video. the item in the list must also be an instance of pytweet.File
         geo: Optional[Union[:class:`Geo`, :class:`str`]]

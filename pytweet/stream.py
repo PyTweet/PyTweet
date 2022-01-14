@@ -8,7 +8,7 @@ import time
 from typing import TYPE_CHECKING, Any, List, Type, Optional
 from .dataclass import StreamRule
 from .errors import ConnectionException, PytweetException
-from .expansions import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_EXPANSION, TWEET_FIELD, USER_FIELD
+from .constants import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_EXPANSION, TWEET_FIELD, USER_FIELD
 from .tweet import Tweet
 
 
@@ -16,12 +16,6 @@ if TYPE_CHECKING:
     from .http import HTTPClient
 
 _log = logging.getLogger(__name__)
-
-
-def _check_for_errors(data, session):
-    if "errors" in data.keys():
-        raise ConnectionException(session, None)
-
 
 class StreamConnection:
     """Represent the twitter api stream connection. This will handle the stream connection.
@@ -115,7 +109,8 @@ class StreamConnection:
                 for response_line in response.iter_lines():
                     if response_line:
                         json_data = json.loads(response_line.decode("UTF-8"))
-                        _check_for_errors(json_data, self.session)
+                        if "errors" in json_data.keys():
+                            raise ConnectionException(self.session, None)
                         tweet = Tweet(json_data, http_client=http)
                         http.tweet_cache[tweet.id] = tweet
                         http.dispatch("stream", tweet, self)

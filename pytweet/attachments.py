@@ -10,7 +10,7 @@ from .entities import Media
 from .enums import ButtonType
 from .utils import time_parse_todt
 from .errors import PytweetException
-from .constant import LANGUAGES_CODES
+from .constants import LANGUAGES_CODES
 
 if TYPE_CHECKING:
     from .type import ID

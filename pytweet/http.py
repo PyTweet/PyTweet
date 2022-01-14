@@ -24,7 +24,7 @@ from .errors import (
     Unauthorized,
     FieldsTooLarge,
 )
-from .expansions import (
+from .constants import (
     MEDIA_FIELD,
     PLACE_FIELD,
     POLL_FIELD,
@@ -48,7 +48,6 @@ if TYPE_CHECKING:
     from .stream import Stream
 
 _log = logging.getLogger(__name__)
-get_kwargs = lambda **kwargs: kwargs
 
 
 class HTTPClient(EventMixin):
@@ -66,7 +65,7 @@ class HTTPClient(EventMixin):
         client_secret: Optional[str] = None,
         use_bearer_only: bool = False,
     ) -> Union[None, NoReturn]:
-        self.credentials: Dict[str, Optional[str]] = {
+        self.credentials = {
             "bearer_token": bearer_token,
             "consumer_key": consumer_key,
             "consumer_secret": consumer_secret,
@@ -80,10 +79,10 @@ class HTTPClient(EventMixin):
         if not access_token:
             _log.warning("Access token is missing this is recommended to have")
         if not access_token_secret:
-            _log.warning("Access token secret is missing this is required if you have passed in the access_toke param.")
+            _log.warning("Access token secret is missing this is required if you have passed in the access_token param.")
 
         for k, v in self.credentials.items():
-            if not isinstance(v, str) and not isinstance(v, type(None)):
+            if not isinstance(v, (str, type(None))):
                 raise Unauthorized(None, f"Wrong authorization passed for credential: {k}.")
 
         self.__session = requests.Session()
@@ -112,7 +111,7 @@ class HTTPClient(EventMixin):
             client_id=self.client_id,
             client_secret=self.client_secret,
         )
-        self.current_header: Optional[Payload] = None
+        self.current_header = None
         self.client_id = client_id
         self.message_cache = {}
         self.tweet_cache = {}

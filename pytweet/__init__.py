@@ -19,7 +19,7 @@ from .enums import *
 from .environment import *
 from .errors import *
 from .events import *
-from .expansions import *
+from .constants import *
 from .http import *
 from .message import *
 from .metrics import *
