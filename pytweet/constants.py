@@ -1,4 +1,4 @@
-#Expansions & Fields use for extend object.
+# Expansions & Fields use for extend object.
 TWEET_EXPANSION = "attachments.poll_ids,attachments.media_keys,author_id,geo.place_id,in_reply_to_user_id,referenced_tweets.id,entities.mentions.username,referenced_tweets.id.author_id"
 SPACE_EXPANSION = "invited_user_ids,speaker_ids,creator_id,host_ids"
 TWEET_FIELD = "attachments,author_id,context_annotations,conversation_id,created_at,geo,entities,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,reply_settings,source,text,withheld"
@@ -9,7 +9,7 @@ PLACE_FIELD = "contained_within,country,country_code,full_name,geo,id,name,place
 POLL_FIELD = "duration_minutes,end_datetime,id,options,voting_status"
 TOPIC_FIELD = "id,name,description"
 
-#Indicator passed in return_when in wait_for_futures module function.
+# Indicator passed in return_when in wait_for_futures module function.
 FIRST_COMPLETED = "FIRST_COMPLETED"
 FIRST_EXCEPTION = "FIRST_EXCEPTION"
 ALL_COMPLETED = "ALL_COMPLETED"

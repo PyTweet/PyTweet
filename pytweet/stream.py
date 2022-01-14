@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 
 _log = logging.getLogger(__name__)
 
+
 class StreamConnection:
     """Represent the twitter api stream connection. This will handle the stream connection.
 
