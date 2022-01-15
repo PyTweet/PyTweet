@@ -33,7 +33,7 @@ from .constants import (
     TWEET_FIELD,
     USER_FIELD,
     TOPIC_FIELD,
-    ALL_COMPLETED
+    ALL_COMPLETED,
 )
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser
@@ -358,9 +358,7 @@ class HTTPClient(EventMixin):
                 segment_id += 1
 
         elif command.upper() == "FINALIZE":
-            executor = self.thread_manager.create_new_executor(
-                thread_name="subfiles-upload-request"
-            )
+            executor = self.thread_manager.create_new_executor(thread_name="subfiles-upload-request")
             res = self.request(
                 "POST",
                 version="1.1",
@@ -395,25 +393,27 @@ class HTTPClient(EventMixin):
                 executor.wait_for_futures()
                 if file.subfiles:
                     for subfile in file.subfiles:
-                        subtitles.append({
-                            "media_id": str(subfile.media_id),
-                            "display_name": subfile.language,
-                            "language_code": subfile.language_code,
-                        })
+                        subtitles.append(
+                            {
+                                "media_id": str(subfile.media_id),
+                                "display_name": subfile.language,
+                                "language_code": subfile.language_code,
+                            }
+                        )
 
                 if file.subfile:
-                    subtitles.append({
-                        "media_id": str(file.subfile.media_id),
-                        "display_name": file.subfile.language,
-                        "language_code": file.subfile.language_code,
-                    })  
-                
+                    subtitles.append(
+                        {
+                            "media_id": str(file.subfile.media_id),
+                            "display_name": file.subfile.language,
+                            "language_code": file.subfile.language_code,
+                        }
+                    )
+
                 subtitle_data = {
                     "media_id": str(file.media_id),
                     "media_category": file.media_category,
-                    "subtitle_info": {
-                        "subtitles": subtitles
-                    },
+                    "subtitle_info": {"subtitles": subtitles},
                 }
 
                 self.request(
@@ -428,7 +428,6 @@ class HTTPClient(EventMixin):
 
             if file.alt_text:
                 alt_text_future.result()
-
 
     def quick_upload(self, file: File) -> File:
         self.upload(file, "INIT")
@@ -812,7 +811,7 @@ class HTTPClient(EventMixin):
             payload["for_super_followers_only"] = True
 
         executor.wait_for_futures()
-        
+
         if file:
             payload["media"]["media_ids"].append(str(file.media_id))
         if files:

@@ -9,6 +9,7 @@ from ..constants import ALL_COMPLETED
 
 __all__ = ("Executor", "ThreadManager")
 
+
 class Executor(ThreadPoolExecutor):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -26,7 +27,7 @@ class Executor(ThreadPoolExecutor):
     def clear_futures(self):
         self.futures.clear()
 
-    def wait_for_futures(self, *,timeout: Optional[int] = None, return_when=ALL_COMPLETED, purge: bool = True):
+    def wait_for_futures(self, *, timeout: Optional[int] = None, return_when=ALL_COMPLETED, purge: bool = True):
         if not self.futures:
             return None
         result = wait(self.futures, timeout, return_when)
@@ -34,14 +35,13 @@ class Executor(ThreadPoolExecutor):
             self.clear_futures()
         return result
 
+
 class ThreadManager:
     @property
     def active_threads(self) -> list:
         return threading.enumerate()
 
-    def create_new_executor(
-        self, *, max_workers: int = 100, thread_name: str = "", session_id: str = None
-    ) -> Executor:
+    def create_new_executor(self, *, max_workers: int = 100, thread_name: str = "", session_id: str = None) -> Executor:
         session_id = session_id or self.generate_thread_session()
         thread_name += f":session_id={session_id}:task_number="
         executor = Executor(max_workers, thread_name)
