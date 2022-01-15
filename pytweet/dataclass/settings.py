@@ -5,6 +5,10 @@ from .locations import Location, TimezoneInfo
 
 @dataclass
 class SleepTimeSettings:
+    """Represents a setting for sleep time from a user setting.
+    
+    .. versionadded:: 1.5.0
+    """
     enabled: bool
     end_time: Optional[int]
     start_time: Optional[int]
@@ -12,6 +16,10 @@ class SleepTimeSettings:
 
 @dataclass
 class UserSettings:
+    """Represents a user setting.
+    
+    .. versionadded:: 1.5.0
+    """
     always_use_https: Optional[bool]
     geo_enabled: Optional[bool]
     sleep_time_setting: SleepTimeSettings

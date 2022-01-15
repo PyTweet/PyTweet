@@ -9,7 +9,6 @@ class StreamRule:
 
     .. versionadded:: 1.3.5
     """
-
     value: str
     tag: Optional[str] = None
     id: Optional[ID] = None
