@@ -15,7 +15,7 @@ from .constants import LANGUAGES_CODES
 if TYPE_CHECKING:
     from .type import ID
 
-__all__ = ("Poll", "QuickReply", "Geo", "CTA", "File")
+__all__ = ("Poll", "QuickReply", "Geo", "CTA", "File", "SubFile")
 
 
 def guess_mimetype(byts: bytes):
