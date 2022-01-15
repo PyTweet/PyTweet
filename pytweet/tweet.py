@@ -318,7 +318,7 @@ class Tweet(Message):
             Returns None if the author is invalid or the tweet doesn't have id.
         """
         try:
-            return f"https://twitter.com/{self.author.username.split('@', 1)[1]}/status/{self.id}"
+            return f"https://twitter.com/{self.author.username}/status/{self.id}"
         except TypeError:
             return None
 
