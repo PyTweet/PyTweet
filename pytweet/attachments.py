@@ -209,10 +209,6 @@ class QuickReply:
     type: :class:`str`
         The quick_reply's types, it must be and only 'options'
 
-    Attributes
-    ------------
-    options: List[Any, Any]
-        The QuickReply's options. An option must have a label, description and metadata, Maximum options is 20.
 
     .. versionadded:: 1.2.0
     """
@@ -220,7 +216,7 @@ class QuickReply:
     __slots__ = ("type", "_options", "_raw_options")
 
     def __init__(self, type: str = "options"):
-        self.type = type if type == "options" else "options"
+        self._type = type if type == "options" else "options"
         self._options: List[Option] = []
         self._raw_options: List[dict] = []
 
@@ -255,6 +251,14 @@ class QuickReply:
         self._options.append(Option(label=label, description=description, metadata=metadata))
 
         return self
+
+    @property
+    def type(self) -> str:
+        """:class:`str`: Returns the QuickReply type.
+        
+        .. versionadded:: 1.5.0
+        """
+        return self._type
 
     @property
     def options(self) -> List[Option]:
