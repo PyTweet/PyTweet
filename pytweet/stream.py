@@ -294,6 +294,7 @@ class Stream:
         dry_run: :class:`bool`
             Indicates if you want to debug your rule's operator syntax.
 
+
         .. versionadded:: 1.3.5
         """
         if self.sample:
