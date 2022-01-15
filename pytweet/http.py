@@ -5,11 +5,10 @@ import logging
 import sys
 import time
 import requests
-import threading
 import random
 import string
 from json import JSONDecodeError
-from typing import Dict, List, NoReturn, Optional, Union, TYPE_CHECKING
+from typing import List, NoReturn, Optional, Union, TYPE_CHECKING
 
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .auth import OauthSession
@@ -34,6 +33,7 @@ from .constants import (
     TWEET_FIELD,
     USER_FIELD,
     TOPIC_FIELD,
+    ALL_COMPLETED
 )
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser
@@ -358,6 +358,9 @@ class HTTPClient(EventMixin):
                 segment_id += 1
 
         elif command.upper() == "FINALIZE":
+            executor = self.thread_manager.create_new_executor(
+                thread_name="subfiles-upload-request"
+            )
             res = self.request(
                 "POST",
                 version="1.1",
@@ -381,22 +384,35 @@ class HTTPClient(EventMixin):
                 )
 
             if file.subfile:
-                executor = self.thread_manager.create_new_executor(
-                    thread_name=f"upload-subfile-request", session_id=thread_session
-                )
-                executor.submit(self.quick_upload, file.subfile).result()
+                executor.submit(self.quick_upload, file.subfile)
 
+            if file.subfiles:
+                for subfile in file.subfiles:
+                    executor.submit(self.quick_upload, subfile)
+
+            if file.subfiles or file.subfile:
+                subtitles = []
+                executor.wait_for_futures()
+                if file.subfiles:
+                    for subfile in file.subfiles:
+                        subtitles.append({
+                            "media_id": str(subfile.media_id),
+                            "display_name": subfile.language,
+                            "language_code": subfile.language_code,
+                        })
+
+                if file.subfile:
+                    subtitles.append({
+                        "media_id": str(file.subfile.media_id),
+                        "display_name": file.subfile.language,
+                        "language_code": file.subfile.language_code,
+                    })  
+                
                 subtitle_data = {
                     "media_id": str(file.media_id),
                     "media_category": file.media_category,
                     "subtitle_info": {
-                        "subtitles": [
-                            {
-                                "media_id": str(file.subfile.media_id),
-                                "display_name": file.subfile.language,
-                                "language_code": file.subfile.language_code,
-                            }
-                        ]
+                        "subtitles": subtitles
                     },
                 }
 
@@ -407,11 +423,12 @@ class HTTPClient(EventMixin):
                     json=subtitle_data,
                     auth=True,
                     use_base_url=False,
-                    thread_name=f"subfile-request:FILE-MEDIA-ID={file.media_id}:SUBFILE-MEDIA-ID={file.subfile.media_id}:thread_session={thread_session}",
+                    thread_name=f"subfile-request:FILE-MEDIA-ID={file.media_id}:SUBFILE-MEDIA-ID={file.subfile.media_id}",
                 )
 
             if file.alt_text:
                 alt_text_future.result()
+
 
     def quick_upload(self, file: File) -> File:
         self.upload(file, "INIT")
@@ -794,9 +811,13 @@ class HTTPClient(EventMixin):
         if super_followers_only:
             payload["for_super_followers_only"] = True
 
-        for future in executor.futures:
-            file = future.result()
+        executor.wait_for_futures()
+        
+        if file:
             payload["media"]["media_ids"].append(str(file.media_id))
+        if files:
+            for file in files:
+                payload["media"]["media_ids"].append(str(file.media_id))
 
         res = self.request("POST", "2", "/tweets", json=payload, auth=True)
         data = res.get("data")
