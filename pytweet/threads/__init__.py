@@ -4,25 +4,47 @@ import threading
 import random
 import string
 from concurrent.futures import ThreadPoolExecutor, wait
-from ..constants import FIRST_COMPLETED
+from typing import Optional, Callable, Any
+from ..constants import ALL_COMPLETED
 
+__all__ = ("Executor", "ThreadManager")
 
-def wait_for_futures(*futures, timeout=None, return_when=FIRST_COMPLETED):
-    return wait(futures, timeout, return_when)
+class Executor(ThreadPoolExecutor):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._futures = []
 
+    @property
+    def futures(self):
+        return self._futures
+
+    def submit(self, fn: Callable, *args: Any, **kwargs: Any):
+        future = super().submit(fn, *args, **kwargs)
+        self.futures.append(future)
+        return future
+
+    def clear_futures(self):
+        self.futures.clear()
+
+    def wait_for_futures(self, *,timeout: Optional[int] = None, return_when=ALL_COMPLETED, purge: bool = True):
+        if not self.futures:
+            return None
+        result = wait(self.futures, timeout, return_when)
+        if purge:
+            self.clear_futures()
+        return result
 
 class ThreadManager:
     @property
-    def active_threads(self):
+    def active_threads(self) -> list:
         return threading.enumerate()
 
     def create_new_executor(
         self, *, max_workers: int = 100, thread_name: str = "", session_id: str = None
-    ) -> ThreadPoolExecutor:
+    ) -> Executor:
         session_id = session_id or self.generate_thread_session()
         thread_name += f":session_id={session_id}:task_number="
-        executor = ThreadPoolExecutor(max_workers, thread_name)
-        setattr(executor, "futures", [])
+        executor = Executor(max_workers, thread_name)
         return executor
 
     def get_threads(self, session_id):
