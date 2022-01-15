@@ -213,7 +213,7 @@ class QuickReply:
     .. versionadded:: 1.2.0
     """
 
-    __slots__ = ("type", "_options", "_raw_options")
+    __slots__ = ("_type", "_options", "_raw_options")
 
     def __init__(self, type: str = "options"):
         self._type = type if type == "options" else "options"
