@@ -21,11 +21,6 @@ Version Related Info
     Get the version of the module (e.g ``1.0.0`` or ``1.0.0a``) this is based on :pep:`440`.
 
 
-Classes 
----------------------------
-
-These are all the **public** classes of pytweet.
-
 Clients
 ----------------
 
@@ -35,15 +30,16 @@ Client
 .. autoclass:: Client
     :members:
 
+
 Application
 ----------------
 
 ApplicationInfo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 .. autoclass:: ApplicationInfo()
     :members:
+
 
 Environment
 ----------------
@@ -64,7 +60,7 @@ Webhook
 Twitter Models
 ---------------------
 
-These following object are not meant to be create as an instance rather its for knowledge of what you can do with them.
+These following objects are not meant to be create as an instance rather its for knowledge of what you can do with them.
 
 
 User
@@ -121,6 +117,60 @@ WelcomeMessageRule
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: WelcomeMessageRule()
+    :members:
+
+
+Twitter Dataclass
+-------------------------
+
+These following section documented objects that use `dataclasses.dataclass` decorator.
+
+Attachments Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: PollOption
+    :members:
+
+.. autoclass:: Option
+    :members:
+
+.. autoclass:: Button
+    :members:
+
+Locations Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Location
+    :members:
+
+.. autoclass:: Trend
+    :members:
+
+.. autoclass:: PlaceType
+    :members:
+
+.. autoclass:: TimezoneInfo
+    :members:
+
+Settings Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: UserSettings
+    :members:
+
+.. autoclass:: SleepTimeSettings
+    :members:
+
+Space Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: SpaceTopic
+    :members:
+
+Stream Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: StreamRule
     :members:
 
 
@@ -197,13 +247,6 @@ StreamConnection
     :members:
 
 
-StreamRule
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: StreamRule
-    :members:
-
-
 Oauth
 -------------
 
@@ -229,13 +272,16 @@ Some endpoints returns more objects but limits it to some pages. Using paginatio
 
 .. code-block:: py
 
-    user = client.fetch_user(ID)
-    pagination = user.fetch_following()
+    pagination = client.account.fetch_following()
     print("Page 1, object 1:", pagination.content[0])
     pagination.next_page() #Change page to the next page
     print("Page 2, object 2:", pagination.content[1])
     pagination.previous_page() #Change page to the previous page
     print("Page 1, object 3:", pagination.content[2])
+
+    #since the pagination caches page content everytime you turn pages, you can do this:
+    for page_number, page_content in pagination.pages:
+        print(f"Page {page_number}, object: 1: {page_content[0]}")
 
 
 Pagination
