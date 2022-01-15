@@ -32,7 +32,7 @@ from .constants import (
     SPACE_EXPANSION,
     TWEET_FIELD,
     USER_FIELD,
-    TOPIC_FIELD
+    TOPIC_FIELD,
 )
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser

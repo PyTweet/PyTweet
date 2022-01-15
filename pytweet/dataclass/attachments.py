@@ -2,12 +2,14 @@ from dataclasses import dataclass
 from typing import Union, Optional
 from ..enums import ButtonType
 
+
 @dataclass
 class Option:
     """Represents an Option object for :class:`QuickReply`. You can add an Option using :meth:`QuickReply.add_option`.
 
     .. versionadded:: 1.3.5
     """
+
     label: str
     description: str
     metadata: str
@@ -19,6 +21,7 @@ class PollOption:
 
     .. versionadded:: 1.3.5
     """
+
     label: str
     position: int = 0
     votes: int = 0
@@ -30,6 +33,7 @@ class Button:
 
     .. versionadded:: 1.3.5
     """
+
     label: str
     type: Union[ButtonType, str]
     url: str

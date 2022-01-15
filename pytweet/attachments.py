@@ -255,7 +255,7 @@ class QuickReply:
     @property
     def type(self) -> str:
         """:class:`str`: Returns the QuickReply type.
-        
+
         .. versionadded:: 1.5.0
         """
         return self._type
