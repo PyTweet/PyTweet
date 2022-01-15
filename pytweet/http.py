@@ -8,7 +8,7 @@ import requests
 import random
 import string
 from json import JSONDecodeError
-from typing import List, NoReturn, Optional, Union, TYPE_CHECKING
+from typing import Any, List, NoReturn, Optional, Union, TYPE_CHECKING
 
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .auth import OauthSession
@@ -32,15 +32,13 @@ from .constants import (
     SPACE_EXPANSION,
     TWEET_FIELD,
     USER_FIELD,
-    TOPIC_FIELD,
-    ALL_COMPLETED,
+    TOPIC_FIELD
 )
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser
 from .space import Space
 from .tweet import Tweet
 from .user import User, ClientAccount
-from .mixins import EventMixin
 from .threads import ThreadManager
 
 if TYPE_CHECKING:
@@ -50,7 +48,7 @@ if TYPE_CHECKING:
 _log = logging.getLogger(__name__)
 
 
-class HTTPClient(EventMixin):
+class HTTPClient:
     def __init__(
         self,
         bearer_token: str,
@@ -118,6 +116,7 @@ class HTTPClient(EventMixin):
         self.message_cache = {}
         self.tweet_cache = {}
         self.user_cache = {}
+        self.events = {}
         if self.stream:
             self.stream.http_client = self
             self.stream.connection.http_client = self
@@ -132,6 +131,14 @@ class HTTPClient(EventMixin):
 
     def generate_thread_session(self):
         return "".join((random.sample(string.ascii_lowercase, 10)))
+
+    def dispatch(self, event_name: str, *args: Any, **kwargs: Any) -> Any:
+        event = self.events.get(event_name)
+        if not event:
+            return None
+
+        _log.debug(f"Dispatching Event: on_{event_name}")
+        return event(*args, **kwargs)
 
     def request(
         self,
