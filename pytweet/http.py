@@ -63,7 +63,7 @@ class HTTPClient:
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
         use_bearer_only: bool = False,
-        sleep_after_ratelimit: bool = False
+        sleep_after_ratelimit: bool = False,
     ) -> Union[None, NoReturn]:
         self.credentials = {
             "bearer_token": bearer_token,
@@ -205,7 +205,7 @@ class HTTPClient:
                 data=data,
                 json=json,
                 files=files,
-                auth=auth
+                auth=auth,
             )
             return future
 
@@ -272,7 +272,7 @@ class HTTPClient:
                         data=data,
                         json=json,
                         files=files,
-                        auth=auth
+                        auth=auth,
                     )
 
                 else:

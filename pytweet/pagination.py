@@ -134,7 +134,7 @@ class UserPagination(Pagination):
         )
         if not res:
             raise NoPageAvailable()
-            
+
         previous_content = self.content
         self._current_page_number += 1
         self.__original_payload = res
@@ -170,7 +170,7 @@ class UserPagination(Pagination):
             params=self._params,
         )
         if not res:
-            raise NoPageAvailable() 
+            raise NoPageAvailable()
 
         previous_content = self.content
         self._current_page_number -= 1
@@ -242,7 +242,7 @@ class TweetPagination(Pagination):
             params=self._params,
         )
         if not res:
-            raise NoPageAvailable() 
+            raise NoPageAvailable()
 
         previous_content = self.content
         self._current_page_number += 1
@@ -279,7 +279,7 @@ class TweetPagination(Pagination):
             params=self._params,
         )
         if not res:
-            raise NoPageAvailable() 
+            raise NoPageAvailable()
 
         previous_content = self.content
         self._current_page_number -= 1

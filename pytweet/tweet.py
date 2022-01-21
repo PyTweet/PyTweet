@@ -595,11 +595,7 @@ class Tweet(Message):
             "GET",
             "2",
             f"/tweets/{self.id}/retweeted_by",
-            params={
-                "expansions": "pinned_tweet_id",
-                "user.fields": USER_FIELD,
-                "tweet.fields": TWEET_FIELD
-            },
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
         )
         if not res:
             return []
