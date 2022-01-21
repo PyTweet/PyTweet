@@ -57,6 +57,8 @@ class Client:
         The client's OAuth 2.0 Client Secret from keys and tokens page.
     use_bearer_only: bool
         Indicates to only use bearer token for all methods. This mean the client is now a twitter-api-client v2 interface. Some methods are unavailable to use such as fetching trends and location, environment fetching methods, and features such as events. Some methods can be recover with OAuth 2 authorization code flow with PKCE with the correct scopes or permissions. Like users.read scope for reading users info which some methods provide a way like :meth:`Client.fetch_user`.
+    sleep_after_ratelimit: bool
+        Indicates to sleep when your client is ratelimited, If set to True it wont raise :class:`TooManyRequests` error but it would print a message indicating to sleep then it sleeps for how many seconds it needs to sleep, after that it continue to restart the request.
 
     Attributes
     ------------
@@ -84,6 +86,7 @@ class Client:
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
         use_bearer_only: bool = False,
+        sleep_after_ratelimit: bool = False
     ) -> None:
         self.http = HTTPClient(
             bearer_token,
@@ -96,6 +99,7 @@ class Client:
             client_id=client_id,
             client_secret=client_secret,
             use_bearer_only=use_bearer_only,
+            sleep_after_ratelimit=sleep_after_ratelimit
         )
         self._account_user: Optional[User] = None  # set in account property.
         self.webhook: Optional[Webhook] = None
@@ -104,7 +108,7 @@ class Client:
         self.thread_manager = self.http.thread_manager
 
     def __repr__(self) -> str:
-        return "Client(bearer_token=SECRET consumer_key=SECRET consumer_secret=SECRET access_token=SECRET access_token_secret=SECRET)"
+        return f"Client({repr(self.account)})"
 
     @property
     def account(self) -> Optional[User]:

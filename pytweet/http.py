@@ -19,6 +19,7 @@ from .errors import (
     Forbidden,
     NotFound,
     NotFoundError,
+    TooManyRequests,
     PytweetException,
     Unauthorized,
     FieldsTooLarge,
@@ -62,6 +63,7 @@ class HTTPClient:
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
         use_bearer_only: bool = False,
+        sleep_after_ratelimit: bool = False
     ) -> Union[None, NoReturn]:
         self.credentials = {
             "bearer_token": bearer_token,
@@ -99,6 +101,7 @@ class HTTPClient:
         self.event_parser = EventParser(self)
         self.payload_parser = self.event_parser.payload_parser
         self.thread_manager = ThreadManager()
+        self.sleep_after_ratelimit = sleep_after_ratelimit
         self.base_url = "https://api.twitter.com/"
         self.upload_url = "https://upload.twitter.com/"
         self._auth = OauthSession(
@@ -202,7 +205,7 @@ class HTTPClient:
                 data=data,
                 json=json,
                 files=files,
-                auth=auth,
+                auth=auth
             )
             return future
 
@@ -254,10 +257,26 @@ class HTTPClient:
                 raise Conflict(response)
 
             elif code in (420, 429):
-                remaining = int(response.headers["x-rate-limit-reset"])
-                sleep_for = (remaining - int(time.time())) + 1
-                _log.warn(f"Client has been ratelimited. Sleeping for {sleep_for}")
-                time.sleep(sleep_for)
+                if self.sleep_after_ratelimit:
+                    remaining = int(response.headers["x-rate-limit-reset"])
+                    sleep_for = (remaining - int(time.time())) + 1
+                    _log.warn(f"Client is ratelimited. Sleeping for {sleep_for}")
+                    print(f"Client is ratelimited. Sleeping for {sleep_for}")
+                    time.sleep(sleep_for)
+                    return self.request(
+                        method,
+                        version,
+                        path,
+                        headers=headers,
+                        params=params,
+                        data=data,
+                        json=json,
+                        files=files,
+                        auth=auth
+                    )
+
+                else:
+                    raise TooManyRequests(response)
 
             elif code == 431:
                 raise FieldsTooLarge(response)
