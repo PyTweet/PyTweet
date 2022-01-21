@@ -103,6 +103,8 @@ class UserPagination(Pagination):
     * :meth:`User.fetch_followers`
     * :meth:`User.fetch_muters`
     * :meth:`User.fetch_blockers`
+    * :meth:`Tweet.fetch_likers`
+    * :meth:`Tweet.fetch_retweeters`
 
 
     .. versionadded:: 1.5.0
@@ -130,6 +132,9 @@ class UserPagination(Pagination):
             auth=True,
             params=self._params,
         )
+        if not res:
+            raise NoPageAvailable()
+            
         previous_content = self.content
         self._current_page_number += 1
         self.__original_payload = res
@@ -164,6 +169,9 @@ class UserPagination(Pagination):
             auth=True,
             params=self._params,
         )
+        if not res:
+            raise NoPageAvailable() 
+
         previous_content = self.content
         self._current_page_number -= 1
         self.__original_payload = res
@@ -233,6 +241,8 @@ class TweetPagination(Pagination):
             auth=True,
             params=self._params,
         )
+        if not res:
+            raise NoPageAvailable() 
 
         previous_content = self.content
         self._current_page_number += 1
@@ -268,6 +278,8 @@ class TweetPagination(Pagination):
             auth=True,
             params=self._params,
         )
+        if not res:
+            raise NoPageAvailable() 
 
         previous_content = self.content
         self._current_page_number -= 1
