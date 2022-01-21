@@ -6,12 +6,13 @@ from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 from .attachments import Poll, Geo, File
 from .entities import Media
 from .enums import ReplySetting
-from .constants import USER_FIELD
+from .constants import TWEET_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, USER_FIELD
 from .metrics import TweetPublicMetrics
 from .relations import RelationHide, RelationLike, RelationRetweet
 from .user import User
 from .utils import time_parse_todt
 from .message import Message
+from .pagination import UserPagination
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -579,13 +580,13 @@ class Tweet(Message):
         res = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
         return RelationHide(res)
 
-    def fetch_retweeters(self):
+    def fetch_retweeters(self) -> Optional[UserPagination]:
         """Return users that retweeted the tweet.
 
         Returns
         ---------
-        Optional[List[:class:`User`], List]
-            This method returns a list of :class:`User` objects
+        Optional[:class:`UserPagination`]
+            This method returns a :class:`UserPagination` object.
 
 
         .. versionadded:: 1.1.3
@@ -594,21 +595,30 @@ class Tweet(Message):
             "GET",
             "2",
             f"/tweets/{self.id}/retweeted_by",
-            params={"user.fields": USER_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD
+            },
         )
-
-        try:
-            return [User(user, http_client=self) for user in res["data"]]
-        except (KeyError, TypeError):
+        if not res:
             return []
 
-    def fetch_liking_users(self) -> Optional[List[User], List]:
+        return UserPagination(
+            res,
+            User,
+            f"/tweets/{self.id}/retweeted_by",
+            http_client=self.http_client,
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+        )
+
+    def fetch_likers(self) -> Optional[UserPagination]:
         """Return users that liked the tweet.
 
         Returns
         ---------
-        Optional[List[:class:`User`], List]
-            This method returns a list of :class:`User` objects
+        Optional[:class:`Pagination`]
+            This method returns a :class:`UserPagination` object.
 
 
         .. versionadded:: 1.1.3
@@ -617,13 +627,19 @@ class Tweet(Message):
             "GET",
             "2",
             f"/tweets/{self.id}/liking_users",
-            params={"user.fields": USER_FIELD},
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
         )
 
-        try:
-            return [User(user, http_client=self) for user in res["data"]]
-        except (KeyError, TypeError):
+        if not res:
             return []
+
+        return UserPagination(
+            res,
+            User,
+            f"/tweets/{self.id}/liking_users",
+            http_client=self.http_client,
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+        )
 
     def fetch_replied_user(self) -> Optional[User]:
         """Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
