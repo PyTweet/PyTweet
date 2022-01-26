@@ -19,17 +19,9 @@ class Space:
 
     def __init__(self, data: Dict[str, Any], http_client: object):
         self.__original_payload = data
-        self._payload = None
+        self._includes = self.__original_payload.get("includes")
+        self._payload = self.__original_payload.get("data") or self.__original_payload
         self.http_client = http_client
-
-        try:
-            if isinstance(data.get("data"), list):
-                self._payload = data.get("data")[0]
-            else:
-                self._payload = data.get("data")
-        except AttributeError:
-            self._payload = self.__original_payload
-        self._include = self.__original_payload.get("includes")
 
     def __repr__(self) -> str:
         return "Space(name={0.title} id={0.id} state={0.state})".format(self)
