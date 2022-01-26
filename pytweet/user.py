@@ -46,9 +46,9 @@ class User:
     __slots__ = ("__original_payload", "_includes", "_payload", "http_client", "_metrics")
 
     def __init__(self, data: Dict[str, Any], http_client: Optional[HTTPClient] = None) -> None:
-        self.__original_payload: Dict[str, Any] = data
+        self.__original_payload = data
         self._includes = self.__original_payload.get("includes")
-        self._payload: Dict[Any, Any] = self.__original_payload.get("data") or self.__original_payload
+        self._payload = self.__original_payload.get("data") or self.__original_payload
         self.http_client = http_client
         self._metrics = UserPublicMetrics(self._payload) or self.__original_payload
 
