@@ -7,7 +7,6 @@ import json
 import logging
 import time
 import threading
-
 from urllib.parse import urlparse
 from asyncio import iscoroutinefunction
 from http import HTTPStatus
@@ -25,6 +24,7 @@ from .tweet import Tweet
 from .user import User, ClientAccount
 from .environment import Environment, Webhook
 from .dataclass import Location, Trend
+from .list import List as TwitterList
 from .type import ID
 
 __all__ = ("Client",)
@@ -58,7 +58,7 @@ class Client:
     use_bearer_only: bool
         Indicates to only use bearer token for all methods. This mean the client is now a twitter-api-client v2 interface. Some methods are unavailable to use such as fetching trends and location, environment fetching methods, and features such as events. Some methods can be recover with OAuth 2 authorization code flow with PKCE with the correct scopes or permissions. Like users.read scope for reading users info which some methods provide a way like :meth:`Client.fetch_user`.
     sleep_after_ratelimit: bool
-        Indicates to sleep when your client is ratelimited, If set to True it wont raise :class:`TooManyRequests` error but it would print a message indicating to sleep then it sleeps for how many seconds it needs to sleep, after that it continue to restart the request.
+        Indicates to sleep when your client is ratelimited, If set to True it wont raise :class:`TooManyRequests` error but it would print a message indicating to sleep, then it sleeps for how many seconds it needs to sleep, after that it continue to restart the request.
 
     Attributes
     ------------
@@ -245,6 +245,95 @@ class Client:
         """
         return self.http.fetch_direct_message(event_id)
 
+    def fetch_welcome_message(self, welcome_message_id: ID) -> WelcomeMessage:
+        """Fetches a welcome message.
+
+        Parameters
+        ------------
+        welcome_message_id: :class:`ID`
+            Represents the welcome message ID that you wish to fetch with.
+
+        Returns
+        ---------
+        :class:`WelcomeMessage`
+            This method returns :class:`WelcomeMessage` object.
+
+
+        .. versionadded:: 1.3.5
+        """
+        return self.http.fetch_welcome_message(welcome_message_id)
+
+    def fetch_welcome_message_rule(self, welcome_message_rule_id: ID) -> WelcomeMessageRule:
+        """Fetches a welcome message rule.
+
+        Parameters
+        ------------
+        welcome_message_rule_id: :class:`ID`
+            Represents the welcome message rule ID that you wish to fetch with.
+
+        Returns
+        ---------
+        :class:`WelcomeMessageRule`
+            This method returns :class:`WelcomeMessageRule` object.
+
+
+        .. versionadded:: 1.3.5
+        """
+        return self.http.fetch_welcome_message_rule(welcome_message_rule_id)
+
+    def fetch_space(self, space_id: ID) -> Space:
+        """Fetches a space.
+
+        Parameters
+        ------------
+        space_id: :class:`ID`
+            Represents the space ID that you wish to fetch with.
+
+        Returns
+        ---------
+        :class:`Space`
+            This method returns a :class:`Space` object.
+
+
+        .. versionadded:: 1.3.5
+        """
+        return self.http.fetch_space(space_id)
+
+    def fetch_spaces_by_title(self, title: str, state: SpaceState = SpaceState.live) -> Space:
+        """Fetches spaces using its title.
+
+        Parameters
+        ------------
+        title: :class:`ID`
+            The space title that you are going use for fetching the space.
+        state: :class:`SpaceState`
+            The type of state the space has. There are only 2 types: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host. Default to SpaceState.live
+
+        Returns
+        ---------
+        :class:`Space`
+            This method returns a :class:`Space` object.
+
+
+        .. versionadded:: 1.3.5
+        """
+        if state == SpaceState.live or state == SpaceState.scheduled:
+            return self.http.fetch_spaces_bytitle(title, state)
+        else:
+            raise UnKnownSpaceState(given_state=state)
+
+    def fetch_list(self, id: ID) -> TwitterList:
+        """Fetches a list using its id
+
+        Returns
+        ---------
+        :class:`List`
+            This method returns a :class:`List` object.
+
+        .. versionadded:: 1.5.0
+        """
+        return self.http.fetch_list(id)
+
     def tweet(
         self,
         text: str = None,
@@ -260,7 +349,7 @@ class Client:
         exclude_reply_users: Optional[List[User, ID]] = None,
         media_tagged_users: Optional[List[User, ID]] = None,
         super_followers_only: bool = False,
-    ) -> Message:
+    ) -> Union[Message, Tweet]:
         """Posts a tweet directly to twitter from the given parameters.
 
         Parameters
@@ -347,82 +436,22 @@ class Client:
         """
         return self.http.create_welcome_message(name=name, text=text, file=file, quick_reply=quick_reply, cta=cta)
 
-    def fetch_welcome_message(self, welcome_message_id: ID) -> WelcomeMessage:
-        """Fetches a welcome message.
+    def create_list(self, name: str, *,description: str = "", private: bool = False) -> Optional[TwitterList]:
+        """Create a new list.
 
-        Parameters
-        ------------
-        welcome_message_id: :class:`ID`
-            Represents the welcome message ID that you wish to fetch with.
+        Paramaters
+        -----------
+        name: :class:`str`
+            The name of the List you wish to create.
+        description: :class:`str`
+            Description of the List.
+        private: :class:`bool`
+            Determine whether the List should be private, default to False.
 
-        Returns
-        ---------
-        :class:`WelcomeMessage`
-            This method returns :class:`WelcomeMessage` object.
-
-
-        .. versionadded:: 1.3.5
+        
+        .. versionadded:: 1.5.0
         """
-        return self.http.fetch_welcome_message(welcome_message_id)
-
-    def fetch_welcome_message_rule(self, welcome_message_rule_id: ID) -> WelcomeMessageRule:
-        """Fetches a welcome message rule.
-
-        Parameters
-        ------------
-        welcome_message_rule_id: :class:`ID`
-            Represents the welcome message rule ID that you wish to fetch with.
-
-        Returns
-        ---------
-        :class:`WelcomeMessageRule`
-            This method returns :class:`WelcomeMessageRule` object.
-
-
-        .. versionadded:: 1.3.5
-        """
-        return self.http.fetch_welcome_message_rule(welcome_message_rule_id)
-
-    def fetch_space(self, space_id: ID) -> Space:
-        """Fetches a space.
-
-        Parameters
-        ------------
-        space_id: :class:`ID`
-            Represents the space ID that you wish to fetch with.
-
-        Returns
-        ---------
-        :class:`Space`
-            This method returns a :class:`Space` object.
-
-
-        .. versionadded:: 1.3.5
-        """
-        return self.http.fetch_space(space_id)
-
-    def fetch_space_by_title(self, title: str, state: SpaceState = SpaceState.live) -> Space:
-        """Fetches a space using its title.
-
-        Parameters
-        ------------
-        title: :class:`ID`
-            The space title that you are going use for fetching the space.
-        state: :class:`SpaceState`
-            The type of state the space has. There are only 2 types: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host. Default to SpaceState.live
-
-        Returns
-        ---------
-        :class:`Space`
-            This method returns a :class:`Space` object.
-
-
-        .. versionadded:: 1.3.5
-        """
-        if state == SpaceState.live or state == SpaceState.scheduled:
-            return self.http.fetch_space_bytitle(title, state)
-        else:
-            raise UnKnownSpaceState(given_state=state)
+        return self.http.create_list(name, description=description, private=private)
 
     def search_geo(
         self,
@@ -433,7 +462,7 @@ class Client:
         long: Optional[int] = None,
         ip: Optional[ID] = None,
         granularity: Granularity = Granularity.neighborhood,
-    ) -> Geo:  # TODO make enums for granularity
+    ) -> Geo:
         """Search a geo with the given arguments.
 
         Parameters
@@ -461,7 +490,7 @@ class Client:
         """
         return self.http.search_geo(query, max_result, lat=lat, long=long, ip=ip, granularity=granularity)
 
-    def search_trend_with_place(self, woeid: ID, exclude: Optional[str] = None):
+    def search_trend_with_place(self, woeid: ID, exclude: Optional[str] = None) -> Optional[List[Trend]]:
         """Search trends with woeid.
 
         .. note::
@@ -473,6 +502,11 @@ class Client:
             "where on earth identifier" or WOEID, which is a legacy identifier created by Yahoo and has been deprecated. Twitter API v1.1 still uses the numeric value to identify town and country trend locations. Example WOEID locations include: Worldwide: 1 UK: 23424975 Brazil: 23424768 Germany: 23424829 Mexico: 23424900 Canada: 23424775 United States: 23424977 New York: 2459115.
         exclude: Optional[:class:`str`]
             Setting this equal to hashtags will remove all hashtags from the trends list.
+        
+        Returns
+        ---------
+        Optional[List[:class:`Trend`]]
+            This method returns a list of :class:`Trend` objects.
 
 
         .. versionadded:: 1.5.0
@@ -483,24 +517,24 @@ class Client:
 
         return [Trend(**data) for data in res[0].get("trends")]
 
-    def search_trend_locations(self):
+    def search_trend_locations(self) -> Optional[List[Location]]:
         """Search locations that Twitter has trending topic information.
+
+        Returns
+        ---------
+        Optional[List[:class:`Location`]]
+            This method returns a list of :class:`Location` objects.
 
 
         .. versionadded:: 1.5.0
         """
         res = self.http.request("GET", "1.1", "/trends/available.json", auth=True)
-        for data in res:
-            data["parent_id"] = data["parentid"]
-            data["place_type"] = data["placeType"]
-            data["country_code"] = data["countryCode"]
-            data.pop("placeType")
-            data.pop("countryCode")
-            data.pop("parentid")
+        for index, data in enumerate(res): 
+            res[index] = self.http.payload_parser.parse_trend_location_payload(data)
 
         return [Location(**data) for data in res]
 
-    def search_trend_closest(self, lat: int, long: int):
+    def search_trend_closest(self, lat: int, long: int) -> Optional[List[Location]]:
         """Search the rend closest to the lat and long.
 
         parameters
@@ -508,7 +542,12 @@ class Client:
         lat: :class:`int`
             If provided with a long parameter the available trend locations will be sorted by distance, nearest to furthest, to the coordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.
         long: :class:`int`
-            If provided with a lat parameter the available trend locations will be sorted by distance, nearest to furthest, to the coordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.        -122.400612831116
+            If provided with a lat parameter the available trend locations will be sorted by distance, nearest to furthest, to the coordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive -122.400612831116
+
+        Returns
+        ---------
+        Optional[List[:class:`Location`]]
+            This method returns a list of :class:`Location` objects.
 
 
         .. versionadded:: 1.5.0
@@ -517,37 +556,47 @@ class Client:
 
         return [Location(**data) for data in res]
 
-    def get_message(self, event_id: ID) -> Optional[DirectMessage]:
-        """Get a direct message through the client message cache. Returns None if the message is not in the cache.
+    def get_user(self, user_id: ID) -> Optional[User]:
+        """Gets a user through the client internal user cache. Return None if the user is not in the cache.
 
         .. note::
-            Note that you can only get the client and the subscriptions users's message.
+            Users will get cache with several conditions:
+                * Users return from a method such as :meth:`Client.fetch_user`.
+                * The client interacts with other users such as dming them, triggering the typing animation, likes the client's tweets etc.
 
         Parameters
         ------------
-        event_id: :class:`ID`
-            The event ID of the Direct Message event that you want to get.
+        user_id: :class:`ID`
+            The ID of a user that you want to get.
+
+        Raises
+        --------
+        ValueError:
+            Raised when the user_id argument is not an integer or a string of digits.
 
         Returns
         ---------
-        :class:`DirectMessage`
-            This method returns a :class:`DirectMessage` object.
+        :class:`User`
+            This method returns a :class:`User` object or None if the user was not found.
 
 
-        .. versionadded:: 1.2.0
+        .. versionadded:: 1.5.0
         """
         try:
-            event_id = int(event_id)
+            user_id = int(user_id)
         except ValueError:
-            raise ValueError("Event id must be an integer or a :class:`str`ing of digits.")
+            raise ValueError("user_id must be an integer or a string of digits.")
 
-        return self.http.message_cache.get(event_id)
+        return self.http.user_cache.get(user_id)
 
     def get_tweet(self, tweet_id: ID) -> Optional[Tweet]:
         """Gets a tweet through the client internal tweet cache. Return None if the tweet is not in the cache.
 
         .. note::
-            Note that you can only get the client and the subscriptions users's tweet.
+            Tweets will get cache with several conditions:
+                * Tweets send by the client.
+                * Tweets send by the subscription users.
+                * Tweets return from a method such as: :meth:`Client.fetch_tweet`
 
         Parameters
         ------------
@@ -573,6 +622,35 @@ class Client:
             raise ValueError("tweet_id must be an integer or a string of digits.")
 
         return self.http.tweet_cache.get(tweet_id)
+
+    def get_message(self, event_id: ID) -> Optional[DirectMessage]:
+        """Get a direct message through the client message cache. Returns None if the message is not in the cache.
+
+        .. note::
+            Messages will get cache with several conditions:
+                * Messages send by the client.
+                * Messages send by the subscription users.
+                * Messages return from a method such as: :meth:`Client.fetch_message`
+
+        Parameters
+        ------------
+        event_id: :class:`ID`
+            The event ID of the Direct Message event that you want to get.
+
+        Returns
+        ---------
+        :class:`DirectMessage`
+            This method returns a :class:`DirectMessage` object.
+
+
+        .. versionadded:: 1.2.0
+        """
+        try:
+            event_id = int(event_id)
+        except ValueError:
+            raise ValueError("Event id must be an integer or a :class:`str`ing of digits.")
+
+        return self.http.message_cache.get(event_id)
 
     def create_custom_profile(self, name: str, file: File) -> Optional[CustomProfile]:
         """Create a custom profile

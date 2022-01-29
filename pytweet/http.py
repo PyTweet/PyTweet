@@ -34,6 +34,8 @@ from .constants import (
     TWEET_FIELD,
     USER_FIELD,
     TOPIC_FIELD,
+    LIST_FIELD, 
+    LIST_EXPANSION
 )
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser
@@ -41,6 +43,8 @@ from .space import Space
 from .tweet import Tweet
 from .user import User, ClientAccount
 from .threads import ThreadManager
+from .relations import RelationUpdate
+from .list import List as TwitterList
 
 if TYPE_CHECKING:
     from .type import ID, Payload, ResponsePayload
@@ -563,7 +567,7 @@ class HTTPClient:
         )
         return Space(res, http_client=self)
 
-    def fetch_space_bytitle(self, title: str, state: SpaceState = SpaceState.live) -> Space:
+    def fetch_spaces_bytitle(self, title: str, state: SpaceState = SpaceState.live) -> Space:
         res = self.request(
             "GET",
             "2",
@@ -576,7 +580,21 @@ class HTTPClient:
                 "topic.fields": TOPIC_FIELD,
             },
         )
-        return Space(res, http_client=self)
+        return [Space(data, http_client=self) for data in res]
+
+    def fetch_list(self, id: ID) -> TwitterList:
+        res = self.request(
+            "GET",
+            "2",
+            f"/lists/{id}",
+            auth=True,
+            params={
+                "expansions": LIST_EXPANSION,
+                "list.fields": LIST_FIELD,
+                "user.fields": USER_FIELD,
+            },
+        )
+        return TwitterList(res, http_client=self)
 
     def handle_events(self, payload: Payload):
         if payload.get("direct_message_events"):
@@ -847,6 +865,34 @@ class HTTPClient:
         res = self.request("POST", "2", "/tweets", json=payload, auth=True)
         data = res.get("data")
         return Message(data.get("text"), data.get("id"), 1)
+
+    def create_list(self, name: str, *,description: str = "", private: bool = False) -> Optional[TwitterList]:
+        res = self.request(
+            "POST",
+            "2",
+            "/lists",
+            auth=True,
+            json={
+                "name": name,
+                "description": description,
+                "private": private
+            }
+        )
+        return TwitterList(res, http_client=self)
+
+    def update_list(self, list_id: int, *,name: Optional[str] = None, description: str = "", private: Optional[bool] = None) -> Optional[RelationUpdate]:
+        res = self.request(
+            "PUT",
+            "2",
+            f"/lists/{list_id}",
+            auth=True,
+            json={
+                "name": name,
+                "description": description,
+                "private": private
+            }
+        )
+        return RelationUpdate(res)
 
     def create_custom_profile(self, name: str, file: File) -> Optional[CustomProfile]:
         file = self.quick_upload(file)
