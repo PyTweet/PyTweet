@@ -7,6 +7,9 @@ class RelationsTypeEnum(Enum):
     LIKED = 2
     RETWEETED = 3
     HIDE = 4
+    UPDATED = 5
+    DELETED = 6
+    PINNED = 7
     NULL = None
 
 
