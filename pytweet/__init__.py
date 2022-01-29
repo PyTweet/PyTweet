@@ -25,7 +25,7 @@ from .http import *
 from .list import *
 from .message import *
 from .metrics import *
-from .pagination import *
+from .paginations import *
 from .parsers import *
 from .relations import *
 from .space import *
