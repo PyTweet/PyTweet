@@ -9,7 +9,7 @@ from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import time_parse_todt
 from .dataclass import UserSettings, SleepTimeSettings, Location, TimezoneInfo
-from .pagination import UserPagination, TweetPagination, ListPagination
+from .paginations import UserPagination, TweetPagination, ListPagination
 from .list import List as TwitterList
 
 if TYPE_CHECKING:
