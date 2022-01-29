@@ -2,14 +2,15 @@ from __future__ import annotations
 
 import io
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, NoReturn, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, NoReturn, Optional, Union, List
 
-from .constants import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_EXPANSION, TWEET_FIELD, USER_FIELD
+from .constants import TWEET_EXPANSION, LIST_EXPANSION, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_FIELD, USER_FIELD, LIST_FIELD
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import time_parse_todt
 from .dataclass import UserSettings, SleepTimeSettings, Location, TimezoneInfo
-from .pagination import UserPagination, TweetPagination
+from .pagination import UserPagination, TweetPagination, ListPagination
+from .list import List as TwitterList
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -240,8 +241,7 @@ class User:
             return []
         return UserPagination(
             following,
-            User,
-            f"/users/{self.id}/followers",
+            endpoint_request=f"/users/{self.id}/followers",
             http_client=self.http_client,
             params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
         )
@@ -268,8 +268,7 @@ class User:
             return []
         return UserPagination(
             following,
-            User,
-            f"/users/{self.id}/following",
+            endpoint_request=f"/users/{self.id}/following",
             http_client=self.http_client,
             params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
         )
@@ -297,8 +296,7 @@ class User:
             return []
         return UserPagination(
             blockers,
-            User,
-            f"/users/{self.id}/blocking",
+            endpoint_request=f"/users/{self.id}/blocking",
             http_client=self.http_client,
             params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
         )
@@ -327,8 +325,7 @@ class User:
 
         return UserPagination(
             muters,
-            User,
-            f"/users/{self.id}/muting",
+            endpoint_request=f"/users/{self.id}/muting",
             http_client=self.http_client,
             params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
         )
@@ -368,8 +365,6 @@ class User:
 
         .. versionadded:: 1.3.5
         """
-        from .tweet import Tweet  # Avoid circular import error.
-
         if (
             not isinstance(start_time, datetime.datetime)
             and start_time
@@ -409,8 +404,7 @@ class User:
             return []
         return TweetPagination(
             res,
-            Tweet,
-            f"/users/{self.id}/tweets" if not mentioned else f"/users/{self.id}",
+            endpoint_request=f"/users/{self.id}/tweets" if not mentioned else f"/users/{self.id}",
             http_client=self.http_client,
             params=params,
         )
@@ -420,8 +414,6 @@ class User:
 
         .. versionadded:: 1.5.0
         """
-        from .tweet import Tweet  # Avoid circular import error.
-
         params = {
             "expansions": TWEET_EXPANSION,
             "user.fields": USER_FIELD,
@@ -442,14 +434,13 @@ class User:
             return []
         return TweetPagination(
             res,
-            Tweet,
-            f"/users/{self.id}/liked_tweets",
+            endpoint_request=f"/users/{self.id}/liked_tweets",
             http_client=self.http_client,
             params=params,
         )
 
     def fetch_pinned_tweet(self) -> Optional[Tweet]:
-        """Fetches the user's pinned tweet if :meth:`User.pinned_tweet` returns None.
+        """Fetches the user's pinned tweet, consider using this method if :meth:`User.pinned_tweet` returns None.
 
         Returns
         ---------
@@ -461,6 +452,70 @@ class User:
         """
         id = self._payload.get("pinned_tweet_id")
         return self.http_client.fetch_tweet(int(id)) if id else None
+
+    def fetch_lists(self) -> Optional[List[TwitterList]]:
+        """Fetches the user's lists
+        
+        Returns
+        ---------
+        Optional[List[:class:`List`]]
+            This method returns a list of :class:`List` objects.
+
+
+        .. versionadded:: 1.5.0
+        """
+        params = {
+            "expansions": LIST_EXPANSION,
+            "list.fields": LIST_FIELD,
+            "user.fields": USER_FIELD
+        }
+
+        res = self.http_client.request(
+            "GET",
+            "2",
+            f"/users/{self.id}/owned_lists",
+            params=params
+        )
+
+        if not res:
+            return []
+
+        return ListPagination(
+            res,
+            endpoint_request=f"/users/{self.id}/owned_lists",
+            http_client=self.http_client,
+            params=params,
+        )
+
+    def fetch_pinned_lists(self) -> Optional[List[TwitterList]]:
+        """Fetches the user's pinned lists, returns an empty list if not found
+        
+        Returns
+        ---------
+        Optional[List[:class:`List`]]:
+            This method returns a list of :class:`List` objects.
+
+
+        .. versionadded:: 1.5.0
+        """
+        res = self.http_client.request(
+            "GET",
+            "2",
+            f"/users/{self.id}/pinned_lists",
+            auth=True,
+            params={
+                "expansions": LIST_EXPANSION,
+                "user.fields": USER_FIELD,
+                "list.fields": LIST_FIELD
+            }
+        )
+        if not res:
+            return None
+
+        for data in res["data"]:
+            self.http_client.payload_parser.insert_list_owner(data, self)
+
+        return [TwitterList(data, http_client=self.http_client) for data in res["data"]]
 
     @property
     def name(self) -> str:
@@ -704,13 +759,16 @@ class ClientAccount(User):
         """
         res = self.http_client.request("GET", "1.1", "/account/settings.json", auth=True)
         if res.get("sleep_time"):
-            res = self.http_client.event_parser.payload_parser.parse_sleep_time_payload(res)
+            sleep_time = self.http_client.payload_parser.parse_sleep_time_payload(res.get("sleep_time"))
+            res["sleep_time"] = sleep_time
 
         if res.get("location"):
-            res = self.http_client.event_parser_payload_parser.parse_trend_location_payload(res)
+            location = self.http_client.payload_parser.parse_trend_location_payload(res.get("location"))
+            res["location"] = location
 
         if res.get("time_zone"):
-            res = self.http_client.event_parser_payload_parser.parse_time_zone_payload(res)
+            time_zone = self.http_client.payload_parser.parse_time_zone_payload(res.get("time_zone"))
+            res["time_zone"] = time_zone
 
         return UserSettings(**res)
 
@@ -784,7 +842,7 @@ class ClientAccount(User):
             },
             auth=True,
         )
-        data = self.http_client.event_parser.payload_parser.parse_user_payload(res)
+        data = self.http_client.payload_parser.parse_user_payload(res)
         return ClientAccount(data, http_client=self.http_client)
 
     def update_profile_banner(
