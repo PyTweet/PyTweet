@@ -15,16 +15,18 @@ if TYPE_CHECKING:
 
 __all__ = ("List",)
 
+
 class List:
     """Represents a Twitter List object
 
     A Twitter List is a curated group of accounts. Create one or subscribe to a list created by others to streamline your timeline.
-    
+
     .. versionadded:: 1.5.0
     """
+
     __slots__ = ("__original_payload", "_payload", "http_client")
 
-    def __init__(self, data: Payload, *,http_client: HTTPClient):
+    def __init__(self, data: Payload, *, http_client: HTTPClient):
         self.__original_payload = data
         self._payload = self.__original_payload.get("data") or self.__original_payload
         self.http_client = http_client
@@ -35,7 +37,7 @@ class List:
     @property
     def name(self) -> str:
         """`str`: Returns the list's name
-        
+
         .. versionadded:: 1.5.0
         """
         return self._payload.get("name")
@@ -43,7 +45,7 @@ class List:
     @property
     def id(self) -> ID:
         """`ID`: Returns the list's id
-        
+
         .. versionadded:: 1.5.0
         """
         return int(self._payload.get("id"))
@@ -51,7 +53,7 @@ class List:
     @property
     def description(self) -> Optional[str]:
         """Optional[:class:`str`]: Returns the list's description or None if the list doesn't have one.
-        
+
         .. versionadded:: 1.5.0
         """
         description = self._payload.get("description")
@@ -60,10 +62,11 @@ class List:
     @property
     def owner(self) -> Optional[User]:
         """:class:`User`: Returns the list's owner in a user object
-        
+
         .. versionadded:: 1.5.0
         """
-        from .user import User #Avoid circular import error
+        from .user import User  # Avoid circular import error
+
         user_data = self.__original_payload.get("includes").get("users")
         if user_data:
             return User(user_data[0], http_client=self.http_client)
@@ -80,7 +83,7 @@ class List:
     @property
     def private(self) -> bool:
         """:class:`bool`: Returns True if the list is private else False.
-        
+
         .. versionadded:: 1.5.0
         """
         return self._payload.get("private")
@@ -88,7 +91,7 @@ class List:
     @property
     def member_count(self) -> int:
         """:class:`int`: Returns then number of users who are a member of the List.
-        
+
         .. versionadded:: 1.5.0
         """
         return int(self._payload.get("member_count"))
@@ -96,7 +99,7 @@ class List:
     @property
     def follower_count(self) -> int:
         """:class:`int`: Returns the number of users who follow the List.
-        
+
         .. versionadded:: 1.5.0
         """
         return int(self._payload.get("follower_count"))
@@ -104,14 +107,14 @@ class List:
     @property
     def url(self) -> str:
         """:class:`str`: Returns the list's url.
-        
+
         .. versionadded:: 1.5.0
         """
         return f"https://twitter.com/i/lists/{self.id}"
 
     def fetch_tweets(self) -> TweetPagination:
         """Fetches tweets from the list.
-        
+
 
         .. versionadded:: 1.5.0
         """
@@ -138,7 +141,9 @@ class List:
             params=params,
         )
 
-    def update(self, *,name: Optional[str] = None, description: Optional[str] = None, private: Optional[bool] = None) -> Optional[RelationUpdate]:
+    def update(
+        self, *, name: Optional[str] = None, description: Optional[str] = None, private: Optional[bool] = None
+    ) -> Optional[RelationUpdate]:
         """Updates the list.
 
         Paramaters
@@ -150,15 +155,10 @@ class List:
         private: :class:`bool`
             Determine whether the List should be private, default to None.
 
-        
+
         .. versionadded:: 1.5.0
         """
-        return self.http_client.update_list(
-            self.id,
-            name=name,
-            description=description,
-            private=private
-        )
+        return self.http_client.update_list(self.id, name=name, description=description, private=private)
 
     def delete(self) -> Optional[RelationDelete]:
         """Deletes the list.
@@ -167,16 +167,11 @@ class List:
         ---------
         Optional[:class:`RelationDelete`]
             This method returns a :class:`RelationDelete` object.
-        
-        
+
+
         .. versionadded:: 1.5.0
         """
-        res = self.http_client.request(
-            "DELETE",
-            "2",
-            f"/lists/{self.id}",
-            auth=True
-        )
+        res = self.http_client.request("DELETE", "2", f"/lists/{self.id}", auth=True)
         return RelationDelete(res)
 
     def pin(self) -> Optional[RelationPin]:
@@ -186,39 +181,28 @@ class List:
         ---------
         Optional[:class:`RelationPin`]
             This method returns a :class:`RelationPin` object.
-        
+
 
         .. versionadded:: 1.5.0
         """
         res = self.http_client.request(
-            "POST",
-            "2",
-            f"/users/{self.owner.id}/pinned_lists",
-            auth=True,
-            json={
-                "list_id": str(self.id)
-            }
+            "POST", "2", f"/users/{self.owner.id}/pinned_lists", auth=True, json={"list_id": str(self.id)}
         )
 
         return RelationPin(res)
 
     def unpin(self) -> Optional[RelationPin]:
-        """Unpins the list. 
-        
+        """Unpins the list.
+
 
         Returns
         ---------
         Optional[:class:`RelationPin`]
             This method returns a :class:`RelationPin` object.
-        
+
 
         .. versionadded:: 1.5.0
         """
-        res = self.http_client.request(
-            "DELETE",
-            "2",
-            f"/users/{self.owner.id}/pinned_lists/{self.id}",
-            auth=True
-        )
+        res = self.http_client.request("DELETE", "2", f"/users/{self.owner.id}/pinned_lists/{self.id}", auth=True)
 
         return RelationPin(res)

@@ -25,11 +25,13 @@ if TYPE_CHECKING:
 
 __all__ = ("PayloadParser", "EventParser")
 
+
 class PayloadParser:
     __slots__ = "http_client"
 
     def __init__(self, http_client: HTTPClient):
         self.http_client = http_client
+
     def parse_user_payload(self, payload: Payload):
         copy = payload.copy()
         copy["public_metrics"] = {
@@ -100,7 +102,6 @@ class PayloadParser:
             fulldata[index]["includes"] = {}
             fulldata[index]["includes"]["users"] = [payload.get("includes", {}).get("users", [None])[0]]
         return fulldata
-
 
 
 class EventParser:

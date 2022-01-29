@@ -117,6 +117,7 @@ def compose_tweet_action(tweet_id: ID, action: str = None):
         else f"https://twitter.com/intent/tweet?in_reply_to={tweet_id}"
     )
 
+
 def sift(iterable: Iterable, **conditions: Any):
     results = []
     for item in iterable:
@@ -131,8 +132,8 @@ def sift(iterable: Iterable, **conditions: Any):
 
             if not result:
                 raise AttributeError(f"'{item.__class__.__name__}' object has no attribute '{real_condition}'")
-            
+
             if result == value:
                 results.append(result)
-      
+
     return results

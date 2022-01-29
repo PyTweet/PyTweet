@@ -10,7 +10,7 @@ __all__ = (
     "RelationHide",
     "RelationUpdate",
     "RelationPin",
-    "RelationDelete"
+    "RelationDelete",
 )
 
 
@@ -141,11 +141,13 @@ class RelationHide(Relation):
         """
         return self._payload.get("hidden")
 
+
 class RelationUpdate(Relation):
     """Represents an update relation that gets return from :meth:`List.update`.
 
     .. versionadded:: 1.5.0
     """
+
     __slots__ = ("__original_payload", "_payload")
 
     def __init__(self, data: Dict[str, Any]):
@@ -164,11 +166,13 @@ class RelationUpdate(Relation):
         """
         return self._payload.get("updated")
 
+
 class RelationPin(Relation):
     """Represents a pin relation that gets return from :meth:`List.pin`.
 
     .. versionadded:: 1.5.0
     """
+
     __slots__ = ("__original_payload", "_payload")
 
     def __init__(self, data: Dict[str, Any]):
@@ -187,6 +191,7 @@ class RelationPin(Relation):
         """
         return self._payload.get("pinned")
 
+
 class RelationDelete(Relation):
     """Represents a delete relation that gets return from:
 
@@ -195,6 +200,7 @@ class RelationDelete(Relation):
 
     .. versionadded:: 1.5.0
     """
+
     __slots__ = ("__original_payload", "_payload")
 
     def __init__(self, data: Dict[str, Any]):

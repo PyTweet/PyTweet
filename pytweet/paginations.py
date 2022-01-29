@@ -14,9 +14,24 @@ class Pagination:
 
     .. versionadded:: 1.5.0
     """
-    __slots__ = ("__original_payload", "_payload", "_meta", "_next_token", "_previous_token", "_count", "_paginate_over", "_current_page_number", "_params", "item_type", "endpoint_request", "http_client", "pages_cache")
 
-    def __init__(self, data: Payload, *,item_type: Any, endpoint_request: str, http_client: HTTPClient, **kwargs: Any):
+    __slots__ = (
+        "__original_payload",
+        "_payload",
+        "_meta",
+        "_next_token",
+        "_previous_token",
+        "_count",
+        "_paginate_over",
+        "_current_page_number",
+        "_params",
+        "item_type",
+        "endpoint_request",
+        "http_client",
+        "pages_cache",
+    )
+
+    def __init__(self, data: Payload, *, item_type: Any, endpoint_request: str, http_client: HTTPClient, **kwargs: Any):
         self.__original_payload = data
         self._payload = self.__original_payload.get("data")
         self._meta = self.__original_payload.get("meta")
@@ -129,8 +144,10 @@ class UserPagination(Pagination):
 
     .. versionadded:: 1.5.0
     """
+
     def __init__(self, data, **kwargs):
-        from .user import User #Avoid circular import error.
+        from .user import User  # Avoid circular import error.
+
         super().__init__(data, item_type=User, **kwargs)
 
     def next_page(self):
@@ -214,8 +231,10 @@ class TweetPagination(Pagination):
 
     .. versionadded:: 1.5.0
     """
+
     def __init__(self, data, **kwargs):
-        from .tweet import Tweet #Avoid circular import error.
+        from .tweet import Tweet  # Avoid circular import error.
+
         super().__init__(data, item_type=Tweet, **kwargs)
 
     # def _insert_author(self):
@@ -235,7 +254,10 @@ class TweetPagination(Pagination):
         .. versionadded:: 1.5.0
         """
 
-        return [self.item_type(data, http_client=self.http_client) for data in self.http_client.payload_parser.insert_tweet_pagination_author(self.original_payload)]
+        return [
+            self.item_type(data, http_client=self.http_client)
+            for data in self.http_client.payload_parser.insert_tweet_pagination_author(self.original_payload)
+        ]
 
     def next_page(self):
         """Change page to the next page.
@@ -311,14 +333,17 @@ class TweetPagination(Pagination):
         if not previous_content[0] == self.content[0]:
             self.pages_cache[len(self.pages_cache) + 1] = {tweet.id: tweet for tweet in self.content}
 
+
 class ListPagination(Pagination):
     """Represents a pagination that handles list objects. This inherits :class:`Pagination`. Only :meth:`User.fetch_lists` returns this Pagination object.
 
 
     .. versionadded:: 1.5.0
     """
+
     def __init__(self, data, **kwargs):
-        from .list import List as TwitterList #Avoid circular import error
+        from .list import List as TwitterList  # Avoid circular import error
+
         super().__init__(data, item_type=TwitterList, **kwargs)
 
     def _insert_owner(self):
@@ -375,7 +400,9 @@ class ListPagination(Pagination):
         self._count = 0
 
         if not previous_content[0] == self.content[0]:
-            self.pages_cache[len(self.pages_cache) + 1] = {_TwitterList.id: _TwitterList for _TwitterList in self.content}
+            self.pages_cache[len(self.pages_cache) + 1] = {
+                _TwitterList.id: _TwitterList for _TwitterList in self.content
+            }
 
     def previous_page(self):
         """Change page to the previous page.
@@ -412,4 +439,6 @@ class ListPagination(Pagination):
         self._count = 0
 
         if not previous_content[0] == self.content[0]:
-            self.pages_cache[len(self.pages_cache) + 1] = {_TwitterList.id: _TwitterList for _TwitterList in self.content}
+            self.pages_cache[len(self.pages_cache) + 1] = {
+                _TwitterList.id: _TwitterList for _TwitterList in self.content
+            }

@@ -4,7 +4,16 @@ import io
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, NoReturn, Optional, Union, List
 
-from .constants import TWEET_EXPANSION, LIST_EXPANSION, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_FIELD, USER_FIELD, LIST_FIELD
+from .constants import (
+    TWEET_EXPANSION,
+    LIST_EXPANSION,
+    MEDIA_FIELD,
+    PLACE_FIELD,
+    POLL_FIELD,
+    TWEET_FIELD,
+    USER_FIELD,
+    LIST_FIELD,
+)
 from .metrics import UserPublicMetrics
 from .relations import RelationFollow
 from .utils import time_parse_todt
@@ -455,7 +464,7 @@ class User:
 
     def fetch_lists(self) -> Optional[List[TwitterList]]:
         """Fetches the user's lists
-        
+
         Returns
         ---------
         Optional[List[:class:`List`]]
@@ -464,18 +473,9 @@ class User:
 
         .. versionadded:: 1.5.0
         """
-        params = {
-            "expansions": LIST_EXPANSION,
-            "list.fields": LIST_FIELD,
-            "user.fields": USER_FIELD
-        }
+        params = {"expansions": LIST_EXPANSION, "list.fields": LIST_FIELD, "user.fields": USER_FIELD}
 
-        res = self.http_client.request(
-            "GET",
-            "2",
-            f"/users/{self.id}/owned_lists",
-            params=params
-        )
+        res = self.http_client.request("GET", "2", f"/users/{self.id}/owned_lists", params=params)
 
         if not res:
             return []
@@ -489,7 +489,7 @@ class User:
 
     def fetch_pinned_lists(self) -> Optional[List[TwitterList]]:
         """Fetches the user's pinned lists, returns an empty list if not found
-        
+
         Returns
         ---------
         Optional[List[:class:`List`]]:
@@ -503,11 +503,7 @@ class User:
             "2",
             f"/users/{self.id}/pinned_lists",
             auth=True,
-            params={
-                "expansions": LIST_EXPANSION,
-                "user.fields": USER_FIELD,
-                "list.fields": LIST_FIELD
-            }
+            params={"expansions": LIST_EXPANSION, "user.fields": USER_FIELD, "list.fields": LIST_FIELD},
         )
         if not res:
             return None

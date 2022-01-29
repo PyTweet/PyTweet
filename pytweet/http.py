@@ -34,8 +34,8 @@ from .constants import (
     TWEET_FIELD,
     USER_FIELD,
     TOPIC_FIELD,
-    LIST_FIELD, 
-    LIST_EXPANSION
+    LIST_FIELD,
+    LIST_EXPANSION,
 )
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser
@@ -866,31 +866,21 @@ class HTTPClient:
         data = res.get("data")
         return Message(data.get("text"), data.get("id"), 1)
 
-    def create_list(self, name: str, *,description: str = "", private: bool = False) -> Optional[TwitterList]:
+    def create_list(self, name: str, *, description: str = "", private: bool = False) -> Optional[TwitterList]:
         res = self.request(
-            "POST",
-            "2",
-            "/lists",
-            auth=True,
-            json={
-                "name": name,
-                "description": description,
-                "private": private
-            }
+            "POST", "2", "/lists", auth=True, json={"name": name, "description": description, "private": private}
         )
         return TwitterList(res, http_client=self)
 
-    def update_list(self, list_id: int, *,name: Optional[str] = None, description: str = "", private: Optional[bool] = None) -> Optional[RelationUpdate]:
+    def update_list(
+        self, list_id: int, *, name: Optional[str] = None, description: str = "", private: Optional[bool] = None
+    ) -> Optional[RelationUpdate]:
         res = self.request(
             "PUT",
             "2",
             f"/lists/{list_id}",
             auth=True,
-            json={
-                "name": name,
-                "description": description,
-                "private": private
-            }
+            json={"name": name, "description": description, "private": private},
         )
         return RelationUpdate(res)
 

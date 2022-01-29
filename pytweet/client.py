@@ -436,7 +436,7 @@ class Client:
         """
         return self.http.create_welcome_message(name=name, text=text, file=file, quick_reply=quick_reply, cta=cta)
 
-    def create_list(self, name: str, *,description: str = "", private: bool = False) -> Optional[TwitterList]:
+    def create_list(self, name: str, *, description: str = "", private: bool = False) -> Optional[TwitterList]:
         """Create a new list.
 
         Paramaters
@@ -448,7 +448,7 @@ class Client:
         private: :class:`bool`
             Determine whether the List should be private, default to False.
 
-        
+
         .. versionadded:: 1.5.0
         """
         return self.http.create_list(name, description=description, private=private)
@@ -502,7 +502,7 @@ class Client:
             "where on earth identifier" or WOEID, which is a legacy identifier created by Yahoo and has been deprecated. Twitter API v1.1 still uses the numeric value to identify town and country trend locations. Example WOEID locations include: Worldwide: 1 UK: 23424975 Brazil: 23424768 Germany: 23424829 Mexico: 23424900 Canada: 23424775 United States: 23424977 New York: 2459115.
         exclude: Optional[:class:`str`]
             Setting this equal to hashtags will remove all hashtags from the trends list.
-        
+
         Returns
         ---------
         Optional[List[:class:`Trend`]]
@@ -529,7 +529,7 @@ class Client:
         .. versionadded:: 1.5.0
         """
         res = self.http.request("GET", "1.1", "/trends/available.json", auth=True)
-        for index, data in enumerate(res): 
+        for index, data in enumerate(res):
             res[index] = self.http.payload_parser.parse_trend_location_payload(data)
 
         return [Location(**data) for data in res]
