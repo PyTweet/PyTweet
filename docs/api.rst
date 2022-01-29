@@ -69,12 +69,6 @@ User
 .. autoclass:: User()
     :members:
 
-ClientAccount
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: ClientAccount()
-    :members:
-    :inherited-members:
 
 Tweet
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,11 +77,27 @@ Tweet
     :members:
     :inherited-members:
 
+
 Space
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Space()
     :members:
+
+
+List
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: List()
+    :members:
+
+
+ClientAccount
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ClientAccount()
+    :members:
+    :inherited-members:
 
 
 Message
