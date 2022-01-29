@@ -6,13 +6,13 @@ from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 from .attachments import Poll, Geo, File
 from .entities import Media
 from .enums import ReplySetting
-from .constants import TWEET_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, USER_FIELD
+from .constants import TWEET_FIELD, USER_FIELD
 from .metrics import TweetPublicMetrics
-from .relations import RelationHide, RelationLike, RelationRetweet
+from .relations import RelationHide, RelationLike, RelationRetweet, RelationDelete
 from .user import User
 from .utils import time_parse_todt
 from .message import Message
-from .pagination import UserPagination
+from .paginations import UserPagination
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -479,7 +479,7 @@ class Tweet(Message):
 
         return RelationRetweet(res)
 
-    def delete(self) -> None:
+    def delete(self) -> RelationDelete:
         """Delete the client's tweet.
 
         .. note::
@@ -487,13 +487,14 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.0
         """
-
-        self.http_client.request("DELETE", "2", f"/tweets/{self.id}", auth=True)
+        res = self.http_client.request("DELETE", "2", f"/tweets/{self.id}", auth=True)
 
         try:
             self.http_client.tweet_cache.pop(self.id)
         except KeyError:
             pass
+
+        return RelationDelete(res)
 
     def reply(
         self,
