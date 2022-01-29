@@ -17,12 +17,19 @@ from .user import User
 from .app import ApplicationInfo
 from .tweet import Tweet
 from .dataclass import TimezoneInfo, Location, SleepTimeSettings
+from .list import List as TwitterList
 
 if TYPE_CHECKING:
     from .type import Payload
+    from .http import HTTPClient
 
+__all__ = ("PayloadParser", "EventParser")
 
 class PayloadParser:
+    __slots__ = "http_client"
+
+    def __init__(self, http_client: HTTPClient):
+        self.http_client = http_client
     def parse_user_payload(self, payload: Payload):
         copy = payload.copy()
         copy["public_metrics"] = {
@@ -60,35 +67,47 @@ class PayloadParser:
         return copy
 
     def parse_time_zone_payload(self, payload: Payload):
-        copy = payload.copy
-        _timezone = copy.get("time_zone")
-        _timezone["name_info"] = _timezone.get("tzinfo_name")
-        _timezone.pop("tzinfo_name")
-        copy["timezone"] = TimezoneInfo(**copy.get("time_zone"))
-        copy.pop("time_zone")
-        return copy
+        payload["name_info"] = payload.get("tzinfo_name")
+        payload["timezone"] = TimezoneInfo(**payload.get("time_zone"))
+        payload.pop("time_zone")
+        payload.pop("tzinfo_name")
+        return payload
 
     def parse_trend_location_payload(self, payload: Payload):
-        copy = payload.copy()["trend_location"]
-        copy["place_type"] = copy["placeType"]
-        copy["country_code"] = copy["countryCode"]
-        copy.pop("placeType")
-        copy.pop("countryCode")
-        copy["location"] = Location(**copy)
-        return copy
+        payload["place_type"] = payload["placeType"]
+        payload["country_code"] = payload["countryCode"]
+        payload.pop("placeType")
+        payload.pop("countryCode")
+        payload.pop("parentid")
+        payload["location"] = Location(**payload)
+        return payload
 
     def parse_sleep_time_payload(self, payload: Payload):
-        copy = payload.copy()
-        copy["sleep_time_setting"] = SleepTimeSettings(**copy["sleep_time"])
-        copy.pop("sleep_time")
-        return copy
+        payload["sleep_time_setting"] = SleepTimeSettings(**payload["sleep_time"])
+        payload.pop("sleep_time")
+        return payload
+
+    def insert_list_owner(self, payload: Payload, owner: User) -> Payload:
+        payload["includes"] = {}
+        payload["includes"]["users"] = [owner._payload]
+        return payload
+
+    def insert_tweet_pagination_author(self, payload: Payload) -> list:
+        fulldata = []
+        for index, data in enumerate(payload["data"]):
+            fulldata.append({})
+            fulldata[index]["data"] = data
+            fulldata[index]["includes"] = {}
+            fulldata[index]["includes"]["users"] = [payload.get("includes", {}).get("users", [None])[0]]
+        return fulldata
+
 
 
 class EventParser:
     __slots__ = ("payload_parser", "http_client", "client_id")
 
-    def __init__(self, http_client: object):
-        self.payload_parser = PayloadParser()
+    def __init__(self, http_client: HTTPClient):
+        self.payload_parser = PayloadParser(http_client)
         self.http_client = http_client
         self.client_id = int(self.http_client.access_token.partition("-")[0])
 
