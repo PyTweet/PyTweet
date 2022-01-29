@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Optional
 
 from .type import ID, Payload
 from .utils import time_parse_todt
-from .pagination import TweetPagination
+from .paginations import TweetPagination
 from .constants import TWEET_EXPANSION, USER_FIELD, TWEET_FIELD
 from .relations import RelationUpdate, RelationDelete, RelationPin
 
