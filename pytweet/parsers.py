@@ -94,7 +94,7 @@ class PayloadParser:
         payload["includes"]["users"] = [owner._payload]
         return payload
 
-    def insert_tweet_pagination_author(self, payload: Payload) -> list:
+    def insert_pagination_object_author(self, payload: Payload) -> list:
         fulldata = []
         for index, data in enumerate(payload["data"]):
             fulldata.append({})
