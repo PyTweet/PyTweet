@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 from .attachments import Poll, Geo, File
 from .entities import Media
@@ -188,34 +188,19 @@ class Tweet(Message):
 
     __slots__ = ("__original_payload", "_payload", "_includes", "tweet_metrics", "http_client", "deleted_timestamp")
 
-    if TYPE_CHECKING:
-        _payload: Dict[Any, Any]
-        __original_payload: Dict[str, Any]
-        _includes: Any
-
     def __init__(
         self, data: Dict[str, Any], *, deleted_timestamp: Optional[int] = None, http_client: Optional[HTTPClient] = None
     ) -> None:
         self.__original_payload = data
         self._payload = data.get("data") or data
         self._includes = self.__original_payload.get("includes")
-        self.tweet_metrics: TweetPublicMetrics = TweetPublicMetrics(self._payload)
+        self.tweet_metrics = TweetPublicMetrics(self._payload)
         self.http_client = http_client
         self.deleted_timestamp = deleted_timestamp
         super().__init__(self._payload.get("text"), self._payload.get("id"), 1)
 
     def __repr__(self) -> str:
-        return "Tweet(text={0.text} id={0.id} author={0.author})".format(self)
-
-    def __eq__(self, other: Tweet) -> Union[bool, NoReturn]:
-        if not isinstance(other, Tweet):
-            raise ValueError("== operation cannot be done with one of the element not a valid Tweet object")
-        return self.id == other.id
-
-    def __ne__(self, other: Tweet) -> Union[bool, NoReturn]:
-        if not isinstance(other, Tweet):
-            raise ValueError("!= operation cannot be done with one of the element not a valid User object")
-        return self.id != other.id
+        return "Tweet(text={0.text} id={0.id} author={0.author!r})".format(self)
 
     @property
     def author(self) -> Optional[User]:
@@ -258,7 +243,7 @@ class Tweet(Message):
         """Optional[:class:`datetime.datetime`]: Return a :class:`datetime.datetime` object when the tweet was deleted. Returns None when the tweet is not deleted.
 
         .. note::
-            This property can only be access through `on_tweet_delete` event and if the tweet was not deleted or it isn't in the client tweet cache, it returns None.
+            This property can only returns :class:`datetime.datetime` object through a tweet object from `on_tweet_delete` event.
 
         .. versionadded: 1.5.0
         """
@@ -300,7 +285,7 @@ class Tweet(Message):
 
     @property
     def conversation_id(self) -> Optional[int]:
-        """Optional[:class:`int`]: All replied are bind to the original tweet, this property returns the tweet's id if the tweet count as reply tweet else it returns None.
+        """Optional[:class:`int`]: All replies are bind to the original tweet, this property returns the tweet's id if the tweet is a reply tweet else it returns None.
 
         .. versionadded: 1.0.0
         """
@@ -603,8 +588,7 @@ class Tweet(Message):
 
         return UserPagination(
             res,
-            User,
-            f"/tweets/{self.id}/retweeted_by",
+            endpoint_request=f"/tweets/{self.id}/retweeted_by",
             http_client=self.http_client,
             params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
         )
@@ -632,8 +616,7 @@ class Tweet(Message):
 
         return UserPagination(
             res,
-            User,
-            f"/tweets/{self.id}/liking_users",
+            endpoint_request=f"/tweets/{self.id}/liking_users",
             http_client=self.http_client,
             params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
         )
