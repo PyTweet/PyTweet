@@ -570,7 +570,7 @@ class File:
 
     @property
     def subfiles(self) -> Optional[List[SubFile]]:
-        """Optional[List[:class:`SubFile`]]: Returns a list of the file's subfile.
+        """Optional[List[:class:`SubFile`]]: Returns a list of the file's subfiles.
 
         .. versionadded:: 1.5.0
         """
@@ -578,7 +578,7 @@ class File:
 
 
 class SubFile(File):
-    """Represents a subtitle File for :class:`File`. You can attach one subfile in :class:`File` via subfile arguments. This method inherits :class:`File`.
+    """Represents a subtitle File for :class:`File`. You can attach one subfile in :class:`File` via subfile arguments. This method inherits :class:`File`. Always remembers that twitter only supports srt extension file with the correct timestamps.
 
 
     .. versionadded:: 1.5.0
@@ -649,7 +649,7 @@ class SubFile(File):
 
     @property
     def mimetype(self) -> str:
-        """:class:`str`: Returns the subfile's media category. This always going to be text/srt as the subtitle format.
+        """:class:`str`: Returns the subfile's media category. This always returns 'text/srt'
 
         .. versionadded:: 1.5.0
         """
@@ -657,7 +657,7 @@ class SubFile(File):
 
     @property
     def media_category(self) -> str:
-        """:class:`str`: Returns the subfile's media category. This always going to return 'Subtitles'
+        """:class:`str`: Returns the subfile's media category. This always returns 'Subtitles'.
 
         .. versionadded:: 1.5.0
         """
