@@ -19,6 +19,12 @@ Version Related Info
 .. data:: __version__
 
     Get the version of the module (e.g ``1.0.0`` or ``1.0.0a``) this is based on :pep:`440`.
+    
+
+Hello, world
+=============
+
+.. authorize:: 3
 
 
 Clients

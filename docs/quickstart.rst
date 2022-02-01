@@ -34,7 +34,7 @@ A Basic PyTweet Client
 Name this file ``pytweet_example.py``
 
 Steps to running it
----------------
+-----------------------
 
 * Install pytweet, with ``pip install pytweet``
 

@@ -13,6 +13,7 @@ from .user import User
 from .utils import time_parse_todt
 from .message import Message
 from .paginations import UserPagination
+from .objects import Comparable
 
 if TYPE_CHECKING:
     from .http import HTTPClient

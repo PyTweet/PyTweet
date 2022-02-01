@@ -5,11 +5,12 @@ from .enums import SpaceState
 from .utils import time_parse_todt
 from .user import User
 from .constants import TWEET_EXPANSION, USER_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_FIELD
+from .objects import Comparable
 
 __all__ = ("Space",)
 
 
-class Space:
+class Space(Comparable):
     """Represents a twitter space.
 
     .. versionadded:: 1.3.5
@@ -22,6 +23,7 @@ class Space:
         self._includes = self.__original_payload.get("includes")
         self._payload = self.__original_payload.get("data") or self.__original_payload
         self.http_client = http_client
+        super().__init__(self.id)
 
     def __repr__(self) -> str:
         return "Space(name={0.title} id={0.id} state={0.state})".format(self)
@@ -33,6 +35,14 @@ class Space:
         .. versionadded:: 1.3.5
         """
         return self._payload.get("title")
+
+    @property
+    def id(self) -> str:
+        """:class:`str`: The space's unique id.
+
+        .. versionadded:: 1.3.5
+        """
+        return self._payload.get("id")
 
     @property
     def raw_state(self) -> str:
@@ -49,14 +59,6 @@ class Space:
         .. versionadded:: 1.3.5
         """
         return SpaceState(self.raw_state)
-
-    @property
-    def id(self) -> str:
-        """:class:`str`: The space's unique id.
-
-        .. versionadded:: 1.3.5
-        """
-        return self._payload.get("id")
 
     @property
     def lang(self) -> str:

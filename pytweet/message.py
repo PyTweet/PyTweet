@@ -8,6 +8,7 @@ from .attachments import CTA, File, QuickReply
 from .entities import Hashtag, Symbol, Url, UserMention
 from .enums import MessageEventTypeEnum, MessageTypeEnum
 from .user import User
+from .objects import Comparable
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -16,7 +17,7 @@ if TYPE_CHECKING:
 __all__ = ("Message", "DirectMessage", "WelcomeMessage", "WelcomeMessageRule")
 
 
-class Message:
+class Message(Comparable):
     """Represents the base Message of all Message types in Twitter.
 
     .. versionadded:: 1.2.0
@@ -25,6 +26,7 @@ class Message:
     __slots__ = ("_text", "_id", "_type")
 
     def __init__(self, text: Optional[str], id: ID, type: int):
+        super().__init__(id)
         self._text = text
         self._id = id
         self._type = type

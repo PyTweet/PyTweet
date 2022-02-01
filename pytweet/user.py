@@ -20,6 +20,7 @@ from .utils import time_parse_todt
 from .dataclass import UserSettings, Location
 from .paginations import UserPagination, TweetPagination, ListPagination
 from .list import List as TwitterList
+from .objects import Comparable
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -30,7 +31,7 @@ if TYPE_CHECKING:
     from .attachments import Geo, CTA, CustomProfile, File, QuickReply
 
 
-class User:
+class User(Comparable):
     """Represents a user in Twitter.
     User is an identity in twitter, its very interactive. Can send message, post a tweet, and even send messages to other user through Dms.
 
@@ -61,20 +62,13 @@ class User:
         self._payload = self.__original_payload.get("data") or self.__original_payload
         self.http_client = http_client
         self._metrics = UserPublicMetrics(self._payload) or self.__original_payload
+        super().__init__(self.id)
 
     def __str__(self) -> str:
         return self.username
 
     def __repr__(self) -> str:
         return "User(name={0.name} username={0.username} id={0.id})".format(self)
-
-    def __eq__(self, other: User) -> Union[bool, NoReturn]:
-        if not isinstance(other, User):
-            raise ValueError("== operation cannot be done with one of the element not a valid User object")
-        return self.id == other.id
-
-    def __ne__(self, other: User) -> Union[bool, NoReturn]:
-        return not self.__eq__(other)
 
     @property
     def name(self) -> str:

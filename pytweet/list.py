@@ -8,6 +8,7 @@ from .utils import time_parse_todt
 from .paginations import UserPagination, TweetPagination
 from .constants import TWEET_EXPANSION, USER_FIELD, TWEET_FIELD
 from .relations import RelationUpdate, RelationDelete, RelationPin
+from .objects import Comparable
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -16,7 +17,7 @@ if TYPE_CHECKING:
 __all__ = ("List",)
 
 
-class List:
+class List(Comparable):
     """Represents a Twitter List object
 
     A Twitter List is a curated group of accounts. Create one or subscribe to a list created by others to streamline your timeline.
@@ -30,6 +31,7 @@ class List:
         self.__original_payload = data
         self._payload = self.__original_payload.get("data") or self.__original_payload
         self.http_client = http_client
+        super().__init__(self.id)
 
     def __repr__(self) -> str:
         return "List(name={0.name} id={0.id} description={0.description} owner={0.owner!r})".format(self)
