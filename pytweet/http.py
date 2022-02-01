@@ -516,7 +516,6 @@ class HTTPClient:
         users = [User(data, http_client=self) for data in res["data"]]
         for user in users:
             self.user_cache[user.id] = user
-
         return users
 
     def fetch_user_by_username(self, username: str) -> Optional[User]:
@@ -556,6 +555,7 @@ class HTTPClient:
 
             tweet = Tweet(res, http_client=self)
             self.tweet_cache[tweet.id] = tweet
+            return tweet
         except NotFoundError:
             return None
 
