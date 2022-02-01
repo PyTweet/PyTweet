@@ -92,11 +92,11 @@ class HTTPClient:
                 raise Unauthorized(None, f"Wrong authorization passed for credential: {k}.")
 
         self.__session = requests.Session()
-        self.bearer_token: Optional[str] = bearer_token
-        self.consumer_key: Optional[str] = consumer_key
-        self.consumer_secret: Optional[str] = consumer_secret
-        self.access_token: Optional[str] = access_token
-        self.access_token_secret: Optional[str] = access_token_secret
+        self.bearer_token = bearer_token
+        self.consumer_key = consumer_key
+        self.consumer_secret = consumer_secret
+        self.access_token = access_token
+        self.access_token_secret = access_token_secret
         self.stream = stream
         self.callback_url = callback_url
         self.client_id = client_id
@@ -505,16 +505,19 @@ class HTTPClient:
             else:
                 str_ids.append(str(id))
 
-        ids = ",".join(str_ids)
         res = self.request(
             "GET",
             "2",
-            f"/users?ids={ids}",
+            f"/users?ids={','.join(str_ids)}",
             params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
             auth=True,
         )
 
-        return [User(data, http_client=self) for data in res["data"]]
+        users = [User(data, http_client=self) for data in res["data"]]
+        for user in users:
+            self.user_cache[user.id] = user
+
+        return users
 
     def fetch_user_by_username(self, username: str) -> Optional[User]:
         if username.startswith("@"):
@@ -528,7 +531,9 @@ class HTTPClient:
                 params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
                 auth=True,
             )
-            return User(data, http_client=self)
+            user = User(data, http_client=self)
+            self.user_cache[user.id] = user
+            return user
         except NotFoundError:
             return None
 
@@ -549,7 +554,8 @@ class HTTPClient:
                 auth=True,
             )
 
-            return Tweet(res, http_client=self)
+            tweet = Tweet(res, http_client=self)
+            self.tweet_cache[tweet.id] = tweet
         except NotFoundError:
             return None
 

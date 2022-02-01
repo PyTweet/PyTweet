@@ -105,10 +105,10 @@ class Client:
         self.webhook: Optional[Webhook] = None
         self.environment: Optional[Environment] = None
         self.webhook_url_path: Optional[str] = None
-        self.thread_manager = self.http.thread_manager
+        self.executor = self.http.thread_manager.create_new_executor(thread_name="main-executor")
 
     def __repr__(self) -> str:
-        return f"Client({repr(self.account)})"
+        return "Client({0.account!r})".format(self)
 
     @property
     def account(self) -> Optional[User]:
@@ -439,8 +439,8 @@ class Client:
     def create_list(self, name: str, *, description: str = "", private: bool = False) -> Optional[TwitterList]:
         """Create a new list.
 
-        Paramaters
-        -----------
+        Parameters
+        ------------
         name: :class:`str`
             The name of the List you wish to create.
         description: :class:`str`
@@ -811,7 +811,7 @@ class Client:
                     return json.dumps(response)
 
                 json_data = request.get_json()
-                self.http.handle_events(json_data)
+                self.executor.submit(self.http.handle_events, payload=json_data)
                 return ("", HTTPStatus.OK)
 
             check = not self.webhook and self.webhook_url_path

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Optional
 
 from .type import ID, Payload
 from .utils import time_parse_todt
-from .paginations import TweetPagination
+from .paginations import UserPagination, TweetPagination
 from .constants import TWEET_EXPANSION, USER_FIELD, TWEET_FIELD
 from .relations import RelationUpdate, RelationDelete, RelationPin
 
@@ -194,7 +194,6 @@ class List:
     def unpin(self) -> Optional[RelationPin]:
         """Unpins the list.
 
-
         Returns
         ---------
         Optional[:class:`RelationPin`]
@@ -206,3 +205,76 @@ class List:
         res = self.http_client.request("DELETE", "2", f"/users/{self.owner.id}/pinned_lists/{self.id}", auth=True)
 
         return RelationPin(res)
+
+    def add_members(self, *users: User):
+        """Adds members to the list.
+        
+        Parameters
+        ------------
+        *users: :class:`User`
+            An array of :class:`User` arguments that you wist to add from the list. Example:
+
+            .. code-blocks:: python
+
+                some_list.add_members(user1, user2, user3)
+
+
+        .. versionadded:: 1.5.0
+        """
+        executor = self.http_client.thread_manager.create_new_executor(thread_name="add-members-list-method")
+        for user in users:
+            executor.submit(
+                self.http_client.request,
+                "POST",
+                "2",
+                f"/lists/{self.id}/members",
+                json={
+                    "user_id": str(user.id)
+                },
+                auth=True
+            )
+        executor.wait_for_futures()
+
+    def remove_members(self, *users: User):
+        """Removes members to the list.
+
+        Parameters
+        ------------
+        *users: :class:`User`
+            An array of :class:`User` arguments that you wist to delete from the list. Example:
+
+            .. code-blocks:: python
+
+                some_list.remove_members(user1, user2, user3)
+
+
+        .. versionadded:: 1.5.0
+        """
+        executor = self.http_client.thread_manager.create_new_executor(thread_name="remove-members-list-method")
+        for user in users:
+            executor.submit(
+                self.http_client.request,
+                "DELETE",
+                "2",
+                f"/lists/{self.id}/members/{user.id}",
+                auth=True
+            )
+        executor.wait_for_futures()
+
+    def fetch_members(self) -> Optional[UserPagination]:
+        res = self.http_client.request(
+            "GET",
+            "2",
+            f"/lists/{self.id}/members",
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            auth=True
+        )
+        if not res:
+            return []
+
+        return UserPagination(
+            res,
+            endpoint_request=f"/lists/{self.id}/member",
+            http_client=self.http_client,
+            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+        )
