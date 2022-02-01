@@ -132,7 +132,7 @@ class Pagination:
 
 
 class UserPagination(Pagination):
-    """Represents a pagination that handles users object. This inherits :class:`Pagination`. These following methods returns this object:
+    """Represents a pagination that handles users object. This inherits :class:`Pagination`. These following methods return this object:
 
     * :meth:`User.fetch_following`
     * :meth:`User.fetch_followers`
@@ -140,6 +140,7 @@ class UserPagination(Pagination):
     * :meth:`User.fetch_blockers`
     * :meth:`Tweet.fetch_likers`
     * :meth:`Tweet.fetch_retweeters`
+    * :meth:`List.fetch_members`
 
 
     .. versionadded:: 1.5.0
@@ -147,7 +148,6 @@ class UserPagination(Pagination):
 
     def __init__(self, data, **kwargs):
         from .user import User  # Avoid circular import error.
-
         super().__init__(data, item_type=User, **kwargs)
 
     def next_page(self):
@@ -226,7 +226,11 @@ class UserPagination(Pagination):
 
 
 class TweetPagination(Pagination):
-    """Represents a pagination that handles tweets object. This inherits :class:`Pagination`. Only :meth:`User.fetch_timelines` returns this Pagination object.
+    """Represents a pagination that handles tweets object. This inherits :class:`Pagination`. These following methods return this object:
+
+    * meth:`User.fetch_timelines`
+    * meth:`User.fetch_liked_tweets`
+    * meth:`List.fetch_tweets`
 
 
     .. versionadded:: 1.5.0
@@ -234,18 +238,7 @@ class TweetPagination(Pagination):
 
     def __init__(self, data, **kwargs):
         from .tweet import Tweet  # Avoid circular import error.
-
         super().__init__(data, item_type=Tweet, **kwargs)
-
-    # def _insert_author(self):
-    #     fulldata = []
-    #     for index, data in enumerate(self.original_payload["data"]):
-    #         fulldata.append({})
-    #         fulldata[index]["data"] = data
-    #         fulldata[index]["includes"] = {}
-    #         fulldata[index]["includes"]["users"] = [self.original_payload.get("includes", {}).get("users", [None])[0]]
-
-    #     return [self.item_type(data, http_client=self.http_client) for data in fulldata]
 
     @property
     def content(self) -> list:
@@ -256,7 +249,7 @@ class TweetPagination(Pagination):
 
         return [
             self.item_type(data, http_client=self.http_client)
-            for data in self.http_client.payload_parser.insert_tweet_pagination_author(self.original_payload)
+            for data in self.http_client.payload_parser.insert_pagination_object_author(self.original_payload)
         ]
 
     def next_page(self):
@@ -287,7 +280,7 @@ class TweetPagination(Pagination):
         previous_content = self.content
         self._current_page_number += 1
         self.original_payload = res
-        self.payload = self.content()
+        self.payload = self.content
         self._meta = self.original_payload.get("meta")
         self._next_token = self._meta.get("next_token")
         self._previous_token = self._meta.get("previous_token")
@@ -324,7 +317,7 @@ class TweetPagination(Pagination):
         previous_content = self.content
         self._current_page_number -= 1
         self.original_payload = res
-        self.payload = self.content()
+        self.payload = self.content
         self._meta = self.original_payload.get("meta")
         self._next_token = self._meta.get("next_token")
         self._previous_token = self._meta.get("previous_token")
@@ -335,7 +328,10 @@ class TweetPagination(Pagination):
 
 
 class ListPagination(Pagination):
-    """Represents a pagination that handles list objects. This inherits :class:`Pagination`. Only :meth:`User.fetch_lists` returns this Pagination object.
+    """Represents a pagination that handles list objects. This inherits :class:`Pagination`. These following methods return this object:
+
+    * meth:`User.fetch_lists`
+    * meth:`User.fetch_memberships`
 
 
     .. versionadded:: 1.5.0
@@ -343,18 +339,7 @@ class ListPagination(Pagination):
 
     def __init__(self, data, **kwargs):
         from .list import List as TwitterList  # Avoid circular import error
-
         super().__init__(data, item_type=TwitterList, **kwargs)
-
-    def _insert_owner(self):
-        fulldata = []
-        for index, data in enumerate(self.original_payload["data"]):
-            fulldata.append({})
-            fulldata[index]["data"] = data
-            fulldata[index]["includes"] = {}
-            fulldata[index]["includes"]["users"] = [self.original_payload.get("includes", {}).get("users", [None])[0]]
-
-        return [self.item_type(data, http_client=self.http_client) for data in fulldata]
 
     @property
     def content(self) -> list:
@@ -363,7 +348,10 @@ class ListPagination(Pagination):
         .. versionadded:: 1.5.0
         """
 
-        return self._insert_owner()
+        return [
+            self.item_type(data, http_client=self.http_client)
+            for data in self.http_client.payload_parser.insert_pagination_object_author(self.original_payload)
+        ]
 
     def next_page(self):
         """Change page to the next page.
@@ -393,7 +381,7 @@ class ListPagination(Pagination):
         previous_content = self.content
         self._current_page_number += 1
         self.original_payload = res
-        self.payload = self._insert_owner()
+        self.payload = self.content
         self._meta = self.original_payload.get("meta")
         self._next_token = self._meta.get("next_token")
         self._previous_token = self._meta.get("previous_token")
@@ -432,7 +420,7 @@ class ListPagination(Pagination):
         previous_content = self.content
         self._current_page_number -= 1
         self.original_payload = res
-        self.payload = self._insert_owner()
+        self.payload = self.content
         self._meta = self.original_payload.get("meta")
         self._next_token = self._meta.get("next_token")
         self._previous_token = self._meta.get("previous_token")
