@@ -208,7 +208,7 @@ class List:
 
     def add_members(self, *users: User):
         """Adds members to the list.
-        
+
         Parameters
         ------------
         *users: :class:`User`
@@ -228,10 +228,8 @@ class List:
                 "POST",
                 "2",
                 f"/lists/{self.id}/members",
-                json={
-                    "user_id": str(user.id)
-                },
-                auth=True
+                json={"user_id": str(user.id)},
+                auth=True,
             )
         executor.wait_for_futures()
 
@@ -252,13 +250,7 @@ class List:
         """
         executor = self.http_client.thread_manager.create_new_executor(thread_name="remove-members-list-method")
         for user in users:
-            executor.submit(
-                self.http_client.request,
-                "DELETE",
-                "2",
-                f"/lists/{self.id}/members/{user.id}",
-                auth=True
-            )
+            executor.submit(self.http_client.request, "DELETE", "2", f"/lists/{self.id}/members/{user.id}", auth=True)
         executor.wait_for_futures()
 
     def fetch_members(self) -> Optional[UserPagination]:
@@ -267,7 +259,7 @@ class List:
             "2",
             f"/lists/{self.id}/members",
             params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
-            auth=True
+            auth=True,
         )
         if not res:
             return []

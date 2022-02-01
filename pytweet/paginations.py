@@ -148,6 +148,7 @@ class UserPagination(Pagination):
 
     def __init__(self, data, **kwargs):
         from .user import User  # Avoid circular import error.
+
         super().__init__(data, item_type=User, **kwargs)
 
     def next_page(self):
@@ -238,6 +239,7 @@ class TweetPagination(Pagination):
 
     def __init__(self, data, **kwargs):
         from .tweet import Tweet  # Avoid circular import error.
+
         super().__init__(data, item_type=Tweet, **kwargs)
 
     @property
@@ -339,6 +341,7 @@ class ListPagination(Pagination):
 
     def __init__(self, data, **kwargs):
         from .list import List as TwitterList  # Avoid circular import error
+
         super().__init__(data, item_type=TwitterList, **kwargs)
 
     @property

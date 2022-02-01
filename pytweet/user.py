@@ -683,21 +683,12 @@ class User:
         Optional[List[:class:`TwitterList`]]
             This method returns a list of :class:`List` objects.
 
-        
+
         .. versionadded:: 1.5.0
         """
-        params = {
-            "expansions": LIST_EXPANSION,
-            "list.fields": LIST_FIELD,
-            "user.fields": USER_FIELD
-        }
-        
-        res = self.http_client.request(
-            "GET",
-            "2",
-            f"/users/{self.id}/list_memberships",
-            params=params
-        )
+        params = {"expansions": LIST_EXPANSION, "list.fields": LIST_FIELD, "user.fields": USER_FIELD}
+
+        res = self.http_client.request("GET", "2", f"/users/{self.id}/list_memberships", params=params)
 
         if not res:
             return []
