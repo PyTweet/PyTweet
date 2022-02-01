@@ -13,7 +13,6 @@ class Comparable:
         self.o = o
 
     def __eq__(self, other: Any):
-        print("CALLING EQ")
         return self.o == other
 
     def __ne__(self, other: Any):
