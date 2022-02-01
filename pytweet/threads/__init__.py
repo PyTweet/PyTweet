@@ -13,10 +13,10 @@ __all__ = ("Executor", "ThreadManager")
 class Executor(ThreadPoolExecutor):
     def __init__(self, *args, **kwargs):
         self._session_id = kwargs.pop("session_id")
-        self._thread_name = kwargs.get("thread_name")
+        self._thread_name = kwargs.pop("thread_name")
         self._futures = []
         self._thread_name += f":session_id={self.session_id}:task_number="
-        super().__init__(*args, **kwargs)
+        super().__init__(thread_name_prefix=self._thread_name, *args, **kwargs)
 
     @property
     def futures(self):
@@ -53,8 +53,7 @@ class ThreadManager:
         return threading.enumerate()
 
     def create_new_executor(self, *, max_workers: int = 100, thread_name: str = "", session_id: str = None) -> Executor:
-        session_id = session_id or self.generate_thread_session()
-        return Executor(max_workers, thread_name=thread_name, session_id=session_id)
+        return Executor(max_workers, thread_name=thread_name, session_id=session_id or self.generate_thread_session())
 
     def get_threads(self, session_id):
         threads = []
