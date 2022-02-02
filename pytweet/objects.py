@@ -2,7 +2,7 @@ from typing import Any
 
 
 class Comparable:
-    """Represents a class that can compare itself to other classes.
+    """Represents a class that can compare other classes.
 
     The sole purpose of this class is to enables other classes to be compare to one or another through an object.
 
