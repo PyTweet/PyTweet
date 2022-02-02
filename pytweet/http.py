@@ -404,7 +404,10 @@ class HTTPClient:
                     "POST",
                     "1.1",
                     "/media/metadata/create.json",
-                    json={"media_id": str(file.media_id), "alt_text": {"text": str(file.alt_text)}},
+                    json={
+                        "media_id": str(file.media_id),
+                        "alt_text": {"text": str(file.alt_text)},
+                    },
                     auth=True,
                     use_base_url=False,
                     thread_name="alt-text-file-request",
@@ -470,7 +473,11 @@ class HTTPClient:
             "GET",
             "2",
             f"/users/me",
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
             auth=True,
         )
 
@@ -487,7 +494,11 @@ class HTTPClient:
                 "GET",
                 "2",
                 f"/users/{user_id}",
-                params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+                params={
+                    "expansions": "pinned_tweet_id",
+                    "user.fields": USER_FIELD,
+                    "tweet.fields": TWEET_FIELD,
+                },
                 auth=True,
             )
 
@@ -509,7 +520,11 @@ class HTTPClient:
             "GET",
             "2",
             f"/users?ids={','.join(str_ids)}",
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
             auth=True,
         )
 
@@ -527,7 +542,11 @@ class HTTPClient:
                 "GET",
                 "2",
                 f"/users/by/username/{username}",
-                params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+                params={
+                    "expansions": "pinned_tweet_id",
+                    "user.fields": USER_FIELD,
+                    "tweet.fields": TWEET_FIELD,
+                },
                 auth=True,
             )
             user = User(data, http_client=self)
@@ -874,12 +893,21 @@ class HTTPClient:
 
     def create_list(self, name: str, *, description: str = "", private: bool = False) -> Optional[TwitterList]:
         res = self.request(
-            "POST", "2", "/lists", auth=True, json={"name": name, "description": description, "private": private}
+            "POST",
+            "2",
+            "/lists",
+            auth=True,
+            json={"name": name, "description": description, "private": private},
         )
         return TwitterList(res, http_client=self)
 
     def update_list(
-        self, list_id: int, *, name: Optional[str] = None, description: str = "", private: Optional[bool] = None
+        self,
+        list_id: int,
+        *,
+        name: Optional[str] = None,
+        description: str = "",
+        private: Optional[bool] = None,
     ) -> Optional[RelationUpdate]:
         res = self.request(
             "PUT",

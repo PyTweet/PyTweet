@@ -31,7 +31,15 @@ class Pagination:
         "pages_cache",
     )
 
-    def __init__(self, data: Payload, *, item_type: Any, endpoint_request: str, http_client: HTTPClient, **kwargs: Any):
+    def __init__(
+        self,
+        data: Payload,
+        *,
+        item_type: Any,
+        endpoint_request: str,
+        http_client: HTTPClient,
+        **kwargs: Any,
+    ):
         self.__original_payload = data
         self._payload = self.__original_payload.get("data")
         self._meta = self.__original_payload.get("meta")

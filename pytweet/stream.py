@@ -8,7 +8,14 @@ import time
 from typing import TYPE_CHECKING, Any, List, Type, Optional
 from .dataclass import StreamRule
 from .errors import ConnectionException, PytweetException
-from .constants import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_EXPANSION, TWEET_FIELD, USER_FIELD
+from .constants import (
+    MEDIA_FIELD,
+    PLACE_FIELD,
+    POLL_FIELD,
+    TWEET_EXPANSION,
+    TWEET_FIELD,
+    USER_FIELD,
+)
 from .tweet import Tweet
 
 
@@ -25,7 +32,15 @@ class StreamConnection:
     .. versionadded:: 1.3.5
     """
 
-    __slots__ = ("url", "backfill_minutes", "reconnect_attempts", "http_client", "session", "errors", "running")
+    __slots__ = (
+        "url",
+        "backfill_minutes",
+        "reconnect_attempts",
+        "http_client",
+        "session",
+        "errors",
+        "running",
+    )
 
     def __init__(
         self,
@@ -152,7 +167,14 @@ class Stream:
     .. versionadded:: 1.3.5
     """
 
-    __slots__ = ("backfill_minutes", "raw_rules", "http_client", "reconnect_attempts", "sample", "connection")
+    __slots__ = (
+        "backfill_minutes",
+        "raw_rules",
+        "http_client",
+        "reconnect_attempts",
+        "sample",
+        "connection",
+    )
 
     def __init__(self, backfill_minutes: int = 0, reconnect_attempts: int = 15):
         self.backfill_minutes = backfill_minutes

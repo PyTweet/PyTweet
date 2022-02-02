@@ -6,7 +6,15 @@ from .enums import MediaType
 class Media:
     """Represents a media attachment in a message."""
 
-    __slots__ = ("_payload", "_url", "_preview_image_url", "_media_key", "_type", "_width", "_height")
+    __slots__ = (
+        "_payload",
+        "_url",
+        "_preview_image_url",
+        "_media_key",
+        "_type",
+        "_width",
+        "_height",
+    )
 
     def __init__(self, data: Dict[str, Any]):
         self._payload = data
@@ -110,7 +118,14 @@ class UserMention:
 class Url:
     """Represents Url in a message."""
 
-    __slots__ = ("_payload", "_url", "_display_url", "_expanded_url", "_startpoint", "_endpoint")
+    __slots__ = (
+        "_payload",
+        "_url",
+        "_display_url",
+        "_expanded_url",
+        "_startpoint",
+        "_endpoint",
+    )
 
     def __init__(self, data=Dict[str, Any]):
         self._payload: Dict[str, Any] = data

@@ -4,7 +4,14 @@ from typing import Any, Union, Dict, List, Optional
 from .enums import SpaceState
 from .utils import time_parse_todt
 from .user import User
-from .constants import TWEET_EXPANSION, USER_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_FIELD
+from .constants import (
+    TWEET_EXPANSION,
+    USER_FIELD,
+    MEDIA_FIELD,
+    PLACE_FIELD,
+    POLL_FIELD,
+    TWEET_FIELD,
+)
 from .objects import Comparable
 
 __all__ = ("Space",)

@@ -38,7 +38,13 @@ class Executor(ThreadPoolExecutor):
     def clear_futures(self):
         self.futures.clear()
 
-    def wait_for_futures(self, *, timeout: Optional[int] = None, return_when=ALL_COMPLETED, purge: bool = True):
+    def wait_for_futures(
+        self,
+        *,
+        timeout: Optional[int] = None,
+        return_when=ALL_COMPLETED,
+        purge: bool = True,
+    ):
         if not self.futures:
             return None
         result = wait(self.futures, timeout, return_when)
@@ -53,7 +59,11 @@ class ThreadManager:
         return threading.enumerate()
 
     def create_new_executor(self, *, max_workers: int = 100, thread_name: str = "", session_id: str = None) -> Executor:
-        return Executor(max_workers, thread_name=thread_name, session_id=session_id or self.generate_thread_session())
+        return Executor(
+            max_workers,
+            thread_name=thread_name,
+            session_id=session_id or self.generate_thread_session(),
+        )
 
     def get_threads(self, session_id):
         threads = []

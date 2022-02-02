@@ -144,7 +144,11 @@ class List(Comparable):
         )
 
     def update(
-        self, *, name: Optional[str] = None, description: Optional[str] = None, private: Optional[bool] = None
+        self,
+        *,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        private: Optional[bool] = None,
     ) -> Optional[RelationUpdate]:
         """Updates the list.
 
@@ -188,7 +192,11 @@ class List(Comparable):
         .. versionadded:: 1.5.0
         """
         res = self.http_client.request(
-            "POST", "2", f"/users/{self.owner.id}/pinned_lists", auth=True, json={"list_id": str(self.id)}
+            "POST",
+            "2",
+            f"/users/{self.owner.id}/pinned_lists",
+            auth=True,
+            json={"list_id": str(self.id)},
         )
 
         return RelationPin(res)
@@ -252,7 +260,13 @@ class List(Comparable):
         """
         executor = self.http_client.thread_manager.create_new_executor(thread_name="remove-members-list-method")
         for user in users:
-            executor.submit(self.http_client.request, "DELETE", "2", f"/lists/{self.id}/members/{user.id}", auth=True)
+            executor.submit(
+                self.http_client.request,
+                "DELETE",
+                "2",
+                f"/lists/{self.id}/members/{user.id}",
+                auth=True,
+            )
         executor.wait_for_futures()
 
     def fetch_members(self) -> Optional[UserPagination]:
@@ -260,7 +274,11 @@ class List(Comparable):
             "GET",
             "2",
             f"/lists/{self.id}/members",
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
             auth=True,
         )
         if not res:
@@ -270,5 +288,9 @@ class List(Comparable):
             res,
             endpoint_request=f"/lists/{self.id}/member",
             http_client=self.http_client,
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
         )

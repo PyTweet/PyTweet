@@ -54,7 +54,13 @@ class User(Comparable):
     .. versionadded: 1.0.0
     """
 
-    __slots__ = ("__original_payload", "_includes", "_payload", "http_client", "_metrics")
+    __slots__ = (
+        "__original_payload",
+        "_includes",
+        "_payload",
+        "http_client",
+        "_metrics",
+    )
 
     def __init__(self, data: Dict[str, Any], http_client: Optional[HTTPClient] = None) -> None:
         self.__original_payload = data
@@ -399,7 +405,11 @@ class User(Comparable):
             "GET",
             "2",
             f"/users/{self.id}/followers",
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
         )
 
         if not following:
@@ -408,7 +418,11 @@ class User(Comparable):
             following,
             endpoint_request=f"/users/{self.id}/followers",
             http_client=self.http_client,
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
         )
 
     def fetch_following(self) -> Optional[UserPagination]:
@@ -426,7 +440,11 @@ class User(Comparable):
             "GET",
             "2",
             f"/users/{self.id}/following",
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
         )
 
         if not following:
@@ -435,7 +453,11 @@ class User(Comparable):
             following,
             endpoint_request=f"/users/{self.id}/following",
             http_client=self.http_client,
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
         )
 
     def fetch_blockers(self) -> Optional[UserPagination]:
@@ -453,7 +475,11 @@ class User(Comparable):
             "GET",
             "2",
             f"/users/{self.id}/blocking",
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
             auth=True,
         )
 
@@ -463,7 +489,11 @@ class User(Comparable):
             blockers,
             endpoint_request=f"/users/{self.id}/blocking",
             http_client=self.http_client,
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
         )
 
     def fetch_muters(self) -> Optional[UserPagination]:
@@ -481,7 +511,11 @@ class User(Comparable):
             "GET",
             "2",
             f"/users/{self.id}/muting",
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
             auth=True,
         )
 
@@ -492,7 +526,11 @@ class User(Comparable):
             muters,
             endpoint_request=f"/users/{self.id}/muting",
             http_client=self.http_client,
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
         )
 
     def fetch_timelines(
@@ -629,7 +667,11 @@ class User(Comparable):
 
         .. versionadded:: 1.5.0
         """
-        params = {"expansions": LIST_EXPANSION, "list.fields": LIST_FIELD, "user.fields": USER_FIELD}
+        params = {
+            "expansions": LIST_EXPANSION,
+            "list.fields": LIST_FIELD,
+            "user.fields": USER_FIELD,
+        }
 
         res = self.http_client.request("GET", "2", f"/users/{self.id}/owned_lists", params=params)
 
@@ -659,7 +701,11 @@ class User(Comparable):
             "2",
             f"/users/{self.id}/pinned_lists",
             auth=True,
-            params={"expansions": LIST_EXPANSION, "user.fields": USER_FIELD, "list.fields": LIST_FIELD},
+            params={
+                "expansions": LIST_EXPANSION,
+                "user.fields": USER_FIELD,
+                "list.fields": LIST_FIELD,
+            },
         )
         if not res:
             return None
@@ -680,7 +726,11 @@ class User(Comparable):
 
         .. versionadded:: 1.5.0
         """
-        params = {"expansions": LIST_EXPANSION, "list.fields": LIST_FIELD, "user.fields": USER_FIELD}
+        params = {
+            "expansions": LIST_EXPANSION,
+            "list.fields": LIST_FIELD,
+            "user.fields": USER_FIELD,
+        }
 
         res = self.http_client.request("GET", "2", f"/users/{self.id}/list_memberships", params=params)
 
@@ -850,7 +900,13 @@ class ClientAccount(User):
         return self
 
     def update_profile_banner(
-        self, *, banner: File, width: int = 0, height: int = 0, offset_left: int = 0, offset_top: int = 0
+        self,
+        *,
+        banner: File,
+        width: int = 0,
+        height: int = 0,
+        offset_left: int = 0,
+        offset_top: int = 0,
     ) -> None:
         """Updates the profile banner.
 
@@ -877,7 +933,12 @@ class ClientAccount(User):
                 "POST",
                 "1.1",
                 "/account/update_profile_banner.json",
-                params={"width": width, "height": height, "offset_left": offset_left, "offset_top": offset_top},
+                params={
+                    "width": width,
+                    "height": height,
+                    "offset_left": offset_left,
+                    "offset_top": offset_top,
+                },
                 files={"banner": path.read(4 * 1024 * 1024)},
                 auth=True,
             )
@@ -886,7 +947,12 @@ class ClientAccount(User):
                 "POST",
                 "1.1",
                 "/account/update_profile_banner.json",
-                params={"width": width, "height": height, "offset_left": offset_left, "offset_top": offset_top},
+                params={
+                    "width": width,
+                    "height": height,
+                    "offset_left": offset_left,
+                    "offset_top": offset_top,
+                },
                 files={"banner": open(path, "rb").read(4 * 1024 * 1024)},
                 auth=True,
             )

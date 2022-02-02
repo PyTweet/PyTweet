@@ -60,7 +60,12 @@ class Environment:
 
         .. versionadded:: 1.5.0
         """
-        client.http.request("POST", "1.1", f"/account_activity/all/{self.label}/subscriptions.json", auth=True)
+        client.http.request(
+            "POST",
+            "1.1",
+            f"/account_activity/all/{self.label}/subscriptions.json",
+            auth=True,
+        )
 
     def add_my_subscription(self) -> None:
         """Add a new user subscription to the environment, which is the client WHO made the environment request. Use :meth:`add_user_subscription` to add other user subscription. This method only add the client WHO made the fetch environment request.
@@ -68,7 +73,12 @@ class Environment:
 
         .. versionadded:: 1.5.0
         """
-        self.client.http.request("POST", "1.1", f"/account_activity/all/{self.label}/subscriptions.json", auth=True)
+        self.client.http.request(
+            "POST",
+            "1.1",
+            f"/account_activity/all/{self.label}/subscriptions.json",
+            auth=True,
+        )
 
     def register_webhook(self, url: str) -> Webhook:
         """Register your WebHook with your WebApp's url that you develop. Before this, you need to develop, deploy and host a WebApp that will receive Twitter webhook events. You also need to perform a Twitter Challenge Response Check (CRC) GET request and responds with a properly formatted JSON response.
@@ -87,7 +97,11 @@ class Environment:
         .. versionadded:: 1.5.0
         """
         res = self.client.http.request(
-            "POST", "1.1", f"/account_activity/all/{self.label}/webhooks.json", auth=True, params={"url": url}
+            "POST",
+            "1.1",
+            f"/account_activity/all/{self.label}/webhooks.json",
+            auth=True,
+            params={"url": url},
         )
         return Webhook(res, environment=self, client=self)
 
@@ -199,7 +213,10 @@ class Webhook:
         .. versionadded:: 1.5.0
         """
         self.client.http.request(
-            "DELETE", "1.1", f"/account_activity/all/{self.env.label}/webhooks/{self.id}.json", auth=True
+            "DELETE",
+            "1.1",
+            f"/account_activity/all/{self.env.label}/webhooks/{self.id}.json",
+            auth=True,
         )
         self.valid = False
         return self
@@ -222,7 +239,10 @@ class Webhook:
             return False
 
         self.client.http.request(
-            "PUT", "1.1", f"/account_activity/all/{self.env.label}/webhooks/{self.id}.json", auth=True
+            "PUT",
+            "1.1",
+            f"/account_activity/all/{self.env.label}/webhooks/{self.id}.json",
+            auth=True,
         )
         _log.info("Successfully triggered a CRC.")
         return True

@@ -325,7 +325,11 @@ class WelcomeMessage(Message):
         .. versionadded:: 1.3.5
         """
         return self.http_client.update_welcome_message(
-            welcome_message_id=self.id, text=text, file=file, quick_reply=quick_reply, cta=cta
+            welcome_message_id=self.id,
+            text=text,
+            file=file,
+            quick_reply=quick_reply,
+            cta=cta,
         )
 
     def delete(self):

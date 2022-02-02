@@ -120,8 +120,14 @@ class EventParser:
         recipient_id = message_create.get("target").get("recipient_id")
         sender_id = message_create.get("sender_id")
 
-        recipient = User(self.payload_parser.parse_user_payload(users.get(recipient_id)), http_client=self.http_client)
-        sender = User(self.payload_parser.parse_user_payload(users.get(sender_id)), http_client=self.http_client)
+        recipient = User(
+            self.payload_parser.parse_user_payload(users.get(recipient_id)),
+            http_client=self.http_client,
+        )
+        sender = User(
+            self.payload_parser.parse_user_payload(users.get(sender_id)),
+            http_client=self.http_client,
+        )
         application_info = direct_message_payload.get("apps")
         if application_info:
             source_app = ApplicationInfo({"apps": direct_message_payload.get("apps")})
@@ -150,8 +156,14 @@ class EventParser:
 
         recipient_id = event_payload.get("target").get("recipient_id")
         sender_id = event_payload.get("sender_id")
-        recipient = User(self.payload_parser.parse_user_payload(users.get(recipient_id)), http_client=self.http_client)
-        sender = User(self.payload_parser.parse_user_payload(users.get(sender_id)), http_client=self.http_client)
+        recipient = User(
+            self.payload_parser.parse_user_payload(users.get(recipient_id)),
+            http_client=self.http_client,
+        )
+        sender = User(
+            self.payload_parser.parse_user_payload(users.get(sender_id)),
+            http_client=self.http_client,
+        )
 
         event_payload["target"]["recipient"] = recipient
         event_payload["target"]["sender"] = sender
@@ -171,8 +183,14 @@ class EventParser:
 
         recipient_id = event_payload.get("target").get("recipient_id")
         sender_id = event_payload.get("sender_id")
-        recipient = User(self.payload_parser.parse_user_payload(users.get(recipient_id)), http_client=self.http_client)
-        sender = User(self.payload_parser.parse_user_payload(users.get(sender_id)), http_client=self.http_client)
+        recipient = User(
+            self.payload_parser.parse_user_payload(users.get(recipient_id)),
+            http_client=self.http_client,
+        )
+        sender = User(
+            self.payload_parser.parse_user_payload(users.get(sender_id)),
+            http_client=self.http_client,
+        )
 
         event_payload["target"]["recipient"] = recipient
         event_payload["target"]["sender"] = sender
@@ -190,8 +208,14 @@ class EventParser:
         action_payload = action_payload.copy()
         event_payload = action_payload.get(action_type)[0]
         action_type = event_payload.get("type")
-        target = User(self.payload_parser.parse_user_payload(event_payload.get("target")), http_client=self.http_client)
-        source = User(self.payload_parser.parse_user_payload(event_payload.get("source")), http_client=self.http_client)
+        target = User(
+            self.payload_parser.parse_user_payload(event_payload.get("target")),
+            http_client=self.http_client,
+        )
+        source = User(
+            self.payload_parser.parse_user_payload(event_payload.get("source")),
+            http_client=self.http_client,
+        )
 
         event_payload["target"] = target
         event_payload["source"] = source

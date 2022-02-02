@@ -512,7 +512,11 @@ class Client:
         .. versionadded:: 1.5.0
         """
         res = self.http.request(
-            "GET", "1.1", "/trends/place.json", params={"id": str(woeid), "exclude": exclude}, auth=True
+            "GET",
+            "1.1",
+            "/trends/place.json",
+            params={"id": str(woeid), "exclude": exclude},
+            auth=True,
         )
 
         return [Trend(**data) for data in res[0].get("trends")]
@@ -552,7 +556,13 @@ class Client:
 
         .. versionadded:: 1.5.0
         """
-        res = self.http.request("GET", "1.1", "/trends/available.json", params={"lat": lat, "long": long}, auth=True)
+        res = self.http.request(
+            "GET",
+            "1.1",
+            "/trends/available.json",
+            params={"lat": lat, "long": long},
+            auth=True,
+        )
 
         return [Location(**data) for data in res]
 
@@ -784,7 +794,9 @@ class Client:
 
         try:
             thread = threading.Thread(
-                target=app.run, name="client-listen-method:thread_session=LISTEN-SESSION", kwargs=kwargs
+                target=app.run,
+                name="client-listen-method:thread_session=LISTEN-SESSION",
+                kwargs=kwargs,
             )
 
             if not self.webhook and not ngrok:

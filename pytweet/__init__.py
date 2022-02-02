@@ -54,4 +54,9 @@ version_info: VersionInfo = VersionInfo(major=1, minor=5, micro=0, releaselevel=
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-assert version_info.releaselevel in ("alpha", "beta", "candidate", "final"), "Invalid release level given."
+assert version_info.releaselevel in (
+    "alpha",
+    "beta",
+    "candidate",
+    "final",
+), "Invalid release level given."

@@ -187,10 +187,21 @@ class Tweet(Message):
     .. versionadded:: 1.0.0
     """
 
-    __slots__ = ("__original_payload", "_payload", "_includes", "tweet_metrics", "http_client", "deleted_timestamp")
+    __slots__ = (
+        "__original_payload",
+        "_payload",
+        "_includes",
+        "tweet_metrics",
+        "http_client",
+        "deleted_timestamp",
+    )
 
     def __init__(
-        self, data: Dict[str, Any], *, deleted_timestamp: Optional[int] = None, http_client: Optional[HTTPClient] = None
+        self,
+        data: Dict[str, Any],
+        *,
+        deleted_timestamp: Optional[int] = None,
+        http_client: Optional[HTTPClient] = None,
     ) -> None:
         self.__original_payload = data
         self._payload = data.get("data") or data
@@ -582,7 +593,11 @@ class Tweet(Message):
             "GET",
             "2",
             f"/tweets/{self.id}/retweeted_by",
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
         )
         if not res:
             return []
@@ -591,7 +606,11 @@ class Tweet(Message):
             res,
             endpoint_request=f"/tweets/{self.id}/retweeted_by",
             http_client=self.http_client,
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
         )
 
     def fetch_likers(self) -> Optional[UserPagination]:
@@ -609,7 +628,11 @@ class Tweet(Message):
             "GET",
             "2",
             f"/tweets/{self.id}/liking_users",
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
         )
 
         if not res:
@@ -619,7 +642,11 @@ class Tweet(Message):
             res,
             endpoint_request=f"/tweets/{self.id}/liking_users",
             http_client=self.http_client,
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": "pinned_tweet_id",
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
         )
 
     def fetch_replied_user(self) -> Optional[User]:

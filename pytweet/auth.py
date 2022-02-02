@@ -371,7 +371,13 @@ class OauthSession:
 
         return tuple(res.split("&"))
 
-    def create_oauth2_url(self, scope: Scope, *, code_challenge_method: str = "plain", state: Optional[str] = None):
+    def create_oauth2_url(
+        self,
+        scope: Scope,
+        *,
+        code_challenge_method: str = "plain",
+        state: Optional[str] = None,
+    ):
         """Creates an oauth 2 url. This is The 1st step of using OAuth 2.0 Authorization Code Flow with PKCE. The callback after pressing authorize button is your callback url that you passed in your :class:`Client`.
 
         Parameters
@@ -430,7 +436,10 @@ class OauthSession:
             "2",
             "/oauth2/token",
             data=f"code={code}&grant_type=authorization_code&client_id={self.client_id}&redirect_uri={self.callback_url}&code_verifier={code_challenge}",
-            headers={"Authorization": f"Basic {self.basic_auth}", "Content-Type": "application/x-www-form-urlencoded"},
+            headers={
+                "Authorization": f"Basic {self.basic_auth}",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
         )
 
         return res
