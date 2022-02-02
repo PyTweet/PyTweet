@@ -42,7 +42,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     # Third-Party Extensions:
-    "docs.ext.authorize"
+    "docs.ext.authorize",
 ]
 
 autodoc_member_order = "bysource"

@@ -248,7 +248,9 @@ class OauthSession:
         self.callback_url = callback_url
         self.client_id = client_id
         self.client_secret = client_secret
-        self.oauth1_session = OAuth1Session(self.consumer_key, client_secret=self.consumer_secret, callback_uri=self.callback_url)
+        self.oauth1_session = OAuth1Session(
+            self.consumer_key, client_secret=self.consumer_secret, callback_uri=self.callback_url
+        )
         self.oauth_url = "https://api.twitter.com/oauth"
 
     @property
@@ -303,7 +305,9 @@ class OauthSession:
         """
         self.http_client.request("POST", "1.1", "/oauth/invalidate_token", auth=True)
 
-    def generate_request_tokens(self, access_type: Optional[Literal["read", "write", "direct_messages"]] = None) -> dict:
+    def generate_request_tokens(
+        self, access_type: Optional[Literal["read", "write", "direct_messages"]] = None
+    ) -> dict:
         """Generates request tokens with an access_type. This method returns a dictionary with the credentials, example return object:
 
         .. code-blocks: python
@@ -331,21 +335,20 @@ class OauthSession:
 
             else:
                 url = self.oauth_url + f"/request_token"
-            
+
             request_tokens = self.oauth1_session.fetch_request_token(url)
             return request_tokens
         except Exception as e:
             raise e
-        
 
     def create_oauth_url(
         self,
         access_type: Optional[Literal["read", "write", "direct_messages"]] = None,
         *,
-        signin_with_twitter: bool = False
+        signin_with_twitter: bool = False,
     ) -> Optional[str]:
         """Creates an oauth url with an access type. This is the 1st step of making a request on behalf of other users through oauth1.1 usercontext.
-        
+
         The callback after pressing authorize button is your callback url that you passed in your :class:`Client`. The oauth_token and oauth_verifier will automatically appended in the callback url. If you are setting up a sign up button in your website to lookup the user's profile information, You have to setup a system where if the oauth_token or oauth_verifier is present in the url then, it will use :meth:`OauthSession.post_oauth_token` to post an oauth token and verifier to exchange with the user's access token and secret. If its for personal uses then just copy the result and passed in :meth:`OauthSession.post_oauth_token`.
 
         Parameters
@@ -367,7 +370,11 @@ class OauthSession:
             raise PytweetException("'callback_url' argument is missing in your client instance")
 
         access_type = access_type.lower()
-        assert access_type in ("read", "write", "direct_messages"), "Wrong access type passed! must be 'read', 'write', or 'direct_messages')"
+        assert access_type in (
+            "read",
+            "write",
+            "direct_messages",
+        ), "Wrong access type passed! must be 'read', 'write', or 'direct_messages')"
         request_tokens = self.generate_request_tokens(access_type)
         authorize_url = self.oauth_url + "/authorize" if not signin_with_twitter else self.oauth_url + "/authenticate"
         return authorize_url + f"?oauth_token={request_tokens.get('oauth_token')}"
