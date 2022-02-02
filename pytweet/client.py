@@ -50,7 +50,7 @@ class Client:
     stream: Optional[Stream]
         The client's stream. Must be an instance of :class:`Stream`.
     callback_url: Optional[:class:`str`]
-        The oauth callback url, default to None.
+        The oauth callback url, default to None. Makes sure the callback url is the same as the one in your application auth-settings or else it cant create and interact with oauth related methods.
     client_id: Optional[:class:`str`]
         The client's OAuth 2.0 Client ID from keys and tokens page.
     client_secret: Optional[:class:`str`]
