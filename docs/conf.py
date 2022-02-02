@@ -20,6 +20,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(".."))
+sys.path.append(os.path.abspath("ext"))
 
 
 # -- Project information -----------------------------------------------------
@@ -42,7 +43,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     # Third-Party Extensions:
-    "docs.ext.authorize",
+    "ext.authorize",
 ]
 
 autodoc_member_order = "bysource"
