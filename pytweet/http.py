@@ -178,7 +178,7 @@ class HTTPClient:
 
         if not self.use_bearer_only:
             if auth:
-                auth = self.oauth_session.oauth1_without_access_tokens
+                auth = self.oauth_session.oauth1
                 for k, v in self.credentials.items():
                     if v is None:
                         raise PytweetException(f"{k} is a required credential for authorization.")
