@@ -44,6 +44,7 @@ extensions = [
     # Third-Party Extensions:
     "docs.ext.authorize"
 ]
+
 autodoc_member_order = "bysource"
 autodoc_typehints = "none"
 autodoc_inherit_docstrings = False
