@@ -19,12 +19,6 @@ Version Related Info
 .. data:: __version__
 
     Get the version of the module (e.g ``1.0.0`` or ``1.0.0a``) this is based on :pep:`440`.
-    
-
-Hello, world
-=============
-
-.. authorize:: 3
 
 
 Clients
@@ -112,6 +106,7 @@ Message
 .. autoclass:: Message()
     :members:
 
+
 DirectMessage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -122,7 +117,6 @@ DirectMessage
 
 WelcomeMessage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 .. autoclass:: WelcomeMessage()
     :members:
@@ -193,7 +187,7 @@ Stream Objects
 Attachments
 ---------------------
 
-Attachments is a way to attach additional part to a message, this include tweet and direct message. You may contruct this following objects except :class:`CustomProfile` and :class:`Geo`. Consider using :class:`Client.create_custom_profile` for making a custom profile attachment and :class:`Client.search_geo` for searching a geo-location.
+Attachments is a way to attach additional part to a message, this include tweet and direct message. You may contruct the following objects except :class:`CustomProfile` and :class:`Geo`. Consider using :class:`Client.create_custom_profile` for making a custom profile attachment and :class:`Client.search_geo` for searching a geo-location.
 
 CustomProfile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
