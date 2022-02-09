@@ -451,7 +451,8 @@ class Client:
 
         .. versionadded:: 1.5.0
         """
-        return self.http.create_list(name, description=description, private=private)
+        twitter_list = self.http.create_list(name, description=description, private=private)
+        return self.http.fetch_list(twitter_list.id)
 
     def search_geo(
         self,
