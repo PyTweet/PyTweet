@@ -25,17 +25,18 @@ from .errors import (
     FieldsTooLarge,
 )
 from .constants import (
+    TWEET_EXPANSION,
+    SPACE_EXPANSION,
+    LIST_EXPANSION,
+    PINNED_TWEET_EXPANSION,
     MEDIA_FIELD,
     PLACE_FIELD,
     POLL_FIELD,
     SPACE_FIELD,
-    TWEET_EXPANSION,
-    SPACE_EXPANSION,
     TWEET_FIELD,
     USER_FIELD,
     TOPIC_FIELD,
     LIST_FIELD,
-    LIST_EXPANSION,
 )
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser
@@ -475,7 +476,7 @@ class HTTPClient:
             "2",
             f"/users/me",
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
@@ -496,7 +497,7 @@ class HTTPClient:
                 "2",
                 f"/users/{user_id}",
                 params={
-                    "expansions": "pinned_tweet_id",
+                    "expansions": PINNED_TWEET_EXPANSION,
                     "user.fields": USER_FIELD,
                     "tweet.fields": TWEET_FIELD,
                 },
@@ -522,7 +523,7 @@ class HTTPClient:
             "2",
             f"/users?ids={','.join(str_ids)}",
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
@@ -544,7 +545,7 @@ class HTTPClient:
                 "2",
                 f"/users/by/username/{username}",
                 params={
-                    "expansions": "pinned_tweet_id",
+                    "expansions": PINNED_TWEET_EXPANSION,
                     "user.fields": USER_FIELD,
                     "tweet.fields": TWEET_FIELD,
                 },
