@@ -6,14 +6,13 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 from .attachments import Poll, Geo, File
 from .entities import Media
 from .enums import ReplySetting
-from .constants import TWEET_FIELD, USER_FIELD
+from .constants import TWEET_FIELD, USER_FIELD, PINNED_TWEET_EXPANSION
 from .metrics import TweetPublicMetrics
 from .relations import RelationHide, RelationLike, RelationRetweet, RelationDelete
 from .user import User
 from .utils import time_parse_todt
 from .message import Message
 from .paginations import UserPagination
-from .objects import Comparable
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -537,7 +536,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        tweet = self.http_client.post_tweet(
+        message = self.http_client.post_tweet(
             text,
             file=file,
             files=files,
@@ -548,7 +547,7 @@ class Tweet(Message):
             exclude_reply_users=exclude_reply_users,
             media_tagged_users=media_tagged_users,
         )
-        return self.http_client.tweet_cache.get(tweet.id, tweet)
+        return self.http_client.fetch_tweet(message.id)
 
     def hide(self) -> RelationHide:
         """Hide a reply tweet.
@@ -594,7 +593,7 @@ class Tweet(Message):
             "2",
             f"/tweets/{self.id}/retweeted_by",
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
@@ -607,7 +606,7 @@ class Tweet(Message):
             endpoint_request=f"/tweets/{self.id}/retweeted_by",
             http_client=self.http_client,
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
@@ -629,7 +628,7 @@ class Tweet(Message):
             "2",
             f"/tweets/{self.id}/liking_users",
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
@@ -643,7 +642,7 @@ class Tweet(Message):
             endpoint_request=f"/tweets/{self.id}/liking_users",
             http_client=self.http_client,
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
