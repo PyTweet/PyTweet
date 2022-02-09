@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Dict, NoReturn, Optional, Union, List
 from .constants import (
     TWEET_EXPANSION,
     LIST_EXPANSION,
+    PINNED_TWEET_EXPANSION,
     MEDIA_FIELD,
     PLACE_FIELD,
     POLL_FIELD,
@@ -406,7 +407,7 @@ class User(Comparable):
             "2",
             f"/users/{self.id}/followers",
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
@@ -414,12 +415,13 @@ class User(Comparable):
 
         if not following:
             return []
+
         return UserPagination(
             following,
             endpoint_request=f"/users/{self.id}/followers",
             http_client=self.http_client,
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
@@ -441,7 +443,7 @@ class User(Comparable):
             "2",
             f"/users/{self.id}/following",
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
@@ -449,12 +451,13 @@ class User(Comparable):
 
         if not following:
             return []
+
         return UserPagination(
             following,
             endpoint_request=f"/users/{self.id}/following",
             http_client=self.http_client,
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
@@ -476,7 +479,7 @@ class User(Comparable):
             "2",
             f"/users/{self.id}/blocking",
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
@@ -485,12 +488,13 @@ class User(Comparable):
 
         if not blockers:
             return []
+
         return UserPagination(
             blockers,
             endpoint_request=f"/users/{self.id}/blocking",
             http_client=self.http_client,
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
@@ -512,7 +516,7 @@ class User(Comparable):
             "2",
             f"/users/{self.id}/muting",
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
@@ -527,7 +531,7 @@ class User(Comparable):
             endpoint_request=f"/users/{self.id}/muting",
             http_client=self.http_client,
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
@@ -653,7 +657,7 @@ class User(Comparable):
 
         .. versionadded: 1.1.3
         """
-        id = self._payload.get("pinned_tweet_id")
+        id = self._payload.get(PINNED_TWEET_EXPANSION)
         return self.http_client.fetch_tweet(int(id)) if id else None
 
     def fetch_lists(self) -> Optional[List[TwitterList]]:
@@ -715,7 +719,7 @@ class User(Comparable):
 
         return [TwitterList(data, http_client=self.http_client) for data in res["data"]]
 
-    def fetch_memberships(self) -> Optional[List[TwitterList]]:
+    def fetch_list_memberships(self) -> Union[ListPagination, List]:
         """Fetches all :class:`List`s the user is a member of.
 
         Returns
@@ -740,6 +744,30 @@ class User(Comparable):
         return ListPagination(
             res,
             endpoint_request=f"/users/{self.id}/list_memberships",
+            http_client=self.http_client,
+            params=params,
+        )
+
+    def fetch_followed_lists(self) -> Union[ListPagination, List]:
+        """Fetches the user's followed lists.
+
+
+        .. versionadded:: 1.5.0
+        """
+        params = {
+            "expansions": LIST_EXPANSION,
+            "list.fields": LIST_FIELD,
+            "user.fields": USER_FIELD,
+        }
+
+        res = self.http_client.request("GET", "2", f"/users/{self.id}/followed_lists", params=params)
+
+        if not res:
+            return []
+
+        return ListPagination(
+            res,
+            endpoint_request=f"/users/{self.id}/followed_lists",
             http_client=self.http_client,
             params=params,
         )

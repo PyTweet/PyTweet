@@ -6,9 +6,10 @@ from typing import TYPE_CHECKING, Optional
 from .type import ID, Payload
 from .utils import time_parse_todt
 from .paginations import UserPagination, TweetPagination
-from .constants import TWEET_EXPANSION, USER_FIELD, TWEET_FIELD
+from .constants import TWEET_EXPANSION, USER_FIELD, TWEET_FIELD, PINNED_TWEET_EXPANSION
 from .relations import RelationUpdate, RelationDelete, RelationPin
 from .objects import Comparable
+from .relations import RelationFollow
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -113,6 +114,72 @@ class List(Comparable):
         .. versionadded:: 1.5.0
         """
         return f"https://twitter.com/i/lists/{self.id}"
+
+    def follow(self) -> RelationFollow:
+        """Let the client follows the list.
+
+        Returns
+        ---------
+        :class:`RelationFollow`
+            This method returns a :class:`RelationFollow` object.
+
+
+        .. versionadded:: 1.5.0
+        """
+        my_id = self.http_client.access_token.partition("-")[0]
+        data = self.http_client.request(
+            "POST", "2", f"/users/{my_id}/followed_lists", json={"list_id": str(self.id)}, auth=True
+        )
+        return RelationFollow(data)
+
+    def unfollow(self) -> RelationFollow:
+        """Let the client unfollows the list.
+
+        Returns
+        ---------
+        :class:`RelationFollow`
+            This method returns a :class:`RelationFollow` object.
+
+
+        .. versionadded:: 1.5.0
+        """
+        my_id = self.http_client.access_token.partition("-")[0]
+        data = self.http_client.request("DELETE", "2", f"/users/{my_id}/followed_lists/{self.id}", auth=True)
+        return RelationFollow(data)
+
+    def fetch_followers(self) -> UserPagination:
+        """Fetches users that followed the list.
+
+        Returns
+        ---------
+        :class:`UserPagination`
+            This method returns a :class:`UserPagination` object.
+
+
+        .. versionadded:: 1.5.0
+        """
+        params = {
+            "expansions": PINNED_TWEET_EXPANSION,
+            "user.fields": USER_FIELD,
+            "tweet.fields": TWEET_FIELD,
+        }
+
+        res = self.http_client.request(
+            "GET",
+            "2",
+            f"/lists/{self.id}/followers",
+            params=params,
+        )
+
+        if not res:
+            return []
+
+        return UserPagination(
+            res,
+            endpoint_request=f"/lists/{self.id}/followers",
+            http_client=self.http_client,
+            params=params,
+        )
 
     def fetch_tweets(self) -> TweetPagination:
         """Fetches tweets from the list.
@@ -275,7 +342,7 @@ class List(Comparable):
             "2",
             f"/lists/{self.id}/members",
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
@@ -289,7 +356,7 @@ class List(Comparable):
             endpoint_request=f"/lists/{self.id}/member",
             http_client=self.http_client,
             params={
-                "expansions": "pinned_tweet_id",
+                "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
