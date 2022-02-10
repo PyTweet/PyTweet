@@ -7,6 +7,7 @@ import json
 import logging
 import time
 import threading
+import datetime
 from urllib.parse import urlparse
 from asyncio import iscoroutinefunction
 from http import HTTPStatus
@@ -15,6 +16,7 @@ from flask import Flask, request
 
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .enums import ReplySetting, SpaceState, Granularity
+from .constants import TWEET_EXPANSION, USER_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_FIELD
 from .errors import PytweetException, UnKnownSpaceState
 from .http import HTTPClient
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
@@ -454,7 +456,7 @@ class Client:
         twitter_list = self.http.create_list(name, description=description, private=private)
         return self.http.fetch_list(twitter_list.id)
 
-    def search_geo(
+    def search_geos(
         self,
         query: str,
         max_result: Optional[ID] = None,
@@ -464,7 +466,7 @@ class Client:
         ip: Optional[ID] = None,
         granularity: Granularity = Granularity.neighborhood,
     ) -> Geo:
-        """Search a geo with the given arguments.
+        """Search geo-locations with the given arguments.
 
         Parameters
         ------------
@@ -495,7 +497,7 @@ class Client:
         """Search trends with woeid.
 
         .. note::
-            You can find woeid information through :class:`Location` with :meth:`Client.search_trend_locations` or :meth:`Client.search_trend_closest`.
+            You can find woeid information through :meth:`Location.woeid` with :meth:`Client.search_trend_locations` or :meth:`Client.search_trend_closest`.
 
         Parameters
         ------------
@@ -567,13 +569,167 @@ class Client:
 
         return [Location(**data) for data in res]
 
+    def search_recent_tweet(
+        self,
+        query: str,
+        *,
+        max_results: int = 10,
+        start_time: Optional[datetime.datetime] = None,
+        end_time: Optional[datetime.datetime] = None,
+        since_id: Optional[ID] = None,
+        until_id: Optional[ID] = None,
+        sort_by_relevancy: bool = False,
+    ) -> List[Tweet]:
+        """Searches tweet from the last seven days that match a search query.
+
+        Parameters
+        ------------
+        query: :class:`str`
+            One query for matching Tweets.
+        max_results: :class:`int`
+            The maximum number of search results to be returned by a request. A number between 10 and 100. By default, the method will returns 10 results.
+        start_time: Optional[:class:`datetime.datetime`]
+            This will make sure the tweets created datetime is after that specific time.
+        end_time: Optional[:class:`datetime.datetime`]
+            This will make sure the tweets created datetime is before that specific time.
+        since_id: Optional[`ID`]
+            Returns results with a Tweet ID greater than (that is, more recent than) the specified 'since' Tweet ID. Only the 3200 most recent Tweets are available. The result will exclude the since_id. If the limit of Tweets has occurred since the since_id, the since_id will be forced to the oldest ID available.
+        until_id: Optional[`ID`]
+            Returns results with a Tweet ID less less than (that is, older than) the specified 'until' Tweet ID. Only the 3200 most recent Tweets are available. The result will exclude the until_id. If the limit of Tweets has occurred since the until_id, the until_id will be forced to the most recent ID available.
+        sort_by_relevancy: :class:`bool`
+            This parameter is used to specify the order in which you want the Tweets returned. If sets to True, tweets will be order by relevancy, else it sets to recency. Default to False.
+
+        Returns
+        ---------
+        Union[:class:`TweetPagination`, :class:`list`]
+            This method returns a list of :class:`Tweet` objects.
+
+
+        .. versionadded:: 1.5.0
+        """
+        if (
+            not isinstance(start_time, datetime.datetime)
+            and start_time
+            or not isinstance(end_time, datetime.datetime)
+            and end_time
+        ):
+            raise ValueError("start_time or end_time must be a datetime object!")
+
+        params = {
+            "expansions": TWEET_EXPANSION,
+            "user.fields": USER_FIELD,
+            "media.fields": MEDIA_FIELD,
+            "place.fields": PLACE_FIELD,
+            "poll.fields": POLL_FIELD,
+            "tweet.fields": TWEET_FIELD,
+            "query": query,
+            "max_results": max_results
+        }
+
+        if start_time:
+            params["start_time"] = start_time.isoformat()
+        if end_time:
+            params["end_time"] = end_time.isoformat()
+        if since_id:
+            params["since_id"] = str(since_id)
+        if until_id:
+            params["until_id"] = str(until_id)
+        if sort_by_relevancy:
+            params["sort_order"] = "relevancy"
+
+        res = self.http.request(
+            "GET",
+            "2",
+            "/tweets/search/recent",
+            params=params
+        )
+
+        return [Tweet(data, http_client=self.http) for data in res.get("data")]
+
+    def search_all_tweet(
+        self,
+        query: str,
+        *,
+        max_results: int = 10,
+        start_time: Optional[datetime.datetime] = None,
+        end_time: Optional[datetime.datetime] = None,
+        since_id: Optional[ID] = None,
+        until_id: Optional[ID] = None,
+        sort_by_relevancy: bool = False,
+    ) -> List[Tweet]:
+        """Searches all tweet from the complete history of public Tweets matching a search query; since the first Tweet was created March 26, 2006. Only available to those users who have been approved for Academic Research access.
+
+        Parameters
+        ------------
+        query: :class:`str`
+            One query for matching Tweets.
+        max_results: :class:`int`
+            The maximum number of search results to be returned by a request. A number between 10 and 100. By default, the method will returns 10 results.
+        start_time: Optional[:class:`datetime.datetime`]
+            This will make sure the tweets created datetime is after that specific time.
+        end_time: Optional[:class:`datetime.datetime`]
+            This will make sure the tweets created datetime is before that specific time.
+        since_id: Optional[`ID`]
+            Returns results with a Tweet ID greater than (that is, more recent than) the specified 'since' Tweet ID. Only the 3200 most recent Tweets are available. The result will exclude the since_id. If the limit of Tweets has occurred since the since_id, the since_id will be forced to the oldest ID available.
+        until_id: Optional[`ID`]
+            Returns results with a Tweet ID less less than (that is, older than) the specified 'until' Tweet ID. Only the 3200 most recent Tweets are available. The result will exclude the until_id. If the limit of Tweets has occurred since the until_id, the until_id will be forced to the most recent ID available.
+        sort_by_relevancy: :class:`bool`
+            This parameter is used to specify the order in which you want the Tweets returned. If sets to True, tweets will be order by relevancy, else it sets to recency. Default to False.
+
+        Returns
+        ---------
+        Union[:class:`TweetPagination`, :class:`list`]
+            This method returns a list of :class:`Tweet` objects.
+
+
+        .. versionadded:: 1.5.0
+        """
+        if (
+            not isinstance(start_time, datetime.datetime)
+            and start_time
+            or not isinstance(end_time, datetime.datetime)
+            and end_time
+        ):
+            raise ValueError("start_time or end_time must be a datetime object!")
+
+        params = {
+            "expansions": TWEET_EXPANSION,
+            "user.fields": USER_FIELD,
+            "media.fields": MEDIA_FIELD,
+            "place.fields": PLACE_FIELD,
+            "poll.fields": POLL_FIELD,
+            "tweet.fields": TWEET_FIELD,
+            "query": query,
+            "max_results": max_results
+        }
+
+        if start_time:
+            params["start_time"] = start_time.isoformat()
+        if end_time:
+            params["end_time"] = end_time.isoformat()
+        if since_id:
+            params["since_id"] = str(since_id)
+        if until_id:
+            params["until_id"] = str(until_id)
+        if sort_by_relevancy:
+            params["sort_order"] = "relevancy"
+
+        res = self.http.request(
+            "GET",
+            "2",
+            "/tweets/search/all",
+            params=params
+        )
+
+        return [Tweet(data, http_client=self.http) for data in res.get("data")]
+
     def get_user(self, user_id: ID) -> Optional[User]:
         """Gets a user through the client internal user cache. Return None if the user is not in the cache.
 
         .. note::
             Users will get cache with several conditions:
                 * Users return from a method such as :meth:`Client.fetch_user`.
-                * The client interacts with other users such as dming them, triggering the typing animation, likes the client's tweets etc.
+                * The client interacts with other users such as dming them, triggering the typing animation, likes the client's tweets etc (This condition only applies if you use :meth:`Client.listen` at the very end of the file)
 
         Parameters
         ------------
