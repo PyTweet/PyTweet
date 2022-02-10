@@ -623,7 +623,7 @@ class Client:
             "poll.fields": POLL_FIELD,
             "tweet.fields": TWEET_FIELD,
             "query": query,
-            "max_results": max_results
+            "max_results": max_results,
         }
 
         if start_time:
@@ -637,12 +637,7 @@ class Client:
         if sort_by_relevancy:
             params["sort_order"] = "relevancy"
 
-        res = self.http.request(
-            "GET",
-            "2",
-            "/tweets/search/recent",
-            params=params
-        )
+        res = self.http.request("GET", "2", "/tweets/search/recent", params=params)
 
         return [Tweet(data, http_client=self.http) for data in res.get("data")]
 
@@ -700,7 +695,7 @@ class Client:
             "poll.fields": POLL_FIELD,
             "tweet.fields": TWEET_FIELD,
             "query": query,
-            "max_results": max_results
+            "max_results": max_results,
         }
 
         if start_time:
@@ -714,12 +709,7 @@ class Client:
         if sort_by_relevancy:
             params["sort_order"] = "relevancy"
 
-        res = self.http.request(
-            "GET",
-            "2",
-            "/tweets/search/all",
-            params=params
-        )
+        res = self.http.request("GET", "2", "/tweets/search/all", params=params)
 
         return [Tweet(data, http_client=self.http) for data in res.get("data")]
 
