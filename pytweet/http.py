@@ -667,8 +667,9 @@ class HTTPClient:
         user_id = message_create.get("target").get("recipient_id")
         user = self.fetch_user(user_id)
         res["event"]["message_create"]["target"]["recipient"] = user
-
-        return DirectMessage(res, http_client=self)
+        message = DirectMessage(res, http_client=self)
+        self.message_cache[message.id] = message
+        return message
 
     def fetch_welcome_message(self, welcome_message_id: ID) -> Optional[WelcomeMessage]:
         try:
