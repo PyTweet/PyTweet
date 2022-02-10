@@ -11,7 +11,6 @@ import logging
 from typing import Literal, NamedTuple
 
 from .dataclass import *
-from .app import *
 from .attachments import *
 from .auth import *
 from .client import *
