@@ -148,12 +148,12 @@ class List(Comparable):
         return RelationFollow(data)
 
     def fetch_followers(self) -> UserPagination:
-        """Fetches users that followed the list.
+        """Returns a pagination with a list of :class:`User`s as its content.
 
         Returns
         ---------
-        :class:`UserPagination`
-            This method returns a :class:`UserPagination` object.
+        :class:`TweetPagination`
+            This method returns a :class:`TweetPagination` object.
 
 
         .. versionadded:: 1.5.0
@@ -182,7 +182,12 @@ class List(Comparable):
         )
 
     def fetch_tweets(self) -> TweetPagination:
-        """Fetches tweets from the list.
+        """Returns a pagination with a list of :class:`Tweet`s as its content,
+
+        Returns
+        ---------
+        :class:`TweetPagination`
+            This method returns a :class:`TweetPagination` object.
 
 
         .. versionadded:: 1.5.0
