@@ -14,10 +14,9 @@ from .events import (
 )
 from .message import Message, DirectMessage
 from .user import User
-from .app import ApplicationInfo
 from .tweet import Tweet
 from .dataclass import TimezoneInfo, Location, SleepTimeSettings
-from .list import List as TwitterList
+from .dataclass import ApplicationInfo
 
 if TYPE_CHECKING:
     from .type import Payload
@@ -130,7 +129,8 @@ class EventParser:
         )
         application_info = direct_message_payload.get("apps")
         if application_info:
-            source_app = ApplicationInfo({"apps": direct_message_payload.get("apps")})
+            source_app_id = list(application_info.keys())[0]
+            source_app = ApplicationInfo(**application_info.get(source_app_id))
 
         else:
             source_app = None

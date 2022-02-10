@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from .app import ApplicationInfo
+from .dataclass import ApplicationInfo
 from .attachments import CTA, File, QuickReply
 from .entities import Hashtag, Symbol, Url, UserMention
 from .enums import MessageEventTypeEnum, MessageTypeEnum
@@ -120,7 +120,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.5.0
         """
-        return self.__message_create.get("target", {}).get("application_info", None)
+        return self.__message_create.get("target", {}).get("source_application", None)
 
     @property
     def created_at(self) -> datetime.datetime:
