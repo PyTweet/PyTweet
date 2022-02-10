@@ -145,7 +145,11 @@ class HTTPClient:
         if not event:
             return None
 
-        _log.debug(f"Dispatching Event: on_{event_name}")
+        _log.debug(
+            f"Dispatching Event: on_{event_name}"
+            f"Positional-Arguments: {args}"
+            f"Keyword-Arguments: {kwargs}"
+        )
         return event(*args, **kwargs)
 
     def request(

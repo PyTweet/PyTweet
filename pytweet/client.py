@@ -824,6 +824,7 @@ class Client:
                     return json.dumps(response)
 
                 json_data = request.get_json()
+                _log.debug(f"An event triggered! {json_data}")
                 self.executor.submit(self.http.handle_events, payload=json_data)
                 return ("", HTTPStatus.OK)
 
