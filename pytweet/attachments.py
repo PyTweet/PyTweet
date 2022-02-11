@@ -77,7 +77,7 @@ class Poll(Comparable):
         "_raw_options",
     )
 
-    def __init__(self, *,duration: int, **kwargs):
+    def __init__(self, *, duration: int, **kwargs):
         self._id: Optional[ID] = kwargs.get("id", None)
         self._voting_status: Optional[str] = kwargs.get("voting_status", None)
         self._end_date = kwargs.get("end_date", None)
@@ -559,6 +559,7 @@ class SubFile(File):
         """
         return "Subtitles"
 
+
 class Geo(Comparable):
     """Represents the Geo location in twitter.
     You can use this as attachment in a tweet or for searching a location
@@ -654,6 +655,7 @@ class Geo(Comparable):
         if self.__bounding_box:
             return self.__bounding_box.get("coordinates")
         return None
+
 
 class CustomProfile(Comparable):
     """Represents a CustomProfile attachments that allow a Direct Message author to present a different identity than that of the Twitter account being used.
