@@ -466,7 +466,7 @@ class OauthSession:
 
         .. versionadded:: 1.5.0
         """
-        res = self.http_client.request(
+        return self.http_client.request(
             "POST",
             "2",
             "/oauth2/token",
@@ -477,4 +477,29 @@ class OauthSession:
             },
         )
 
-        return res
+    def request_new_token(self, refresh_token: str) -> Optional[dict]:
+        """Request a new access token with the refresh token, to obtain a refresh token make sure to use :meth:`OauthSession.create_oauth2_url` with offline_access permission sets to True in the scope parameter.
+        
+        Paramaters
+        ------------
+        refresh_token: :class:`str`
+            Refresh tokens allow an application to obtain a new access token without prompting the user via the refresh token flow.
+
+        Returns
+        ---------
+        Optional[:class:`dict`]
+            This method returns a dict object with the new request token in that dict.
+
+        
+        .. versionadded:: 1.5.0
+        """
+        return self.http_client.request(
+            "POST",
+            "2",
+            "/oauth2/token",
+            data=f"refresh_token={refresh_token}&grant_type=refresh_token&client_id={self.client_id}",
+            headers={
+                "Authorization": f"Basic {self.basic_auth}",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        )
