@@ -409,84 +409,75 @@ Event Objects
 
 Event objects are objects returned by an event filled with the event data.
 
-Event
+Event Type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Event()
     :members:
 
-DirectMessageEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: DirectMessageEvent()
     :members:
     :inherited-members:
 
-UserActionEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserActionEvent()
     :members:
     :inherited-members:
 
-DirectMessageTypingEvent
+
+
+Direct Message Events
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Event objects thats related with direct message events.
+
 
 .. autoclass:: DirectMessageTypingEvent()
     :members:
     :inherited-members:
-
-DirectMessageReadEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
 
 .. autoclass:: DirectMessageReadEvent()
     :members:
     :inherited-members:
 
-TweetFavoriteActionEvent
+
+Action Events
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Action events are events trigger by or from a user
+
 
 .. autoclass:: TweetFavoriteActionEvent()
     :members:
     :inherited-members:
 
-UserFollowActionEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: UserFollowActionEvent()
+.. autoclass:: UserRevokeEvent()
     :members:
     :inherited-members:
 
-UserUnfollowActionEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserUnfollowActionEvent()
     :members:
     :inherited-members:
 
-UserBlockActionEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserBlockActionEvent()
     :members:
     :inherited-members:
 
-UserUnblockActionEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserUnblockActionEvent()
     :members:
     :inherited-members:
 
-UserMuteActionEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserMuteActionEvent()
     :members:
     :inherited-members:
 
-UserUnmuteActionEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserUnmuteActionEvent()
     :members:
@@ -551,6 +542,13 @@ Example:
 
     :param action: The event action object information.
     :type action: :class:`TweetFavoriteActionEvent`
+
+.. function:: on_user_revoke(action)
+
+    `on_user_revoke` is an event triggers when someone revoke the application access.
+
+    :param action: The event action object information.
+    :type action: :class:`UserRevokeEvent`
 
 .. function:: on_user_follow(action)
 
