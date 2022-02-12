@@ -193,11 +193,13 @@ class TweetFavoriteActionEvent(Event):
         """
         return self.payload.get("liker")
 
+
 class UserRevokeEvent(Event):
     """Represents a revoke access event by the subcription user, this inherits :class:`Event`. This object contains information that twitter posts through the webhook url.
 
     .. versionadded:: 1.5.0
     """
+
     def __init__(self, data: Payload):
         super().__init__(data.get("revoke"))
 
