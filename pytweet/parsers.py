@@ -5,6 +5,7 @@ from .events import (
     DirectMessageTypingEvent,
     DirectMessageReadEvent,
     TweetFavoriteActionEvent,
+    UserRevokeEvent,
     UserFollowActionEvent,
     UserUnfollowActionEvent,
     UserBlockActionEvent,
@@ -206,6 +207,10 @@ class EventParser:
 
         payload = DirectMessageReadEvent(event_payload, http_client=self.http_client)
         self.http_client.dispatch("read", payload)
+
+    def parse_user_revoke(self, action_payload: Payload):
+        action = UserRevokeEvent(action_payload)
+        self.http_client.dispatch("user_revoke", action)
 
     def parse_user_action(self, action_payload: Payload, action_type):
         action_payload = action_payload.copy()
