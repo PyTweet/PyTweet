@@ -62,7 +62,7 @@ class Client:
     sleep_after_ratelimit: :class:`bool`
         Indicates to sleep when your client is ratelimited, If set to True it won't raise :class:`TooManyRequests` error but it would print a message indicating to sleep, then it sleeps for how many seconds it needs to sleep, after that it continue to restart the request.
     verify_credentials: :class:`bool`
-        Indicates to verify the credentials you specified, this includes consumer_key, consumer_secret, access_token, access_token_secret. make sure to specified all of them in your client, you cannot specified only one of them. 
+        Indicates to verify the credentials you specified, this includes consumer_key, consumer_secret, access_token, access_token_secret. make sure to specified all of them in your client, you cannot specified only one of them.
 
     Attributes
     ------------
@@ -91,8 +91,8 @@ class Client:
         client_secret: Optional[str] = None,
         use_bearer_only: bool = False,
         sleep_after_ratelimit: bool = False,
-        verify_credentials: bool = False
-    ) -> None:  
+        verify_credentials: bool = False,
+    ) -> None:
         self.http = HTTPClient(
             bearer_token,
             consumer_key=consumer_key,
