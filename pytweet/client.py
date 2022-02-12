@@ -59,8 +59,10 @@ class Client:
         The client's OAuth 2.0 Client Secret from keys and tokens page.
     use_bearer_only: bool
         Indicates to only use bearer token for all methods. This mean the client is now a twitter-api-client v2 interface. Some methods are unavailable to use such as fetching trends and location, environment fetching methods, and features such as events. Some methods can be recover with OAuth 2 authorization code flow with PKCE with the correct scopes or permissions. Like users.read scope for reading users info which some methods provide a way like :meth:`Client.fetch_user`.
-    sleep_after_ratelimit: bool
+    sleep_after_ratelimit: :class:`bool`
         Indicates to sleep when your client is ratelimited, If set to True it won't raise :class:`TooManyRequests` error but it would print a message indicating to sleep, then it sleeps for how many seconds it needs to sleep, after that it continue to restart the request.
+    verify_credentials: :class:`bool`
+        Indicates to verify the credentials you specified, this includes consumer_key, consumer_secret, access_token, access_token_secret. make sure to specified all of them in your client, you cannot specified only one of them. 
 
     Attributes
     ------------
@@ -89,7 +91,8 @@ class Client:
         client_secret: Optional[str] = None,
         use_bearer_only: bool = False,
         sleep_after_ratelimit: bool = False,
-    ) -> None:
+        verify_credentials: bool = False
+    ) -> None:  
         self.http = HTTPClient(
             bearer_token,
             consumer_key=consumer_key,
@@ -108,6 +111,9 @@ class Client:
         self.environment: Optional[Environment] = None
         self.webhook_url_path: Optional[str] = None
         self.executor = self.http.thread_manager.create_new_executor(thread_name="main-executor")
+        self.verify_credentials = verify_credentials
+        if self.verify_credentials:
+            self.http.oauth_session.verify_credentials(raise_error=True)
 
     def __repr__(self) -> str:
         return "Client({0.account!r})".format(self)
