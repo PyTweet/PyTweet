@@ -269,21 +269,6 @@ class OauthSession:
         )
 
     @property
-    def oauth1_without_access_tokens(self) -> OAuth1:
-        return OAuth1(
-            self.consumer_key,
-            client_secret=None,
-            resource_owner_key=None,
-            resource_owner_secret=None,
-            callback_uri=self.callback_url,
-            decoding=None,
-        )
-
-    @property
-    def request_session(self):
-        return self.http_client._HTTPClient__session
-
-    @property
     def basic_auth(self) -> str:
         """:class:`str`: The decoded base64 encoded client id and secret.
 
@@ -304,6 +289,40 @@ class OauthSession:
         .. versionadded:: 1.3.5
         """
         self.http_client.request("POST", "1.1", "/oauth/invalidate_token", auth=True)
+
+    def verify_credentials(self, *,raise_error: bool = True) -> Optional[bool]:
+        """Verify the credentials are correct. Returns a boolean whether its succesful or not if raise_error turns to False. Default to True
+
+        Parameters
+        ------------
+        raise_error: :class:`bool`
+            Indicates whether to raise if the credentials are wrong. If sets to False, the method will returns a boolean, True for succesful and False for error.
+
+        Raises
+        --------
+        :class:`Forbidden`
+            Raised if the credentials are wrong.
+        
+
+        .. versionadded:: 1.5.0
+        """
+        try:
+            error = None
+            self.http_client.request(
+                "GET",
+                "1.1",
+                "/account/verify_credentials.json",
+                auth=True
+            )
+        except Exception as e:
+            error = e
+        finally:
+            if not error:
+                return True
+            elif error and raise_error:
+                raise error
+            else:
+                return False
 
     def generate_request_tokens(
         self, access_type: Optional[Literal["read", "write", "direct_messages"]] = None
