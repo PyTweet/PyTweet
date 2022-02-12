@@ -224,7 +224,7 @@ class List(Comparable):
     ) -> Optional[RelationUpdate]:
         """Updates the list.
 
-        Paramaters
+        Parameters
         -----------
         name: :class:`str`
             The name of the List you wish to update.

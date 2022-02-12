@@ -480,7 +480,7 @@ class OauthSession:
     def request_new_token(self, refresh_token: str) -> Optional[dict]:
         """Request a new access token with the refresh token, to obtain a refresh token make sure to use :meth:`OauthSession.create_oauth2_url` with offline_access permission sets to True in the scope parameter.
 
-        Paramaters
+        Parameters
         ------------
         refresh_token: :class:`str`
             Refresh tokens allow an application to obtain a new access token without prompting the user via the refresh token flow.
