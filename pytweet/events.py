@@ -4,6 +4,7 @@ from .user import User
 from .tweet import Tweet
 from .enums import ActionEventType, UserActionEventType
 from .type import Payload
+from .utils import time_parser_todt
 
 # Events type
 
@@ -191,6 +192,38 @@ class TweetFavoriteActionEvent(Event):
         .. versionadded:: 1.5.0
         """
         return self.payload.get("liker")
+
+class UserRevokeEvent(Event):
+    """Represents a revoke access event by the subcription user, this inherits :class:`Event`. This object contains information that twitter posts through the webhook url.
+
+    .. versionadded:: 1.5.0
+    """
+    def __init__(self, data: Payload):
+        super().__init__(data.get("revoke"))
+
+    @property
+    def revoked_at(self) -> datetime.datetime:
+        """:class:`datetime.datetime`: Returns a datetime.datetime object with the action's created timestamp.
+
+        .. versionadded:: 1.5.0
+        """
+        return time_parser_todt(self.payload.get("date_time"))
+
+    @property
+    def app_id(self) -> int:
+        """:class:`int`: Returns an application id who the user revoked from.
+
+        .. versionadded:: 1.5.0
+        """
+        return int(self.payload.get("target").get("app_id"))
+
+    @property
+    def user_id(self) -> int:
+        """:class:`int`: Returns a user id who revoked the access.
+
+        .. versionadded:: 1.5.0
+        """
+        return int(self.payload.get("source").get("user_id"))
 
 
 class UserFollowActionEvent(UserActionEvent):
