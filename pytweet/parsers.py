@@ -109,7 +109,10 @@ class EventParser:
     def __init__(self, http_client: HTTPClient):
         self.payload_parser = PayloadParser(http_client)
         self.http_client = http_client
-        self.client_id = int(self.http_client.access_token.partition("-")[0])
+        try:
+            self.client_id = int(self.http_client.access_token.partition("-")[0])
+        except AttributeError:
+            self.client_id = int(self.http_client.fetch_me().id)
 
     def parse_direct_message_create(self, direct_message_payload: Payload):
         event_payload = {"event": direct_message_payload.get("direct_message_events")[0]}
