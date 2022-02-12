@@ -479,7 +479,7 @@ class OauthSession:
 
     def request_new_token(self, refresh_token: str) -> Optional[dict]:
         """Request a new access token with the refresh token, to obtain a refresh token make sure to use :meth:`OauthSession.create_oauth2_url` with offline_access permission sets to True in the scope parameter.
-        
+
         Paramaters
         ------------
         refresh_token: :class:`str`
@@ -490,7 +490,7 @@ class OauthSession:
         Optional[:class:`dict`]
             This method returns a dict object with the new request token in that dict.
 
-        
+
         .. versionadded:: 1.5.0
         """
         return self.http_client.request(
