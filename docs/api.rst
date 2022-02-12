@@ -613,10 +613,11 @@ Example:
     :param action: The event action object information.
     :type action: :class:`DirectMessageTypingEvent`
 
+
 Enums 
 --------------
 
-All these enums are a subclass of :class:`enum.Enum`
+All of these enums are a subclass of :class:`enum.Enum`
 
 .. class:: MessageTypeEnum
 
