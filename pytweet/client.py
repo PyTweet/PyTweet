@@ -52,7 +52,7 @@ class Client:
     stream: Optional[Stream]
         The client's stream. Must be an instance of :class:`Stream`.
     callback_url: Optional[:class:`str`]
-        The oauth callback url, default to None. Makes sure the callback url is the same as the one in your application auth-settings or else it cant create and interact with oauth related methods.
+        The oauth callback url, default to None. Makes sure the callback url is the same as the one in your application auth-settings or else it can't create and interact with oauth related methods.
     client_id: Optional[:class:`str`]
         The client's OAuth 2.0 Client ID from keys and tokens page.
     client_secret: Optional[:class:`str`]
@@ -60,7 +60,7 @@ class Client:
     use_bearer_only: bool
         Indicates to only use bearer token for all methods. This mean the client is now a twitter-api-client v2 interface. Some methods are unavailable to use such as fetching trends and location, environment fetching methods, and features such as events. Some methods can be recover with OAuth 2 authorization code flow with PKCE with the correct scopes or permissions. Like users.read scope for reading users info which some methods provide a way like :meth:`Client.fetch_user`.
     sleep_after_ratelimit: bool
-        Indicates to sleep when your client is ratelimited, If set to True it wont raise :class:`TooManyRequests` error but it would print a message indicating to sleep, then it sleeps for how many seconds it needs to sleep, after that it continue to restart the request.
+        Indicates to sleep when your client is ratelimited, If set to True it won't raise :class:`TooManyRequests` error but it would print a message indicating to sleep, then it sleeps for how many seconds it needs to sleep, after that it continue to restart the request.
 
     Attributes
     ------------

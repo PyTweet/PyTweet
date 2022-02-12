@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import io
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, NoReturn, Optional, Union, List
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union, List
 
 from .constants import (
     TWEET_EXPANSION,
@@ -617,7 +617,7 @@ class User(Comparable):
         )
 
     def fetch_liked_tweets(self) -> TweetPagination:
-        """Fetches tweets thats been liked by the user.
+        """Fetches tweets that's been liked by the user.
 
         .. versionadded:: 1.5.0
         """
