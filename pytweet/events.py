@@ -4,7 +4,7 @@ from .user import User
 from .tweet import Tweet
 from .enums import ActionEventType, UserActionEventType
 from .type import Payload
-from .utils import time_parser_todt
+from .utils import time_parse_todt
 
 # Events type
 
@@ -207,7 +207,7 @@ class UserRevokeEvent(Event):
 
         .. versionadded:: 1.5.0
         """
-        return time_parser_todt(self.payload.get("date_time"))
+        return time_parse_todt(self.payload.get("date_time"))
 
     @property
     def app_id(self) -> int:
