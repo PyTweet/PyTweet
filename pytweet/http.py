@@ -93,6 +93,8 @@ class HTTPClient:
                 raise Unauthorized(None, f"Wrong authorization passed for credential: {k}.")
 
         self.__session = requests.Session()
+        self.base_url = "https://api.twitter.com/"
+        self.upload_url = "https://upload.twitter.com/"
         self.bearer_token = bearer_token
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
@@ -107,8 +109,6 @@ class HTTPClient:
         self.payload_parser = self.event_parser.payload_parser
         self.thread_manager = ThreadManager()
         self.sleep_after_ratelimit = sleep_after_ratelimit
-        self.base_url = "https://api.twitter.com/"
-        self.upload_url = "https://upload.twitter.com/"
         self._auth = OauthSession(
             self.consumer_key,
             self.consumer_secret,
@@ -635,6 +635,9 @@ class HTTPClient:
 
         elif payload.get("favorite_events"):
             self.event_parser.parse_favorite_tweet(payload)
+
+        elif payload.get("user_event"):
+            self.event_parser.parse_revoke_event(payload)
 
         elif payload.get("follow_events"):
             self.event_parser.parse_user_action(payload, "follow_events")
