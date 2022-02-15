@@ -816,7 +816,7 @@ class HTTPClient:
         exclude_reply_users: Optional[List[User, ID]] = None,
         media_tagged_users: Optional[List[User, ID]] = None,
         super_followers_only: bool = False,
-    ) -> Optional[Message]:
+    ) -> Optional[Tweet]:
         thread_session = self.generate_thread_session()
         executor = self.thread_manager.create_new_executor(thread_name="post-tweet-request", session_id=thread_session)
 
@@ -827,8 +827,7 @@ class HTTPClient:
         if file:
             payload["media"] = {}
             payload["media"]["media_ids"] = []
-            file_future = executor.submit(self.quick_upload, file)
-            executor.futures.append(file_future)
+            executor.submit(self.quick_upload, file)
 
         if files:
             if len(files) + 1 if file else len(files) > 4:
@@ -837,8 +836,7 @@ class HTTPClient:
             payload["media"] = {}
             payload["media"]["media_ids"] = []
             for file in files:
-                future = executor.submit(self.quick_upload, file)
-                executor.futures.append(future)
+                executor.submit(self.quick_upload, file)
 
         if poll:
             payload["poll"] = {}
@@ -886,7 +884,6 @@ class HTTPClient:
             payload["for_super_followers_only"] = True
 
         executor.wait_for_futures()
-
         if file:
             payload["media"]["media_ids"].append(str(file.media_id))
         if files:
@@ -894,8 +891,7 @@ class HTTPClient:
                 payload["media"]["media_ids"].append(str(file.media_id))
 
         res = self.request("POST", "2", "/tweets", json=payload, auth=True)
-        data = res.get("data")
-        return Message(data.get("text"), data.get("id"), 1)
+        return self.fetch_tweet(res["data"]["id"])
 
     def create_list(self, name: str, *, description: str = "", private: bool = False) -> Optional[TwitterList]:
         res = self.request(
