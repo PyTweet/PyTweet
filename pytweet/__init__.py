@@ -35,7 +35,7 @@ from .user import *
 from .utils import *
 
 __title__ = "PyTweet"
-__version__ = "1.5.0a5"
+__version__ = "1.5.0a10"
 __author__ = "TheFarGG & TheGenocides"
 __license__ = "MIT"
 __copyright__ = "Copyright 2021-present TheFarGG & TheGenocides"
@@ -49,7 +49,7 @@ class VersionInfo(NamedTuple):
     serial: int
 
 
-version_info: VersionInfo = VersionInfo(major=1, minor=5, micro=0, releaselevel="alpha", serial=5)
+version_info: VersionInfo = VersionInfo(major=1, minor=5, micro=0, releaselevel="alpha", serial=10)
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
