@@ -536,7 +536,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        tweet = self.http_client.post_tweet(
+        return self.http_client.post_tweet(
             text,
             file=file,
             files=files,
@@ -547,7 +547,6 @@ class Tweet(Message):
             exclude_reply_users=exclude_reply_users,
             media_tagged_users=media_tagged_users,
         )
-        return tweet
 
     def hide(self) -> RelationHide:
         """Hide a reply tweet.
