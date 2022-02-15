@@ -290,7 +290,7 @@ class OauthSession:
         """
         self.http_client.request("POST", "1.1", "/oauth/invalidate_token", auth=True)
 
-    def verify_credentials(self, *,raise_error: bool = True) -> Optional[bool]:
+    def verify_credentials(self, *, raise_error: bool = True) -> Optional[bool]:
         """Verify the credentials are correct. Returns a boolean whether its succesful or not if raise_error turns to False. Default to True
 
         Parameters
@@ -302,18 +302,13 @@ class OauthSession:
         --------
         :class:`Forbidden`
             Raised if the credentials are wrong.
-        
+
 
         .. versionadded:: 1.5.0
         """
         try:
             error = None
-            self.http_client.request(
-                "GET",
-                "1.1",
-                "/account/verify_credentials.json",
-                auth=True
-            )
+            self.http_client.request("GET", "1.1", "/account/verify_credentials.json", auth=True)
         except Exception as e:
             error = e
         finally:
