@@ -503,7 +503,7 @@ class Tweet(Message):
         reply_setting: Optional[Union[ReplySetting, str]] = None,
         exclude_reply_users: Optional[List[User, ID]] = None,
         media_tagged_users: Optional[List[User, ID]] = None,
-    ) -> Union[Tweet, Message]:
+    ) -> Optional[Tweet]:
         """Post a tweet to reply to the tweet present by the tweet's id. Returns a :class:`Tweet` object or :class:`Message` if the tweet is not found in the cache.
 
         .. note::
@@ -536,7 +536,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        message = self.http_client.post_tweet(
+        tweet = self.http_client.post_tweet(
             text,
             file=file,
             files=files,
@@ -547,7 +547,7 @@ class Tweet(Message):
             exclude_reply_users=exclude_reply_users,
             media_tagged_users=media_tagged_users,
         )
-        return self.http_client.fetch_tweet(message.id)
+        return tweet
 
     def hide(self) -> RelationHide:
         """Hide a reply tweet.
