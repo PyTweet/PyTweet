@@ -357,7 +357,7 @@ class Client:
         exclude_reply_users: Optional[List[User, ID]] = None,
         media_tagged_users: Optional[List[User, ID]] = None,
         super_followers_only: bool = False,
-    ) -> Union[Message, Tweet]:
+    ) -> Optional[Tweet]:
         """Posts a tweet directly to twitter from the given parameters.
 
         Parameters
@@ -1095,3 +1095,4 @@ class Client:
             _log.debug(
                 f"Listening for events! user cache filled at {len(self.http.user_cache)} users! flask application is running with url: {url}({self.webhook_url_path}).\n Ngrok: {ngrok}\nMake a new webhook when not found: {make_new}\n In Environment: {repr(self.environment)} with webhook: {repr(self.webhook)}."
             )
+            
