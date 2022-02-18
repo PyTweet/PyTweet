@@ -80,7 +80,8 @@ class HTTPClient:
         if not bearer_token:
             _log.error("bearer token is missing!")
         if not consumer_key:
-            _log.warning("Consumer key is missing this is recommended to have!")
+            _log.warning(
+                "Consumer key is missing this is recommended to have!")
         if not access_token:
             _log.warning("Access token is missing this is recommended to have")
         if not access_token_secret:
@@ -90,7 +91,8 @@ class HTTPClient:
 
         for k, v in self.credentials.items():
             if not isinstance(v, (str, type(None))):
-                raise Unauthorized(None, f"Wrong authorization passed for credential: {k}.")
+                raise Unauthorized(
+                    None, f"Wrong authorization passed for credential: {k}.")
 
         self.__session = requests.Session()
         self.base_url = "https://api.twitter.com/"
@@ -125,6 +127,37 @@ class HTTPClient:
         self.tweet_cache = {}
         self.user_cache = {}
         self.events = {}
+        self.routes = {
+            # media/
+            "upload": "/media/upload.json",
+            "metadata_create": "/media/metadata/create.json",
+            "subtitles_create": "/media/subtitles/create.json",
+            # users/
+            "fetch_me": "/users/me",
+            "fetch_user": lambda user_id: f"/users/{user_id}",
+            "fetch_users": lambda str_ids: f"/users?ids={','.join(str_ids)}",
+            "fetch_user_by_username": lambda username: f"/users/by/username/{username}",
+            # spaces/
+            "fetch_space": lambda space_id: f"/spaces/{str(space_id)}",
+            "fetch_spaces_bytitle": "/spaces/search",
+            # lists/
+            "fetch_list": lambda id: f"/lists/{id}",
+            "lists": "/lists",
+            # tweets/
+            "tweets": "/tweets",
+            "fetch_tweet": lambda tweet_id: f"/tweets/{tweet_id}",
+            # direct_messages/
+            "fetch_direct_messages": lambda event_id: f"/direct_messages/events/show.json?id={event_id}",
+            "fetch_welcome_message": "/direct_messages/welcome_messages/show.json",
+            "fetch_welcome_message_rule": "/direct_messages/welcome_messages/rules/show.json",
+            "create_welcome_message": "/direct_messages/welcome_messages/new.json",
+            "update_welcome_message": "/direct_messages/welcome_messages/update.json",
+            "send_message": "/direct_messages/events/new.json",
+            # geo/
+            "search_geo": "/geo/search.json",
+            # custom_profiles/
+            "create_custom_profile": "/custom_profiles/new.json"
+        }
         if self.stream:
             self.stream.http_client = self
             self.stream.connection.http_client = self
@@ -145,7 +178,8 @@ class HTTPClient:
         if not event:
             return None
 
-        _log.debug(f"Dispatching Event: on_{event_name}" f"Positional-Arguments: {args}" f"Keyword-Arguments: {kwargs}")
+        _log.debug(
+            f"Dispatching Event: on_{event_name}" f"Positional-Arguments: {args}" f"Keyword-Arguments: {kwargs}")
         return event(*args, **kwargs)
 
     def request(
@@ -175,14 +209,16 @@ class HTTPClient:
         if "Authorization" not in headers.keys():
             headers["Authorization"] = f"Bearer {self.bearer_token}"
 
-        headers["User-Agent"] = user_agent.format(sys.version_info, requests.__version__)
+        headers["User-Agent"] = user_agent.format(
+            sys.version_info, requests.__version__)
 
         if not self.use_bearer_only:
             if auth:
                 auth = self.oauth_session.oauth1
                 for k, v in self.credentials.items():
                     if v is None:
-                        raise PytweetException(f"{k} is a required credential for authorization.")
+                        raise PytweetException(
+                            f"{k} is a required credential for authorization.")
 
             if basic_auth:
                 headers["Authorization"] = f"Basic {self.oauth_session.basic_auth}"
@@ -199,7 +235,8 @@ class HTTPClient:
 
         method = method.upper()
         if thread_session:
-            executor = self.thread_manager.create_new_executor(thread_name=thread_name, session_id=thread_session)
+            executor = self.thread_manager.create_new_executor(
+                thread_name=thread_name, session_id=thread_session)
             future = executor.submit(
                 self.request,
                 method,
@@ -266,7 +303,8 @@ class HTTPClient:
                 if self.sleep_after_ratelimit:
                     remaining = int(response.headers["x-rate-limit-reset"])
                     sleep_for = (remaining - int(time.time())) + 1
-                    _log.warn(f"Client is ratelimited. Sleeping for {sleep_for}")
+                    _log.warn(
+                        f"Client is ratelimited. Sleeping for {sleep_for}")
                     print(f"Client is ratelimited. Sleeping for {sleep_for}")
                     time.sleep(sleep_for)
                     return self.request(
@@ -305,6 +343,42 @@ class HTTPClient:
 
             return res
 
+# EVENTS
+
+    def handle_events(self, payload: Payload):
+
+        if payload.get("direct_message_events"):
+            self.event_parser.parse_direct_message_create(payload)
+
+        elif payload.get("direct_message_indicate_typing_events"):
+            self.event_parser.parse_direct_message_typing(payload)
+
+        elif payload.get("direct_message_mark_read_events"):
+            self.event_parser.parse_direct_message_read(payload)
+
+        elif payload.get("favorite_events"):
+            self.event_parser.parse_favorite_tweet(payload)
+
+        elif payload.get("user_event"):
+            self.event_parser.parse_revoke_event(payload)
+
+        elif payload.get("follow_events"):
+            self.event_parser.parse_user_action(payload, "follow_events")
+
+        elif payload.get("block_events"):
+            self.event_parser.parse_user_action(payload, "block_events")
+
+        elif payload.get("mute_events"):
+            self.event_parser.parse_user_action(payload, "mute_events")
+
+        elif payload.get("tweet_create_events"):
+            self.event_parser.parse_tweet_create(payload)
+
+        elif payload.get("tweet_delete_events"):
+            self.event_parser.parse_tweet_delete(payload)
+
+# MEDIA
+
     def upload(self, file: File, command: str):
         assert command.upper() in ("INIT", "APPEND", "FINALIZE", "STATUS")
         thread_session = self.generate_thread_session()
@@ -322,14 +396,15 @@ class HTTPClient:
                 return
 
             if state == "failed":
-                raise PytweetException(f"Failed to finalize Media!\n{processing_info}")
+                raise PytweetException(
+                    f"Failed to finalize Media!\n{processing_info}")
 
             time.sleep(seconds)
 
             res = self.request(
                 "GET",
                 version="1.1",
-                path="/media/upload.json",
+                path=self.routes["upload"],
                 params={"command": "STATUS", "media_id": media_id},
                 auth=True,
                 use_base_url=False,
@@ -350,7 +425,7 @@ class HTTPClient:
             res = self.request(
                 "POST",
                 "1.1",
-                "/media/upload.json",
+                self.routes["upload"],
                 data=data,
                 auth=True,
                 use_base_url=False,
@@ -375,7 +450,7 @@ class HTTPClient:
                 self.request(
                     "POST",
                     version="1.1",
-                    path="/media/upload.json",
+                    path=self.routes["upload"],
                     data={
                         "command": "APPEND",
                         "media_id": file.media_id,
@@ -390,11 +465,12 @@ class HTTPClient:
                 segment_id += 1
 
         elif command.upper() == "FINALIZE":
-            executor = self.thread_manager.create_new_executor(thread_name="subfiles-upload-request")
+            executor = self.thread_manager.create_new_executor(
+                thread_name="subfiles-upload-request")
             res = self.request(
                 "POST",
                 version="1.1",
-                path="/media/upload.json",
+                path=self.routes["upload"],
                 data={"command": "FINALIZE", "media_id": file.media_id},
                 auth=True,
                 use_base_url=False,
@@ -405,7 +481,7 @@ class HTTPClient:
                 alt_text_future = self.request(
                     "POST",
                     "1.1",
-                    "/media/metadata/create.json",
+                    self.request["metadata_create"],
                     json={
                         "media_id": str(file.media_id),
                         "alt_text": {"text": str(file.alt_text)},
@@ -454,7 +530,7 @@ class HTTPClient:
                 self.request(
                     "POST",
                     version="1.1",
-                    path="/media/subtitles/create.json",
+                    path=self.routes["subtitles_create"],
                     json=subtitle_data,
                     auth=True,
                     use_base_url=False,
@@ -470,11 +546,13 @@ class HTTPClient:
         self.upload(file, "FINALIZE")
         return file
 
+# USERS
+
     def fetch_me(self):
         data = self.request(
             "GET",
             "2",
-            f"/users/me",
+            self.routes["fetch_me"],
             params={
                 "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
@@ -495,7 +573,7 @@ class HTTPClient:
             data = self.request(
                 "GET",
                 "2",
-                f"/users/{user_id}",
+                self.routes["fetch_user"](user_id),
                 params={
                     "expansions": PINNED_TWEET_EXPANSION,
                     "user.fields": USER_FIELD,
@@ -521,7 +599,7 @@ class HTTPClient:
         res = self.request(
             "GET",
             "2",
-            f"/users?ids={','.join(str_ids)}",
+            self.routes["fetch_users"](str_ids),
             params={
                 "expansions": PINNED_TWEET_EXPANSION,
                 "user.fields": USER_FIELD,
@@ -543,7 +621,7 @@ class HTTPClient:
             data = self.request(
                 "GET",
                 "2",
-                f"/users/by/username/{username}",
+                self.routes["fetch_user_by_username"](username),
                 params={
                     "expansions": PINNED_TWEET_EXPANSION,
                     "user.fields": USER_FIELD,
@@ -557,12 +635,88 @@ class HTTPClient:
         except NotFoundError:
             return None
 
+# SPACES
+
+    def fetch_space(self, space_id: str) -> Space:
+        res = self.request(
+            "GET",
+            "2",
+            self.routes["fetch_space"](space_id),
+            params={
+                "expansions": SPACE_EXPANSION,
+                "space.fields": SPACE_FIELD,
+                "topic.fields": TOPIC_FIELD,
+                "user.fields": USER_FIELD,
+            },
+        )
+        return Space(res, http_client=self)
+
+    def fetch_spaces_bytitle(self, title: str, state: SpaceState = SpaceState.live) -> Space:
+        res = self.request(
+            "GET",
+            "2",
+            self.routes["fetch_spaces_bytitle"],
+            params={
+                "query": title,
+                "state": state.value,
+                "expansions": SPACE_EXPANSION,
+                "space.fields": SPACE_FIELD,
+                "topic.fields": TOPIC_FIELD,
+            },
+        )
+        return [Space(data, http_client=self) for data in res]
+
+# LISTS
+
+    def fetch_list(self, id: ID) -> TwitterList:
+        res = self.request(
+            "GET",
+            "2",
+            self.routes["fetch_list"](id),
+            auth=True,
+            params={
+                "expansions": LIST_EXPANSION,
+                "list.fields": LIST_FIELD,
+                "user.fields": USER_FIELD,
+            },
+        )
+        return TwitterList(res, http_client=self)
+
+    def create_list(self, name: str, *, description: str = "", private: bool = False) -> Optional[TwitterList]:
+        res = self.request(
+            "POST",
+            "2",
+            self.routes["lists"],
+            auth=True,
+            json={"name": name, "description": description, "private": private},
+        )
+        return TwitterList(res, http_client=self)
+
+    def update_list(
+        self,
+        list_id: int,
+        *,
+        name: Optional[str] = None,
+        description: str = "",
+        private: Optional[bool] = None,
+    ) -> Optional[RelationUpdate]:
+        res = self.request(
+            "PUT",
+            "2",
+            self.routes["fetch_list"](list_id),
+            auth=True,
+            json={"name": name, "description": description, "private": private},
+        )
+        return RelationUpdate(res)
+
+# TWEETS
+
     def fetch_tweet(self, tweet_id: ID) -> Optional[Tweet]:
         try:
             res = self.request(
                 "GET",
                 "2",
-                f"/tweets/{tweet_id}",
+                self.routes["fetch_tweet"](tweet_id),
                 params={
                     "tweet.fields": TWEET_FIELD,
                     "user.fields": USER_FIELD,
@@ -580,87 +734,121 @@ class HTTPClient:
         except NotFoundError:
             return None
 
-    def fetch_space(self, space_id: str) -> Space:
+    def post_tweet(
+        self,
+        text: str = None,
+        *,
+        file: Optional[File] = None,
+        files: Optional[List[File]] = None,
+        poll: Optional[Poll] = None,
+        geo: Optional[Union[Geo, str]] = None,
+        direct_message_deep_link: Optional[str] = None,
+        reply_setting: Optional[Union[ReplySetting, str]] = None,
+        quote_tweet: Optional[Union[Tweet, ID]] = None,
+        reply_tweet: Optional[Union[Tweet, ID]] = None,
+        exclude_reply_users: Optional[List[User, ID]] = None,
+        media_tagged_users: Optional[List[User, ID]] = None,
+        super_followers_only: bool = False,
+    ) -> Optional[Tweet]:
+        thread_session = self.generate_thread_session()
+        executor = self.thread_manager.create_new_executor(
+            thread_name="post-tweet-request", session_id=thread_session)
+
+        payload = {}
+        if text:
+            payload["text"] = text
+
+        if file:
+            payload["media"] = {}
+            payload["media"]["media_ids"] = []
+            executor.submit(self.quick_upload, file)
+
+        if files:
+            if len(files) + 1 if file else len(files) > 4:
+                raise BadRequests(message="Cannot upload more then 4 files!")
+
+            payload["media"] = {}
+            payload["media"]["media_ids"] = []
+            for file in files:
+                executor.submit(self.quick_upload, file)
+
+        if poll:
+            payload["poll"] = {}
+            payload["poll"]["duration_minutes"] = int(poll.duration)
+            payload["poll"]["options"] = [
+                option.label for option in poll.options]
+
+        if geo:
+            payload["geo"] = {}
+            payload["geo"]["place_id"] = geo.id if isinstance(
+                geo, Geo) else geo
+
+        if direct_message_deep_link:
+            payload["direct_message_deep_link"] = direct_message_deep_link
+
+        if reply_setting:
+            payload["reply_settings"] = (
+                reply_setting.value if isinstance(
+                    reply_setting, ReplySetting) else reply_setting
+            )
+
+        if reply_tweet:
+            payload["reply"] = {}
+            payload["reply"]["in_reply_to_tweet_id"] = (
+                reply_tweet.id if isinstance(
+                    reply_tweet, Tweet) else str(reply_tweet)
+            )
+
+        if quote_tweet:
+            payload["quote_tweet_id"] = quote_tweet.id if isinstance(
+                quote_tweet, Tweet) else str(quote_tweet)
+
+        if exclude_reply_users:
+            ids = [str(user.id) if isinstance(user, User) else str(user)
+                   for user in exclude_reply_users]
+
+            if "reply" in payload.keys():
+                payload["reply"]["exclude_reply_user_ids"] = ids
+            else:
+                payload["reply"] = {}
+                payload["reply"]["exclude_reply_user_ids"] = ids
+
+        if media_tagged_users:
+            if not payload.get("media"):
+                raise PytweetException("Cannot tag users without any file!")
+            payload["media"]["tagged_user_ids"] = [
+                str(user.id) if isinstance(user, (User, ClientAccount)) else str(user) for user in media_tagged_users
+            ]
+
+        if super_followers_only:
+            payload["for_super_followers_only"] = True
+
+        executor.wait_for_futures()
+        if file:
+            payload["media"]["media_ids"].append(str(file.media_id))
+        if files:
+            for file in files:
+                payload["media"]["media_ids"].append(str(file.media_id))
+
         res = self.request(
-            "GET",
-            "2",
-            f"/spaces/{str(space_id)}",
-            params={
-                "expansions": SPACE_EXPANSION,
-                "space.fields": SPACE_FIELD,
-                "topic.fields": TOPIC_FIELD,
-                "user.fields": USER_FIELD,
-            },
-        )
-        return Space(res, http_client=self)
+            "POST", "2", self.routes["tweets"], json=payload, auth=True)
+        return self.fetch_tweet(res["data"]["id"])
 
-    def fetch_spaces_bytitle(self, title: str, state: SpaceState = SpaceState.live) -> Space:
-        res = self.request(
-            "GET",
-            "2",
-            "/spaces/search",
-            params={
-                "query": title,
-                "state": state.value,
-                "expansions": SPACE_EXPANSION,
-                "space.fields": SPACE_FIELD,
-                "topic.fields": TOPIC_FIELD,
-            },
-        )
-        return [Space(data, http_client=self) for data in res]
-
-    def fetch_list(self, id: ID) -> TwitterList:
-        res = self.request(
-            "GET",
-            "2",
-            f"/lists/{id}",
-            auth=True,
-            params={
-                "expansions": LIST_EXPANSION,
-                "list.fields": LIST_FIELD,
-                "user.fields": USER_FIELD,
-            },
-        )
-        return TwitterList(res, http_client=self)
-
-    def handle_events(self, payload: Payload):
-        if payload.get("direct_message_events"):
-            self.event_parser.parse_direct_message_create(payload)
-
-        elif payload.get("direct_message_indicate_typing_events"):
-            self.event_parser.parse_direct_message_typing(payload)
-
-        elif payload.get("direct_message_mark_read_events"):
-            self.event_parser.parse_direct_message_read(payload)
-
-        elif payload.get("favorite_events"):
-            self.event_parser.parse_favorite_tweet(payload)
-
-        elif payload.get("user_event"):
-            self.event_parser.parse_revoke_event(payload)
-
-        elif payload.get("follow_events"):
-            self.event_parser.parse_user_action(payload, "follow_events")
-
-        elif payload.get("block_events"):
-            self.event_parser.parse_user_action(payload, "block_events")
-
-        elif payload.get("mute_events"):
-            self.event_parser.parse_user_action(payload, "mute_events")
-
-        elif payload.get("tweet_create_events"):
-            self.event_parser.parse_tweet_create(payload)
-
-        elif payload.get("tweet_delete_events"):
-            self.event_parser.parse_tweet_delete(payload)
+# DIRECT MESSAGE
 
     def fetch_direct_message(self, event_id: ID) -> Optional[DirectMessage]:
         try:
             event_id = str(event_id)
         except ValueError:
-            raise ValueError("event_id must be an integer or a string of digits.")
+            raise ValueError(
+                "event_id must be an integer or a string of digits.")
 
-        res = self.request("GET", "1.1", f"/direct_messages/events/show.json?id={event_id}", auth=True)
+        res = self.request(
+            "GET",
+            "1.1",
+            self.routes["fetch_direct_messages"](event_id),
+            auth=True
+        )
 
         message_create = res.get("event").get("message_create")
         user_id = message_create.get("target").get("recipient_id")
@@ -674,12 +862,14 @@ class HTTPClient:
         try:
             welcome_message_id = str(welcome_message_id)
         except ValueError:
-            raise ValueError("welcome_message_id must be an integer or a string of digits.")
+            raise ValueError(
+                "welcome_message_id must be an integer or a string of digits."
+            )
 
         res = self.request(
             "GET",
             "1.1",
-            "/direct_messages/welcome_messages/show.json",
+            self.routes["fetch_welcome_message"],
             params={"id": str(welcome_message_id)},
             auth=True,
         )
@@ -695,7 +885,7 @@ class HTTPClient:
         res = self.request(
             "GET",
             "1.1",
-            "/direct_messages/welcome_messages/rules/show.json",
+            self.routes["fetch_welcome_message_rule"],
             params={"id": str(welcome_message_rule_id)},
             auth=True,
         )
@@ -704,36 +894,6 @@ class HTTPClient:
         timestamp = data.get("created_timestamp")
         welcome_message_id = data.get("welcome_message_id")
         return WelcomeMessageRule(id, welcome_message_id, timestamp, http_client=self)
-
-    def search_geo(
-        self,
-        query: str,
-        max_result: Optional[ID] = None,
-        *,
-        lat: Optional[int] = None,
-        long: Optional[int] = None,
-        ip: Optional[ID] = None,
-        granularity: Granularity = Granularity.neighborhood,
-    ) -> Optional[Geo]:
-        if query:
-            query = query.replace(" ", "%20")
-
-        data = self.request(
-            "GET",
-            "1.1",
-            "/geo/search.json",
-            params={
-                "query": query,
-                "lat": lat,
-                "long": long,
-                "ip": ip,
-                "granularity": granularity.value,
-                "max_results": max_result,
-            },
-            auth=True,
-        )
-
-        return [Geo(data) for data in data.get("result").get("places")]
 
     def send_message(
         self,
@@ -787,7 +947,7 @@ class HTTPClient:
         res = self.request(
             "POST",
             "1.1",
-            "/direct_messages/events/new.json",
+            self.routes["send_message"],
             json=data,
             auth=True,
         )
@@ -800,139 +960,6 @@ class HTTPClient:
         msg = DirectMessage(res, http_client=self)
         self.message_cache[msg.id] = msg
         return msg
-
-    def post_tweet(
-        self,
-        text: str = None,
-        *,
-        file: Optional[File] = None,
-        files: Optional[List[File]] = None,
-        poll: Optional[Poll] = None,
-        geo: Optional[Union[Geo, str]] = None,
-        direct_message_deep_link: Optional[str] = None,
-        reply_setting: Optional[Union[ReplySetting, str]] = None,
-        quote_tweet: Optional[Union[Tweet, ID]] = None,
-        reply_tweet: Optional[Union[Tweet, ID]] = None,
-        exclude_reply_users: Optional[List[User, ID]] = None,
-        media_tagged_users: Optional[List[User, ID]] = None,
-        super_followers_only: bool = False,
-    ) -> Optional[Tweet]:
-        thread_session = self.generate_thread_session()
-        executor = self.thread_manager.create_new_executor(thread_name="post-tweet-request", session_id=thread_session)
-
-        payload = {}
-        if text:
-            payload["text"] = text
-
-        if file:
-            payload["media"] = {}
-            payload["media"]["media_ids"] = []
-            executor.submit(self.quick_upload, file)
-
-        if files:
-            if len(files) + 1 if file else len(files) > 4:
-                raise BadRequests(message="Cannot upload more then 4 files!")
-
-            payload["media"] = {}
-            payload["media"]["media_ids"] = []
-            for file in files:
-                executor.submit(self.quick_upload, file)
-
-        if poll:
-            payload["poll"] = {}
-            payload["poll"]["duration_minutes"] = int(poll.duration)
-            payload["poll"]["options"] = [option.label for option in poll.options]
-
-        if geo:
-            payload["geo"] = {}
-            payload["geo"]["place_id"] = geo.id if isinstance(geo, Geo) else geo
-
-        if direct_message_deep_link:
-            payload["direct_message_deep_link"] = direct_message_deep_link
-
-        if reply_setting:
-            payload["reply_settings"] = (
-                reply_setting.value if isinstance(reply_setting, ReplySetting) else reply_setting
-            )
-
-        if reply_tweet:
-            payload["reply"] = {}
-            payload["reply"]["in_reply_to_tweet_id"] = (
-                reply_tweet.id if isinstance(reply_tweet, Tweet) else str(reply_tweet)
-            )
-
-        if quote_tweet:
-            payload["quote_tweet_id"] = quote_tweet.id if isinstance(quote_tweet, Tweet) else str(quote_tweet)
-
-        if exclude_reply_users:
-            ids = [str(user.id) if isinstance(user, User) else str(user) for user in exclude_reply_users]
-
-            if "reply" in payload.keys():
-                payload["reply"]["exclude_reply_user_ids"] = ids
-            else:
-                payload["reply"] = {}
-                payload["reply"]["exclude_reply_user_ids"] = ids
-
-        if media_tagged_users:
-            if not payload.get("media"):
-                raise PytweetException("Cannot tag users without any file!")
-            payload["media"]["tagged_user_ids"] = [
-                str(user.id) if isinstance(user, (User, ClientAccount)) else str(user) for user in media_tagged_users
-            ]
-
-        if super_followers_only:
-            payload["for_super_followers_only"] = True
-
-        executor.wait_for_futures()
-        if file:
-            payload["media"]["media_ids"].append(str(file.media_id))
-        if files:
-            for file in files:
-                payload["media"]["media_ids"].append(str(file.media_id))
-
-        res = self.request("POST", "2", "/tweets", json=payload, auth=True)
-        return self.fetch_tweet(res["data"]["id"])
-
-    def create_list(self, name: str, *, description: str = "", private: bool = False) -> Optional[TwitterList]:
-        res = self.request(
-            "POST",
-            "2",
-            "/lists",
-            auth=True,
-            json={"name": name, "description": description, "private": private},
-        )
-        return TwitterList(res, http_client=self)
-
-    def update_list(
-        self,
-        list_id: int,
-        *,
-        name: Optional[str] = None,
-        description: str = "",
-        private: Optional[bool] = None,
-    ) -> Optional[RelationUpdate]:
-        res = self.request(
-            "PUT",
-            "2",
-            f"/lists/{list_id}",
-            auth=True,
-            json={"name": name, "description": description, "private": private},
-        )
-        return RelationUpdate(res)
-
-    def create_custom_profile(self, name: str, file: File) -> Optional[CustomProfile]:
-        file = self.quick_upload(file)
-        data = {"custom_profile": {"name": name, "avatar": {"media": {"id": file.media_id}}}}
-
-        res = self.request("POST", "1.1", "/custom_profiles/new.json", json=data, auth=True)
-        data = res.get("custom_profile")
-
-        return CustomProfile(
-            data.get("name"),
-            data.get("id"),
-            data.get("created_timestamp"),
-            data.get("avatar"),
-        )
 
     def create_welcome_message(
         self,
@@ -968,12 +995,13 @@ class HTTPClient:
             message_data["attachment"] = {}
             message_data["attachment"]["type"] = "media"
             message_data["attachment"]["media"] = {}
-            message_data["attachment"]["media"]["id"] = str(file_future.result().media_id)
+            message_data["attachment"]["media"]["id"] = str(
+                file_future.result().media_id)
 
         res = self.request(
             "POST",
             "1.1",
-            "/direct_messages/welcome_messages/new.json",
+            self.routes["create_welcome_message"],
             json=data,
             auth=True,
         )
@@ -1022,12 +1050,13 @@ class HTTPClient:
             message_data["attachment"] = {}
             message_data["attachment"]["type"] = "media"
             message_data["attachment"]["media"] = {}
-            message_data["attachment"]["media"]["id"] = str(file_future.result().media_id)
+            message_data["attachment"]["media"]["id"] = str(
+                file_future.result().media_id)
 
         res = self.request(
             "PUT",
             "1.1",
-            "/direct_messages/welcome_messages/update.json",
+            self.routes["update_welcome_message"],
             params={"id": str(welcome_message_id)},
             json=data,
             auth=True,
@@ -1042,4 +1071,58 @@ class HTTPClient:
             id=welcome_message.get("id"),
             timestamp=welcome_message.get("created_timestamp"),
             http_client=self,
+        )
+
+# GEO
+
+    def search_geo(
+        self,
+        query: str,
+        max_result: Optional[ID] = None,
+        *,
+        lat: Optional[int] = None,
+        long: Optional[int] = None,
+        ip: Optional[ID] = None,
+        granularity: Granularity = Granularity.neighborhood,
+    ) -> Optional[Geo]:
+        if query:
+            query = query.replace(" ", "%20")
+
+        data = self.request(
+            "GET",
+            "1.1",
+            self.routes["search_geo"],
+            params={
+                "query": query,
+                "lat": lat,
+                "long": long,
+                "ip": ip,
+                "granularity": granularity.value,
+                "max_results": max_result,
+            },
+            auth=True,
+        )
+
+        return [Geo(data) for data in data.get("result").get("places")]
+
+# CUSTOM PROFILES
+
+    def create_custom_profile(self, name: str, file: File) -> Optional[CustomProfile]:
+        file = self.quick_upload(file)
+        data = {"custom_profile": {"name": name,
+                                   "avatar": {"media": {"id": file.media_id}}}}
+
+        res = self.request(
+            "POST",
+            "1.1",
+            self.routes["create_custom_profile"],
+            json=data,
+            auth=True)
+        data = res.get("custom_profile")
+
+        return CustomProfile(
+            data.get("name"),
+            data.get("id"),
+            data.get("created_timestamp"),
+            data.get("avatar"),
         )
