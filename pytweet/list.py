@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 
 __all__ = ("List", "_CopyList")
 
+
 class List(Comparable):
     """Represents a Twitter List object
 
@@ -366,5 +367,6 @@ class List(Comparable):
             },
         )
 
-class _CopyList(List): #An alias for documentation (not interfering with List clas)
+
+class _CopyList(List):  # An alias for documentation (not interfering with List clas)
     pass

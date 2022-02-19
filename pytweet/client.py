@@ -338,7 +338,7 @@ class Client:
         :class:`List`
             This method returns a :class:`List` object.
 
-        
+
         .. versionadded:: 1.5.0
         """
         return self.http.fetch_list(id)
