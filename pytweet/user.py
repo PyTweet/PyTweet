@@ -24,8 +24,8 @@ from .list import List as TwitterList
 from .objects import Comparable
 
 if TYPE_CHECKING:
-    from .http import HTTPClient
     from .message import DirectMessage
+    from .http import HTTPClient
     from .type import ID
     from .tweet import Tweet
     from .enums import Timezone
@@ -993,3 +993,23 @@ class ClientAccount(User):
         .. versionadded:: 1.5.0
         """
         self.http_client.request("POST", "1.1", "/account/remove_profile_banner.json", auth=True)
+
+    def fetch_message_history(self):
+        """Returns all Direct Messages (both sent and received) within the last 30 days. Sorted in chronological order.
+
+        
+        .. versionadded:: 1.5.0
+        """
+        # TODO return a pagination object.
+        from .message import DirectMessage # Avoid circular import error.
+        
+        res = self.http_client.request(
+            "GET",
+            "1.1",
+            "/direct_messages/events/list.json",
+            auth=True
+        )
+
+        updated_res = self.http_client.payload_parser.parse_message_to_pagination_data(res, None, self)        
+
+        return [DirectMessage(data, http_client=self.http_client) for data in updated_res.get("events")]
