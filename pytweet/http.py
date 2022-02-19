@@ -663,11 +663,23 @@ class HTTPClient:
         res = self.request("GET", "1.1", f"/direct_messages/events/show.json?id={event_id}", auth=True)
 
         message_create = res.get("event").get("message_create")
-        user_id = message_create.get("target").get("recipient_id")
-        user = self.fetch_user(user_id)
-        res["event"]["message_create"]["target"]["recipient"] = user
+        recipient_id = int(message_create.get("target").get("recipient_id"))
+        sender_id = int(message_create.get("sender_id"))
+        
+        recipient = self.user_cache.get(recipient_id)
+        sender = self.user_cache.get(sender_id)
+        if not recipient:
+            recipient = self.fetch_user(recipient_id)
+
+        if not sender:
+            sender = self.fetch_user(sender_id)
+        
+        res["event"]["message_create"]["target"]["recipient"] = recipient
+        res["event"]["message_create"]["target"]["sender"] = sender
         message = DirectMessage(res, http_client=self)
         self.message_cache[message.id] = message
+        self.message_cache[recipient_id] = recipient
+        self.message_cache[sender_id] = sender
         return message
 
     def fetch_welcome_message(self, welcome_message_id: ID) -> Optional[WelcomeMessage]:
