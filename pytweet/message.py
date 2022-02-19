@@ -78,7 +78,7 @@ class DirectMessage(Message):
 
     def __init__(self, data: Dict[str, Any], *, http_client: HTTPClient):
         self.__original_payload = data
-        self._payload = data.get("event", None)
+        self._payload = data.get("event", None) or data
         self.__message_create = self._payload.get("message_create", None)
         self.__message_data = self.__message_create.get("message_data", None)
         self.__entities = self.__message_data.get("entities", None)
@@ -107,12 +107,20 @@ class DirectMessage(Message):
         return self.__message_create.get("target", {}).get("recipient")
 
     @property
-    def author(self) -> Optional[User]:
+    def sender(self) -> Optional[User]:
         """:class:`User`: Returns the user that sent the direct message.
 
         .. versionadded:: 1.5.0
         """
-        return self.__message_create.get("target", {}).get("sender", None)
+        return self.__message_create.get("target", {}).get("sender")
+
+    @property
+    def author(self) -> Optional[User]:
+        """:class:`User`: An alias to :meth:`DirectMessage.sender`
+
+        .. versionadded:: 1.5.0
+        """
+        return self.sender
 
     @property
     def application_info(self) -> Optional[ApplicationInfo]:
