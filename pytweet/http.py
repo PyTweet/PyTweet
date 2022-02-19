@@ -665,7 +665,7 @@ class HTTPClient:
         message_create = res.get("event").get("message_create")
         recipient_id = int(message_create.get("target").get("recipient_id"))
         sender_id = int(message_create.get("sender_id"))
-        
+
         recipient = self.user_cache.get(recipient_id)
         sender = self.user_cache.get(sender_id)
         if not recipient:
@@ -673,7 +673,7 @@ class HTTPClient:
 
         if not sender:
             sender = self.fetch_user(sender_id)
-        
+
         res["event"]["message_create"]["target"]["recipient"] = recipient
         res["event"]["message_create"]["target"]["sender"] = sender
         message = DirectMessage(res, http_client=self)

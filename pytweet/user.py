@@ -997,19 +997,14 @@ class ClientAccount(User):
     def fetch_message_history(self):
         """Returns all Direct Messages (both sent and received) within the last 30 days. Sorted in chronological order.
 
-        
+
         .. versionadded:: 1.5.0
         """
         # TODO return a pagination object.
-        from .message import DirectMessage # Avoid circular import error.
-        
-        res = self.http_client.request(
-            "GET",
-            "1.1",
-            "/direct_messages/events/list.json",
-            auth=True
-        )
+        from .message import DirectMessage  # Avoid circular import error.
 
-        updated_res = self.http_client.payload_parser.parse_message_to_pagination_data(res, None, self)        
+        res = self.http_client.request("GET", "1.1", "/direct_messages/events/list.json", auth=True)
+
+        updated_res = self.http_client.payload_parser.parse_message_to_pagination_data(res, None, self)
 
         return [DirectMessage(data, http_client=self.http_client) for data in updated_res.get("events")]
