@@ -38,7 +38,7 @@
 ### Windows
 
 ```bash
-py3 -m pip install PyTweet
+py -m pip install PyTweet
 ```
 
 ### Linux/MacOS
