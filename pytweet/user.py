@@ -396,8 +396,8 @@ class User(Comparable):
 
         Returns
         ---------
-        Optional[:class:`Pagination`]
-            This method returns a :class:`Pagination` object.
+        Optional[:class:`UserPagination`]
+            This method returns a :class:`UserPagination` object.
 
 
         .. versionadded:: 1.3.5
@@ -432,8 +432,8 @@ class User(Comparable):
 
         Returns
         ---------
-        Optional[:class:`Pagination`]
-            This method returns a :class:`Pagination` object.
+        Optional[:class:`UserPagination`]
+            This method returns a :class:`UserPagination` object.
 
 
         .. versionadded:: 1.3.5
@@ -468,8 +468,8 @@ class User(Comparable):
 
         Returns
         ---------
-        Optional[:class:`Pagination`]
-            This method returns a :class:`Pagination` object.
+        Optional[:class:`UserPagination`]
+            This method returns a :class:`UserPagination` object.
 
 
         .. versionadded:: 1.5.0
@@ -505,8 +505,8 @@ class User(Comparable):
 
         Returns
         ---------
-        Optional[:class:`Pagination`]
-            This method returns a :class:`Pagination` object.
+        Optional[:class:`UserPagination`]
+            This method returns a :class:`UserPagination` object.
 
 
         .. versionadded:: 1.5.0
@@ -724,7 +724,7 @@ class User(Comparable):
 
         Returns
         ---------
-        Optional[List[:class:`TwitterList`]]
+        Optional[List[:class:`List`]]
             This method returns a list of :class:`List` objects.
 
 

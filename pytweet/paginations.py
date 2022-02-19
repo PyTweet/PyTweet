@@ -340,8 +340,8 @@ class TweetPagination(Pagination):
 class ListPagination(Pagination):
     """Represents a pagination that handles list objects. This inherits :class:`Pagination`. These following methods return this object:
 
-    * meth:`User.fetch_lists`
-    * meth:`User.fetch_memberships`
+    * :meth:`User.fetch_lists`
+    * :meth:`User.fetch_list_memberships`
 
 
     .. versionadded:: 1.5.0

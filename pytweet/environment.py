@@ -4,6 +4,7 @@ import logging
 import datetime
 from typing import Any, List, Dict, TYPE_CHECKING
 from .utils import time_parse_todt
+from .objects import Comparable
 
 if TYPE_CHECKING:
     from .client import Client
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
 _log = logging.getLogger(__name__)
 
 
-class Environment:
+class Environment(Comparable):
     """Represents a dev environment to use one of the subscription APIs (Account Activity API or events etc)
 
     .. versionadded:: 1.5.0
@@ -23,6 +24,7 @@ class Environment:
     def __init__(self, data: Dict[str, Any], *, client: Client):
         self._payload = data
         self.client = client
+        super().__init__(self.name)
 
     def __repr__(self) -> str:
         return f"Environment(name={self.name})"
@@ -121,7 +123,7 @@ class Environment:
         return [int(subscription.get("user_id")) for subscription in res.get("subscriptions")]
 
 
-class Webhook:
+class Webhook(Comparable):
     """Represents a webhook for an environment. This webhook belongs to an environment and have a webhook url for sending account activity events.
 
     .. versionadded:: 1.5.0
@@ -135,6 +137,7 @@ class Webhook:
         self._valid = data.get("valid")
         self._environment = environment
         self.client = client
+        super().__init__(self.id)
 
     def __repr__(self) -> str:
         return f"Webhook(id={self.id} url={self.url} valid={self.valid} environment={self.environment})"

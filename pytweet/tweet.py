@@ -616,7 +616,7 @@ class Tweet(Message):
 
         Returns
         ---------
-        Optional[:class:`Pagination`]
+        Optional[:class:`UserPagination`]
             This method returns a :class:`UserPagination` object.
 
 

@@ -174,7 +174,11 @@ class UnKnownSpaceState(APIException):
 
 
 class NoPageAvailable(APIException):
-    """This error class inherits :class:`APIException`. This error is raises when a user try to lookup a new page in :class:`PaginationIterator` that does not exist.
+    """This error class inherits :class:`APIException`. This error is raises when a user try to lookup a new page in a pagination object that does not exist. These following methods can raise this error:
+
+    * :meth:`UserPagination.next_page` and :meth:`UserPagination.previous_page`
+    * :meth:`TweetPagination.next_page` and :meth:`TweetPagination.previous_page`
+    * :meth:`ListPagination.next_page` and :meth:`ListPagination.previous_page`
 
     .. versionadded:: 1.5.0
     """

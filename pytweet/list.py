@@ -15,8 +15,7 @@ if TYPE_CHECKING:
     from .http import HTTPClient
     from .user import User
 
-__all__ = ("List",)
-
+__all__ = ("List", "_CopyList")
 
 class List(Comparable):
     """Represents a Twitter List object
@@ -366,3 +365,6 @@ class List(Comparable):
                 "tweet.fields": TWEET_FIELD,
             },
         )
+
+class _CopyList(List): #An alias for documentation (not interfering with List clas)
+    pass

@@ -236,7 +236,7 @@ class Client:
         """Fetches a direct message.
 
         .. warning::
-            This method uses API call and might cause ratelimits if used often! There is always an alternative like :meth:`Client.get_direct_message` from the client's internal cache.
+            This method uses API call and might cause ratelimits if used often! There is always an alternative like :meth:`Client.fetch_direct_message` from the client's internal cache.
 
         Parameters
         ------------
@@ -307,7 +307,7 @@ class Client:
         """
         return self.http.fetch_space(space_id)
 
-    def fetch_spaces_by_title(self, title: str, state: SpaceState = SpaceState.live) -> Space:
+    def fetch_spaces_by_title(self, title: str, state: SpaceState = SpaceState.live) -> Optional[List[Space]]:
         """Fetches spaces using its title.
 
         Parameters
@@ -319,8 +319,8 @@ class Client:
 
         Returns
         ---------
-        :class:`Space`
-            This method returns a :class:`Space` object.
+        Optional[List[:class:`Space`]]
+            This method returns a list of :class:`Space`s object.
 
 
         .. versionadded:: 1.3.5
@@ -338,9 +338,25 @@ class Client:
         :class:`List`
             This method returns a :class:`List` object.
 
+        
         .. versionadded:: 1.5.0
         """
         return self.http.fetch_list(id)
+
+    def fetch_all_environments(self) -> Optional[List[Environment]]:
+        """Fetches all the client's environments.
+
+        Returns
+        ---------
+        Optional[List[:class:`Environment`]]
+            Returns a list of :class:`Environment` objects.
+
+
+        .. versionadded:: 1.5.0
+        """
+        res = self.http.request("GET", "1.1", "/account_activity/all/webhooks.json")
+
+        return [Environment(data, client=self) for data in res.get("environments")]
 
     def tweet(
         self,
@@ -456,11 +472,33 @@ class Client:
         private: :class:`bool`
             Determine whether the List should be private, default to False.
 
+        Returns
+        ---------
+        Optional[:class:`List`]
+            This method returns a :class:`List` object.
+
 
         .. versionadded:: 1.5.0
         """
         twitter_list = self.http.create_list(name, description=description, private=private)
         return self.http.fetch_list(twitter_list.id)
+
+    def create_custom_profile(self, name: str, file: File) -> Optional[CustomProfile]:
+        """Create a custom profile
+
+        Parameters
+        ------------
+        name: :class:`str`
+            The author's custom name.
+        file: :class:`File`
+            The media file that's associate with the profile.
+
+        Returns
+        ---------
+        :class:`CustomProfile`
+            This method returns a :class:`CustomProfile` object.
+        """
+        return self.http.create_custom_profile(name, file)
 
     def search_geos(
         self,
@@ -786,14 +824,14 @@ class Client:
 
         return self.http.tweet_cache.get(tweet_id)
 
-    def get_message(self, event_id: ID) -> Optional[DirectMessage]:
+    def get_direct_message(self, event_id: ID) -> Optional[DirectMessage]:
         """Get a direct message through the client message cache. Returns None if the message is not in the cache.
 
         .. note::
             Messages will get cache with several conditions:
                 * Messages send by the client.
                 * Messages send by the subscription users.
-                * Messages return from a method such as: :meth:`Client.fetch_message`
+                * Messages return from a method such as: :meth:`Client.fetch_direct_message`
 
         Parameters
         ------------
@@ -814,23 +852,6 @@ class Client:
             raise ValueError("Event id must be an integer or a :class:`str`ing of digits.")
 
         return self.http.message_cache.get(event_id)
-
-    def create_custom_profile(self, name: str, file: File) -> Optional[CustomProfile]:
-        """Create a custom profile
-
-        Parameters
-        ------------
-        name: :class:`str`
-            The author's custom name.
-        file: :class:`File`
-            The media file that's associate with the profile.
-
-        Returns
-        ---------
-        :class:`CustomProfile`
-            This method returns a :class:`CustomProfile` object.
-        """
-        return self.http.create_custom_profile(name, file)
 
     def stream(self, *, dry_run: bool = False) -> None:
         """Stream realtime in twitter for tweets! This method use the stream argument in :meth:`request.get` for streaming in one of the stream endpoint that twitter api provides. If you want to use this method, make sure to provides the stream kwarg in your :class:`Client` instance and make an on_stream event to get the stream's tweet data and connection,
@@ -871,21 +892,6 @@ class Client:
             self.http.stream.connect(dry_run=dry_run)
         except KeyboardInterrupt:
             print("\nKeyboardInterrupt: Exit stream.")
-
-    def fetch_all_environments(self) -> Optional[List[Environment]]:
-        """Fetches all the client's environments.
-
-        Returns
-        ---------
-        Optional[List[:class:`Environment`]]
-            Returns a list of :class:`Environment` objects.
-
-
-        .. versionadded:: 1.5.0
-        """
-        res = self.http.request("GET", "1.1", "/account_activity/all/webhooks.json")
-
-        return [Environment(data, client=self) for data in res.get("environments")]
 
     def listen(
         self,
