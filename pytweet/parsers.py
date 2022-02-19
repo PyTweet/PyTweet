@@ -22,6 +22,7 @@ from .dataclass import ApplicationInfo
 if TYPE_CHECKING:
     from .type import Payload
     from .http import HTTPClient
+    from .user import ClientAccount
 
 __all__ = ("PayloadParser", "EventParser")
 
@@ -102,6 +103,13 @@ class PayloadParser:
             fulldata[index]["includes"] = {}
             fulldata[index]["includes"]["users"] = [payload.get("includes", {}).get("users", [None])[0]]
         return fulldata
+
+    def parse_message_to_pagination_data(self, data: Payload, recipient: User, author: ClientAccount):
+        for event_data in data.get("events"):
+            message_data = event_data.get("message_create")
+            message_data["target"]["recipient"] = recipient
+            message_data["target"]["sender"] = author
+        return data
 
 
 class EventParser:
