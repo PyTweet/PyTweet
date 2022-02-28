@@ -5,6 +5,7 @@ from .events import (
     DirectMessageTypingEvent,
     DirectMessageReadEvent,
     TweetFavoriteActionEvent,
+    UserRevokeEvent,
     UserFollowActionEvent,
     UserUnfollowActionEvent,
     UserBlockActionEvent,
@@ -14,15 +15,24 @@ from .events import (
 )
 from .message import Message, DirectMessage
 from .user import User
-from .app import ApplicationInfo
 from .tweet import Tweet
 from .dataclass import TimezoneInfo, Location, SleepTimeSettings
+from .dataclass import ApplicationInfo
 
 if TYPE_CHECKING:
     from .type import Payload
+    from .http import HTTPClient
+    from .user import ClientAccount
+
+__all__ = ("PayloadParser", "EventParser")
 
 
 class PayloadParser:
+    __slots__ = "http_client"
+
+    def __init__(self, http_client: HTTPClient):
+        self.http_client = http_client
+
     def parse_user_payload(self, payload: Payload):
         copy = payload.copy()
         copy["public_metrics"] = {
@@ -60,37 +70,58 @@ class PayloadParser:
         return copy
 
     def parse_time_zone_payload(self, payload: Payload):
-        copy = payload.copy
-        _timezone = copy.get("time_zone")
-        _timezone["name_info"] = _timezone.get("tzinfo_name")
-        _timezone.pop("tzinfo_name")
-        copy["timezone"] = TimezoneInfo(**copy.get("time_zone"))
-        copy.pop("time_zone")
-        return copy
+        payload["name_info"] = payload.get("tzinfo_name")
+        payload["timezone"] = TimezoneInfo(**payload.get("time_zone"))
+        payload.pop("time_zone")
+        payload.pop("tzinfo_name")
+        return payload
 
     def parse_trend_location_payload(self, payload: Payload):
-        copy = payload.copy()["trend_location"]
-        copy["place_type"] = copy["placeType"]
-        copy["country_code"] = copy["countryCode"]
-        copy.pop("placeType")
-        copy.pop("countryCode")
-        copy["location"] = Location(**copy)
-        return copy
+        payload["place_type"] = payload["placeType"]
+        payload["country_code"] = payload["countryCode"]
+        payload.pop("placeType")
+        payload.pop("countryCode")
+        payload.pop("parentid")
+        payload["location"] = Location(**payload)
+        return payload
 
     def parse_sleep_time_payload(self, payload: Payload):
-        copy = payload.copy()
-        copy["sleep_time_setting"] = SleepTimeSettings(**copy["sleep_time"])
-        copy.pop("sleep_time")
-        return copy
+        payload["sleep_time_setting"] = SleepTimeSettings(**payload["sleep_time"])
+        payload.pop("sleep_time")
+        return payload
+
+    def insert_list_owner(self, payload: Payload, owner: User) -> Payload:
+        payload["includes"] = {}
+        payload["includes"]["users"] = [owner._payload]
+        return payload
+
+    def insert_pagination_object_author(self, payload: Payload) -> list:
+        fulldata = []
+        for index, data in enumerate(payload["data"]):
+            fulldata.append({})
+            fulldata[index]["data"] = data
+            fulldata[index]["includes"] = {}
+            fulldata[index]["includes"]["users"] = [payload.get("includes", {}).get("users", [None])[0]]
+        return fulldata
+
+    def parse_message_to_pagination_data(self, data: Payload, recipient: User, author: ClientAccount):
+        for event_data in data.get("events"):
+            message_data = event_data.get("message_create")
+            message_data["target"]["recipient"] = recipient
+            message_data["target"]["sender"] = author
+        return data
 
 
 class EventParser:
     __slots__ = ("payload_parser", "http_client", "client_id")
 
-    def __init__(self, http_client: object):
-        self.payload_parser = PayloadParser()
+    def __init__(self, http_client: HTTPClient):
+        self.payload_parser = PayloadParser(http_client)
         self.http_client = http_client
-        self.client_id = int(self.http_client.access_token.partition("-")[0])
+        try:
+            self.client_id = int(self.http_client.access_token.partition("-")[0])
+        except AttributeError:
+            self.client_id = int(self.http_client.fetch_me().id)
 
     def parse_direct_message_create(self, direct_message_payload: Payload):
         event_payload = {"event": direct_message_payload.get("direct_message_events")[0]}
@@ -100,11 +131,18 @@ class EventParser:
         recipient_id = message_create.get("target").get("recipient_id")
         sender_id = message_create.get("sender_id")
 
-        recipient = User(self.payload_parser.parse_user_payload(users.get(recipient_id)), http_client=self.http_client)
-        sender = User(self.payload_parser.parse_user_payload(users.get(sender_id)), http_client=self.http_client)
+        recipient = User(
+            self.payload_parser.parse_user_payload(users.get(recipient_id)),
+            http_client=self.http_client,
+        )
+        sender = User(
+            self.payload_parser.parse_user_payload(users.get(sender_id)),
+            http_client=self.http_client,
+        )
         application_info = direct_message_payload.get("apps")
         if application_info:
-            source_app = ApplicationInfo({"apps": direct_message_payload.get("apps")})
+            source_app_id = list(application_info.keys())[0]
+            source_app = ApplicationInfo(**application_info.get(source_app_id))
 
         else:
             source_app = None
@@ -130,8 +168,14 @@ class EventParser:
 
         recipient_id = event_payload.get("target").get("recipient_id")
         sender_id = event_payload.get("sender_id")
-        recipient = User(self.payload_parser.parse_user_payload(users.get(recipient_id)), http_client=self.http_client)
-        sender = User(self.payload_parser.parse_user_payload(users.get(sender_id)), http_client=self.http_client)
+        recipient = User(
+            self.payload_parser.parse_user_payload(users.get(recipient_id)),
+            http_client=self.http_client,
+        )
+        sender = User(
+            self.payload_parser.parse_user_payload(users.get(sender_id)),
+            http_client=self.http_client,
+        )
 
         event_payload["target"]["recipient"] = recipient
         event_payload["target"]["sender"] = sender
@@ -151,8 +195,14 @@ class EventParser:
 
         recipient_id = event_payload.get("target").get("recipient_id")
         sender_id = event_payload.get("sender_id")
-        recipient = User(self.payload_parser.parse_user_payload(users.get(recipient_id)), http_client=self.http_client)
-        sender = User(self.payload_parser.parse_user_payload(users.get(sender_id)), http_client=self.http_client)
+        recipient = User(
+            self.payload_parser.parse_user_payload(users.get(recipient_id)),
+            http_client=self.http_client,
+        )
+        sender = User(
+            self.payload_parser.parse_user_payload(users.get(sender_id)),
+            http_client=self.http_client,
+        )
 
         event_payload["target"]["recipient"] = recipient
         event_payload["target"]["sender"] = sender
@@ -166,12 +216,22 @@ class EventParser:
         payload = DirectMessageReadEvent(event_payload, http_client=self.http_client)
         self.http_client.dispatch("read", payload)
 
+    def parse_user_revoke(self, action_payload: Payload):
+        action = UserRevokeEvent(action_payload)
+        self.http_client.dispatch("user_revoke", action)
+
     def parse_user_action(self, action_payload: Payload, action_type):
         action_payload = action_payload.copy()
         event_payload = action_payload.get(action_type)[0]
         action_type = event_payload.get("type")
-        target = User(self.payload_parser.parse_user_payload(event_payload.get("target")), http_client=self.http_client)
-        source = User(self.payload_parser.parse_user_payload(event_payload.get("source")), http_client=self.http_client)
+        target = User(
+            self.payload_parser.parse_user_payload(event_payload.get("target")),
+            http_client=self.http_client,
+        )
+        source = User(
+            self.payload_parser.parse_user_payload(event_payload.get("source")),
+            http_client=self.http_client,
+        )
 
         event_payload["target"] = target
         event_payload["source"] = source

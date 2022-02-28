@@ -4,6 +4,7 @@ import logging
 import datetime
 from typing import Any, List, Dict, TYPE_CHECKING
 from .utils import time_parse_todt
+from .objects import Comparable
 
 if TYPE_CHECKING:
     from .client import Client
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
 _log = logging.getLogger(__name__)
 
 
-class Environment:
+class Environment(Comparable):
     """Represents a dev environment to use one of the subscription APIs (Account Activity API or events etc)
 
     .. versionadded:: 1.5.0
@@ -23,6 +24,7 @@ class Environment:
     def __init__(self, data: Dict[str, Any], *, client: Client):
         self._payload = data
         self.client = client
+        super().__init__(self.name)
 
     def __repr__(self) -> str:
         return f"Environment(name={self.name})"
@@ -60,7 +62,12 @@ class Environment:
 
         .. versionadded:: 1.5.0
         """
-        client.http.request("POST", "1.1", f"/account_activity/all/{self.label}/subscriptions.json", auth=True)
+        client.http.request(
+            "POST",
+            "1.1",
+            f"/account_activity/all/{self.label}/subscriptions.json",
+            auth=True,
+        )
 
     def add_my_subscription(self) -> None:
         """Add a new user subscription to the environment, which is the client WHO made the environment request. Use :meth:`add_user_subscription` to add other user subscription. This method only add the client WHO made the fetch environment request.
@@ -68,7 +75,12 @@ class Environment:
 
         .. versionadded:: 1.5.0
         """
-        self.client.http.request("POST", "1.1", f"/account_activity/all/{self.label}/subscriptions.json", auth=True)
+        self.client.http.request(
+            "POST",
+            "1.1",
+            f"/account_activity/all/{self.label}/subscriptions.json",
+            auth=True,
+        )
 
     def register_webhook(self, url: str) -> Webhook:
         """Register your WebHook with your WebApp's url that you develop. Before this, you need to develop, deploy and host a WebApp that will receive Twitter webhook events. You also need to perform a Twitter Challenge Response Check (CRC) GET request and responds with a properly formatted JSON response.
@@ -87,7 +99,11 @@ class Environment:
         .. versionadded:: 1.5.0
         """
         res = self.client.http.request(
-            "POST", "1.1", f"/account_activity/all/{self.label}/webhooks.json", auth=True, params={"url": url}
+            "POST",
+            "1.1",
+            f"/account_activity/all/{self.label}/webhooks.json",
+            auth=True,
+            params={"url": url},
         )
         return Webhook(res, environment=self, client=self)
 
@@ -107,7 +123,7 @@ class Environment:
         return [int(subscription.get("user_id")) for subscription in res.get("subscriptions")]
 
 
-class Webhook:
+class Webhook(Comparable):
     """Represents a webhook for an environment. This webhook belongs to an environment and have a webhook url for sending account activity events.
 
     .. versionadded:: 1.5.0
@@ -121,6 +137,7 @@ class Webhook:
         self._valid = data.get("valid")
         self._environment = environment
         self.client = client
+        super().__init__(self.id)
 
     def __repr__(self) -> str:
         return f"Webhook(id={self.id} url={self.url} valid={self.valid} environment={self.environment})"
@@ -199,7 +216,10 @@ class Webhook:
         .. versionadded:: 1.5.0
         """
         self.client.http.request(
-            "DELETE", "1.1", f"/account_activity/all/{self.env.label}/webhooks/{self.id}.json", auth=True
+            "DELETE",
+            "1.1",
+            f"/account_activity/all/{self.env.label}/webhooks/{self.id}.json",
+            auth=True,
         )
         self.valid = False
         return self
@@ -222,7 +242,10 @@ class Webhook:
             return False
 
         self.client.http.request(
-            "PUT", "1.1", f"/account_activity/all/{self.env.label}/webhooks/{self.id}.json", auth=True
+            "PUT",
+            "1.1",
+            f"/account_activity/all/{self.env.label}/webhooks/{self.id}.json",
+            auth=True,
         )
         _log.info("Successfully triggered a CRC.")
         return True

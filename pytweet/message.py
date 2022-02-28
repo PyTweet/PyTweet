@@ -3,11 +3,12 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from .app import ApplicationInfo
+from .dataclass import ApplicationInfo
 from .attachments import CTA, File, QuickReply
 from .entities import Hashtag, Symbol, Url, UserMention
 from .enums import MessageEventTypeEnum, MessageTypeEnum
 from .user import User
+from .objects import Comparable
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -16,30 +17,16 @@ if TYPE_CHECKING:
 __all__ = ("Message", "DirectMessage", "WelcomeMessage", "WelcomeMessageRule")
 
 
-class Message:
+class Message(Comparable):
     """Represents the base Message of all Message types in Twitter.
-
-    Parameters
-    ------------
-    text: Optional[:class:`str`]
-        The messages's text.
-    id: `ID`
-        The messages's unique ID.
-    type: :class:`int`.
-        The message's type in int form, it will gets form to MessageTypeEnum.
-
 
     .. versionadded:: 1.2.0
     """
 
     __slots__ = ("_text", "_id", "_type")
 
-    if TYPE_CHECKING:
-        _text: Optional[str]
-        _id: ID
-        _type: int
-
     def __init__(self, text: Optional[str], id: ID, type: int):
+        super().__init__(id)
         self._text = text
         self._id = id
         self._type = type
@@ -91,7 +78,7 @@ class DirectMessage(Message):
 
     def __init__(self, data: Dict[str, Any], *, http_client: HTTPClient):
         self.__original_payload = data
-        self._payload = data.get("event", None)
+        self._payload = data.get("event", None) or data
         self.__message_create = self._payload.get("message_create", None)
         self.__message_data = self.__message_create.get("message_data", None)
         self.__entities = self.__message_data.get("entities", None)
@@ -102,39 +89,6 @@ class DirectMessage(Message):
 
     def __repr__(self) -> str:
         return "DirectMessage(text={0.text} id={0.id} recipient={0.recipient})".format(self)
-
-    def delete(self) -> None:
-        """Delete the direct message.
-
-        .. versionadded:: 1.1.0
-        """
-        self.http_client.request(
-            "DELETE",
-            "1.1",
-            f"/direct_messages/events/destroy.json?id={self.id}",
-            auth=True,
-        )
-
-        try:
-            self.http_client.message_cache.pop(int(self.id))
-        except KeyError:
-            pass
-
-    def mark_read(self) -> None:
-        """Mark the DirectMessage as read, it also mark other messages before the DirectMessage was sent as read.
-
-        .. versionadded:: 1.3.5
-        """
-        self.http_client.request(
-            "POST",
-            "1.1",
-            "/direct_messages/mark_read.json",
-            params={
-                "last_read_event_id": str(self.id),
-                "recipient_id": str(self.author.id),
-            },
-            auth=True,
-        )
 
     @property
     def event_type(self) -> MessageEventTypeEnum:
@@ -153,12 +107,20 @@ class DirectMessage(Message):
         return self.__message_create.get("target", {}).get("recipient")
 
     @property
-    def author(self) -> Optional[User]:
+    def sender(self) -> Optional[User]:
         """:class:`User`: Returns the user that sent the direct message.
 
         .. versionadded:: 1.5.0
         """
-        return self.__message_create.get("target", {}).get("sender", None)
+        return self.__message_create.get("target", {}).get("sender")
+
+    @property
+    def author(self) -> Optional[User]:
+        """:class:`User`: An alias to :meth:`DirectMessage.sender`
+
+        .. versionadded:: 1.5.0
+        """
+        return self.sender
 
     @property
     def application_info(self) -> Optional[ApplicationInfo]:
@@ -166,7 +128,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.5.0
         """
-        return self.__message_create.get("target", {}).get("application_info", None)
+        return self.__message_create.get("target", {}).get("source_application", None)
 
     @property
     def created_at(self) -> datetime.datetime:
@@ -242,22 +204,42 @@ class DirectMessage(Message):
             return attachment
         return None
 
+    def delete(self) -> None:
+        """Delete the direct message.
+
+        .. versionadded:: 1.1.0
+        """
+        self.http_client.request(
+            "DELETE",
+            "1.1",
+            f"/direct_messages/events/destroy.json?id={self.id}",
+            auth=True,
+        )
+
+        try:
+            self.http_client.message_cache.pop(int(self.id))
+        except KeyError:
+            pass
+
+    def mark_read(self) -> None:
+        """Mark the DirectMessage as read, it also mark other messages before the DirectMessage was sent as read.
+
+        .. versionadded:: 1.3.5
+        """
+        self.http_client.request(
+            "POST",
+            "1.1",
+            "/direct_messages/mark_read.json",
+            params={
+                "last_read_event_id": str(self.id),
+                "recipient_id": str(self.author.id),
+            },
+            auth=True,
+        )
+
 
 class WelcomeMessage(Message):
     """Represents a Welcome Message in a Direct Message.
-
-    Parameters
-    ------------
-    name: Optional[:class:`str`]
-        A human readable name for the Welcome Message.
-    text: :class:`str`
-        The welcome message main text.
-    id: `ID`
-        The welcome message unique id.
-    timestamp: Optional[:class:`str`]
-        The welcome message timestamp.
-    http_client: :class:`HTTPClient`
-        The http client that make the request.
 
 
     .. versionadded:: 1.3.5
@@ -281,6 +263,22 @@ class WelcomeMessage(Message):
 
     def __repr__(self) -> str:
         return "WelcomeMessage(text={0.text} id={0.id})".format(self)
+
+    @property
+    def name(self) -> str:
+        """:class:`str`: Returns the welcome message's name.
+
+        .. versionadded:: 1.3.5
+        """
+        return self._name
+
+    @property
+    def created_at(self) -> datetime.datetime:
+        """:class:`datetime.datetime`: Returns the welcome message created date.
+
+        .. versionadded:: 1.3.5
+        """
+        return datetime.datetime.fromtimestamp(int(self._timestamp) / 1000)
 
     def set_rule(self) -> WelcomeMessageRule:
         """Set a new Welcome Message Rule that determines which Welcome Message will be shown in a given conversation. Returns the created rule if successful.
@@ -335,7 +333,11 @@ class WelcomeMessage(Message):
         .. versionadded:: 1.3.5
         """
         return self.http_client.update_welcome_message(
-            welcome_message_id=self.id, text=text, file=file, quick_reply=quick_reply, cta=cta
+            welcome_message_id=self.id,
+            text=text,
+            file=file,
+            quick_reply=quick_reply,
+            cta=cta,
         )
 
     def delete(self):
@@ -351,36 +353,9 @@ class WelcomeMessage(Message):
             auth=True,
         )
 
-    @property
-    def created_at(self) -> datetime.datetime:
-        """:class:`datetime.datetime`: Returns the welcome message created date.
-
-        .. versionadded:: 1.3.5
-        """
-        return datetime.datetime.fromtimestamp(int(self._timestamp) / 1000)
-
-    @property
-    def name(self) -> str:
-        """:class:`str`: Returns the welcome message's name.
-
-        .. versionadded:: 1.3.5
-        """
-        return self._name
-
 
 class WelcomeMessageRule(Message):
     """Represents a Welcome Message Rule in a Direct Message. This object is returns by WelcomeMessage.set_rule or client.fetch_welcome_message_rules, it determines which Welcome Message will be shown in a given conversation.
-
-    Parameters
-    ------------
-    id: `ID`
-        The welcome message rule unique id.
-    welcome_message_id: `ID`
-        The welcome message unique id.
-    timestamp: Optional[:class:`str`]
-        The welcome message rule created timestamp.
-    http_client: :class:`HTTPClient`
-        The http client that make the request.
 
 
     .. versionadded:: 1.3.5
@@ -408,6 +383,22 @@ class WelcomeMessageRule(Message):
             )
         )
 
+    @property
+    def welcome_message_id(self) -> ID:
+        """:clasD`: Returns the welcome message's id.
+
+        .. versionadded:: 1.3.5
+        """
+        return int(self._welcome_message_id)
+
+    @property
+    def created_at(self) -> datetime.datetime:
+        """:class:`datetime.datetime`: Returns a datetime.datetime object with the WelcomeMessageRule created time.
+
+        .. versionadded:: 1.3.5
+        """
+        return datetime.datetime.fromtimestamp(int(self._timestamp) / 1000)
+
     def delete(self):
         """Delete the Welcome Message Rule.
 
@@ -433,19 +424,3 @@ class WelcomeMessageRule(Message):
         .. versionadded:: 1.5.0
         """
         return self.http_client.fetch_welcome_message(self.welcome_message_id)
-
-    @property
-    def created_at(self) -> datetime.datetime:
-        """:class:`datetime.datetime`: Returns a datetime.datetime object with the WelcomeMessageRule created time.
-
-        .. versionadded:: 1.3.5
-        """
-        return datetime.datetime.fromtimestamp(int(self._timestamp) / 1000)
-
-    @property
-    def welcome_message_id(self) -> ID:
-        """:clasD`: Returns the welcome message's id.
-
-        .. versionadded:: 1.3.5
-        """
-        return int(self._welcome_message_id)

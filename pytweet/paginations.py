@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Any, List, Tuple, Optional, TYPE_CHECKING
 from .errors import NoPageAvailable
 
+
 if TYPE_CHECKING:
     from .http import HTTPClient
     from .type import Payload
@@ -14,7 +15,31 @@ class Pagination:
     .. versionadded:: 1.5.0
     """
 
-    def __init__(self, data: Payload, item_type: Any, endpoint_request: str, *, http_client: HTTPClient, **kwargs: Any):
+    __slots__ = (
+        "__original_payload",
+        "_payload",
+        "_meta",
+        "_next_token",
+        "_previous_token",
+        "_count",
+        "_paginate_over",
+        "_current_page_number",
+        "_params",
+        "item_type",
+        "endpoint_request",
+        "http_client",
+        "pages_cache",
+    )
+
+    def __init__(
+        self,
+        data: Payload,
+        *,
+        item_type: Any,
+        endpoint_request: str,
+        http_client: HTTPClient,
+        **kwargs: Any,
+    ):
         self.__original_payload = data
         self._payload = self.__original_payload.get("data")
         self._meta = self.__original_payload.get("meta")
@@ -30,12 +55,30 @@ class Pagination:
         self.pages_cache = {1: {obj.id: obj for obj in self.content}}
 
     @property
+    def original_payload(self):
+        return self.__original_payload
+
+    @original_payload.setter
+    def original_payload(self, other: dict):
+        self.__original_payload = other
+        return self.original_payload
+
+    @property
+    def payload(self):
+        return self._payload
+
+    @payload.setter
+    def payload(self, other: dict):
+        self._payload = other
+        return self._payload
+
+    @property
     def content(self) -> list:
         """:class:`list`: Returns a list of objects from the current page's content.
 
         .. versionadded:: 1.5.0
         """
-        return [self.item_type(data, http_client=self.http_client) for data in self._payload]
+        return [self.item_type(data, http_client=self.http_client) for data in self.payload]
 
     @property
     def paginate_over(self) -> int:
@@ -97,16 +140,24 @@ class Pagination:
 
 
 class UserPagination(Pagination):
-    """A pagination that handles users object. This inherits :class:`Pagination`. These following methods returns this object:
+    """Represents a pagination that handles users object. This inherits :class:`Pagination`. These following methods return this object:
 
     * :meth:`User.fetch_following`
     * :meth:`User.fetch_followers`
     * :meth:`User.fetch_muters`
     * :meth:`User.fetch_blockers`
+    * :meth:`Tweet.fetch_likers`
+    * :meth:`Tweet.fetch_retweeters`
+    * :meth:`List.fetch_members`
 
 
     .. versionadded:: 1.5.0
     """
+
+    def __init__(self, data, **kwargs):
+        from .user import User  # Avoid circular import error.
+
+        super().__init__(data, item_type=User, **kwargs)
 
     def next_page(self):
         """Change page to the next page.
@@ -130,11 +181,14 @@ class UserPagination(Pagination):
             auth=True,
             params=self._params,
         )
+        if not res:
+            raise NoPageAvailable()
+
         previous_content = self.content
         self._current_page_number += 1
-        self.__original_payload = res
-        self._payload = self.__original_payload.get("data")
-        self._meta = self.__original_payload.get("meta")
+        self.original_payload = res
+        self.payload = self.original_payload.get("data")
+        self._meta = self.original_payload.get("meta")
         self._next_token = self._meta.get("next_token")
         self._previous_token = self._meta.get("previous_token")
         self._count = 0
@@ -164,11 +218,14 @@ class UserPagination(Pagination):
             auth=True,
             params=self._params,
         )
+        if not res:
+            raise NoPageAvailable()
+
         previous_content = self.content
         self._current_page_number -= 1
-        self.__original_payload = res
-        self._payload = self.__original_payload.get("data")
-        self._meta = self.__original_payload.get("meta")
+        self.original_payload = res
+        self.payload = self.original_payload.get("data")
+        self._meta = self.original_payload.get("meta")
         self._next_token = self._meta.get("next_token")
         self._previous_token = self._meta.get("previous_token")
         self._count = 0
@@ -178,29 +235,20 @@ class UserPagination(Pagination):
 
 
 class TweetPagination(Pagination):
-    """A pagination that handles tweets object. This inherits :class:`Pagination`. Only :meth:`User.fetch_timelines` returns this Pagination object.
+    """Represents a pagination that handles tweets object. This inherits :class:`Pagination`. These following methods return this object:
+
+    * meth:`User.fetch_timelines`
+    * meth:`User.fetch_liked_tweets`
+    * meth:`List.fetch_tweets`
 
 
     .. versionadded:: 1.5.0
     """
 
-    @property
-    def __original_payload(self):
-        return self._Pagination__original_payload
+    def __init__(self, data, **kwargs):
+        from .tweet import Tweet  # Avoid circular import error.
 
-    @__original_payload.setter
-    def __original_payload(self, data):
-        self._Pagination__original_payload = data
-
-    def _insert_author(self):
-        fulldata = []
-        for index, data in enumerate(self.__original_payload["data"]):
-            fulldata.append({})
-            fulldata[index]["data"] = data
-            fulldata[index]["includes"] = {}
-            fulldata[index]["includes"]["users"] = [self.__original_payload.get("includes", {}).get("users", [None])[0]]
-
-        return [self.item_type(data, http_client=self.http_client) for data in fulldata]
+        super().__init__(data, item_type=Tweet, **kwargs)
 
     @property
     def content(self) -> list:
@@ -209,7 +257,10 @@ class TweetPagination(Pagination):
         .. versionadded:: 1.5.0
         """
 
-        return self._insert_author()
+        return [
+            self.item_type(data, http_client=self.http_client)
+            for data in self.http_client.payload_parser.insert_pagination_object_author(self.original_payload)
+        ]
 
     def next_page(self):
         """Change page to the next page.
@@ -233,12 +284,14 @@ class TweetPagination(Pagination):
             auth=True,
             params=self._params,
         )
+        if not res:
+            raise NoPageAvailable()
 
         previous_content = self.content
         self._current_page_number += 1
-        self.__original_payload = res
-        self._payload = self._insert_author()
-        self._meta = self.__original_payload.get("meta")
+        self.original_payload = res
+        self.payload = self.content
+        self._meta = self.original_payload.get("meta")
         self._next_token = self._meta.get("next_token")
         self._previous_token = self._meta.get("previous_token")
         self._count = 0
@@ -268,15 +321,123 @@ class TweetPagination(Pagination):
             auth=True,
             params=self._params,
         )
+        if not res:
+            raise NoPageAvailable()
 
         previous_content = self.content
         self._current_page_number -= 1
-        self.__original_payload = res
-        self._payload = self._insert_author()
-        self._meta = self.__original_payload.get("meta")
+        self.original_payload = res
+        self.payload = self.content
+        self._meta = self.original_payload.get("meta")
         self._next_token = self._meta.get("next_token")
         self._previous_token = self._meta.get("previous_token")
         self._count = 0
 
         if not previous_content[0] == self.content[0]:
             self.pages_cache[len(self.pages_cache) + 1] = {tweet.id: tweet for tweet in self.content}
+
+
+class ListPagination(Pagination):
+    """Represents a pagination that handles list objects. This inherits :class:`Pagination`. These following methods return this object:
+
+    * :meth:`User.fetch_lists`
+    * :meth:`User.fetch_list_memberships`
+
+
+    .. versionadded:: 1.5.0
+    """
+
+    def __init__(self, data, **kwargs):
+        from .list import List as TwitterList  # Avoid circular import error
+
+        super().__init__(data, item_type=TwitterList, **kwargs)
+
+    @property
+    def content(self) -> list:
+        """:class:`list`: Returns a list of objects from the current page's content.
+
+        .. versionadded:: 1.5.0
+        """
+
+        return [
+            self.item_type(data, http_client=self.http_client)
+            for data in self.http_client.payload_parser.insert_pagination_object_author(self.original_payload)
+        ]
+
+    def next_page(self):
+        """Change page to the next page.
+
+        Raises
+        --------
+        :class:`NoPageAvailable`
+            Raises when no page available to change.
+
+
+        .. versionadded:: 1.5.0
+        """
+        if not self._next_token:
+            raise NoPageAvailable()
+        self._params["pagination_token"] = self._next_token
+
+        res = self.http_client.request(
+            "GET",
+            "2",
+            self.endpoint_request,
+            auth=True,
+            params=self._params,
+        )
+        if not res:
+            raise NoPageAvailable()
+
+        previous_content = self.content
+        self._current_page_number += 1
+        self.original_payload = res
+        self.payload = self.content
+        self._meta = self.original_payload.get("meta")
+        self._next_token = self._meta.get("next_token")
+        self._previous_token = self._meta.get("previous_token")
+        self._count = 0
+
+        if not previous_content[0] == self.content[0]:
+            self.pages_cache[len(self.pages_cache) + 1] = {
+                _TwitterList.id: _TwitterList for _TwitterList in self.content
+            }
+
+    def previous_page(self):
+        """Change page to the previous page.
+
+        Raises
+        --------
+        :class:`NoPageAvailable`
+            Raises when no page available to change.
+
+
+        .. versionadded:: 1.5.0
+        """
+        if not self._previous_token:
+            raise NoPageAvailable()
+        self._params["pagination_token"] = self._previous_token
+
+        res = self.http_client.request(
+            "GET",
+            "2",
+            self.endpoint_request,
+            auth=True,
+            params=self._params,
+        )
+        if not res:
+            raise NoPageAvailable()
+
+        previous_content = self.content
+        self._current_page_number -= 1
+        self.original_payload = res
+        self.payload = self.content
+        self._meta = self.original_payload.get("meta")
+        self._next_token = self._meta.get("next_token")
+        self._previous_token = self._meta.get("previous_token")
+        self._count = 0
+
+        if not previous_content[0] == self.content[0]:
+            self.pages_cache[len(self.pages_cache) + 1] = {
+                _TwitterList.id: _TwitterList for _TwitterList in self.content
+            }

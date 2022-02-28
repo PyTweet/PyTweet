@@ -5,11 +5,10 @@ import logging
 import sys
 import time
 import requests
-import threading
 import random
 import string
 from json import JSONDecodeError
-from typing import Dict, List, NoReturn, Optional, Union, TYPE_CHECKING
+from typing import Any, List, NoReturn, Optional, Union, TYPE_CHECKING
 
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .auth import OauthSession
@@ -20,38 +19,42 @@ from .errors import (
     Forbidden,
     NotFound,
     NotFoundError,
+    TooManyRequests,
     PytweetException,
     Unauthorized,
     FieldsTooLarge,
 )
-from .expansions import (
+from .constants import (
+    TWEET_EXPANSION,
+    SPACE_EXPANSION,
+    LIST_EXPANSION,
+    PINNED_TWEET_EXPANSION,
     MEDIA_FIELD,
     PLACE_FIELD,
     POLL_FIELD,
     SPACE_FIELD,
-    TWEET_EXPANSION,
-    SPACE_EXPANSION,
     TWEET_FIELD,
     USER_FIELD,
     TOPIC_FIELD,
+    LIST_FIELD,
 )
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser
 from .space import Space
 from .tweet import Tweet
 from .user import User, ClientAccount
-from .mixins import EventMixin
 from .threads import ThreadManager
+from .relations import RelationUpdate
+from .list import List as TwitterList
 
 if TYPE_CHECKING:
     from .type import ID, Payload, ResponsePayload
     from .stream import Stream
 
 _log = logging.getLogger(__name__)
-get_kwargs = lambda **kwargs: kwargs
 
 
-class HTTPClient(EventMixin):
+class HTTPClient:
     def __init__(
         self,
         bearer_token: str,
@@ -65,8 +68,9 @@ class HTTPClient(EventMixin):
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
         use_bearer_only: bool = False,
+        sleep_after_ratelimit: bool = False,
     ) -> Union[None, NoReturn]:
-        self.credentials: Dict[str, Optional[str]] = {
+        self.credentials = {
             "bearer_token": bearer_token,
             "consumer_key": consumer_key,
             "consumer_secret": consumer_secret,
@@ -80,18 +84,22 @@ class HTTPClient(EventMixin):
         if not access_token:
             _log.warning("Access token is missing this is recommended to have")
         if not access_token_secret:
-            _log.warning("Access token secret is missing this is required if you have passed in the access_toke param.")
+            _log.warning(
+                "Access token secret is missing this is required if you have passed in the access_token param."
+            )
 
         for k, v in self.credentials.items():
-            if not isinstance(v, str) and not isinstance(v, type(None)):
+            if not isinstance(v, (str, type(None))):
                 raise Unauthorized(None, f"Wrong authorization passed for credential: {k}.")
 
         self.__session = requests.Session()
-        self.bearer_token: Optional[str] = bearer_token
-        self.consumer_key: Optional[str] = consumer_key
-        self.consumer_secret: Optional[str] = consumer_secret
-        self.access_token: Optional[str] = access_token
-        self.access_token_secret: Optional[str] = access_token_secret
+        self.base_url = "https://api.twitter.com/"
+        self.upload_url = "https://upload.twitter.com/"
+        self.bearer_token = bearer_token
+        self.consumer_key = consumer_key
+        self.consumer_secret = consumer_secret
+        self.access_token = access_token
+        self.access_token_secret = access_token_secret
         self.stream = stream
         self.callback_url = callback_url
         self.client_id = client_id
@@ -100,8 +108,7 @@ class HTTPClient(EventMixin):
         self.event_parser = EventParser(self)
         self.payload_parser = self.event_parser.payload_parser
         self.thread_manager = ThreadManager()
-        self.base_url = "https://api.twitter.com/"
-        self.upload_url = "https://upload.twitter.com/"
+        self.sleep_after_ratelimit = sleep_after_ratelimit
         self._auth = OauthSession(
             self.consumer_key,
             self.consumer_secret,
@@ -112,11 +119,12 @@ class HTTPClient(EventMixin):
             client_id=self.client_id,
             client_secret=self.client_secret,
         )
-        self.current_header: Optional[Payload] = None
+        self.current_header = None
         self.client_id = client_id
         self.message_cache = {}
         self.tweet_cache = {}
         self.user_cache = {}
+        self.events = {}
         if self.stream:
             self.stream.http_client = self
             self.stream.connection.http_client = self
@@ -131,6 +139,14 @@ class HTTPClient(EventMixin):
 
     def generate_thread_session(self):
         return "".join((random.sample(string.ascii_lowercase, 10)))
+
+    def dispatch(self, event_name: str, *args: Any, **kwargs: Any) -> Any:
+        event = self.events.get(event_name)
+        if not event:
+            return None
+
+        _log.debug(f"Dispatching Event: on_{event_name}" f"Positional-Arguments: {args}" f"Keyword-Arguments: {kwargs}")
+        return event(*args, **kwargs)
 
     def request(
         self,
@@ -218,6 +234,7 @@ class HTTPClient(EventMixin):
                 f"Headers: {response.headers}\n"
                 f"Content: {response.content}\n"
                 f"Json-payload: {json}\n"
+                f"Parameters: {params}\n"
             )
 
             if code in (201, 202, 204):
@@ -246,10 +263,26 @@ class HTTPClient(EventMixin):
                 raise Conflict(response)
 
             elif code in (420, 429):
-                remaining = int(response.headers["x-rate-limit-reset"])
-                sleep_for = (remaining - int(time.time())) + 1
-                _log.warn(f"Client has been ratelimited. Sleeping for {sleep_for}")
-                time.sleep(sleep_for)
+                if self.sleep_after_ratelimit:
+                    remaining = int(response.headers["x-rate-limit-reset"])
+                    sleep_for = (remaining - int(time.time())) + 1
+                    _log.warn(f"Client is ratelimited. Sleeping for {sleep_for}")
+                    print(f"Client is ratelimited. Sleeping for {sleep_for}")
+                    time.sleep(sleep_for)
+                    return self.request(
+                        method,
+                        version,
+                        path,
+                        headers=headers,
+                        params=params,
+                        data=data,
+                        json=json,
+                        files=files,
+                        auth=auth,
+                    )
+
+                else:
+                    raise TooManyRequests(response)
 
             elif code == 431:
                 raise FieldsTooLarge(response)
@@ -357,6 +390,7 @@ class HTTPClient(EventMixin):
                 segment_id += 1
 
         elif command.upper() == "FINALIZE":
+            executor = self.thread_manager.create_new_executor(thread_name="subfiles-upload-request")
             res = self.request(
                 "POST",
                 version="1.1",
@@ -372,7 +406,10 @@ class HTTPClient(EventMixin):
                     "POST",
                     "1.1",
                     "/media/metadata/create.json",
-                    json={"media_id": str(file.media_id), "alt_text": {"text": str(file.alt_text)}},
+                    json={
+                        "media_id": str(file.media_id),
+                        "alt_text": {"text": str(file.alt_text)},
+                    },
                     auth=True,
                     use_base_url=False,
                     thread_name="alt-text-file-request",
@@ -380,23 +417,38 @@ class HTTPClient(EventMixin):
                 )
 
             if file.subfile:
-                executor = self.thread_manager.create_new_executor(
-                    thread_name=f"upload-subfile-request", session_id=thread_session
-                )
-                executor.submit(self.quick_upload, file.subfile).result()
+                executor.submit(self.quick_upload, file.subfile)
+
+            if file.subfiles:
+                for subfile in file.subfiles:
+                    executor.submit(self.quick_upload, subfile)
+
+            if file.subfiles or file.subfile:
+                subtitles = []
+                executor.wait_for_futures()
+                if file.subfiles:
+                    for subfile in file.subfiles:
+                        subtitles.append(
+                            {
+                                "media_id": str(subfile.media_id),
+                                "display_name": subfile.language,
+                                "language_code": subfile.language_code,
+                            }
+                        )
+
+                if file.subfile:
+                    subtitles.append(
+                        {
+                            "media_id": str(file.subfile.media_id),
+                            "display_name": file.subfile.language,
+                            "language_code": file.subfile.language_code,
+                        }
+                    )
 
                 subtitle_data = {
                     "media_id": str(file.media_id),
                     "media_category": file.media_category,
-                    "subtitle_info": {
-                        "subtitles": [
-                            {
-                                "media_id": str(file.subfile.media_id),
-                                "display_name": file.subfile.language,
-                                "language_code": file.subfile.language_code,
-                            }
-                        ]
-                    },
+                    "subtitle_info": {"subtitles": subtitles},
                 }
 
                 self.request(
@@ -406,7 +458,7 @@ class HTTPClient(EventMixin):
                     json=subtitle_data,
                     auth=True,
                     use_base_url=False,
-                    thread_name=f"subfile-request:FILE-MEDIA-ID={file.media_id}:SUBFILE-MEDIA-ID={file.subfile.media_id}:thread_session={thread_session}",
+                    thread_name=f"subfile-request:FILE-MEDIA-ID={file.media_id}:SUBFILE-MEDIA-ID={file.subfile.media_id}",
                 )
 
             if file.alt_text:
@@ -423,7 +475,11 @@ class HTTPClient(EventMixin):
             "GET",
             "2",
             f"/users/me",
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            params={
+                "expansions": PINNED_TWEET_EXPANSION,
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
             auth=True,
         )
 
@@ -440,7 +496,11 @@ class HTTPClient(EventMixin):
                 "GET",
                 "2",
                 f"/users/{user_id}",
-                params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+                params={
+                    "expansions": PINNED_TWEET_EXPANSION,
+                    "user.fields": USER_FIELD,
+                    "tweet.fields": TWEET_FIELD,
+                },
                 auth=True,
             )
 
@@ -458,16 +518,22 @@ class HTTPClient(EventMixin):
             else:
                 str_ids.append(str(id))
 
-        ids = ",".join(str_ids)
         res = self.request(
             "GET",
             "2",
-            f"/users?ids={ids}",
-            params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+            f"/users?ids={','.join(str_ids)}",
+            params={
+                "expansions": PINNED_TWEET_EXPANSION,
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
             auth=True,
         )
 
-        return [User(data, http_client=self) for data in res["data"]]
+        users = [User(data, http_client=self) for data in res["data"]]
+        for user in users:
+            self.user_cache[user.id] = user
+        return users
 
     def fetch_user_by_username(self, username: str) -> Optional[User]:
         if username.startswith("@"):
@@ -478,10 +544,16 @@ class HTTPClient(EventMixin):
                 "GET",
                 "2",
                 f"/users/by/username/{username}",
-                params={"expansions": "pinned_tweet_id", "user.fields": USER_FIELD, "tweet.fields": TWEET_FIELD},
+                params={
+                    "expansions": PINNED_TWEET_EXPANSION,
+                    "user.fields": USER_FIELD,
+                    "tweet.fields": TWEET_FIELD,
+                },
                 auth=True,
             )
-            return User(data, http_client=self)
+            user = User(data, http_client=self)
+            self.user_cache[user.id] = user
+            return user
         except NotFoundError:
             return None
 
@@ -502,7 +574,9 @@ class HTTPClient(EventMixin):
                 auth=True,
             )
 
-            return Tweet(res, http_client=self)
+            tweet = Tweet(res, http_client=self)
+            self.tweet_cache[tweet.id] = tweet
+            return tweet
         except NotFoundError:
             return None
 
@@ -520,7 +594,7 @@ class HTTPClient(EventMixin):
         )
         return Space(res, http_client=self)
 
-    def fetch_space_bytitle(self, title: str, state: SpaceState = SpaceState.live) -> Space:
+    def fetch_spaces_bytitle(self, title: str, state: SpaceState = SpaceState.live) -> Space:
         res = self.request(
             "GET",
             "2",
@@ -533,7 +607,21 @@ class HTTPClient(EventMixin):
                 "topic.fields": TOPIC_FIELD,
             },
         )
-        return Space(res, http_client=self)
+        return [Space(data, http_client=self) for data in res]
+
+    def fetch_list(self, id: ID) -> TwitterList:
+        res = self.request(
+            "GET",
+            "2",
+            f"/lists/{id}",
+            auth=True,
+            params={
+                "expansions": LIST_EXPANSION,
+                "list.fields": LIST_FIELD,
+                "user.fields": USER_FIELD,
+            },
+        )
+        return TwitterList(res, http_client=self)
 
     def handle_events(self, payload: Payload):
         if payload.get("direct_message_events"):
@@ -547,6 +635,9 @@ class HTTPClient(EventMixin):
 
         elif payload.get("favorite_events"):
             self.event_parser.parse_favorite_tweet(payload)
+
+        elif payload.get("user_event"):
+            self.event_parser.parse_revoke_event(payload)
 
         elif payload.get("follow_events"):
             self.event_parser.parse_user_action(payload, "follow_events")
@@ -572,11 +663,24 @@ class HTTPClient(EventMixin):
         res = self.request("GET", "1.1", f"/direct_messages/events/show.json?id={event_id}", auth=True)
 
         message_create = res.get("event").get("message_create")
-        user_id = message_create.get("target").get("recipient_id")
-        user = self.fetch_user(user_id)
-        res["event"]["message_create"]["target"]["recipient"] = user
+        recipient_id = int(message_create.get("target").get("recipient_id"))
+        sender_id = int(message_create.get("sender_id"))
 
-        return DirectMessage(res, http_client=self)
+        recipient = self.user_cache.get(recipient_id)
+        sender = self.user_cache.get(sender_id)
+        if not recipient:
+            recipient = self.fetch_user(recipient_id)
+
+        if not sender:
+            sender = self.fetch_user(sender_id)
+
+        res["event"]["message_create"]["target"]["recipient"] = recipient
+        res["event"]["message_create"]["target"]["sender"] = sender
+        message = DirectMessage(res, http_client=self)
+        self.message_cache[message.id] = message
+        self.message_cache[recipient_id] = recipient
+        self.message_cache[sender_id] = sender
+        return message
 
     def fetch_welcome_message(self, welcome_message_id: ID) -> Optional[WelcomeMessage]:
         try:
@@ -724,7 +828,7 @@ class HTTPClient(EventMixin):
         exclude_reply_users: Optional[List[User, ID]] = None,
         media_tagged_users: Optional[List[User, ID]] = None,
         super_followers_only: bool = False,
-    ) -> Optional[Message]:
+    ) -> Optional[Tweet]:
         thread_session = self.generate_thread_session()
         executor = self.thread_manager.create_new_executor(thread_name="post-tweet-request", session_id=thread_session)
 
@@ -735,8 +839,7 @@ class HTTPClient(EventMixin):
         if file:
             payload["media"] = {}
             payload["media"]["media_ids"] = []
-            file_future = executor.submit(self.quick_upload, file)
-            executor.futures.append(file_future)
+            executor.submit(self.quick_upload, file)
 
         if files:
             if len(files) + 1 if file else len(files) > 4:
@@ -745,8 +848,7 @@ class HTTPClient(EventMixin):
             payload["media"] = {}
             payload["media"]["media_ids"] = []
             for file in files:
-                future = executor.submit(self.quick_upload, file)
-                executor.futures.append(future)
+                executor.submit(self.quick_upload, file)
 
         if poll:
             payload["poll"] = {}
@@ -793,13 +895,42 @@ class HTTPClient(EventMixin):
         if super_followers_only:
             payload["for_super_followers_only"] = True
 
-        for future in executor.futures:
-            file = future.result()
+        executor.wait_for_futures()
+        if file:
             payload["media"]["media_ids"].append(str(file.media_id))
+        if files:
+            for file in files:
+                payload["media"]["media_ids"].append(str(file.media_id))
 
         res = self.request("POST", "2", "/tweets", json=payload, auth=True)
-        data = res.get("data")
-        return Message(data.get("text"), data.get("id"), 1)
+        return self.fetch_tweet(res["data"]["id"])
+
+    def create_list(self, name: str, *, description: str = "", private: bool = False) -> Optional[TwitterList]:
+        res = self.request(
+            "POST",
+            "2",
+            "/lists",
+            auth=True,
+            json={"name": name, "description": description, "private": private},
+        )
+        return TwitterList(res, http_client=self)
+
+    def update_list(
+        self,
+        list_id: int,
+        *,
+        name: Optional[str] = None,
+        description: str = "",
+        private: Optional[bool] = None,
+    ) -> Optional[RelationUpdate]:
+        res = self.request(
+            "PUT",
+            "2",
+            f"/lists/{list_id}",
+            auth=True,
+            json={"name": name, "description": description, "private": private},
+        )
+        return RelationUpdate(res)
 
     def create_custom_profile(self, name: str, file: File) -> Optional[CustomProfile]:
         file = self.quick_upload(file)

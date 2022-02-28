@@ -4,6 +4,7 @@
 
 .. versionadded:: 1.2.0
 
+
 Logging
 ===============
 

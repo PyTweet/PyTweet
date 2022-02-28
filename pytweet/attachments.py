@@ -10,12 +10,13 @@ from .entities import Media
 from .enums import ButtonType
 from .utils import time_parse_todt
 from .errors import PytweetException
-from .constant import LANGUAGES_CODES
+from .constants import LANGUAGES_CODES
+from .objects import Comparable
 
 if TYPE_CHECKING:
     from .type import ID
 
-__all__ = ("Poll", "QuickReply", "Geo", "CTA", "File")
+__all__ = ("Poll", "QuickReply", "Geo", "CTA", "File", "SubFile")
 
 
 def guess_mimetype(byts: bytes):
@@ -35,7 +36,7 @@ def guess_mimetype(byts: bytes):
         return "text/plain"
 
 
-class Poll:
+class Poll(Comparable):
     """Represents a Poll attachment in a tweet.
 
     .. describe:: x == y
@@ -76,26 +77,17 @@ class Poll:
         "_raw_options",
     )
 
-    def __init__(self, duration: int, **kwargs):
+    def __init__(self, *, duration: int, **kwargs):
         self._id: Optional[ID] = kwargs.get("id", None)
         self._voting_status: Optional[str] = kwargs.get("voting_status", None)
         self._end_date = kwargs.get("end_date", None)
         self._duration = duration
         self._options = []
         self._raw_options = []
+        super().__init__(self.id)
 
     def __repr__(self) -> str:
         return "Poll(id={0.id} voting_status={0.voting_status} duration={0.duration})".format(self)
-
-    def __eq__(self, other: Poll) -> Union[bool, NoReturn]:
-        if not isinstance(other, Poll):
-            raise ValueError("== operation cannot be done with one of the element not a valid Poll object")
-        return self.id == other.id
-
-    def __ne__(self, other: Poll) -> Union[bool, NoReturn]:
-        if not isinstance(other, Poll):
-            raise ValueError("!= operation cannot be done with one of the element not a valid Poll object")
-        return self.id != other.id
 
     def __len__(self) -> int:
         return len(self.options)
@@ -209,18 +201,14 @@ class QuickReply:
     type: :class:`str`
         The quick_reply's types, it must be and only 'options'
 
-    Attributes
-    ------------
-    options: List[Any, Any]
-        The QuickReply's options. An option must have a label, description and metadata, Maximum options is 20.
 
     .. versionadded:: 1.2.0
     """
 
-    __slots__ = ("type", "_options", "_raw_options")
+    __slots__ = ("_type", "_options", "_raw_options")
 
     def __init__(self, type: str = "options"):
-        self.type = type if type == "options" else "options"
+        self._type = type if type == "options" else "options"
         self._options: List[Option] = []
         self._raw_options: List[dict] = []
 
@@ -257,6 +245,14 @@ class QuickReply:
         return self
 
     @property
+    def type(self) -> str:
+        """:class:`str`: Returns the QuickReply type.
+
+        .. versionadded:: 1.5.0
+        """
+        return self._type
+
+    @property
     def options(self) -> List[Option]:
         """List[:class:`Option`]: Returns a list of pre-made Option objects.
 
@@ -271,102 +267,6 @@ class QuickReply:
         .. versionadded:: 1.2.0
         """
         return self._raw_options
-
-
-class Geo:
-    """Represents the Geo location in twitter.
-    You can use this as attachment in a tweet or for searching a location
-
-
-    .. versionadded:: 1.3.5
-    """
-
-    __slots__ = ("_payload", "__bounding_box")
-
-    def __init__(self, data: Dict[str, Any]):
-        self._payload = data
-        self.__bounding_box = self._payload.get("bounding_box")
-
-    def __repr__(self) -> str:
-        return "Geo(name={0.name} fullname={0.fullname} country={0.country} country_code={0.country_code} id={0.id})".format(
-            self
-        )
-
-    @property
-    def name(self) -> str:
-        """:class:`str`: Returns the geo's name.
-
-        .. versionadded:: 1.3.5
-        """
-        return self._payload.get("name")
-
-    @property
-    def id(self) -> str:
-        """:class:`str`: Returns the geo's unique id.
-
-        .. versionadded:: 1.3.5
-        """
-        return self._payload.get("id")
-
-    @property
-    def fullname(self) -> str:
-        """:class:`str`: Returns the geo's fullname.
-
-        .. versionadded:: 1.3.5
-        """
-        return self._payload.get("full_name")
-
-    @property
-    def type(self) -> str:
-        """:class:`str`: Returns the geo's type.
-
-        .. versionadded:: 1.3.5
-        """
-        return self._payload.get("place_type")
-
-    @property
-    def country(self) -> str:
-        """:class:`str`: Returns the country where the geo is in.
-
-        .. versionadded:: 1.3.5
-        """
-        return self._payload.get("country")
-
-    @property
-    def country_code(self) -> str:
-        """:class:`str`: Returns the country's code where the geo is in.
-
-        .. versionadded:: 1.3.5
-        """
-        return self._payload.get("country_code")
-
-    @property
-    def centroid(self) -> str:
-        """:class:`str`: Returns the geo's centroid.
-
-        .. versionadded:: 1.3.5
-        """
-        return self._payload.get("centroid")
-
-    @property
-    def bounding_box_type(self) -> str:
-        """:class:`str`: Returns the geo's bounding box type.
-
-        .. versionadded:: 1.3.5
-        """
-        if self.__bounding_box:
-            return self.__bounding_box.get("type")
-        return None
-
-    @property
-    def coordinates(self) -> List[str]:
-        """List[:class:`str`]: Returns a list of coordinates where the geo's located.
-
-        .. versionadded:: 1.3.5
-        """
-        if self.__bounding_box:
-            return self.__bounding_box.get("coordinates")
-        return None
 
 
 class CTA:
@@ -566,7 +466,7 @@ class File:
 
     @property
     def subfiles(self) -> Optional[List[SubFile]]:
-        """Optional[List[:class:`SubFile`]]: Returns a list of the file's subfile.
+        """Optional[List[:class:`SubFile`]]: Returns a list of the file's subfiles.
 
         .. versionadded:: 1.5.0
         """
@@ -574,7 +474,7 @@ class File:
 
 
 class SubFile(File):
-    """Represents a subtitle File for :class:`File`. You can attach one subfile in :class:`File` via subfile arguments. This method inherits :class:`File`.
+    """Represents a subtitle File for :class:`File`. You can attach one subfile in :class:`File` via subfile arguments. This method inherits :class:`File`. Always remembers that twitter only supports srt extension file with the correct timestamps.
 
 
     .. versionadded:: 1.5.0
@@ -645,7 +545,7 @@ class SubFile(File):
 
     @property
     def mimetype(self) -> str:
-        """:class:`str`: Returns the subfile's media category. This always going to be text/srt as the subtitle format.
+        """:class:`str`: Returns the subfile's media category. This always returns 'text/srt'
 
         .. versionadded:: 1.5.0
         """
@@ -653,14 +553,111 @@ class SubFile(File):
 
     @property
     def media_category(self) -> str:
-        """:class:`str`: Returns the subfile's media category. This always going to return 'Subtitles'
+        """:class:`str`: Returns the subfile's media category. This always returns 'Subtitles'.
 
         .. versionadded:: 1.5.0
         """
         return "Subtitles"
 
 
-class CustomProfile:
+class Geo(Comparable):
+    """Represents the Geo location in twitter.
+    You can use this as attachment in a tweet or for searching a location
+
+
+    .. versionadded:: 1.3.5
+    """
+
+    __slots__ = ("_payload", "__bounding_box")
+
+    def __init__(self, data: Dict[str, Any]):
+        self._payload = data
+        self.__bounding_box = self._payload.get("bounding_box")
+        super().__init__(self.id)
+
+    def __repr__(self) -> str:
+        return "Geo(name={0.name} fullname={0.fullname} country={0.country} country_code={0.country_code} id={0.id})".format(
+            self
+        )
+
+    @property
+    def name(self) -> str:
+        """:class:`str`: Returns the geo's name.
+
+        .. versionadded:: 1.3.5
+        """
+        return self._payload.get("name")
+
+    @property
+    def id(self) -> str:
+        """:class:`str`: Returns the geo's unique id.
+
+        .. versionadded:: 1.3.5
+        """
+        return self._payload.get("id")
+
+    @property
+    def fullname(self) -> str:
+        """:class:`str`: Returns the geo's fullname.
+
+        .. versionadded:: 1.3.5
+        """
+        return self._payload.get("full_name")
+
+    @property
+    def type(self) -> str:
+        """:class:`str`: Returns the geo's type.
+
+        .. versionadded:: 1.3.5
+        """
+        return self._payload.get("place_type")
+
+    @property
+    def country(self) -> str:
+        """:class:`str`: Returns the country where the geo is in.
+
+        .. versionadded:: 1.3.5
+        """
+        return self._payload.get("country")
+
+    @property
+    def country_code(self) -> str:
+        """:class:`str`: Returns the country's code where the geo is in.
+
+        .. versionadded:: 1.3.5
+        """
+        return self._payload.get("country_code")
+
+    @property
+    def centroid(self) -> str:
+        """:class:`str`: Returns the geo's centroid.
+
+        .. versionadded:: 1.3.5
+        """
+        return self._payload.get("centroid")
+
+    @property
+    def bounding_box_type(self) -> str:
+        """:class:`str`: Returns the geo's bounding box type.
+
+        .. versionadded:: 1.3.5
+        """
+        if self.__bounding_box:
+            return self.__bounding_box.get("type")
+        return None
+
+    @property
+    def coordinates(self) -> List[str]:
+        """List[:class:`str`]: Returns a list of coordinates where the geo's located.
+
+        .. versionadded:: 1.3.5
+        """
+        if self.__bounding_box:
+            return self.__bounding_box.get("coordinates")
+        return None
+
+
+class CustomProfile(Comparable):
     """Represents a CustomProfile attachments that allow a Direct Message author to present a different identity than that of the Twitter account being used.
 
     .. versionadded:: 1.3.5
@@ -679,6 +676,7 @@ class CustomProfile:
         self._id = id
         self._timestamp = timestamp
         self._media = Media(media)
+        super().__init__(self.id)
 
     def __repr__(self) -> str:
         return "CustomProfile(name={0.name} id={0.id} media_id={0.media_id})".format(self)

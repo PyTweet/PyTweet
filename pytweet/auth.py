@@ -7,7 +7,7 @@ import datetime
 
 from random import randint
 from typing import Tuple, Optional, Literal, TYPE_CHECKING
-from requests_oauthlib import OAuth1
+from requests_oauthlib import OAuth1, OAuth1Session
 from .errors import PytweetException
 
 if TYPE_CHECKING:
@@ -248,6 +248,10 @@ class OauthSession:
         self.callback_url = callback_url
         self.client_id = client_id
         self.client_secret = client_secret
+        self.oauth1_session = OAuth1Session(
+            self.consumer_key, client_secret=self.consumer_secret, callback_uri=self.callback_url
+        )
+        self.oauth_url = "https://api.twitter.com/oauth"
 
     @property
     def oauth1(self) -> OAuth1:
@@ -263,10 +267,6 @@ class OauthSession:
             callback_uri=self.callback_url,
             decoding=None,
         )
-
-    @property
-    def request_session(self):
-        return self.http_client._HTTPClient__session
 
     @property
     def basic_auth(self) -> str:
@@ -290,23 +290,87 @@ class OauthSession:
         """
         self.http_client.request("POST", "1.1", "/oauth/invalidate_token", auth=True)
 
-    def generate_oauth_url(
+    def verify_credentials(self, *, raise_error: bool = True) -> Optional[bool]:
+        """Verify the credentials are correct. Returns a boolean whether its succesful or not if raise_error turns to False. Default to True
+
+        Parameters
+        ------------
+        raise_error: :class:`bool`
+            Indicates whether to raise if the credentials are wrong. If sets to False, the method will returns a boolean, True for succesful and False for error.
+
+        Raises
+        --------
+        :class:`Forbidden`
+            Raised if the credentials are wrong.
+
+
+        .. versionadded:: 1.5.0
+        """
+        try:
+            error = None
+            self.http_client.request("GET", "1.1", "/account/verify_credentials.json", auth=True)
+        except Exception as e:
+            error = e
+        finally:
+            if not error:
+                return True
+            elif error and raise_error:
+                raise error
+            else:
+                return False
+
+    def generate_request_tokens(
+        self, access_type: Optional[Literal["read", "write", "direct_messages"]] = None
+    ) -> dict:
+        """Generates request tokens with an access_type. This method returns a dictionary with the credentials, example return object:
+
+        .. code-blocks: python
+
+            data = oauth_session.generate_request_tokens()
+            print(data) # -> {'oauth_token': 'XXXXXXXXXXXXXXX', 'oauth_token_secret': 'XXXXXXXXXXXXXXX', 'oauth_callback_confirmed': 'true'}
+
+
+        Parameters
+        ------------
+        access_type: :class:`str`
+            Must be either read, write, direct_messages. read for reading twitter info only, write will have the same as read and also write permission this includes but not limited to post & delete a :class:`Tweet`, and direct_messages is for read & write and sending & deleting
+
+        Returns
+        ---------
+        :class:`dict`
+            Returns the request_tokens data.
+
+
+        .. versionadded:: 1.3.5
+        """
+        try:
+            if access_type:
+                url = self.oauth_url + f"/request_token?x_auth_access_type={access_type}"
+
+            else:
+                url = self.oauth_url + f"/request_token"
+
+            request_tokens = self.oauth1_session.fetch_request_token(url)
+            return request_tokens
+        except Exception as e:
+            raise e
+
+    def create_oauth_url(
         self,
-        access_type: Literal["read", "write", "direct_messages"] = "write",
+        access_type: Optional[Literal["read", "write", "direct_messages"]] = None,
         *,
-        force_login: bool = False,
-        screen_name: Optional[str] = None,
+        signin_with_twitter: bool = False,
     ) -> Optional[str]:
-        """Generates an oauth url with an access type. The callback after pressing authorize button is your callback url that you passed in your :class:`Client`. The oauth_token and oauth_verifier will automatically appended in the callback url. If you are setting up a sign up button in your website to lookup the user's profile information, You have to setup a system where if the oauth_token or oauth_verifier is present in the url then, it will use :meth:`OauthSession.post_oauth_token` to post an oauth token and verifier to exchange with the user's access token and secret. If its for personal uses then just copy the result and passed in :meth:`OauthSession.post_oauth_token`.
+        """Creates an oauth url with an access type. This is the 1st step of making a request on behalf of other users through oauth1.1 usercontext.
+
+        The callback after pressing authorize button is your callback url that you passed in your :class:`Client`. The oauth_token and oauth_verifier will automatically appended in the callback url. If you are setting up a sign up button in your website to lookup the user's profile information, You have to setup a system where if the oauth_token or oauth_verifier is present in the url then, it will use :meth:`OauthSession.post_oauth_token` to post an oauth token and verifier to exchange with the user's access token and secret. If its for personal uses then just copy the result and passed in :meth:`OauthSession.post_oauth_token`.
 
         Parameters
         ------------
         access_type: :class:`str`
             Must be either read, write, direct_messages. read for reading twitter info only, write will have the same as read and also write permission this includes but not limited to post & delete a :class:`Tweet`, and direct_messages is for read & write and sending & deleting :class:`DirectMessages`.
-        force_login: :class:`bool`
-            Forces the user to enter their credentials to ensure the correct users account is authorized.
-        screen_name: :class:`str`
-            Prefills the username input box of the OAuth login screen with the given value.
+        signin_with_twitter: :class:`bool`
+           Register a user account in as little as one click. This works on websites, iOS, mobile, and desktop applications.
 
         Returns
         ---------
@@ -320,32 +384,17 @@ class OauthSession:
             raise PytweetException("'callback_url' argument is missing in your client instance")
 
         access_type = access_type.lower()
-        assert access_type in ("read", "write", "direct_messages")
-        request_tokens = self.http_client.request(
-            "POST",
-            "",
-            "oauth/request_token",
-            params={
-                "oauth_callback": self.callback_url,
-                "x_auth_access_type": access_type,
-            },
-            auth=True,
-        )
-        (
-            oauth_token,
-            oauth_token_secret,
-            oauth_callback_confirmed,
-        ) = request_tokens.split("&")
-        url = "https://api.twitter.com/oauth/authorize" + f"?{oauth_token}"
-        if force_login:
-            url += "?force_login=true"
-
-        if screen_name:
-            url += f"?screen_name={screen_name}"
-        return url
+        assert access_type in (
+            "read",
+            "write",
+            "direct_messages",
+        ), "Wrong access type passed! must be 'read', 'write', or 'direct_messages')"
+        request_tokens = self.generate_request_tokens(access_type)
+        authorize_url = self.oauth_url + "/authorize" if not signin_with_twitter else self.oauth_url + "/authenticate"
+        return authorize_url + f"?oauth_token={request_tokens.get('oauth_token')}"
 
     def post_oauth_token(self, oauth_token: str, oauth_verifier: str) -> Optional[Tuple[str]]:
-        """Posts the oauth token & verifier, this method will returns a pair of access token & secret also the user's username(present as screen_name) and id e.g ("access_token=xxxxxxxxxxxxx", "access_token_secret=xxxxxxxxxxxxx", "screen_name=TheGenocides", "user_id=1382006704171196419"). Uses the access token and secret to make request on behalf of users! You can use the raw api or construct another client with the access token and secret.
+        """Posts the oauth token & verifier. This is the 2nd step(and the last step) of making a request on behalf of other users through oauth1.1 usercontext. Returns a pair of access token & secret also the user's username(present as screen_name) and id e.g ("access_token=xxxxxxxxxxxxx", "access_token_secret=xxxxxxxxxxxxx", "screen_name=TheGenocides", "user_id=1382006704171196419"). Uses the access token and secret to make request on behalf of users! You can use the raw api or construct another client with the access token and secret.
 
         Parameters
         ------------
@@ -371,7 +420,13 @@ class OauthSession:
 
         return tuple(res.split("&"))
 
-    def create_oauth2_url(self, scope: Scope, *, code_challenge_method: str = "plain", state: Optional[str] = None):
+    def create_oauth2_url(
+        self,
+        scope: Scope,
+        *,
+        code_challenge_method: str = "plain",
+        state: Optional[str] = None,
+    ):
         """Creates an oauth 2 url. This is The 1st step of using OAuth 2.0 Authorization Code Flow with PKCE. The callback after pressing authorize button is your callback url that you passed in your :class:`Client`.
 
         Parameters
@@ -425,12 +480,40 @@ class OauthSession:
 
         .. versionadded:: 1.5.0
         """
-        res = self.http_client.request(
+        return self.http_client.request(
             "POST",
             "2",
             "/oauth2/token",
             data=f"code={code}&grant_type=authorization_code&client_id={self.client_id}&redirect_uri={self.callback_url}&code_verifier={code_challenge}",
-            headers={"Authorization": f"Basic {self.basic_auth}", "Content-Type": "application/x-www-form-urlencoded"},
+            headers={
+                "Authorization": f"Basic {self.basic_auth}",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
         )
 
-        return res
+    def request_new_token(self, refresh_token: str) -> Optional[dict]:
+        """Request a new access token with the refresh token, to obtain a refresh token make sure to use :meth:`OauthSession.create_oauth2_url` with offline_access permission sets to True in the scope parameter.
+
+        Parameters
+        ------------
+        refresh_token: :class:`str`
+            Refresh tokens allow an application to obtain a new access token without prompting the user via the refresh token flow.
+
+        Returns
+        ---------
+        Optional[:class:`dict`]
+            This method returns a dict object with the new request token in that dict.
+
+
+        .. versionadded:: 1.5.0
+        """
+        return self.http_client.request(
+            "POST",
+            "2",
+            "/oauth2/token",
+            data=f"refresh_token={refresh_token}&grant_type=refresh_token&client_id={self.client_id}",
+            headers={
+                "Authorization": f"Basic {self.basic_auth}",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        )

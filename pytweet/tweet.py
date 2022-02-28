@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 from .attachments import Poll, Geo, File
 from .entities import Media
 from .enums import ReplySetting
-from .expansions import USER_FIELD
+from .constants import TWEET_FIELD, USER_FIELD, PINNED_TWEET_EXPANSION
 from .metrics import TweetPublicMetrics
-from .relations import RelationHide, RelationLike, RelationRetweet
+from .relations import RelationHide, RelationLike, RelationRetweet, RelationDelete
 from .user import User
 from .utils import time_parse_todt
 from .message import Message
+from .paginations import UserPagination
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -185,36 +186,32 @@ class Tweet(Message):
     .. versionadded:: 1.0.0
     """
 
-    __slots__ = ("__original_payload", "_payload", "_includes", "tweet_metrics", "http_client", "deleted_timestamp")
-
-    if TYPE_CHECKING:
-        _payload: Dict[Any, Any]
-        __original_payload: Dict[str, Any]
-        _includes: Any
+    __slots__ = (
+        "__original_payload",
+        "_payload",
+        "_includes",
+        "tweet_metrics",
+        "http_client",
+        "deleted_timestamp",
+    )
 
     def __init__(
-        self, data: Dict[str, Any], *, deleted_timestamp: Optional[int] = None, http_client: Optional[HTTPClient] = None
+        self,
+        data: Dict[str, Any],
+        *,
+        deleted_timestamp: Optional[int] = None,
+        http_client: Optional[HTTPClient] = None,
     ) -> None:
         self.__original_payload = data
         self._payload = data.get("data") or data
         self._includes = self.__original_payload.get("includes")
-        self.tweet_metrics: TweetPublicMetrics = TweetPublicMetrics(self._payload)
+        self.tweet_metrics = TweetPublicMetrics(self._payload)
         self.http_client = http_client
         self.deleted_timestamp = deleted_timestamp
         super().__init__(self._payload.get("text"), self._payload.get("id"), 1)
 
     def __repr__(self) -> str:
-        return "Tweet(text={0.text} id={0.id} author={0.author})".format(self)
-
-    def __eq__(self, other: Tweet) -> Union[bool, NoReturn]:
-        if not isinstance(other, Tweet):
-            raise ValueError("== operation cannot be done with one of the element not a valid Tweet object")
-        return self.id == other.id
-
-    def __ne__(self, other: Tweet) -> Union[bool, NoReturn]:
-        if not isinstance(other, Tweet):
-            raise ValueError("!= operation cannot be done with one of the element not a valid User object")
-        return self.id != other.id
+        return "Tweet(text={0.text} id={0.id} author={0.author!r})".format(self)
 
     @property
     def author(self) -> Optional[User]:
@@ -257,7 +254,7 @@ class Tweet(Message):
         """Optional[:class:`datetime.datetime`]: Return a :class:`datetime.datetime` object when the tweet was deleted. Returns None when the tweet is not deleted.
 
         .. note::
-            This property can only be access through `on_tweet_delete` event and if the tweet was not deleted or it isn't in the client tweet cache, it returns None.
+            This property can only returns :class:`datetime.datetime` object through a tweet object from `on_tweet_delete` event.
 
         .. versionadded: 1.5.0
         """
@@ -299,7 +296,7 @@ class Tweet(Message):
 
     @property
     def conversation_id(self) -> Optional[int]:
-        """Optional[:class:`int`]: All replied are bind to the original tweet, this property returns the tweet's id if the tweet count as reply tweet else it returns None.
+        """Optional[:class:`int`]: All replies are bind to the original tweet, this property returns the tweet's id if the tweet is a reply tweet else it returns None.
 
         .. versionadded: 1.0.0
         """
@@ -318,7 +315,7 @@ class Tweet(Message):
             Returns None if the author is invalid or the tweet doesn't have id.
         """
         try:
-            return f"https://twitter.com/{self.author.username.split('@', 1)[1]}/status/{self.id}"
+            return f"https://twitter.com/{self.author.username}/status/{self.id}"
         except TypeError:
             return None
 
@@ -478,7 +475,7 @@ class Tweet(Message):
 
         return RelationRetweet(res)
 
-    def delete(self) -> None:
+    def delete(self) -> RelationDelete:
         """Delete the client's tweet.
 
         .. note::
@@ -486,13 +483,14 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.0
         """
-
-        self.http_client.request("DELETE", "2", f"/tweets/{self.id}", auth=True)
+        res = self.http_client.request("DELETE", "2", f"/tweets/{self.id}", auth=True)
 
         try:
             self.http_client.tweet_cache.pop(self.id)
         except KeyError:
             pass
+
+        return RelationDelete(res)
 
     def reply(
         self,
@@ -505,7 +503,7 @@ class Tweet(Message):
         reply_setting: Optional[Union[ReplySetting, str]] = None,
         exclude_reply_users: Optional[List[User, ID]] = None,
         media_tagged_users: Optional[List[User, ID]] = None,
-    ) -> Union[Tweet, Message]:
+    ) -> Optional[Tweet]:
         """Post a tweet to reply to the tweet present by the tweet's id. Returns a :class:`Tweet` object or :class:`Message` if the tweet is not found in the cache.
 
         .. note::
@@ -516,7 +514,7 @@ class Tweet(Message):
         text: :class:`str`
             The tweet's text, it will show up as the main text in a tweet.
         file: Optional[:class:`File`]
-            Represent a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
+            Represents a single file attachment. It could be an image, gif, or video. It also have to be an instance of pytweet.File
         files: Optional[List[:class:`File`]]
             Represents multiple file attachments in a list. It could be an image, gif, or video. the item in the list must also be an instance of pytweet.File
         geo: Optional[Union[:class:`Geo`, :class:`str`]]
@@ -538,7 +536,7 @@ class Tweet(Message):
 
         .. versionadded:: 1.2.5
         """
-        tweet = self.http_client.post_tweet(
+        return self.http_client.post_tweet(
             text,
             file=file,
             files=files,
@@ -549,7 +547,6 @@ class Tweet(Message):
             exclude_reply_users=exclude_reply_users,
             media_tagged_users=media_tagged_users,
         )
-        return self.http_client.tweet_cache.get(tweet.id, tweet)
 
     def hide(self) -> RelationHide:
         """Hide a reply tweet.
@@ -579,13 +576,13 @@ class Tweet(Message):
         res = self.http_client.request("PUT", "2", f"/tweets/{self.id}/hidden", json={"hidden": False}, auth=True)
         return RelationHide(res)
 
-    def fetch_retweeters(self):
+    def fetch_retweeters(self) -> Optional[UserPagination]:
         """Return users that retweeted the tweet.
 
         Returns
         ---------
-        Optional[List[:class:`User`], List]
-            This method returns a list of :class:`User` objects
+        Optional[:class:`UserPagination`]
+            This method returns a :class:`UserPagination` object.
 
 
         .. versionadded:: 1.1.3
@@ -594,21 +591,33 @@ class Tweet(Message):
             "GET",
             "2",
             f"/tweets/{self.id}/retweeted_by",
-            params={"user.fields": USER_FIELD},
+            params={
+                "expansions": PINNED_TWEET_EXPANSION,
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
         )
-
-        try:
-            return [User(user, http_client=self) for user in res["data"]]
-        except (KeyError, TypeError):
+        if not res:
             return []
 
-    def fetch_liking_users(self) -> Optional[List[User], List]:
+        return UserPagination(
+            res,
+            endpoint_request=f"/tweets/{self.id}/retweeted_by",
+            http_client=self.http_client,
+            params={
+                "expansions": PINNED_TWEET_EXPANSION,
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
+        )
+
+    def fetch_likers(self) -> Optional[UserPagination]:
         """Return users that liked the tweet.
 
         Returns
         ---------
-        Optional[List[:class:`User`], List]
-            This method returns a list of :class:`User` objects
+        Optional[:class:`UserPagination`]
+            This method returns a :class:`UserPagination` object.
 
 
         .. versionadded:: 1.1.3
@@ -617,13 +626,26 @@ class Tweet(Message):
             "GET",
             "2",
             f"/tweets/{self.id}/liking_users",
-            params={"user.fields": USER_FIELD},
+            params={
+                "expansions": PINNED_TWEET_EXPANSION,
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
         )
 
-        try:
-            return [User(user, http_client=self) for user in res["data"]]
-        except (KeyError, TypeError):
+        if not res:
             return []
+
+        return UserPagination(
+            res,
+            endpoint_request=f"/tweets/{self.id}/liking_users",
+            http_client=self.http_client,
+            params={
+                "expansions": PINNED_TWEET_EXPANSION,
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
+        )
 
     def fetch_replied_user(self) -> Optional[User]:
         """Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.

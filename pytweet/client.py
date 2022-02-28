@@ -7,7 +7,7 @@ import json
 import logging
 import time
 import threading
-
+import datetime
 from urllib.parse import urlparse
 from asyncio import iscoroutinefunction
 from http import HTTPStatus
@@ -16,6 +16,7 @@ from flask import Flask, request
 
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .enums import ReplySetting, SpaceState, Granularity
+from .constants import TWEET_EXPANSION, USER_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_FIELD
 from .errors import PytweetException, UnKnownSpaceState
 from .http import HTTPClient
 from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
@@ -25,6 +26,7 @@ from .tweet import Tweet
 from .user import User, ClientAccount
 from .environment import Environment, Webhook
 from .dataclass import Location, Trend
+from .list import List as TwitterList
 from .type import ID
 
 __all__ = ("Client",)
@@ -50,13 +52,17 @@ class Client:
     stream: Optional[Stream]
         The client's stream. Must be an instance of :class:`Stream`.
     callback_url: Optional[:class:`str`]
-        The oauth callback url, default to None.
+        The oauth callback url, default to None. Makes sure the callback url is the same as the one in your application auth-settings or else it can't create and interact with oauth related methods.
     client_id: Optional[:class:`str`]
         The client's OAuth 2.0 Client ID from keys and tokens page.
     client_secret: Optional[:class:`str`]
         The client's OAuth 2.0 Client Secret from keys and tokens page.
     use_bearer_only: bool
         Indicates to only use bearer token for all methods. This mean the client is now a twitter-api-client v2 interface. Some methods are unavailable to use such as fetching trends and location, environment fetching methods, and features such as events. Some methods can be recover with OAuth 2 authorization code flow with PKCE with the correct scopes or permissions. Like users.read scope for reading users info which some methods provide a way like :meth:`Client.fetch_user`.
+    sleep_after_ratelimit: :class:`bool`
+        Indicates to sleep when your client is ratelimited, If set to True it won't raise :class:`TooManyRequests` error but it would print a message indicating to sleep, then it sleeps for how many seconds it needs to sleep, after that it continue to restart the request.
+    verify_credentials: :class:`bool`
+        Indicates to verify the credentials you specified, this includes consumer_key, consumer_secret, access_token, access_token_secret. make sure to specified all of them in your client, you cannot specified only one of them.
 
     Attributes
     ------------
@@ -84,6 +90,8 @@ class Client:
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
         use_bearer_only: bool = False,
+        sleep_after_ratelimit: bool = False,
+        verify_credentials: bool = False,
     ) -> None:
         self.http = HTTPClient(
             bearer_token,
@@ -96,15 +104,19 @@ class Client:
             client_id=client_id,
             client_secret=client_secret,
             use_bearer_only=use_bearer_only,
+            sleep_after_ratelimit=sleep_after_ratelimit,
         )
         self._account_user: Optional[User] = None  # set in account property.
         self.webhook: Optional[Webhook] = None
         self.environment: Optional[Environment] = None
         self.webhook_url_path: Optional[str] = None
-        self.thread_manager = self.http.thread_manager
+        self.executor = self.http.thread_manager.create_new_executor(thread_name="main-executor")
+        self.verify_credentials = verify_credentials
+        if self.verify_credentials:
+            self.http.oauth_session.verify_credentials(raise_error=True)
 
     def __repr__(self) -> str:
-        return "Client(bearer_token=SECRET consumer_key=SECRET consumer_secret=SECRET access_token=SECRET access_token_secret=SECRET)"
+        return "Client({0.account!r})".format(self)
 
     @property
     def account(self) -> Optional[User]:
@@ -224,7 +236,7 @@ class Client:
         """Fetches a direct message.
 
         .. warning::
-            This method uses API call and might cause ratelimits if used often! There is always an alternative like :meth:`Client.get_direct_message` from the client's internal cache.
+            This method uses API call and might cause ratelimits if used often! There is always an alternative like :meth:`Client.fetch_direct_message` from the client's internal cache.
 
         Parameters
         ------------
@@ -241,6 +253,111 @@ class Client:
         """
         return self.http.fetch_direct_message(event_id)
 
+    def fetch_welcome_message(self, welcome_message_id: ID) -> WelcomeMessage:
+        """Fetches a welcome message.
+
+        Parameters
+        ------------
+        welcome_message_id: :class:`ID`
+            Represents the welcome message ID that you wish to fetch with.
+
+        Returns
+        ---------
+        :class:`WelcomeMessage`
+            This method returns :class:`WelcomeMessage` object.
+
+
+        .. versionadded:: 1.3.5
+        """
+        return self.http.fetch_welcome_message(welcome_message_id)
+
+    def fetch_welcome_message_rule(self, welcome_message_rule_id: ID) -> WelcomeMessageRule:
+        """Fetches a welcome message rule.
+
+        Parameters
+        ------------
+        welcome_message_rule_id: :class:`ID`
+            Represents the welcome message rule ID that you wish to fetch with.
+
+        Returns
+        ---------
+        :class:`WelcomeMessageRule`
+            This method returns :class:`WelcomeMessageRule` object.
+
+
+        .. versionadded:: 1.3.5
+        """
+        return self.http.fetch_welcome_message_rule(welcome_message_rule_id)
+
+    def fetch_space(self, space_id: ID) -> Space:
+        """Fetches a space.
+
+        Parameters
+        ------------
+        space_id: :class:`ID`
+            Represents the space ID that you wish to fetch with.
+
+        Returns
+        ---------
+        :class:`Space`
+            This method returns a :class:`Space` object.
+
+
+        .. versionadded:: 1.3.5
+        """
+        return self.http.fetch_space(space_id)
+
+    def fetch_spaces_by_title(self, title: str, state: SpaceState = SpaceState.live) -> Optional[List[Space]]:
+        """Fetches spaces using its title.
+
+        Parameters
+        ------------
+        title: :class:`ID`
+            The space title that you are going use for fetching the space.
+        state: :class:`SpaceState`
+            The type of state the space has. There are only 2 types: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host. Default to SpaceState.live
+
+        Returns
+        ---------
+        Optional[List[:class:`Space`]]
+            This method returns a list of :class:`Space`s object.
+
+
+        .. versionadded:: 1.3.5
+        """
+        if state == SpaceState.live or state == SpaceState.scheduled:
+            return self.http.fetch_spaces_bytitle(title, state)
+        else:
+            raise UnKnownSpaceState(given_state=state)
+
+    def fetch_list(self, id: ID) -> TwitterList:
+        """Fetches a list using its id
+
+        Returns
+        ---------
+        :class:`List`
+            This method returns a :class:`List` object.
+
+
+        .. versionadded:: 1.5.0
+        """
+        return self.http.fetch_list(id)
+
+    def fetch_all_environments(self) -> Optional[List[Environment]]:
+        """Fetches all the client's environments.
+
+        Returns
+        ---------
+        Optional[List[:class:`Environment`]]
+            Returns a list of :class:`Environment` objects.
+
+
+        .. versionadded:: 1.5.0
+        """
+        res = self.http.request("GET", "1.1", "/account_activity/all/webhooks.json")
+
+        return [Environment(data, client=self) for data in res.get("environments")]
+
     def tweet(
         self,
         text: str = None,
@@ -256,7 +373,7 @@ class Client:
         exclude_reply_users: Optional[List[User, ID]] = None,
         media_tagged_users: Optional[List[User, ID]] = None,
         super_followers_only: bool = False,
-    ) -> Message:
+    ) -> Optional[Tweet]:
         """Posts a tweet directly to twitter from the given parameters.
 
         Parameters
@@ -343,84 +460,47 @@ class Client:
         """
         return self.http.create_welcome_message(name=name, text=text, file=file, quick_reply=quick_reply, cta=cta)
 
-    def fetch_welcome_message(self, welcome_message_id: ID) -> WelcomeMessage:
-        """Fetches a welcome message.
+    def create_list(self, name: str, *, description: str = "", private: bool = False) -> Optional[TwitterList]:
+        """Create a new list.
 
         Parameters
         ------------
-        welcome_message_id: :class:`ID`
-            Represents the welcome message ID that you wish to fetch with.
+        name: :class:`str`
+            The name of the List you wish to create.
+        description: :class:`str`
+            Description of the List.
+        private: :class:`bool`
+            Determine whether the List should be private, default to False.
 
         Returns
         ---------
-        :class:`WelcomeMessage`
-            This method returns :class:`WelcomeMessage` object.
+        Optional[:class:`List`]
+            This method returns a :class:`List` object.
 
 
-        .. versionadded:: 1.3.5
+        .. versionadded:: 1.5.0
         """
-        return self.http.fetch_welcome_message(welcome_message_id)
+        twitter_list = self.http.create_list(name, description=description, private=private)
+        return self.http.fetch_list(twitter_list.id)
 
-    def fetch_welcome_message_rule(self, welcome_message_rule_id: ID) -> WelcomeMessageRule:
-        """Fetches a welcome message rule.
+    def create_custom_profile(self, name: str, file: File) -> Optional[CustomProfile]:
+        """Create a custom profile
 
         Parameters
         ------------
-        welcome_message_rule_id: :class:`ID`
-            Represents the welcome message rule ID that you wish to fetch with.
+        name: :class:`str`
+            The author's custom name.
+        file: :class:`File`
+            The media file that's associate with the profile.
 
         Returns
         ---------
-        :class:`WelcomeMessageRule`
-            This method returns :class:`WelcomeMessageRule` object.
-
-
-        .. versionadded:: 1.3.5
+        :class:`CustomProfile`
+            This method returns a :class:`CustomProfile` object.
         """
-        return self.http.fetch_welcome_message_rule(welcome_message_rule_id)
+        return self.http.create_custom_profile(name, file)
 
-    def fetch_space(self, space_id: ID) -> Space:
-        """Fetches a space.
-
-        Parameters
-        ------------
-        space_id: :class:`ID`
-            Represents the space ID that you wish to fetch with.
-
-        Returns
-        ---------
-        :class:`Space`
-            This method returns a :class:`Space` object.
-
-
-        .. versionadded:: 1.3.5
-        """
-        return self.http.fetch_space(space_id)
-
-    def fetch_space_by_title(self, title: str, state: SpaceState = SpaceState.live) -> Space:
-        """Fetches a space using its title.
-
-        Parameters
-        ------------
-        title: :class:`ID`
-            The space title that you are going use for fetching the space.
-        state: :class:`SpaceState`
-            The type of state the space has. There are only 2 types: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host. Default to SpaceState.live
-
-        Returns
-        ---------
-        :class:`Space`
-            This method returns a :class:`Space` object.
-
-
-        .. versionadded:: 1.3.5
-        """
-        if state == SpaceState.live or state == SpaceState.scheduled:
-            return self.http.fetch_space_bytitle(title, state)
-        else:
-            raise UnKnownSpaceState(given_state=state)
-
-    def search_geo(
+    def search_geos(
         self,
         query: str,
         max_result: Optional[ID] = None,
@@ -429,8 +509,8 @@ class Client:
         long: Optional[int] = None,
         ip: Optional[ID] = None,
         granularity: Granularity = Granularity.neighborhood,
-    ) -> Geo:  # TODO make enums for granularity
-        """Search a geo with the given arguments.
+    ) -> Geo:
+        """Search geo-locations with the given arguments.
 
         Parameters
         ------------
@@ -457,11 +537,11 @@ class Client:
         """
         return self.http.search_geo(query, max_result, lat=lat, long=long, ip=ip, granularity=granularity)
 
-    def search_trend_with_place(self, woeid: ID, exclude: Optional[str] = None):
+    def search_trend_with_place(self, woeid: ID, exclude: Optional[str] = None) -> Optional[List[Trend]]:
         """Search trends with woeid.
 
         .. note::
-            You can find woeid information through :class:`Location` with :meth:`Client.search_trend_locations` or :meth:`Client.search_trend_closest`.
+            You can find woeid information through :meth:`Location.woeid` with :meth:`Client.search_trend_locations` or :meth:`Client.search_trend_closest`.
 
         Parameters
         ------------
@@ -470,33 +550,42 @@ class Client:
         exclude: Optional[:class:`str`]
             Setting this equal to hashtags will remove all hashtags from the trends list.
 
+        Returns
+        ---------
+        Optional[List[:class:`Trend`]]
+            This method returns a list of :class:`Trend` objects.
+
 
         .. versionadded:: 1.5.0
         """
         res = self.http.request(
-            "GET", "1.1", "/trends/place.json", params={"id": str(woeid), "exclude": exclude}, auth=True
+            "GET",
+            "1.1",
+            "/trends/place.json",
+            params={"id": str(woeid), "exclude": exclude},
+            auth=True,
         )
 
         return [Trend(**data) for data in res[0].get("trends")]
 
-    def search_trend_locations(self):
+    def search_trend_locations(self) -> Optional[List[Location]]:
         """Search locations that Twitter has trending topic information.
+
+        Returns
+        ---------
+        Optional[List[:class:`Location`]]
+            This method returns a list of :class:`Location` objects.
 
 
         .. versionadded:: 1.5.0
         """
         res = self.http.request("GET", "1.1", "/trends/available.json", auth=True)
-        for data in res:
-            data["parent_id"] = data["parentid"]
-            data["place_type"] = data["placeType"]
-            data["country_code"] = data["countryCode"]
-            data.pop("placeType")
-            data.pop("countryCode")
-            data.pop("parentid")
+        for index, data in enumerate(res):
+            res[index] = self.http.payload_parser.parse_trend_location_payload(data)
 
         return [Location(**data) for data in res]
 
-    def search_trend_closest(self, lat: int, long: int):
+    def search_trend_closest(self, lat: int, long: int) -> Optional[List[Location]]:
         """Search the rend closest to the lat and long.
 
         parameters
@@ -504,46 +593,211 @@ class Client:
         lat: :class:`int`
             If provided with a long parameter the available trend locations will be sorted by distance, nearest to furthest, to the coordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.
         long: :class:`int`
-            If provided with a lat parameter the available trend locations will be sorted by distance, nearest to furthest, to the coordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.        -122.400612831116
+            If provided with a lat parameter the available trend locations will be sorted by distance, nearest to furthest, to the coordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive -122.400612831116
+
+        Returns
+        ---------
+        Optional[List[:class:`Location`]]
+            This method returns a list of :class:`Location` objects.
 
 
         .. versionadded:: 1.5.0
         """
-        res = self.http.request("GET", "1.1", "/trends/available.json", params={"lat": lat, "long": long}, auth=True)
+        res = self.http.request(
+            "GET",
+            "1.1",
+            "/trends/available.json",
+            params={"lat": lat, "long": long},
+            auth=True,
+        )
 
         return [Location(**data) for data in res]
 
-    def get_message(self, event_id: ID) -> Optional[DirectMessage]:
-        """Get a direct message through the client message cache. Returns None if the message is not in the cache.
-
-        .. note::
-            Note that you can only get the client and the subscriptions users's message.
+    def search_recent_tweet(
+        self,
+        query: str,
+        *,
+        max_results: int = 10,
+        start_time: Optional[datetime.datetime] = None,
+        end_time: Optional[datetime.datetime] = None,
+        since_id: Optional[ID] = None,
+        until_id: Optional[ID] = None,
+        sort_by_relevancy: bool = False,
+    ) -> List[Tweet]:
+        """Searches tweet from the last seven days that match a search query.
 
         Parameters
         ------------
-        event_id: :class:`ID`
-            The event ID of the Direct Message event that you want to get.
+        query: :class:`str`
+            One query for matching Tweets.
+        max_results: :class:`int`
+            The maximum number of search results to be returned by a request. A number between 10 and 100. By default, the method will returns 10 results.
+        start_time: Optional[:class:`datetime.datetime`]
+            This will make sure the tweets created datetime is after that specific time.
+        end_time: Optional[:class:`datetime.datetime`]
+            This will make sure the tweets created datetime is before that specific time.
+        since_id: Optional[`ID`]
+            Returns results with a Tweet ID greater than (that is, more recent than) the specified 'since' Tweet ID. Only the 3200 most recent Tweets are available. The result will exclude the since_id. If the limit of Tweets has occurred since the since_id, the since_id will be forced to the oldest ID available.
+        until_id: Optional[`ID`]
+            Returns results with a Tweet ID less less than (that is, older than) the specified 'until' Tweet ID. Only the 3200 most recent Tweets are available. The result will exclude the until_id. If the limit of Tweets has occurred since the until_id, the until_id will be forced to the most recent ID available.
+        sort_by_relevancy: :class:`bool`
+            This parameter is used to specify the order in which you want the Tweets returned. If sets to True, tweets will be order by relevancy, else it sets to recency. Default to False.
 
         Returns
         ---------
-        :class:`DirectMessage`
-            This method returns a :class:`DirectMessage` object.
+        Union[:class:`TweetPagination`, :class:`list`]
+            This method returns a list of :class:`Tweet` objects.
 
 
-        .. versionadded:: 1.2.0
+        .. versionadded:: 1.5.0
+        """
+        if (
+            not isinstance(start_time, datetime.datetime)
+            and start_time
+            or not isinstance(end_time, datetime.datetime)
+            and end_time
+        ):
+            raise ValueError("start_time or end_time must be a datetime object!")
+
+        params = {
+            "expansions": TWEET_EXPANSION,
+            "user.fields": USER_FIELD,
+            "media.fields": MEDIA_FIELD,
+            "place.fields": PLACE_FIELD,
+            "poll.fields": POLL_FIELD,
+            "tweet.fields": TWEET_FIELD,
+            "query": query,
+            "max_results": max_results,
+        }
+
+        if start_time:
+            params["start_time"] = start_time.isoformat()
+        if end_time:
+            params["end_time"] = end_time.isoformat()
+        if since_id:
+            params["since_id"] = str(since_id)
+        if until_id:
+            params["until_id"] = str(until_id)
+        if sort_by_relevancy:
+            params["sort_order"] = "relevancy"
+
+        res = self.http.request("GET", "2", "/tweets/search/recent", params=params)
+
+        return [Tweet(data, http_client=self.http) for data in res.get("data")]
+
+    def search_all_tweet(
+        self,
+        query: str,
+        *,
+        max_results: int = 10,
+        start_time: Optional[datetime.datetime] = None,
+        end_time: Optional[datetime.datetime] = None,
+        since_id: Optional[ID] = None,
+        until_id: Optional[ID] = None,
+        sort_by_relevancy: bool = False,
+    ) -> List[Tweet]:
+        """Searches all tweet from the complete history of public Tweets matching a search query; since the first Tweet was created March 26, 2006. Only available to those users who have been approved for Academic Research access.
+
+        Parameters
+        ------------
+        query: :class:`str`
+            One query for matching Tweets.
+        max_results: :class:`int`
+            The maximum number of search results to be returned by a request. A number between 10 and 100. By default, the method will returns 10 results.
+        start_time: Optional[:class:`datetime.datetime`]
+            This will make sure the tweets created datetime is after that specific time.
+        end_time: Optional[:class:`datetime.datetime`]
+            This will make sure the tweets created datetime is before that specific time.
+        since_id: Optional[`ID`]
+            Returns results with a Tweet ID greater than (that is, more recent than) the specified 'since' Tweet ID. Only the 3200 most recent Tweets are available. The result will exclude the since_id. If the limit of Tweets has occurred since the since_id, the since_id will be forced to the oldest ID available.
+        until_id: Optional[`ID`]
+            Returns results with a Tweet ID less less than (that is, older than) the specified 'until' Tweet ID. Only the 3200 most recent Tweets are available. The result will exclude the until_id. If the limit of Tweets has occurred since the until_id, the until_id will be forced to the most recent ID available.
+        sort_by_relevancy: :class:`bool`
+            This parameter is used to specify the order in which you want the Tweets returned. If sets to True, tweets will be order by relevancy, else it sets to recency. Default to False.
+
+        Returns
+        ---------
+        Union[:class:`TweetPagination`, :class:`list`]
+            This method returns a list of :class:`Tweet` objects.
+
+
+        .. versionadded:: 1.5.0
+        """
+        if (
+            not isinstance(start_time, datetime.datetime)
+            and start_time
+            or not isinstance(end_time, datetime.datetime)
+            and end_time
+        ):
+            raise ValueError("start_time or end_time must be a datetime object!")
+
+        params = {
+            "expansions": TWEET_EXPANSION,
+            "user.fields": USER_FIELD,
+            "media.fields": MEDIA_FIELD,
+            "place.fields": PLACE_FIELD,
+            "poll.fields": POLL_FIELD,
+            "tweet.fields": TWEET_FIELD,
+            "query": query,
+            "max_results": max_results,
+        }
+
+        if start_time:
+            params["start_time"] = start_time.isoformat()
+        if end_time:
+            params["end_time"] = end_time.isoformat()
+        if since_id:
+            params["since_id"] = str(since_id)
+        if until_id:
+            params["until_id"] = str(until_id)
+        if sort_by_relevancy:
+            params["sort_order"] = "relevancy"
+
+        res = self.http.request("GET", "2", "/tweets/search/all", params=params)
+
+        return [Tweet(data, http_client=self.http) for data in res.get("data")]
+
+    def get_user(self, user_id: ID) -> Optional[User]:
+        """Gets a user through the client internal user cache. Return None if the user is not in the cache.
+
+        .. note::
+            Users will get cache with several conditions:
+                * Users return from a method such as :meth:`Client.fetch_user`.
+                * The client interacts with other users such as dming them, triggering the typing animation, likes the client's tweets etc (This condition only applies if you use :meth:`Client.listen` at the very end of the file)
+
+        Parameters
+        ------------
+        user_id: :class:`ID`
+            The ID of a user that you want to get.
+
+        Raises
+        --------
+        ValueError:
+            Raised when the user_id argument is not an integer or a string of digits.
+
+        Returns
+        ---------
+        :class:`User`
+            This method returns a :class:`User` object or None if the user was not found.
+
+
+        .. versionadded:: 1.5.0
         """
         try:
-            event_id = int(event_id)
+            user_id = int(user_id)
         except ValueError:
-            raise ValueError("Event id must be an integer or a :class:`str`ing of digits.")
+            raise ValueError("user_id must be an integer or a string of digits.")
 
-        return self.http.message_cache.get(event_id)
+        return self.http.user_cache.get(user_id)
 
     def get_tweet(self, tweet_id: ID) -> Optional[Tweet]:
         """Gets a tweet through the client internal tweet cache. Return None if the tweet is not in the cache.
 
         .. note::
-            Note that you can only get the client and the subscriptions users's tweet.
+            Tweets will get cache with several conditions:
+                * Tweets send by the client.
+                * Tweets send by the subscription users.
+                * Tweets return from a method such as: :meth:`Client.fetch_tweet`
 
         Parameters
         ------------
@@ -570,22 +824,34 @@ class Client:
 
         return self.http.tweet_cache.get(tweet_id)
 
-    def create_custom_profile(self, name: str, file: File) -> Optional[CustomProfile]:
-        """Create a custom profile
+    def get_direct_message(self, event_id: ID) -> Optional[DirectMessage]:
+        """Get a direct message through the client message cache. Returns None if the message is not in the cache.
+
+        .. note::
+            Messages will get cache with several conditions:
+                * Messages send by the client.
+                * Messages send by the subscription users.
+                * Messages return from a method such as: :meth:`Client.fetch_direct_message`
 
         Parameters
         ------------
-        name: :class:`str`
-            The author's custom name.
-        file: :class:`File`
-            The media file that's associate with the profile.
+        event_id: :class:`ID`
+            The event ID of the Direct Message event that you want to get.
 
         Returns
         ---------
-        :class:`CustomProfile`
-            This method returns a :class:`CustomProfile` object.
+        :class:`DirectMessage`
+            This method returns a :class:`DirectMessage` object.
+
+
+        .. versionadded:: 1.2.0
         """
-        return self.http.create_custom_profile(name, file)
+        try:
+            event_id = int(event_id)
+        except ValueError:
+            raise ValueError("Event id must be an integer or a :class:`str`ing of digits.")
+
+        return self.http.message_cache.get(event_id)
 
     def stream(self, *, dry_run: bool = False) -> None:
         """Stream realtime in twitter for tweets! This method use the stream argument in :meth:`request.get` for streaming in one of the stream endpoint that twitter api provides. If you want to use this method, make sure to provides the stream kwarg in your :class:`Client` instance and make an on_stream event to get the stream's tweet data and connection,
@@ -626,21 +892,6 @@ class Client:
             self.http.stream.connect(dry_run=dry_run)
         except KeyboardInterrupt:
             print("\nKeyboardInterrupt: Exit stream.")
-
-    def fetch_all_environments(self) -> Optional[List[Environment]]:
-        """Fetches all the client's environments.
-
-        Returns
-        ---------
-        Optional[List[:class:`Environment`]]
-            Returns a list of :class:`Environment` objects.
-
-
-        .. versionadded:: 1.5.0
-        """
-        res = self.http.request("GET", "1.1", "/account_activity/all/webhooks.json")
-
-        return [Environment(data, client=self) for data in res.get("environments")]
 
     def listen(
         self,
@@ -702,7 +953,9 @@ class Client:
 
         try:
             thread = threading.Thread(
-                target=app.run, name="client-listen-method:thread_session=LISTEN-SESSION", kwargs=kwargs
+                target=app.run,
+                name="client-listen-method:thread_session=LISTEN-SESSION",
+                kwargs=kwargs,
             )
 
             if not self.webhook and not ngrok:
@@ -729,7 +982,8 @@ class Client:
                     return json.dumps(response)
 
                 json_data = request.get_json()
-                self.http.handle_events(json_data)
+                _log.debug(f"An event triggered! {json_data}")
+                self.executor.submit(self.http.handle_events, payload=json_data)
                 return ("", HTTPStatus.OK)
 
             check = not self.webhook and self.webhook_url_path

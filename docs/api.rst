@@ -21,11 +21,6 @@ Version Related Info
     Get the version of the module (e.g ``1.0.0`` or ``1.0.0a``) this is based on :pep:`440`.
 
 
-Classes 
----------------------------
-
-These are all the **public** classes of pytweet.
-
 Clients
 ----------------
 
@@ -35,15 +30,16 @@ Client
 .. autoclass:: Client
     :members:
 
+
 Application
 ----------------
 
 ApplicationInfo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 .. autoclass:: ApplicationInfo()
     :members:
+
 
 Environment
 ----------------
@@ -64,7 +60,7 @@ Webhook
 Twitter Models
 ---------------------
 
-These following object are not meant to be create as an instance rather its for knowledge of what you can do with them.
+These following objects are not meant to be create as an instance rather its for knowledge of what you can do with them.
 
 
 User
@@ -73,12 +69,6 @@ User
 .. autoclass:: User()
     :members:
 
-ClientAccount
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: ClientAccount()
-    :members:
-    :inherited-members:
 
 Tweet
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -87,6 +77,7 @@ Tweet
     :members:
     :inherited-members:
 
+
 Space
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -94,11 +85,27 @@ Space
     :members:
 
 
+List
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: List()
+    :members:
+
+
+ClientAccount
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ClientAccount()
+    :members:
+    :inherited-members:
+
+
 Message
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Message()
     :members:
+
 
 DirectMessage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -110,7 +117,6 @@ DirectMessage
 
 WelcomeMessage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 .. autoclass:: WelcomeMessage()
     :members:
@@ -124,10 +130,64 @@ WelcomeMessageRule
     :members:
 
 
+Twitter Dataclass
+-------------------------
+
+These following section documented objects that use `dataclasses.dataclass` decorator.
+
+Attachments Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: PollOption
+    :members:
+
+.. autoclass:: Option
+    :members:
+
+.. autoclass:: Button
+    :members:
+
+Locations Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Location
+    :members:
+
+.. autoclass:: Trend
+    :members:
+
+.. autoclass:: PlaceType
+    :members:
+
+.. autoclass:: TimezoneInfo
+    :members:
+
+Settings Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: UserSettings
+    :members:
+
+.. autoclass:: SleepTimeSettings
+    :members:
+
+Space Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: SpaceTopic
+    :members:
+
+Stream Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: StreamRule
+    :members:
+
+
 Attachments
 ---------------------
 
-Attachments is a way to attach additional part to a message, this include tweet and direct message. You may contruct this following objects except :class:`CustomProfile` and :class:`Geo`. Consider using :class:`Client.create_custom_profile` for making a custom profile attachment and :class:`Client.search_geo` for searching a geo-location.
+Attachments is a way to attach additional part to a message, this include tweet and direct message. You may contruct the following objects except :class:`CustomProfile` and :class:`Geo`. Consider using :class:`Client.create_custom_profile` for making a custom profile attachment and :class:`Client.search_geo` for searching a geo-location.
 
 CustomProfile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -197,13 +257,6 @@ StreamConnection
     :members:
 
 
-StreamRule
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: StreamRule
-    :members:
-
-
 Oauth
 -------------
 
@@ -229,13 +282,16 @@ Some endpoints returns more objects but limits it to some pages. Using paginatio
 
 .. code-block:: py
 
-    user = client.fetch_user(ID)
-    pagination = user.fetch_following()
+    pagination = client.account.fetch_following()
     print("Page 1, object 1:", pagination.content[0])
     pagination.next_page() #Change page to the next page
     print("Page 2, object 2:", pagination.content[1])
     pagination.previous_page() #Change page to the previous page
     print("Page 1, object 3:", pagination.content[2])
+
+    #since the pagination caches page content everytime you turn pages, you can do this:
+    for page_number, page_content in pagination.pages:
+        print(f"Page {page_number}, object: 1: {page_content[0]}")
 
 
 Pagination
@@ -353,84 +409,75 @@ Event Objects
 
 Event objects are objects returned by an event filled with the event data.
 
-Event
+Event Type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Event()
     :members:
 
-DirectMessageEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: DirectMessageEvent()
     :members:
     :inherited-members:
 
-UserActionEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserActionEvent()
     :members:
     :inherited-members:
 
-DirectMessageTypingEvent
+
+
+Direct Message Events
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Event objects thats related with direct message events.
+
 
 .. autoclass:: DirectMessageTypingEvent()
     :members:
     :inherited-members:
-
-DirectMessageReadEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
 
 .. autoclass:: DirectMessageReadEvent()
     :members:
     :inherited-members:
 
-TweetFavoriteActionEvent
+
+Action Events
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Action events are events trigger by or from a user
+
 
 .. autoclass:: TweetFavoriteActionEvent()
     :members:
     :inherited-members:
 
-UserFollowActionEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: UserFollowActionEvent()
+.. autoclass:: UserRevokeEvent()
     :members:
     :inherited-members:
 
-UserUnfollowActionEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserUnfollowActionEvent()
     :members:
     :inherited-members:
 
-UserBlockActionEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserBlockActionEvent()
     :members:
     :inherited-members:
 
-UserUnblockActionEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserUnblockActionEvent()
     :members:
     :inherited-members:
 
-UserMuteActionEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserMuteActionEvent()
     :members:
     :inherited-members:
 
-UserUnmuteActionEvent
-~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserUnmuteActionEvent()
     :members:
@@ -496,6 +543,13 @@ Example:
     :param action: The event action object information.
     :type action: :class:`TweetFavoriteActionEvent`
 
+.. function:: on_user_revoke(action)
+
+    `on_user_revoke` is an event triggers when someone revoke the application access.
+
+    :param action: The event action object information.
+    :type action: :class:`UserRevokeEvent`
+
 .. function:: on_user_follow(action)
 
     `on_user_follow` is an event triggers when someone follows the subscription user or the subscription user follows someone.
@@ -559,10 +613,11 @@ Example:
     :param action: The event action object information.
     :type action: :class:`DirectMessageTypingEvent`
 
+
 Enums 
 --------------
 
-All these enums are a subclass of :class:`enum.Enum`
+All of these enums are a subclass of :class:`enum.Enum`
 
 .. class:: MessageTypeEnum
 

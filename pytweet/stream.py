@@ -8,7 +8,14 @@ import time
 from typing import TYPE_CHECKING, Any, List, Type, Optional
 from .dataclass import StreamRule
 from .errors import ConnectionException, PytweetException
-from .expansions import MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_EXPANSION, TWEET_FIELD, USER_FIELD
+from .constants import (
+    MEDIA_FIELD,
+    PLACE_FIELD,
+    POLL_FIELD,
+    TWEET_EXPANSION,
+    TWEET_FIELD,
+    USER_FIELD,
+)
 from .tweet import Tweet
 
 
@@ -18,11 +25,6 @@ if TYPE_CHECKING:
 _log = logging.getLogger(__name__)
 
 
-def _check_for_errors(data, session):
-    if "errors" in data.keys():
-        raise ConnectionException(session, None)
-
-
 class StreamConnection:
     """Represent the twitter api stream connection. This will handle the stream connection.
 
@@ -30,7 +32,15 @@ class StreamConnection:
     .. versionadded:: 1.3.5
     """
 
-    __slots__ = ("url", "backfill_minutes", "reconnect_attempts", "http_client", "session", "errors", "running")
+    __slots__ = (
+        "url",
+        "backfill_minutes",
+        "reconnect_attempts",
+        "http_client",
+        "session",
+        "errors",
+        "running",
+    )
 
     def __init__(
         self,
@@ -115,7 +125,8 @@ class StreamConnection:
                 for response_line in response.iter_lines():
                     if response_line:
                         json_data = json.loads(response_line.decode("UTF-8"))
-                        _check_for_errors(json_data, self.session)
+                        if "errors" in json_data.keys():
+                            raise ConnectionException(self.session, None)
                         tweet = Tweet(json_data, http_client=http)
                         http.tweet_cache[tweet.id] = tweet
                         http.dispatch("stream", tweet, self)
@@ -156,7 +167,14 @@ class Stream:
     .. versionadded:: 1.3.5
     """
 
-    __slots__ = ("backfill_minutes", "raw_rules", "http_client", "reconnect_attempts", "sample", "connection")
+    __slots__ = (
+        "backfill_minutes",
+        "raw_rules",
+        "http_client",
+        "reconnect_attempts",
+        "sample",
+        "connection",
+    )
 
     def __init__(self, backfill_minutes: int = 0, reconnect_attempts: int = 15):
         self.backfill_minutes = backfill_minutes
@@ -297,6 +315,7 @@ class Stream:
         ------------
         dry_run: :class:`bool`
             Indicates if you want to debug your rule's operator syntax.
+
 
         .. versionadded:: 1.3.5
         """

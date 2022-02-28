@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional, Iterable, TYPE_CHECKING
 from dateutil import parser
 
 if TYPE_CHECKING:
@@ -116,3 +116,24 @@ def compose_tweet_action(tweet_id: ID, action: str = None):
         if action != "reply"
         else f"https://twitter.com/intent/tweet?in_reply_to={tweet_id}"
     )
+
+
+def sift(iterable: Iterable, **conditions: Any):
+    results = []
+    for item in iterable:
+        for condition, value in conditions.items():
+            real_condition = condition.replace("_", "", 1)
+            if condition.startswith("_") and not condition.startswith("__"):
+                result = getattr(item, real_condition, None)
+                if result:
+                    result = result()
+            else:
+                result = getattr(item, condition, None)
+
+            if not result:
+                raise AttributeError(f"'{item.__class__.__name__}' object has no attribute '{real_condition}'")
+
+            if result == value:
+                results.append(result)
+
+    return results
