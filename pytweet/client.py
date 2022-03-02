@@ -14,12 +14,13 @@ from http import HTTPStatus
 from typing import Callable, List, Optional, Union, Any
 from flask import Flask, request
 
+from .paginations import MessagePagination
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .enums import ReplySetting, SpaceState, Granularity
 from .constants import TWEET_EXPANSION, USER_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_FIELD
 from .errors import PytweetException, UnKnownSpaceState
 from .http import HTTPClient
-from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
+from .message import DirectMessage, WelcomeMessage, WelcomeMessageRule
 from .space import Space
 from .stream import Stream
 from .tweet import Tweet
@@ -357,6 +358,34 @@ class Client:
         res = self.http.request("GET", "1.1", "/account_activity/all/webhooks.json")
 
         return [Environment(data, client=self) for data in res.get("environments")]
+
+    def fetch_message_history(self) -> Optional[MessagePagination]:
+        """Returns all Direct Messages (both sent and received) within the last 30 days. Sorted in chronological order.
+
+        Returns
+        ---------
+        Optional[:class:`MessagePagination`]
+            This method returns a :class:`MessagePagination` object.
+
+        
+        .. versionadded:: 1.5.0
+        """
+        params = {
+            "count": 50
+        }
+        
+        res = self.http.request("GET", "1.1", "/direct_messages/events/list.json", auth=True, params=params)
+        
+        if not res or not res.get("events"):
+            return []
+
+        res = self.http.payload_parser.parse_message_to_pagination_data(res)
+        return MessagePagination(
+            res,
+            endpoint_request=f"/direct_messages/events/list.jsons",
+            http_client=self.http,
+            params=params
+        )
 
     def tweet(
         self,
