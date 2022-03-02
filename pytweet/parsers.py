@@ -104,11 +104,8 @@ class PayloadParser:
         return fulldata
 
     def parse_message_to_pagination_data(self, data: Payload):
-        data["meta"] = {
-            "next_token": data.get("next_cursor"),
-            "previous_token": data.get("previous_cursor")
-        }
-        
+        data["meta"] = {"next_token": data.get("next_cursor"), "previous_token": data.get("previous_cursor")}
+
         if data.get("events"):
             events = data["events"]
             del data["events"]
@@ -116,7 +113,7 @@ class PayloadParser:
 
         else:
             events = data["data"]
-        
+
         ids = []
         for event_data in events:
             message_create = event_data["message_create"]
@@ -137,11 +134,12 @@ class PayloadParser:
                 for app in [ApplicationInfo(**data) for data in list(data.get("apps").values())]:
                     if app.id == int(message_create.get("source_app_id", 0)):
                         message_create["target"]["source_application"] = app
-    
+
                     if app.id == int(message_create.get("source_app_id", 0)):
                         message_create["target"]["source_application"] = app
         return data
-                    
+
+
 class EventParser:
     __slots__ = ("payload_parser", "http_client", "client_id")
 

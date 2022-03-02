@@ -442,8 +442,9 @@ class ListPagination(Pagination):
                 _TwitterList.id: _TwitterList for _TwitterList in self.content
             }
 
+
 class MessagePagination(Pagination):
-    """"Represents a pagination for message objects. 
+    """ "Represents a pagination for message objects.
     These methods returns this pagination object:
 
     * :meth:`Client.fetch_message_history`
@@ -451,8 +452,10 @@ class MessagePagination(Pagination):
 
     .. versionadded:: 1.5.0
     """
+
     def __init__(self, data, **kwargs):
         from .message import DirectMessage  # Avoid circular import error.
+
         data = kwargs.get("http_client").payload_parser.parse_message_to_pagination_data(data)
         super().__init__(data, item_type=DirectMessage, **kwargs)
 
@@ -491,9 +494,7 @@ class MessagePagination(Pagination):
         self._count = 0
 
         if not previous_content[0] == self.content[0]:
-            self.pages_cache[len(self.pages_cache) + 1] = {
-                message.id: message for message in self.content
-            }
+            self.pages_cache[len(self.pages_cache) + 1] = {message.id: message for message in self.content}
 
     def previous_page(self):
         """Iterate to the previous page.
@@ -530,6 +531,4 @@ class MessagePagination(Pagination):
         self._count = 0
 
         if not previous_content[0] == self.content[0]:
-            self.pages_cache[len(self.pages_cache) + 1] = {
-                message.id: message for message in self.content
-            }
+            self.pages_cache[len(self.pages_cache) + 1] = {message.id: message for message in self.content}

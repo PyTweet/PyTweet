@@ -367,24 +367,19 @@ class Client:
         Optional[:class:`MessagePagination`]
             This method returns a :class:`MessagePagination` object.
 
-        
+
         .. versionadded:: 1.5.0
         """
-        params = {
-            "count": 50
-        }
-        
+        params = {"count": 50}
+
         res = self.http.request("GET", "1.1", "/direct_messages/events/list.json", auth=True, params=params)
-        
+
         if not res or not res.get("events"):
             return []
 
         res = self.http.payload_parser.parse_message_to_pagination_data(res)
         return MessagePagination(
-            res,
-            endpoint_request=f"/direct_messages/events/list.jsons",
-            http_client=self.http,
-            params=params
+            res, endpoint_request=f"/direct_messages/events/list.jsons", http_client=self.http, params=params
         )
 
     def tweet(
