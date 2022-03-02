@@ -22,7 +22,6 @@ from .dataclass import ApplicationInfo
 if TYPE_CHECKING:
     from .type import Payload
     from .http import HTTPClient
-    from .user import ClientAccount
 
 __all__ = ("PayloadParser", "EventParser")
 
@@ -104,14 +103,45 @@ class PayloadParser:
             fulldata[index]["includes"]["users"] = [payload.get("includes", {}).get("users", [None])[0]]
         return fulldata
 
-    def parse_message_to_pagination_data(self, data: Payload, recipient: User, author: ClientAccount):
-        for event_data in data.get("events"):
-            message_data = event_data.get("message_create")
-            message_data["target"]["recipient"] = recipient
-            message_data["target"]["sender"] = author
+    def parse_message_to_pagination_data(self, data: Payload):
+        data["meta"] = {
+            "next_token": data.get("next_cursor"),
+            "previous_token": data.get("previous_cursor")
+        }
+        
+        if data.get("events"):
+            events = data["events"]
+            del data["events"]
+            events = data["data"] = events
+
+        else:
+            events = data["data"]
+        
+        ids = []
+        for event_data in events:
+            message_create = event_data["message_create"]
+            ids.append(message_create["target"]["recipient_id"])
+            ids.append(message_create["sender_id"])
+        users = self.http_client.fetch_users(ids)
+
+        for event_data in events:
+            message_create = event_data["message_create"]
+            for user in users:
+                if user.id == int(message_create["target"]["recipient_id"]):
+                    message_create["target"]["recipient"] = user
+
+                elif user.id == int(message_create["sender_id"]):
+                    message_create["target"]["sender"] = user
+
+            if data.get("apps"):
+                for app in [ApplicationInfo(**data) for data in list(data.get("apps").values())]:
+                    if app.id == int(message_create.get("source_app_id", 0)):
+                        message_create["target"]["source_application"] = app
+    
+                    if app.id == int(message_create.get("source_app_id", 0)):
+                        message_create["target"]["source_application"] = app
         return data
-
-
+                    
 class EventParser:
     __slots__ = ("payload_parser", "http_client", "client_id")
 
