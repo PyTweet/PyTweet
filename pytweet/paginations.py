@@ -160,7 +160,7 @@ class UserPagination(Pagination):
         super().__init__(data, item_type=User, **kwargs)
 
     def next_page(self):
-        """Change page to the next page.
+        """Iterate to the next page.
 
         Raises
         --------
@@ -197,7 +197,7 @@ class UserPagination(Pagination):
             self.pages_cache[len(self.pages_cache) + 1] = {user.id: user for user in self.content}
 
     def previous_page(self):
-        """Change page to the previous page.
+        """Iterate to the previous page.
 
         Raises
         --------
@@ -263,7 +263,7 @@ class TweetPagination(Pagination):
         ]
 
     def next_page(self):
-        """Change page to the next page.
+        """Iterate to the next page.
 
         Raises
         --------
@@ -300,7 +300,7 @@ class TweetPagination(Pagination):
             self.pages_cache[len(self.pages_cache) + 1] = {tweet.id: tweet for tweet in self.content}
 
     def previous_page(self):
-        """Change page to the previous page.
+        """Iterate to the previous page.
 
         Raises
         --------
@@ -365,7 +365,7 @@ class ListPagination(Pagination):
         ]
 
     def next_page(self):
-        """Change page to the next page.
+        """Iterate to the next page.
 
         Raises
         --------
@@ -404,7 +404,7 @@ class ListPagination(Pagination):
             }
 
     def previous_page(self):
-        """Change page to the previous page.
+        """Iterate to the previous page.
 
         Raises
         --------
@@ -440,4 +440,96 @@ class ListPagination(Pagination):
         if not previous_content[0] == self.content[0]:
             self.pages_cache[len(self.pages_cache) + 1] = {
                 _TwitterList.id: _TwitterList for _TwitterList in self.content
+            }
+
+class MessagePagination(Pagination):
+    """"Represents a pagination for message objects. 
+    These methods returns this pagination object:
+
+    * :meth:`Client.fetch_message_history`
+
+
+    .. versionadded:: 1.5.0
+    """
+    def __init__(self, data, **kwargs):
+        from .message import DirectMessage  # Avoid circular import error.
+        data = kwargs.get("http_client").payload_parser.parse_message_to_pagination_data(data)
+        super().__init__(data, item_type=DirectMessage, **kwargs)
+
+    def next_page(self):
+        """Iterate to the next page.
+
+        Raises
+        --------
+        :class:`NoPageAvailable`
+            Raises when no page available to change.
+
+
+        .. versionadded:: 1.5.0
+        """
+        if not self._next_token:
+            raise NoPageAvailable()
+        self._params["cursor"] = self._next_token
+
+        res = self.http_client.request(
+            "GET",
+            "1.1",
+            self.endpoint_request,
+            auth=True,
+            params=self._params,
+        )
+        if not res:
+            raise NoPageAvailable()
+
+        previous_content = self.content
+        self._current_page_number += 1
+        self.original_payload = self.http_client.payload_parser.parse_message_to_pagination_data(res)
+        self.payload = self.content
+        self._meta = self.original_payload.get("meta")
+        self._next_token = self._meta.get("next_token")
+        self._previous_token = self._meta.get("previous_token")
+        self._count = 0
+
+        if not previous_content[0] == self.content[0]:
+            self.pages_cache[len(self.pages_cache) + 1] = {
+                message.id: message for message in self.content
+            }
+
+    def previous_page(self):
+        """Iterate to the previous page.
+
+        Raises
+        --------
+        :class:`NoPageAvailable`
+            Raises when no page available to change.
+
+
+        .. versionadded:: 1.5.0
+        """
+        if not self._previous_token:
+            raise NoPageAvailable()
+        self._params["cursor"] = self._previous_token
+
+        res = self.http_client.request(
+            "GET",
+            "1.1",
+            self.endpoint_request,
+            auth=True,
+            params=self._params,
+        )
+        if not res:
+            raise NoPageAvailable()
+
+        previous_content = self.content
+        self._current_page_number -= 1
+        self.original_payload = self.http_client.payload_parser.parse_message_to_pagination_data(res)
+        self.payload = self.content
+        self._meta = self.original_payload.get("meta")
+        self._next_token = self._meta.get("next_token")
+        self._previous_token = self._meta.get("previous_token")
+        self._count = 0
+
+        if not previous_content[0] == self.content[0]:
+            self.pages_cache[len(self.pages_cache) + 1] = {
+                message.id: message for message in self.content
             }
