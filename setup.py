@@ -53,6 +53,7 @@ setup(
     project_urls={
         "Documentation": "https://py-tweet.readthedocs.io/",
         "HomePage/Github": "https://github.com/PyTweet/PyTweet/",
+        "Discord": "https://discord.gg/XHBhg6A4jJ"
     },
     description="A Synchronous python API wrapper for twitter's api",
     long_description=readme,
