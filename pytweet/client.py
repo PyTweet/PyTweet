@@ -119,7 +119,7 @@ class Client:
     def __repr__(self) -> str:
         return "Client({0.account!r})".format(self)
 
-    def account(self, *,update: bool = False) -> Optional[ClientAccount]:
+    def account(self, *, update: bool = False) -> Optional[ClientAccount]:
         """An alias to :meth:`Client.account`.
 
         Parameters
@@ -147,7 +147,7 @@ class Client:
             # The account_user does not change when the function is called. That is why we are returning this.
         return account_user
 
-    def me(self, *,update: bool = False) -> Optional[ClientAccount]:
+    def me(self, *, update: bool = False) -> Optional[ClientAccount]:
         """An alias to :meth:`Client.account`.
 
         Parameters
@@ -340,7 +340,9 @@ class Client:
         """
         return self.http.fetch_space(space_id, space_host=space_host)
 
-    def fetch_spaces_by_title(self, title: str, state: SpaceState = SpaceState.live, *, space_host: bool = False) -> Optional[List[Space]]:
+    def fetch_spaces_by_title(
+        self, title: str, state: SpaceState = SpaceState.live, *, space_host: bool = False
+    ) -> Optional[List[Space]]:
         """Fetches spaces using its title.
 
         Parameters

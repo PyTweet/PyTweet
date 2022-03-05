@@ -595,7 +595,9 @@ class HTTPClient:
         )
         return Space(res, http_client=self)
 
-    def fetch_spaces_bytitle(self, title: str, state: SpaceState = SpaceState.live, *, space_host: bool) -> Optional[List[Space]]:
+    def fetch_spaces_bytitle(
+        self, title: str, state: SpaceState = SpaceState.live, *, space_host: bool
+    ) -> Optional[List[Space]]:
         res = self.request(
             "GET",
             "2",

@@ -118,21 +118,21 @@ class Space(Comparable):
     @property
     def topics(self) -> Optional[List[Topic]]:
         """Optional[List[::class:`Topic`]]: Returns a list of the space's topics, returns None if the space has no topic
-        
+
         .. versionadded:: 1.5.0
         """
         if self._includes.get("topics"):
             return [Topic(**data) for data in self._includes["topics"]]
         return None
-            
+
     @property
     def participant_count(self) -> int:
         """:class:`int`: Returns the current number of users in the Space, including Hosts and Speakers.
-        
+
         .. versionadded:: 1.5.0
         """
         return int(self._payload.get("participant_count"))
-    
+
     @property
     def subscriber_count(self) -> Optional[int]:
         """Optional[:class:`int`]: Returns the number of people who set a remainder to this Space. This requires you to authenticate the request using the Access Token of the creator of the requested Space aka using OAuth 2.0 Authorization Code with PKCE.
@@ -206,7 +206,7 @@ class Space(Comparable):
         Optional[List[:class:`Tweet`]]
             This method returns a list of :class:`Tweet`s or an empty list.
 
-        
+
         .. versionadded:: 1.5.0
         """
         res = self.http_client.request(
@@ -219,10 +219,10 @@ class Space(Comparable):
                 "user.fields": USER_FIELD,
                 "media.fields": MEDIA_FIELD,
                 "place.fields": PLACE_FIELD,
-                "poll.fields": POLL_FIELD
-            }
+                "poll.fields": POLL_FIELD,
+            },
         )
-        
+
         if not res or not res.get("data"):
             return []
 
@@ -236,7 +236,7 @@ class Space(Comparable):
         Union[List[:class:`User`], list]
             This method returns a list of users.
 
-        
+
         .. versionadded:: 1.5.0
         """
         res = self.http_client.request(
