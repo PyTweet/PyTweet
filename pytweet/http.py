@@ -33,12 +33,13 @@ from .constants import (
     PLACE_FIELD,
     POLL_FIELD,
     SPACE_FIELD,
+    COMPLETE_SPACE_FIELD,
     TWEET_FIELD,
     USER_FIELD,
     TOPIC_FIELD,
     LIST_FIELD,
 )
-from .message import DirectMessage, Message, WelcomeMessage, WelcomeMessageRule
+from .message import DirectMessage, WelcomeMessage, WelcomeMessageRule
 from .parsers import EventParser
 from .space import Space
 from .tweet import Tweet
@@ -580,13 +581,13 @@ class HTTPClient:
         except NotFoundError:
             return None
 
-    def fetch_space(self, space_id: str) -> Space:
+    def fetch_space(self, space_id: str, *, space_host: bool) -> Space:
         res = self.request(
             "GET",
             "2",
             f"/spaces/{str(space_id)}",
             params={
-                "expansions": SPACE_EXPANSION,
+                "expansions": SPACE_EXPANSION if not space_host else COMPLETE_SPACE_FIELD,
                 "space.fields": SPACE_FIELD,
                 "topic.fields": TOPIC_FIELD,
                 "user.fields": USER_FIELD,
@@ -594,7 +595,7 @@ class HTTPClient:
         )
         return Space(res, http_client=self)
 
-    def fetch_spaces_bytitle(self, title: str, state: SpaceState = SpaceState.live) -> Space:
+    def fetch_spaces_bytitle(self, title: str, state: SpaceState = SpaceState.live, *, space_host: bool) -> Optional[List[Space]]:
         res = self.request(
             "GET",
             "2",
@@ -602,7 +603,7 @@ class HTTPClient:
             params={
                 "query": title,
                 "state": state.value,
-                "expansions": SPACE_EXPANSION,
+                "expansions": SPACE_EXPANSION if not space_host else COMPLETE_SPACE_FIELD,
                 "space.fields": SPACE_FIELD,
                 "topic.fields": TOPIC_FIELD,
             },
