@@ -119,26 +119,56 @@ class Client:
     def __repr__(self) -> str:
         return "Client({0.account!r})".format(self)
 
-    @property
-    def account(self) -> Optional[User]:
-        """Optional[:class:`User`]: Returns a user object presenting the client's account.
+    def account(self, *,update: bool = False) -> Optional[ClientAccount]:
+        """An alias to :meth:`Client.account`.
+
+        Parameters
+        ------------
+        update: :class:`bool`
+            Indicates to update the client's account information, setting update to True would make a request to the api and returns a new and updated data everytime. If sets to False, it will either make a request (if used the first time) or use the previous data stored in an instance variable.
+
+        Returns
+        ---------
+        Optional[:class:`ClientAccount`]
+            This method returns a :class:`ClientAccount` object.
+
+
+        .. versionchanged:: 1.5.0
+
+            Added an update argument and made as a function rather then a property.
+
 
         .. versionadded:: 1.2.0
         """
         account_user = self._account_user
-        if account_user is None:
+        if account_user is None or update:
             self._set_account_user()
             return self._account_user  # type: ignore
             # The account_user does not change when the function is called. That is why we are returning this.
         return account_user
 
-    @property
-    def me(self) -> Optional[User]:
-        """Optional[:class:`User`]: An alias to :meth:`Client.account`
+    def me(self, *,update: bool = False) -> Optional[ClientAccount]:
+        """An alias to :meth:`Client.account`.
 
-        .. versionadded:: 1.5.0
+        Parameters
+        ------------
+        update: :class:`bool`
+            Indicates to update the client's account information, setting update to True would make a request to the api and returns a new and updated data everytime. If sets to False, it will either make a request (if used the first time) or use the previous data stored in an instance variable.
+
+        Returns
+        ---------
+        Optional[:class:`ClientAccount`]
+            This method returns a :class:`ClientAccount` object.
+
+
+        .. versionchanged:: 1.5.0
+
+            Added an update argument and made as a function rather then a property.
+
+
+        .. versionadded:: 1.2.0
         """
-        return self.account
+        return self.account(update=update)
 
     def _set_account_user(self) -> None:
         if not self.http.access_token:
@@ -290,13 +320,15 @@ class Client:
         """
         return self.http.fetch_welcome_message_rule(welcome_message_rule_id)
 
-    def fetch_space(self, space_id: ID) -> Space:
+    def fetch_space(self, space_id: ID, *, space_host: bool = False) -> Space:
         """Fetches a space.
 
         Parameters
         ------------
         space_id: :class:`ID`
             Represents the space ID that you wish to fetch with.
+        space_host: :class:`bool`
+            Indicates if the client is the host of the requested space. This is very useful to returns a space with the 'subscriber_count' data, if sets to False the 'subscriber_count' will returns None. Default to False.
 
         Returns
         ---------
@@ -306,9 +338,9 @@ class Client:
 
         .. versionadded:: 1.3.5
         """
-        return self.http.fetch_space(space_id)
+        return self.http.fetch_space(space_id, space_host=space_host)
 
-    def fetch_spaces_by_title(self, title: str, state: SpaceState = SpaceState.live) -> Optional[List[Space]]:
+    def fetch_spaces_by_title(self, title: str, state: SpaceState = SpaceState.live, *, space_host: bool = False) -> Optional[List[Space]]:
         """Fetches spaces using its title.
 
         Parameters
@@ -316,18 +348,20 @@ class Client:
         title: :class:`ID`
             The space title that you are going use for fetching the space.
         state: :class:`SpaceState`
-            The type of state the space has. There are only 2 types: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host. Default to SpaceState.live
+            The type of state the space has. There are only 2 types: SpaceState.live indicates that the space is live and SpaceState.scheduled indicates the space is not live and scheduled by the host. Default to SpaceState.live,
+        space_host: :class:`bool`
+            Indicates if the client is the host of the requested space. This is very useful to returns a space with the 'subscriber_count' data, if sets to False the 'subscriber_count' will returns None. Default to False.
 
         Returns
         ---------
         Optional[List[:class:`Space`]]
-            This method returns a list of :class:`Space`s object.
+            This method returns a list of :class:`Space` objects.
 
 
         .. versionadded:: 1.3.5
         """
         if state == SpaceState.live or state == SpaceState.scheduled:
-            return self.http.fetch_spaces_bytitle(title, state)
+            return self.http.fetch_spaces_bytitle(title, state, space_host=space_host)
         else:
             raise UnKnownSpaceState(given_state=state)
 
