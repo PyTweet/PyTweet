@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class SpaceTopic:
+class Topic:
     """Represents a space topic.
 
     .. versionadded:: 1.5.0
