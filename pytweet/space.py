@@ -4,6 +4,9 @@ from typing import Any, Union, Dict, List, Optional
 from .enums import SpaceState
 from .utils import time_parse_todt
 from .user import User
+from .tweet import Tweet
+from .objects import Comparable
+from .dataclass import Topic
 from .constants import (
     TWEET_EXPANSION,
     USER_FIELD,
@@ -12,7 +15,6 @@ from .constants import (
     POLL_FIELD,
     TWEET_FIELD,
 )
-from .objects import Comparable
 
 __all__ = ("Space",)
 
@@ -113,6 +115,34 @@ class Space(Comparable):
         """
         return self._payload.get("is_ticketed")
 
+    @property
+    def topics(self) -> Optional[List[Topic]]:
+        """Optional[List[::class:`Topic`]]: Returns a list of the space's topics, returns None if the space has no topic
+        
+        .. versionadded:: 1.5.0
+        """
+        if self._includes.get("topics"):
+            return [Topic(**data) for data in self._includes["topics"]]
+        return None
+            
+    @property
+    def participant_count(self) -> int:
+        """:class:`int`: Returns the current number of users in the Space, including Hosts and Speakers.
+        
+        .. versionadded:: 1.5.0
+        """
+        return int(self._payload.get("participant_count"))
+    
+    @property
+    def subscriber_count(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the number of people who set a remainder to this Space. This requires you to authenticate the request using the Access Token of the creator of the requested Space aka using OAuth 2.0 Authorization Code with PKCE.
+
+        .. versionadded:: 1.5.0
+        """
+        if self._payload.get("subscriber_count"):
+            return int(self._payload["subscriber_count"])
+        return None
+
     def fetch_creator(self) -> User:
         """Fetches the creator's using the id.
 
@@ -145,7 +175,7 @@ class Space(Comparable):
             Made as a function that returns a list of :class:`User`.
         """
         if self._payload.get("invited_users"):
-            ids = [int(id) for id in self._payload.get("invited_users")]
+            ids = [int(id) for id in self._payload["invited_users"]]
             return self.http_client.fetch_users(ids)
         return None
 
@@ -164,29 +194,49 @@ class Space(Comparable):
             Made as a function that returns a list of :class:`User`.
         """
         if self._payload.get("host_ids"):
-            ids = [int(id) for id in self._payload.get("host_ids")]
+            ids = [int(id) for id in self._payload["host_ids"]]
             return self.http_client.fetch_users(ids)
         return None
 
-    def is_ticketed(self) -> bool:
-        """An alias to :meth:`Space.ticketed`.
+    def fetch_tweets(self) -> Optional[List[Tweet]]:
+        """Fetches users who purchased a ticket to the space. This requires you to authenticate the request using the Access Token of the creator of the requested Space aka using OAuth 2.0 Authorization Code with PKCE.
 
         Returns
         ---------
-        :class:`bool`
-            This method returns a :class:`bool` object.
+        Optional[List[:class:`Tweet`]]
+            This method returns a list of :class:`Tweet`s or an empty list.
 
-
-        .. versionadded:: 1.3.5
-
-        .. versionchanged:: 1.5.0
-            Made as an alias to :meth:`Space.ticketed`.
+        
+        .. versionadded:: 1.5.0
         """
-        return self.ticketed
+        res = self.http_client.request(
+            "GET",
+            "2",
+            f"/spaces/{self.id}/tweets",
+            params={
+                "expansions": TWEET_EXPANSION,
+                "tweet.fields": TWEET_FIELD,
+                "user.fields": USER_FIELD,
+                "media.fields": MEDIA_FIELD,
+                "place.fields": PLACE_FIELD,
+                "poll.fields": POLL_FIELD
+            }
+        )
+        
+        if not res or not res.get("data"):
+            return []
+
+        return [Tweet(data, http_client=self.http_client) for data in res["data"]]
 
     def fetch_buyers(self) -> Union[List[User], list]:
-        """Fetches users who purchased a ticket to the space. This requires you to authenticate the request using the Access Token of the creator of the requested Space aka OAuth 2.0 Authorization Code with PKCE.
+        """Fetches users who purchased a ticket to the space. This requires you to authenticate the request using the Access Token of the creator of the requested Space aka using OAuth 2.0 Authorization Code with PKCE.
 
+        Returns
+        ---------
+        Union[List[:class:`User`], list]
+            This method returns a list of users.
+
+        
         .. versionadded:: 1.5.0
         """
         res = self.http_client.request(
@@ -204,4 +254,20 @@ class Space(Comparable):
         )
         if not res:
             return []
-        return [User(data, http_client=self.http_client) for data in res.get("data")]
+        return [User(data, http_client=self.http_client) for data in res["data"]]
+
+    def is_ticketed(self) -> bool:
+        """An alias to :meth:`Space.ticketed`.
+
+        Returns
+        ---------
+        :class:`bool`
+            This method returns a :class:`bool` object.
+
+
+        .. versionadded:: 1.3.5
+
+        .. versionchanged:: 1.5.0
+            Made as an alias to :meth:`Space.ticketed`.
+        """
+        return self.ticketed
