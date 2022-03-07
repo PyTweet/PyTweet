@@ -208,7 +208,7 @@ class DirectMessage(Message):
     @property
     def initiated_via(self) -> Optional[Initiated]:
         """Optional[:class:`Initiated`]: Returns :class:`Initiated` object which provides a way to track how a conversation starts. For example, if a welcome message was used then :meth:`Initiated.welcome_message_id` would returns the welcome message id that was used in that conversation.
-        
+
         .. versionadded:: 1.5.0
         """
         if not self._initiated_via:

@@ -262,7 +262,7 @@ class HTTPClient:
             elif code == 409:
                 raise Conflict(response)
 
-            elif code in (420, 429): #420 status code is an unofficial extension by Twitter.
+            elif code in (420, 429):  # 420 status code is an unofficial extension by Twitter.
                 if self.sleep_after_ratelimit:
                     remaining = int(response.headers["x-rate-limit-reset"])
                     sleep_for = (remaining - int(time.time())) + 1

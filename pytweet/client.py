@@ -138,7 +138,7 @@ class Client:
 
         .. versionchanged:: 1.5.0
 
-        
+
             Added an update argument and made as a function rather then a property.
         """
         account_user = self._account_user
@@ -167,7 +167,7 @@ class Client:
 
         .. versionchanged:: 1.5.0
 
-        
+
             Added an update argument and made as a function rather then a property.
         """
         return self.account(update=update)
