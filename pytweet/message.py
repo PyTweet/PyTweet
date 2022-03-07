@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from .dataclass import ApplicationInfo
+from .dataclass import ApplicationInfo, Initiated
 from .attachments import CTA, File, QuickReply
 from .entities import Hashtag, Symbol, Url, UserMention
 from .enums import MessageEventTypeEnum, MessageTypeEnum
@@ -82,6 +82,7 @@ class DirectMessage(Message):
         self.__message_create = self._payload.get("message_create", None)
         self.__message_data = self.__message_create.get("message_data", None)
         self.__entities = self.__message_data.get("entities", None)
+        self._initiated_via = self._payload.get("initiated_via")
         self._quick_reply_data = self.__message_data.get("quick_reply")
         self._cta_data = self.__message_data.get("ctas")
         self.http_client = http_client
@@ -203,6 +204,23 @@ class DirectMessage(Message):
                 attachment.add_button(**button)
             return attachment
         return None
+
+    @property
+    def initiated_via(self) -> Optional[Initiated]:
+        """Optional[:class:`Initiated`]: Returns :class:`Initiated` object which provides a way to track how a conversation starts. For example, if a welcome message was used then :meth:`Initiated.welcome_message_id` would returns the welcome message id that was used in that conversation.
+        
+        .. versionadded:: 1.5.0
+        """
+        if not self._initiated_via:
+            return None
+
+        if not self._initiated_via.get("welcome_message_id"):
+            self._initiated_via["welcome_message_id"] = None
+
+        if not self._initiated_via.get("tweet_id"):
+            self._initiated_via["tweet_id"] = None
+
+        return Initiated(self._initiated_via)
 
     def delete(self) -> None:
         """Delete the direct message.
