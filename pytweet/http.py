@@ -70,7 +70,7 @@ class HTTPClient:
         client_secret: Optional[str] = None,
         use_bearer_only: bool = False,
         sleep_after_ratelimit: bool = False,
-    ) -> Union[None, NoReturn]:
+    ):
         self.credentials = {
             "bearer_token": bearer_token,
             "consumer_key": consumer_key,
@@ -105,11 +105,6 @@ class HTTPClient:
         self.callback_url = callback_url
         self.client_id = client_id
         self.client_secret = client_secret
-        self.use_bearer_only = use_bearer_only
-        self.event_parser = EventParser(self)
-        self.payload_parser = self.event_parser.payload_parser
-        self.thread_manager = ThreadManager()
-        self.sleep_after_ratelimit = sleep_after_ratelimit
         self._auth = OauthSession(
             self.consumer_key,
             self.consumer_secret,
@@ -120,8 +115,12 @@ class HTTPClient:
             client_id=self.client_id,
             client_secret=self.client_secret,
         )
+        self.use_bearer_only = use_bearer_only
+        self.event_parser = EventParser(self)
+        self.payload_parser = self.event_parser.payload_parser
+        self.thread_manager = ThreadManager()
+        self.sleep_after_ratelimit = sleep_after_ratelimit
         self.current_header = None
-        self.client_id = client_id
         self.message_cache = {}
         self.tweet_cache = {}
         self.user_cache = {}
@@ -263,7 +262,7 @@ class HTTPClient:
             elif code == 409:
                 raise Conflict(response)
 
-            elif code in (420, 429):
+            elif code in (420, 429): #420 status code is an unofficial extension by Twitter.
                 if self.sleep_after_ratelimit:
                     remaining = int(response.headers["x-rate-limit-reset"])
                     sleep_for = (remaining - int(time.time())) + 1
