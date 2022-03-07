@@ -133,12 +133,13 @@ class Client:
             This method returns a :class:`ClientAccount` object.
 
 
+        .. versionadded:: 1.2.0
+
+
         .. versionchanged:: 1.5.0
 
+        
             Added an update argument and made as a function rather then a property.
-
-
-        .. versionadded:: 1.2.0
         """
         account_user = self._account_user
         if account_user is None or update:
@@ -161,12 +162,13 @@ class Client:
             This method returns a :class:`ClientAccount` object.
 
 
+        .. versionadded:: 1.2.0
+
+
         .. versionchanged:: 1.5.0
 
+        
             Added an update argument and made as a function rather then a property.
-
-
-        .. versionadded:: 1.2.0
         """
         return self.account(update=update)
 
@@ -328,7 +330,7 @@ class Client:
         space_id: :class:`ID`
             Represents the space ID that you wish to fetch with.
         space_host: :class:`bool`
-            Indicates if the client is the host of the requested space. This is very useful to returns a space with the 'subscriber_count' data, if sets to False the 'subscriber_count' will returns None. Default to False.
+            Indicates if the client is the host of the requested space. This is very useful to returns a :class:`Space` object with the 'subscriber_count' data, if sets to False the 'subscriber_count' will returns None. Default to False.
 
         Returns
         ---------
@@ -337,6 +339,11 @@ class Client:
 
 
         .. versionadded:: 1.3.5
+
+
+        .. versionchanged:: 1.5.0
+
+            Added `space_host` argument.
         """
         return self.http.fetch_space(space_id, space_host=space_host)
 
@@ -361,6 +368,10 @@ class Client:
 
 
         .. versionadded:: 1.3.5
+
+        .. versionchanged:: 1.5.0
+
+            Added `space_host` argument and returns a list of spaces.
         """
         if state == SpaceState.live or state == SpaceState.scheduled:
             return self.http.fetch_spaces_bytitle(title, state, space_host=space_host)
@@ -465,11 +476,16 @@ class Client:
 
         Returns
         ---------
-        :class:`Message`
-            This method returns a :class:`Message` object.
+        :class:`Tweet`
+            This method returns a :class:`Tweet` object.
 
 
         .. versionadded:: 1.1.0
+
+
+        .. versionchaned:: 1.5.0
+
+            Added `files` and `media_tagged_users` arguments.
         """
         return self.http.post_tweet(
             text,
@@ -823,7 +839,8 @@ class Client:
         .. note::
             Users will get cache with several conditions:
                 * Users return from a method such as :meth:`Client.fetch_user`.
-                * The client interacts with other users such as dming them, triggering the typing animation, likes the client's tweets etc (This condition only applies if you use :meth:`Client.listen` at the very end of the file)
+                * The client interacts with other users such as sending a message to another user through :meth:`User.send` and many more
+                * The subscription users interact with other users such as sending message from the subscription user to another user (This condition only applies if you use :meth:`Client.listen` at the very end of the file)
 
         Parameters
         ------------
@@ -856,7 +873,7 @@ class Client:
         .. note::
             Tweets will get cache with several conditions:
                 * Tweets send by the client.
-                * Tweets send by the subscription users.
+                * Tweets send by the subscription users (This condition only applies if you use :meth:`Client.listen` at the very end of the file).
                 * Tweets return from a method such as: :meth:`Client.fetch_tweet`
 
         Parameters
@@ -890,8 +907,8 @@ class Client:
         .. note::
             Messages will get cache with several conditions:
                 * Messages send by the client.
-                * Messages send by the subscription users.
                 * Messages return from a method such as: :meth:`Client.fetch_direct_message`
+                * The subscription users interact with other users such as sending message from the subscription user to another user (This condition only applies if you use :meth:`Client.listen` at the very end of the file).
 
         Parameters
         ------------
