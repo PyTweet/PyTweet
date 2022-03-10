@@ -203,9 +203,11 @@ class User(Comparable):
 
         .. versionadded: 1.0.0
         """
-        if isinstance(self._payload.get("created_at"), str):
-            return datetime.datetime.fromtimestamp(int(self._payload.get("created_at")) / 1000)
-        return time_parse_todt(self._payload.get("created_at"))
+        try:
+            timestamp = int(self._payload.get("created_at"))
+            return datetime.datetime.fromtimestamp(timestamp / 1000)
+        except ValueError:
+            return time_parse_todt(self._payload.get("created_at"))
 
     @property
     def follower_count(self) -> int:
