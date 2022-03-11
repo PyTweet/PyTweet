@@ -14,6 +14,7 @@ from .dataclass import *
 from .attachments import *
 from .auth import *
 from .client import *
+from .compliance import *
 from .entities import *
 from .enums import *
 from .environment import *
