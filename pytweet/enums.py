@@ -36,6 +36,32 @@ class SpaceState(Enum):
     scheduled = "scheduled"
 
 
+class JobType(Enum):
+    tweets = "tweets"
+    users = "users"
+
+
+class JobStatus(Enum):
+    created = "created"
+    in_progress = "in_progress"
+    failed = "failed "
+    complete = "complete"
+    expired = "expired"
+
+
+class JobResultAction(Enum):
+    delete = "delete"
+    null = None
+
+
+class JobResultActionReason(Enum):
+    deleted = "deleted"
+    deactivated = "deactivated"
+    scrub_geo = "scrub_geo"
+    protected = "protected"
+    suspended = "suspended"
+
+
 class ReplySetting(Enum):
     everyone = "everyone"
     mention_users = "mentionedUsers"

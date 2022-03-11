@@ -16,7 +16,7 @@ from flask import Flask, request
 
 from .paginations import MessagePagination
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
-from .enums import ReplySetting, SpaceState, Granularity
+from .enums import ReplySetting, SpaceState, Granularity, JobType, JobStatus
 from .constants import TWEET_EXPANSION, USER_FIELD, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD, TWEET_FIELD
 from .errors import PytweetException, UnKnownSpaceState
 from .http import HTTPClient
@@ -29,6 +29,7 @@ from .environment import Environment, Webhook
 from .dataclass import Location, Trend
 from .list import List as TwitterList
 from .type import ID
+from .compliance import Job
 
 __all__ = ("Client",)
 
@@ -138,7 +139,7 @@ class Client:
 
         .. versionchanged:: 1.5.0
 
-        
+
             Added an update argument and made as a function rather then a property.
         """
         account_user = self._account_user
@@ -167,7 +168,7 @@ class Client:
 
         .. versionchanged:: 1.5.0
 
-        
+
             Added an update argument and made as a function rather then a property.
         """
         return self.account(update=update)
@@ -211,7 +212,7 @@ class Client:
         Parameters
         ------------
         user_id: :class:`ID`
-            Represents the user ID that you wish to get info for. If you don't have it you may use `fetch_user_by_username` because it only requires the user's username.
+            Represents the user ID that you wish to get info with. If you don't have it you may use `fetch_user_by_username` because it only requires the user's username.
 
         Returns
         ---------
@@ -253,7 +254,7 @@ class Client:
         Parameters
         ------------
         tweet_id: :class:`ID`
-            Represents the tweet id that you wish to get info about.
+            Represents the tweet ID that you wish to get info with.
 
         Returns
         ---------
@@ -274,7 +275,7 @@ class Client:
         Parameters
         ------------
         event_id: :class:`ID`
-            Represents the event's ID that you wish to fetch with.
+            Represents the event's ID that you wish to get info with.
 
         Returns
         ---------
@@ -292,7 +293,7 @@ class Client:
         Parameters
         ------------
         welcome_message_id: :class:`ID`
-            Represents the welcome message ID that you wish to fetch with.
+            Represents the welcome message ID that you wish to get info with.
 
         Returns
         ---------
@@ -310,7 +311,7 @@ class Client:
         Parameters
         ------------
         welcome_message_rule_id: :class:`ID`
-            Represents the welcome message rule ID that you wish to fetch with.
+            Represents the welcome message rule ID that you wish to get info with.
 
         Returns
         ---------
@@ -325,12 +326,20 @@ class Client:
     def fetch_space(self, space_id: ID, *, space_host: bool = False) -> Space:
         """Fetches a space.
 
+        .. warning
+
+            This will cause error if `space_host` paramater is True and the client is not the host of the Space!
+
+
         Parameters
         ------------
         space_id: :class:`ID`
-            Represents the space ID that you wish to fetch with.
+            Represents the space ID that you wish to get info with.
         space_host: :class:`bool`
             Indicates if the client is the host of the requested space. This is very useful to returns a :class:`Space` object with the 'subscriber_count' data, if sets to False the 'subscriber_count' will returns None. Default to False.
+
+            .. versionchanged:: 1.5.0
+
 
         Returns
         ---------
@@ -339,11 +348,6 @@ class Client:
 
 
         .. versionadded:: 1.3.5
-
-
-        .. versionchanged:: 1.5.0
-
-            Added `space_host` argument.
         """
         return self.http.fetch_space(space_id, space_host=space_host)
 
@@ -361,6 +365,9 @@ class Client:
         space_host: :class:`bool`
             Indicates if the client is the host of the requested space. This is very useful to returns a space with the 'subscriber_count' data, if sets to False the 'subscriber_count' will returns None. Default to False.
 
+            .. versionchanged:: 1.5.0
+
+
         Returns
         ---------
         Optional[List[:class:`Space`]]
@@ -368,10 +375,6 @@ class Client:
 
 
         .. versionadded:: 1.3.5
-
-        .. versionchanged:: 1.5.0
-
-            Added `space_host` argument and returns a list of spaces.
         """
         if state == SpaceState.live or state == SpaceState.scheduled:
             return self.http.fetch_spaces_bytitle(title, state, space_host=space_host)
@@ -379,7 +382,7 @@ class Client:
             raise UnKnownSpaceState(given_state=state)
 
     def fetch_list(self, id: ID) -> TwitterList:
-        """Fetches a list using its id
+        """Fetches a twitter list using its id
 
         Returns
         ---------
@@ -428,6 +431,20 @@ class Client:
         return MessagePagination(
             res, endpoint_request=f"/direct_messages/events/list.jsons", http_client=self.http, params=params
         )
+
+    def fetch_job(self, id: ID) -> Optional[Job]:
+        """Fetches a job.
+
+        Paramaters
+        ------------
+        id: `ID`
+            The job's ID
+        """
+        return self.http.fetch_job(id)
+
+    def fetch_jobs(self, type: JobType, status: Optional[JobStatus] = None) -> Optional[List[Job]]:
+        """"""
+        return self.http.fetch_jobs(type, status)
 
     def tweet(
         self,
@@ -537,7 +554,7 @@ class Client:
         return self.http.create_welcome_message(name=name, text=text, file=file, quick_reply=quick_reply, cta=cta)
 
     def create_list(self, name: str, *, description: str = "", private: bool = False) -> Optional[TwitterList]:
-        """Create a new list.
+        """Creates a new list.
 
         Parameters
         ------------
@@ -558,6 +575,28 @@ class Client:
         """
         twitter_list = self.http.create_list(name, description=description, private=private)
         return self.http.fetch_list(twitter_list.id)
+
+    def create_job(self, type: JobType, *, name: Optional[str] = None, resumable: bool = False) -> Optional[Job]:
+        """Creates a Job Compliance.
+
+        Parameters
+        ------------
+        type: :class:`JobType`
+            The type of the job. There's only 2 types of job, :meth:`JobType.tweets' and :class:`JobType.users`. You can upload tweet ids if use :meth:`JobType.tweets` otherwise you can use user ids. You cannot mix tweet ids with user ids!
+        name: :class:`str`
+            The human readable name for the Job, default to None.
+        resumable: :class:`bool`
+                Specifies whether to enable the upload URL with support for resumable uploads. If true, this endpoint will return a pre-signed URL with resumable uploads enabled. Default to False
+
+        Returns
+        ---------
+        Optional[:class:`Job`]
+            This method returns :class:`Job` object
+
+
+        .. versionadded:: 1.5.0
+        """
+        return self.http.create_job(type, name=name, resumable=resumable)
 
     def create_custom_profile(self, name: str, file: File) -> Optional[CustomProfile]:
         """Create a custom profile
@@ -609,7 +648,7 @@ class Client:
             This method return a list of :class:`Geo` objects.
 
 
-        .. versionadded:: 1.5.3
+        .. versionadded:: 1.3.5
         """
         return self.http.search_geo(query, max_result, lat=lat, long=long, ip=ip, granularity=granularity)
 

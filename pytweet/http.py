@@ -12,7 +12,7 @@ from typing import Any, List, NoReturn, Optional, Union, TYPE_CHECKING
 
 from .attachments import CTA, CustomProfile, File, Geo, Poll, QuickReply
 from .auth import OauthSession
-from .enums import ReplySetting, SpaceState, Granularity
+from .enums import ReplySetting, SpaceState, Granularity, JobType, JobStatus
 from .errors import (
     BadRequests,
     Conflict,
@@ -23,6 +23,7 @@ from .errors import (
     PytweetException,
     Unauthorized,
     FieldsTooLarge,
+    UnauthorizedForResource,
 )
 from .constants import (
     TWEET_EXPANSION,
@@ -47,6 +48,7 @@ from .user import User, ClientAccount
 from .threads import ThreadManager
 from .relations import RelationUpdate
 from .list import List as TwitterList
+from .compliance import Job
 
 if TYPE_CHECKING:
     from .type import ID, Payload, ResponsePayload
@@ -245,6 +247,7 @@ class HTTPClient:
                         return response.text
                 else:
                     return response.text
+
                 return res
 
             elif code == 400:
@@ -262,7 +265,7 @@ class HTTPClient:
             elif code == 409:
                 raise Conflict(response)
 
-            elif code in (420, 429): #420 status code is an unofficial extension by Twitter.
+            elif code in (420, 429):  # 420 status code is an unofficial extension by Twitter.
                 if self.sleep_after_ratelimit:
                     remaining = int(response.headers["x-rate-limit-reset"])
                     sleep_for = (remaining - int(time.time())) + 1
@@ -291,11 +294,18 @@ class HTTPClient:
                 try:
                     res = response.json()
                 except JSONDecodeError:
-                    return response.text
+                    res = response.text
             else:
                 return response.text
 
             if isinstance(res, dict):
+                if res.get("errors"):
+                    error = res["errors"][0]
+                    print(error)
+                    if error["type"] == "https://api.twitter.com/2/problems/not-authorized-for-resource":
+                        if not error["parameter"] == "pinned_tweet_id":
+                            raise UnauthorizedForResource(error["detail"])
+
                 if "meta" in res.keys():
                     try:
                         if res["meta"]["result_count"] == 0:
@@ -719,6 +729,28 @@ class HTTPClient:
         welcome_message_id = data.get("welcome_message_id")
         return WelcomeMessageRule(id, welcome_message_id, timestamp, http_client=self)
 
+    def fetch_job(self, id: ID) -> Optional[Job]:
+        res = self.request(
+            "GET",
+            "2",
+            f"/compliance/jobs/{id}",
+        )
+
+        return Job(res.get("data"), http_client=self)
+
+    def fetch_jobs(self, type: JobType, status: Optional[JobStatus] = None) -> Optional[List[Job]]:
+        res = self.request(
+            "GET",
+            "2",
+            f"/compliance/jobs",
+            params={"type": type.value, "status": status.value if isinstance(status, JobStatus) else status},
+        )
+
+        if not res:
+            return []
+
+        return [Job(data) for data in res["data"]]
+
     def search_geo(
         self,
         query: str,
@@ -906,6 +938,13 @@ class HTTPClient:
 
         res = self.request("POST", "2", "/tweets", json=payload, auth=True)
         return self.fetch_tweet(res["data"]["id"])
+
+    def create_job(self, type: JobType, *, name: Optional[str] = None, resumable: bool = False) -> Optional[Job]:
+        res = self.request(
+            "POST", "2", "/compliance/jobs", json={"type": type.value, "name": name, "resumable": resumable}
+        )
+
+        return Job(res.get("data"))
 
     def create_list(self, name: str, *, description: str = "", private: bool = False) -> Optional[TwitterList]:
         res = self.request(
