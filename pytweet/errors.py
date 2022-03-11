@@ -133,7 +133,7 @@ class TooManyRequests(HTTPException):
 
 
 class ConnectionException(HTTPException):
-    """This error class inherits :class:`HTTPException`. This error is raises when a stream connection throw an error.
+    """This error class inherits :class:`HTTPException`. This error is raise when a stream connection throw an error.
 
     .. versionadded:: 1.3.5
     """
@@ -142,7 +142,7 @@ class ConnectionException(HTTPException):
 
 
 class Conflict(HTTPException):
-    """This error class inherits :class:`HTTPException`. This error is raises when a request return 409 status code."""
+    """This error class inherits :class:`HTTPException`. This error is raise when a request return 409 status code."""
 
     pass
 
@@ -164,7 +164,7 @@ class NotFoundError(APIException):
 
 
 class UnKnownSpaceState(APIException):
-    """This error class inherits :class:`APIException`. This error is raises when a user specified an invalid space state.
+    """This error class inherits :class:`APIException`. This error is raise when a user specified an invalid space state.
 
     .. versionadded:: 1.5.0
     """
@@ -174,7 +174,7 @@ class UnKnownSpaceState(APIException):
 
 
 class NoPageAvailable(APIException):
-    """This error class inherits :class:`APIException`. This error is raises when a user try to lookup a new page in a pagination object that does not exist. These following methods can raise this error:
+    """This error class inherits :class:`APIException`. This error is raise when a user try to lookup a new page in a pagination object that does not exist. These following methods can raise this error:
 
     * :meth:`UserPagination.next_page` and :meth:`UserPagination.previous_page`
     * :meth:`TweetPagination.next_page` and :meth:`TweetPagination.previous_page`
@@ -185,3 +185,13 @@ class NoPageAvailable(APIException):
 
     def __init__(self):
         super().__init__(message="Pagination have no more page available!")
+
+
+class UnauthorizedForResource(APIException):
+    """This error class inherits :class:`APIException`. This error is raise when the client is unauthorized to view certain resource like for example: viewing a protected user's tweets using :meth:`User.fetch_timelines`.
+    
+    .. versionadded:: 1.5.0
+    """
+
+    def __init__(self, message):
+        super().__init__(message=message)
