@@ -301,7 +301,6 @@ class HTTPClient:
             if isinstance(res, dict):
                 if res.get("errors"):
                     error = res["errors"][0]
-                    print(error)
                     if error["type"] == "https://api.twitter.com/2/problems/not-authorized-for-resource":
                         if not error["parameter"] == "pinned_tweet_id":
                             raise UnauthorizedForResource(error["detail"])
