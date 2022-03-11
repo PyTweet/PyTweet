@@ -189,7 +189,7 @@ class NoPageAvailable(APIException):
 
 class UnauthorizedForResource(APIException):
     """This error class inherits :class:`APIException`. This error is raise when the client is unauthorized to view certain resource like for example: viewing a protected user's tweets using :meth:`User.fetch_timelines`.
-    
+
     .. versionadded:: 1.5.0
     """
 
