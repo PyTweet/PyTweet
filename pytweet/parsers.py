@@ -127,7 +127,7 @@ class PayloadParser:
                 if user.id == int(message_create["target"]["recipient_id"]):
                     message_create["target"]["recipient"] = user
 
-                elif user.id == int(message_create["sender_id"]):
+                if user.id == int(message_create["sender_id"]):
                     message_create["target"]["sender"] = user
 
             if data.get("apps"):
