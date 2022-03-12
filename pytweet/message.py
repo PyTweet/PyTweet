@@ -145,7 +145,7 @@ class DirectMessage(Message):
 
         .. versionadded:: 1.2.0
         """
-        return [Hashtag(data) for data in self.__entities.get("hashtag")]
+        return [Hashtag(data) for data in self.__entities.get("hashtags")]
 
     @property
     def symbols(self) -> Optional[List[Symbol]]:
