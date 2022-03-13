@@ -31,16 +31,6 @@ Client
     :members:
 
 
-Application
-----------------
-
-ApplicationInfo
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: ApplicationInfo()
-    :members:
-
-
 Environment
 ----------------
 
@@ -57,7 +47,7 @@ Webhook
     :members:
 
 
-Twitter Models
+Twitter Objects
 ---------------------
 
 These following objects are not meant to be create as an instance rather its for knowledge of what you can do with them.
@@ -74,8 +64,8 @@ Tweet
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Tweet()
+    :inherited-members:    
     :members:
-    :inherited-members:
 
 
 Space
@@ -88,7 +78,14 @@ Space
 List
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: List()
+.. autoclass:: pytweet.List()
+    :members:
+
+
+Job
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: pytweet.Job()
     :members:
 
 
@@ -97,7 +94,6 @@ ClientAccount
 
 .. autoclass:: ClientAccount()
     :members:
-    :inherited-members:
 
 
 Message
@@ -111,16 +107,16 @@ DirectMessage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: DirectMessage()
-    :members:
     :inherited-members:
+    :members:
 
 
 WelcomeMessage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: WelcomeMessage()
-    :members:
     :inherited-members:
+    :members:
 
 
 WelcomeMessageRule
@@ -134,6 +130,13 @@ Twitter Dataclass
 -------------------------
 
 These following section documented objects that use `dataclasses.dataclass` decorator.
+
+ApplicationInfo
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ApplicationInfo()
+    :members:
+
 
 Attachments Objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -162,7 +165,7 @@ Locations Objects
 .. autoclass:: TimezoneInfo
     :members:
 
-Settings Objects
+Setting Objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserSettings
@@ -174,7 +177,7 @@ Settings Objects
 Space Objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: SpaceTopic
+.. autoclass:: Topic
     :members:
 
 Stream Objects
@@ -220,7 +223,7 @@ QuickReply
 Geo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: Geo()
+.. autoclass:: Geo
     :members:
 
 
@@ -260,7 +263,7 @@ StreamConnection
 Oauth
 -------------
 
-Oauth is a way to authenticate a twitter user account. You can do this with 3 legged authentication via :meth:`OauthSession.generate_oauth_url` to generate an oauth url and :meth:`OauthSession.post_oauth_token` to post an oauth token and verifier. This also required in every request you've made for identification! This section will show you what you can do with oauth, You can use `Client.http.oauth_session` to get the client's `OauthSession`.
+Oauth is a way to authenticate a twitter user account. You can do this with 3 legged authentication via :meth:`OauthSession.create_oauth_url` to generate an oauth url and :meth:`OauthSession.post_oauth_token` to post an oauth token and verifier. This also required in every request you've made for identification! This section will show you what you can do with oauth, You can use `Client.http.oauth_session` to get the client's `OauthSession`.
 
 OauthSession
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -275,23 +278,23 @@ Scope
     :members:
 
 
-Pagination
+Paginations
 -------------
 
 Some endpoints returns more objects but limits it to some pages. Using pagination classes like `UserPagination` and `TweetPagination`, you can change page and manage objects easily. Example:
 
 .. code-block:: py
 
-    pagination = client.account.fetch_following()
+    pagination = client.account().fetch_following()
     print("Page 1, object 1:", pagination.content[0])
     pagination.next_page() #Change page to the next page
     print("Page 2, object 2:", pagination.content[1])
     pagination.previous_page() #Change page to the previous page
     print("Page 1, object 3:", pagination.content[2])
 
-    #since the pagination caches page content everytime you turn pages, you can do this:
+    #Pagination object stores page's content in a cache everytime you turn a page. You can use the pages property to get the zipped page number and the page content:
     for page_number, page_content in pagination.pages:
-        print(f"Page {page_number}, object: 1: {page_content[0]}")
+        print(f"Page {page_number}, content: 1: {page_content[0]}")
 
 
 Pagination
@@ -300,21 +303,37 @@ Pagination
 .. autoclass:: Pagination
     :members:
 
+
 UserPagination
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: UserPagination
-    :members:
     :inherited-members:
+    :members:
+
 
 TweetPagination
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: TweetPagination
+    :inherited-members:
+    :members:
+
+
+ListPagination
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ListPagination
     :members:
     :inherited-members:
 
 
+MessagePagination
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: MessagePagination
+    :members:
+    :inherited-members:
 
 Relations
 ----------------
@@ -702,6 +721,57 @@ All of these enums are a subclass of :class:`enum.Enum`
     .. attribute:: mute
 
         A user mute action type returns by `on_user_mute` and `on_user_unmute`.
+
+
+.. class:: JobType
+
+    .. attribute:: tweets
+    
+        Indicates the job only support tweets id.
+    
+    
+    .. attribute:: users
+    
+        Indicates the job only support users id.
+
+
+.. class:: JobResultAction
+
+    .. attribute:: delete
+    
+        Indicates if the Job's status is created.
+    
+    
+    .. attribute:: null
+    
+        For None value.
+
+
+.. class:: JobStatus
+
+    .. attribute:: created
+    
+        Indicates if the Job is created.
+    
+    
+    .. attribute:: in_progress
+    
+        Indicates if the Job is in_progress.
+    
+    
+    .. attribute:: failed
+    
+        Indicates if the Job is failed.
+    
+    
+    .. attribute:: complete
+    
+        Indicates if the Job is complete.
+    
+    
+    .. attribute:: expired
+    
+        Indicates if the Job is expired.
 
 
 .. class:: Timezone
