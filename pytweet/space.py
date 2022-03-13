@@ -117,7 +117,7 @@ class Space(Comparable):
 
     @property
     def topics(self) -> Optional[List[Topic]]:
-        """Optional[List[::class:`Topic`]]: Returns a list of the space's topics, returns None if the space has no topic
+        """Optional[List[:class:`Topic`]]: Returns a list of the space's topics, returns None if the space has no topic
 
         .. versionadded:: 1.5.0
         """
@@ -149,7 +149,7 @@ class Space(Comparable):
         Returns
         ---------
         :class:`User`
-            This method returns a :class`User` object.
+            This method returns a :class:`User` object.
 
 
         .. versionadded:: 1.3.5
@@ -204,7 +204,7 @@ class Space(Comparable):
         Returns
         ---------
         Optional[List[:class:`Tweet`]]
-            This method returns a list of :class:`Tweet`s or an empty list.
+            This method returns a list of :class:`Tweet` objects or an empty list.
 
 
         .. versionadded:: 1.5.0

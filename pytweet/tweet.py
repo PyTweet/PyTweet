@@ -166,7 +166,7 @@ class Embed:
 
 class Tweet(Message):
     """Represents a tweet message from Twitter.
-    A Tweet is any message posted to Twitter which may contain photos, videos, links, and text.
+    A Tweet is any message posted to Twitter which may contain photos, videos, links, and text. This class inherits :class:`Message`,
 
     .. describe:: x == y
 
@@ -225,7 +225,7 @@ class Tweet(Message):
 
     @property
     def possibly_sensitive(self) -> bool:
-        """:class`bool`: Return True if the tweet is possible sensitive to some users, else False.
+        """:class:`bool`: Return True if the tweet is possible sensitive to some users, else False.
 
         .. versionadded: 1.0.0
         """
@@ -233,7 +233,7 @@ class Tweet(Message):
 
     @property
     def sensitive(self) -> bool:
-        """:class`bool`: An alias to :meth:`Tweet.possibly_sensitive`.
+        """:class:`bool`: An alias to :meth:`Tweet.possibly_sensitive`.
 
         .. versionadded: 1.5.0
         """
@@ -271,20 +271,20 @@ class Tweet(Message):
         return self._payload.get("source")
 
     @property
+    def reply_setting(self) -> ReplySetting:
+        """:class:`ReplySetting`: Return a :class:`ReplySetting` object with the tweet's reply setting. If everyone can reply, this method return :class:`ReplySetting.everyone`.
+
+        .. versionadded: 1.3.5
+        """
+        return ReplySetting(self._payload.get("reply_settings"))
+
+    @property
     def raw_reply_setting(self) -> str:
         """:class:`str`: Return the raw reply setting value. If everyone can replied, this method return 'Everyone'.
 
         .. versionadded: 1.0.0
         """
         return self._payload.get("reply_settings")
-
-    @property
-    def reply_setting(self) -> ReplySetting:
-        """:class:`ReplySetting`: Return a :class:`ReplySetting` object with the tweet's reply setting. If everyone can reply, this method return :class:`replySetting.everyone`.
-
-        .. versionadded: 1.3.5
-        """
-        return ReplySetting(self._payload.get("reply_settings"))
 
     @property
     def lang(self) -> str:

@@ -57,7 +57,7 @@ class Environment(Comparable):
         """Add a new user subscription to the environment, which is the client (that you passed in the argument) itself.
 
         .. note::
-            If you want to add other user subscription, use :class:`OauthSession.generate_oauth_url` to generate an oauth url and get the oauth token and verifier, then use :class:`OauthSession.post_oauth_token` to post the oauth token.
+            If you want to add other user subscription, use :meth:`OauthSession.create_oauth_url` to generate an oauth url and get the oauth token and verifier, then use :meth:`OauthSession.post_oauth_token` to post the oauth token.
 
 
         .. versionadded:: 1.5.0
