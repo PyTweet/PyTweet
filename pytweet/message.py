@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from .dataclass import ApplicationInfo, Initiated
+from .dataclass import ApplicationInfo, InitiatedVia
 from .attachments import CTA, File, QuickReply
 from .entities import Hashtag, Symbol, Url, UserMention
 from .enums import MessageEventTypeEnum, MessageTypeEnum
@@ -60,7 +60,7 @@ class Message(Comparable):
 
 
 class DirectMessage(Message):
-    """Represents a Direct Message in Twitter.
+    """Represents a Direct Message in Twitter. This class inherits :class:`Message`.
 
     .. versionadded:: 1.2.0
     """
@@ -206,8 +206,8 @@ class DirectMessage(Message):
         return None
 
     @property
-    def initiated_via(self) -> Optional[Initiated]:
-        """Optional[:class:`Initiated`]: Returns :class:`Initiated` object which provides a way to track how a conversation starts. For example, if a welcome message was used then :meth:`Initiated.welcome_message_id` would returns the welcome message id that was used in that conversation.
+    def initiated_via(self) -> Optional[InitiatedVia]:
+        """Optional[:class:`InitiatedVia`]: Returns :class:`InitiatedVia` object which provides a way to track how a conversation starts. For example, if a welcome message was used then :meth:`InitiatedVia.welcome_message_id` would returns the welcome message id that was used in that conversation.
 
         .. versionadded:: 1.5.0
         """
@@ -220,7 +220,7 @@ class DirectMessage(Message):
         if not self._initiated_via.get("tweet_id"):
             self._initiated_via["tweet_id"] = None
 
-        return Initiated(self._initiated_via)
+        return InitiatedVia(self._initiated_via)
 
     def delete(self) -> None:
         """Delete the direct message.
@@ -239,7 +239,7 @@ class DirectMessage(Message):
         except KeyError:
             pass
 
-    def mark_read(self) -> None:
+    def mark_as_read(self):
         """Mark the DirectMessage as read, it also mark other messages before the DirectMessage was sent as read.
 
         .. versionadded:: 1.3.5
@@ -257,7 +257,7 @@ class DirectMessage(Message):
 
 
 class WelcomeMessage(Message):
-    """Represents a Welcome Message in a Direct Message.
+    """Represents a Welcome Message in a Direct Message. This class inherits :class:`Message`.
 
 
     .. versionadded:: 1.3.5
@@ -373,7 +373,7 @@ class WelcomeMessage(Message):
 
 
 class WelcomeMessageRule(Message):
-    """Represents a Welcome Message Rule in a Direct Message. This object is returns by WelcomeMessage.set_rule or client.fetch_welcome_message_rules, it determines which Welcome Message will be shown in a given conversation.
+    """Represents a Welcome Message Rule in a Direct Message. This object is returns by WelcomeMessage.set_rule or client.fetch_welcome_message_rules, it determines which Welcome Message will be shown in a given conversation. This class inherits :class:`Message`.
 
 
     .. versionadded:: 1.3.5

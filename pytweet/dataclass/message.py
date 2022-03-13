@@ -3,7 +3,7 @@ from ..type import ID
 
 
 @dataclass
-class Initiated:
+class InitiatedVia:
     """Represents an object that stores 'initiated_via' key from direct message event data.
 
     .. versionadded:: 1.5.0
