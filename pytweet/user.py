@@ -722,7 +722,7 @@ class User(Comparable):
         return [TwitterList(data, http_client=self.http_client) for data in res["data"]]
 
     def fetch_list_memberships(self) -> Union[ListPagination, List]:
-        """Fetches all :class:`List`s the user is a member of.
+        """Fetches all lists the user is a member of.
 
         Returns
         ---------
@@ -781,7 +781,7 @@ class ClientAccount(User):
     .. versionadded:: 1.5.0
     """
 
-    def update_setting(
+    def update_settings(
         self,
         *,
         lang: Optional[str] = None,
