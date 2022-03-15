@@ -440,13 +440,13 @@ class Client:
         user_id: :class:`ID`
             Represents the job's ID that you wish to get info with.
 
-        
+
         .. versionadded:: 1.5.0
         """
         return self.http.fetch_job(id)
 
     def fetch_jobs(self, type: JobType = JobType.users, status: Optional[JobStatus] = None) -> Optional[List[Job]]:
-        """Fetches jobs and minimize the results with the correct :class:`JobType` or :class:`JobStatus`. 
+        """Fetches jobs and minimize the results with the correct :class:`JobType` or :class:`JobStatus`.
 
         Parameters
         ------------
@@ -455,7 +455,7 @@ class Client:
         status: :class:`Jobstatus`
             The job's status, this parameter minimize the results to only return jobs with the status you specified. Default to None.
 
-        
+
         .. versionadded:: 1.5.0
         """
         return self.http.fetch_jobs(type, status)

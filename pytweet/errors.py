@@ -146,6 +146,7 @@ class Conflict(HTTPException):
 
     pass
 
+
 class UnKnownSpaceState(APIException):
     """This error class inherits :class:`APIException`. This error is Raise when a user specified an invalid space state.
 
@@ -180,16 +181,16 @@ class UnauthorizedForResource(APIException):
     def __init__(self, message):
         super().__init__(message=message)
 
+
 class ResourceNotFound(APIException):
     """This error class inherits :class:`APIException`. This error is a result of finding a none existent resource .
 
     .. versionadded:: 1.0.0
 
     .. versionchanged:: 1.5.0
-    
+
         Changed name from `NotFoundError` to `ResourceNotFound`
     """
 
     def __init__(self, message):
         super().__init__(message=message)
-        

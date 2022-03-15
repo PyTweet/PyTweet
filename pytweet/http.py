@@ -23,7 +23,7 @@ from .errors import (
     Unauthorized,
     FieldsTooLarge,
     UnauthorizedForResource,
-    ResourceNotFound
+    ResourceNotFound,
 )
 from .constants import (
     TWEET_EXPANSION,
@@ -503,19 +503,19 @@ class HTTPClient:
             raise ValueError("user_id must be an int, or a string of digits!")
 
         data = self.request(
-                "GET",
-                "2",
-                f"/users/{user_id}",
-                params={
-                    "expansions": PINNED_TWEET_EXPANSION,
-                    "user.fields": USER_FIELD,
-                    "tweet.fields": TWEET_FIELD,
-                },
-                auth=True,
-            )
+            "GET",
+            "2",
+            f"/users/{user_id}",
+            params={
+                "expansions": PINNED_TWEET_EXPANSION,
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
+            auth=True,
+        )
 
         return User(data, http_client=self)
-        
+
     def fetch_users(self, ids: List[ID]) -> List[User]:
         str_ids = []
         for id in ids:
