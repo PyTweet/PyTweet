@@ -18,12 +18,12 @@ from .errors import (
     Conflict,
     Forbidden,
     NotFound,
-    NotFoundError,
     TooManyRequests,
     PytweetException,
     Unauthorized,
     FieldsTooLarge,
     UnauthorizedForResource,
+    ResourceNotFound
 )
 from .constants import (
     TWEET_EXPANSION,
@@ -304,6 +304,8 @@ class HTTPClient:
                     if error["type"] == "https://api.twitter.com/2/problems/not-authorized-for-resource":
                         if not error["parameter"] == "pinned_tweet_id":
                             raise UnauthorizedForResource(error["detail"])
+                    elif error["type"] == "https://api.twitter.com/2/problems/resource-not-found":
+                        raise ResourceNotFound(error["detail"])
 
                 if "meta" in res.keys():
                     try:
@@ -500,8 +502,7 @@ class HTTPClient:
         except ValueError:
             raise ValueError("user_id must be an int, or a string of digits!")
 
-        try:
-            data = self.request(
+        data = self.request(
                 "GET",
                 "2",
                 f"/users/{user_id}",
@@ -513,10 +514,8 @@ class HTTPClient:
                 auth=True,
             )
 
-            return User(data, http_client=self)
-        except NotFoundError:
-            return None
-
+        return User(data, http_client=self)
+        
     def fetch_users(self, ids: List[ID]) -> List[User]:
         str_ids = []
         for id in ids:
@@ -548,46 +547,40 @@ class HTTPClient:
         if username.startswith("@"):
             username = username.replace("@", "", 1)
 
-        try:
-            data = self.request(
-                "GET",
-                "2",
-                f"/users/by/username/{username}",
-                params={
-                    "expansions": PINNED_TWEET_EXPANSION,
-                    "user.fields": USER_FIELD,
-                    "tweet.fields": TWEET_FIELD,
-                },
-                auth=True,
-            )
-            user = User(data, http_client=self)
-            self.user_cache[user.id] = user
-            return user
-        except NotFoundError:
-            return None
+        data = self.request(
+            "GET",
+            "2",
+            f"/users/by/username/{username}",
+            params={
+                "expansions": PINNED_TWEET_EXPANSION,
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
+            auth=True,
+        )
+        user = User(data, http_client=self)
+        self.user_cache[user.id] = user
+        return user
 
     def fetch_tweet(self, tweet_id: ID) -> Optional[Tweet]:
-        try:
-            res = self.request(
-                "GET",
-                "2",
-                f"/tweets/{tweet_id}",
-                params={
-                    "tweet.fields": TWEET_FIELD,
-                    "user.fields": USER_FIELD,
-                    "expansions": TWEET_EXPANSION,
-                    "media.fields": MEDIA_FIELD,
-                    "place.fields": PLACE_FIELD,
-                    "poll.fields": POLL_FIELD,
-                },
-                auth=True,
-            )
+        res = self.request(
+            "GET",
+            "2",
+            f"/tweets/{tweet_id}",
+            params={
+                "tweet.fields": TWEET_FIELD,
+                "user.fields": USER_FIELD,
+                "expansions": TWEET_EXPANSION,
+                "media.fields": MEDIA_FIELD,
+                "place.fields": PLACE_FIELD,
+                "poll.fields": POLL_FIELD,
+            },
+            auth=True,
+        )
 
-            tweet = Tweet(res, http_client=self)
-            self.tweet_cache[tweet.id] = tweet
-            return tweet
-        except NotFoundError:
-            return None
+        tweet = Tweet(res, http_client=self)
+        self.tweet_cache[tweet.id] = tweet
+        return tweet
 
     def fetch_space(self, space_id: str, *, space_host: bool) -> Space:
         res = self.request(
