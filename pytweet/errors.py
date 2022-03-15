@@ -4,7 +4,7 @@ from json import decoder
 
 
 class PytweetException(Exception):
-    """This is the base class of all exceptions raise by PyTweet. This inherits :class:`Exception`.
+    """This is the base class of all exceptions Raise by PyTweet. This inherits :class:`Exception`.
 
     .. versionadded:: 1.2.0
     """
@@ -18,7 +18,7 @@ class PytweetException(Exception):
 
 
 class APIException(PytweetException):
-    """raises when an error is incurred during a request with HTTP Status code 200. This inherits :class:`PytweetException`.
+    """A custom error that will be Raise whenever a request returns an HTTP status code 200. This inherits :class:`PytweetException`.
 
     .. versionadded:: 1.2.0
     """
@@ -34,7 +34,7 @@ class APIException(PytweetException):
 
 
 class HTTPException(PytweetException):
-    """A custom error that will be raises whenever a request returns an HTTP status code above 200. This inherits :class:`PytweetException`.
+    """A custom error that will be Raise whenever a request returns an HTTP status code above 200. This inherits :class:`PytweetException`.
 
     .. versionadded:: 1.2.0
     """
@@ -82,7 +82,7 @@ class HTTPException(PytweetException):
 
 
 class BadRequests(HTTPException):
-    """This class inherits :class:`HTTPException`. raises when a request return status code: 400.
+    """This class inherits :class:`HTTPException`. Raise when a request return status code: 400.
 
     .. versionadded:: 1.2.0
     """
@@ -91,7 +91,7 @@ class BadRequests(HTTPException):
 
 
 class Unauthorized(HTTPException):
-    """This class inherits :class:`HTTPException`. raises when the credentials you passed are invalid and a request returns status code: 401
+    """This class inherits :class:`HTTPException`. Raise when the credentials you passed are invalid and a request returns status code: 401
 
     .. versionadded:: 1.0.0
     """
@@ -115,7 +115,7 @@ class FieldsTooLarge(HTTPException):
 
 
 class NotFound(HTTPException):
-    """This class inherits :class:`HTTPException`. raises when a request returns status code: 404.
+    """This class inherits :class:`HTTPException`. Raise when a request returns status code: 404.
 
     .. versionadded:: 1.2.0
     """
@@ -124,7 +124,7 @@ class NotFound(HTTPException):
 
 
 class TooManyRequests(HTTPException):
-    """This class inherits :class:`HTTPException`. raises when ratelimit exceeded and a request return status code: 429
+    """This class inherits :class:`HTTPException`. Raise when ratelimit exceeded and a request return status code 429.
 
     .. versionadded:: 1.1.0
     """
@@ -133,7 +133,7 @@ class TooManyRequests(HTTPException):
 
 
 class ConnectionException(HTTPException):
-    """This error class inherits :class:`HTTPException`. This error is raise when a stream connection throw an error.
+    """This error class inherits :class:`HTTPException`. This error is Raise when a stream connection throw an error.
 
     .. versionadded:: 1.3.5
     """
@@ -142,29 +142,12 @@ class ConnectionException(HTTPException):
 
 
 class Conflict(HTTPException):
-    """This error class inherits :class:`HTTPException`. This error is raise when a request return 409 status code."""
+    """This error class inherits :class:`HTTPException`. This error is Raise when a request return 409 status code."""
 
     pass
 
-
-class NotFoundError(APIException):
-    """This error class inherits :class:`APIException`. This error is usually raises when trying to find specific Tweet or User that does not exist.
-
-    .. versionadded:: 1.0.0
-    """
-
-    def __init__(
-        self,
-        response: Optional[requests.models.Response] = None,
-        message: Optional[str] = None,
-    ):
-        msg = response.json().get("errors")[0].get("message") if not message else message
-        detail = response.json().get("errors")[0].get("detail")
-        super().__init__(response, msg if msg else detail if detail else "Not Found!")
-
-
 class UnKnownSpaceState(APIException):
-    """This error class inherits :class:`APIException`. This error is raise when a user specified an invalid space state.
+    """This error class inherits :class:`APIException`. This error is Raise when a user specified an invalid space state.
 
     .. versionadded:: 1.5.0
     """
@@ -174,24 +157,39 @@ class UnKnownSpaceState(APIException):
 
 
 class NoPageAvailable(APIException):
-    """This error class inherits :class:`APIException`. This error is raise when a user try to lookup a new page in a pagination object that does not exist. These following methods can raise this error:
+    """This error class inherits :class:`APIException`. This error is Raise when a user try to lookup a new page in a pagination object that does not exist. These following methods can Raise this error:
 
     * :meth:`UserPagination.next_page` and :meth:`UserPagination.previous_page`
     * :meth:`TweetPagination.next_page` and :meth:`TweetPagination.previous_page`
     * :meth:`ListPagination.next_page` and :meth:`ListPagination.previous_page`
+    * :meth:`MessagePagination.next_page` and :meth:`MessagePagination.previous_page`
 
     .. versionadded:: 1.5.0
     """
 
     def __init__(self):
-        super().__init__(message="Pagination have no more page available!")
+        super().__init__(message="Pagination has no more page available!")
 
 
 class UnauthorizedForResource(APIException):
-    """This error class inherits :class:`APIException`. This error is raise when the client is unauthorized to view certain resource like for example: viewing a protected user's tweets using :meth:`User.fetch_timelines`.
+    """This error class inherits :class:`APIException`. This error is Raise when the client is unauthorized to view certain resource like for example: viewing a protected user's tweets using :meth:`User.fetch_timelines`.
 
     .. versionadded:: 1.5.0
     """
 
     def __init__(self, message):
         super().__init__(message=message)
+
+class ResourceNotFound(APIException):
+    """This error class inherits :class:`APIException`. This error is a result of finding a none existent resource .
+
+    .. versionadded:: 1.0.0
+
+    .. versionchanged:: 1.5.0
+    
+        Changed name from `NotFoundError` to `ResourceNotFound`
+    """
+
+    def __init__(self, message):
+        super().__init__(message=message)
+        
