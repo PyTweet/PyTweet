@@ -389,7 +389,11 @@ class OauthSession:
             "direct_messages",
         ), "Wrong access type passed! must be 'read', 'write', or 'direct_messages')"
         request_tokens = self.generate_request_tokens(access_type)
-        authorize_url = self.http_client.base_url + "oauth/authorize" if not signin_with_twitter else self.http_client.base_url + "oauth/authenticate"
+        authorize_url = (
+            self.http_client.base_url + "oauth/authorize"
+            if not signin_with_twitter
+            else self.http_client.base_url + "oauth/authenticate"
+        )
         return authorize_url + f"?oauth_token={request_tokens.get('oauth_token')}"
 
     def post_oauth_token(self, oauth_token: str, oauth_verifier: str) -> Optional[Tuple[str]]:
