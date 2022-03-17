@@ -339,7 +339,7 @@ class Tweet(Message):
             if self._includes.get("polls"):
                 data = self._includes.get("polls")[0]
                 poll = Poll(
-                    data.get("duration_minutes"),
+                    duration=data.get("duration_minutes"),
                     id=data.get("id"),
                     voting_status=data.get("voting_status"),
                     end_date=data.get("end_datetime"),
