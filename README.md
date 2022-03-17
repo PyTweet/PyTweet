@@ -49,6 +49,8 @@ python3 -m pip install PyTweet
 
 ## Usage
 
+Before using PyTweet you have to setup an application in [here](https://apps.twitter.com), for more comfortable experience you can create an application inside a project. Most endpoints require the client to have read, post and direct_messages app permissions and elevated access type. For more accessibility you can create a dev environment to support events and other premium endpoints. If you have any questions, please open an issue or ask in the official [discord server](https://discord.gg/nxZCE9EbVr)
+
 ```py
 import pytweet
 
@@ -58,9 +60,9 @@ client = pytweet.Client(
     consumer_secret="Your consumer_secret here", 
     access_token="Your access_token here", 
     access_token_secret="Your access_token_secret here",
-) #if you dont have one make an application in https://apps.twitter.com
+) #Before using PyTweet, make sure to create an application in https://apps.twitter.com.
 
-client.tweet("Hello world, Hello twitter!")
+client.tweet("Hello world, Hello twitter!") #This requires a read & post app permissions also elevated access type.
 ```
 
 You can check in `examples` directory for more example code.
