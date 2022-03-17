@@ -7,7 +7,7 @@ import datetime
 
 from random import randint
 from typing import Tuple, Optional, Literal, TYPE_CHECKING
-from requests_oauthlib import OAuth1, OAuth1Session
+from requests_oauthlib import OAuth1
 from .errors import PytweetException
 
 if TYPE_CHECKING:
@@ -186,8 +186,7 @@ class Scope:
             import pytweet
 
             scope = pytweet.Scope(tweet_read=True, tweet_write=True)
-            print(scope.value)
-            #>>> This will returns: tweet.read%20tweet.write
+            print(scope.value) # --> 'tweet.read%20tweet.write'
 
 
         .. versionadded:: 1.5.0
@@ -248,10 +247,6 @@ class OauthSession:
         self.callback_url = callback_url
         self.client_id = client_id
         self.client_secret = client_secret
-        self.oauth1_session = OAuth1Session(
-            self.consumer_key, client_secret=self.consumer_secret, callback_uri=self.callback_url
-        )
-        self.oauth_url = "https://api.twitter.com/oauth"
 
     @property
     def oauth1(self) -> OAuth1:
@@ -327,7 +322,7 @@ class OauthSession:
         .. code-blocks: python
 
             data = oauth_session.generate_request_tokens()
-            print(data) # -> {'oauth_token': 'XXXXXXXXXXXXXXX', 'oauth_token_secret': 'XXXXXXXXXXXXXXX', 'oauth_callback_confirmed': 'true'}
+            print(data) # --> {'oauth_token': 'XXXXXXXXXXXXXXX', 'oauth_token_secret': 'XXXXXXXXXXXXXXX', 'oauth_callback_confirmed': 'true'}
 
 
         Parameters
@@ -345,13 +340,17 @@ class OauthSession:
         """
         try:
             if access_type:
-                url = self.oauth_url + f"/request_token?x_auth_access_type={access_type}"
+                url = f"/request_token?x_auth_access_type={access_type}"
 
             else:
-                url = self.oauth_url + f"/request_token"
+                url = f"/request_token"
 
-            request_tokens = self.oauth1_session.fetch_request_token(url)
-            return request_tokens
+            request_tokens = self.http_client.request("POST", "oauth", url, auth=self.oauth1)
+            data = {}
+            for credential in request_tokens.split("&"):
+                k, v = credential.split("=")
+                data[k] = v
+            return data
         except Exception as e:
             raise e
 
@@ -390,7 +389,7 @@ class OauthSession:
             "direct_messages",
         ), "Wrong access type passed! must be 'read', 'write', or 'direct_messages')"
         request_tokens = self.generate_request_tokens(access_type)
-        authorize_url = self.oauth_url + "/authorize" if not signin_with_twitter else self.oauth_url + "/authenticate"
+        authorize_url = self.http_client.base_url + "oauth/authorize" if not signin_with_twitter else self.http_client.base_url + "oauth/authenticate"
         return authorize_url + f"?oauth_token={request_tokens.get('oauth_token')}"
 
     def post_oauth_token(self, oauth_token: str, oauth_verifier: str) -> Optional[Tuple[str]]:
