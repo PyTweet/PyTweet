@@ -6,13 +6,13 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 from .attachments import Poll, Geo, File
 from .entities import Media
 from .enums import ReplySetting
-from .constants import TWEET_FIELD, USER_FIELD, PINNED_TWEET_EXPANSION
+from .constants import TWEET_EXPANSION, TWEET_FIELD, USER_FIELD, PINNED_TWEET_EXPANSION, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD
 from .metrics import TweetPublicMetrics
 from .relations import RelationHide, RelationLike, RelationRetweet, RelationDelete
 from .user import User
 from .utils import time_parse_todt
 from .message import Message
-from .paginations import UserPagination
+from .paginations import UserPagination, TweetPagination
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -577,7 +577,7 @@ class Tweet(Message):
         return RelationHide(res)
 
     def fetch_retweeters(self) -> Optional[UserPagination]:
-        """Return users that retweeted the tweet.
+        """Returns a pagination object with the users that retweeted the tweet.
 
         Returns
         ---------
@@ -612,7 +612,7 @@ class Tweet(Message):
         )
 
     def fetch_likers(self) -> Optional[UserPagination]:
-        """Return users that liked the tweet.
+        """Returns a pagination object with the users that liked the tweet.
 
         Returns
         ---------
@@ -648,12 +648,12 @@ class Tweet(Message):
         )
 
     def fetch_replied_user(self) -> Optional[User]:
-        """Return the user that you reply with the tweet, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
+        """Returns the replied user, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
 
         Returns
         ---------
         Optional[:class:`User`]
-            This method returns a :class:`User` object or :class:`NoneType`
+            This method returns a :class:`User` object or `None` if the tweet was not a reply tweet.
 
 
         .. versionadded:: 1.1.3
@@ -665,4 +665,37 @@ class Tweet(Message):
             )
             if self._payload.get("in_reply_to_user_id")
             else None
+        )
+
+    def fetch_quoted_tweets(self) -> Optional[TweetPagination]:
+        """Returns a pagination object for tweets that quoted the tweet
+        
+        Returns
+        ---------
+        Optional[:class:`TweetPagination`]
+            This method returns :class:`TweetPagination` or an empty list if the tweet does not contain any quoted tweets.
+
+
+        .. versionadded:: 1.5.0
+        """
+        params = {
+            "expansions": TWEET_EXPANSION,
+            "user.fields": USER_FIELD,
+            "tweet.fields": TWEET_FIELD,
+            "media.fields": MEDIA_FIELD,
+            "place.fields": PLACE_FIELD,
+            "poll.fields": POLL_FIELD,
+            "max_results": 100,
+        }
+        
+        res = self.http_client.request("GET", "2", f"/tweets/{self.id}/quote_tweets", params=params)
+        
+        if not res:
+            return []
+
+        return TweetPagination(
+            res,
+            endpoint_request=f"/tweets/{self.id}/quote_tweets",
+            http_client=self.http_client,
+            params=params,
         )
