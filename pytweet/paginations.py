@@ -160,12 +160,12 @@ class UserPagination(Pagination):
         super().__init__(data, item_type=User, **kwargs)
 
     def next_page(self):
-        """Iterate to the next page.
+        """Change `content` property to the next page's contents..
 
         Raises
         --------
         :class:`NoPageAvailable`
-            Raises when no page available to change.
+            Raises when you reached the end of the pagination.
 
 
         .. versionadded:: 1.5.0
@@ -197,12 +197,12 @@ class UserPagination(Pagination):
             self.pages_cache[len(self.pages_cache) + 1] = {user.id: user for user in self.content}
 
     def previous_page(self):
-        """Iterate to the previous page.
+        """Change `content` property to the previous page's contents..
 
         Raises
         --------
         :class:`NoPageAvailable`
-            Raises when no page available to change.
+            Raises when you reached the end of the pagination.
 
 
         .. versionadded:: 1.5.0
@@ -263,12 +263,12 @@ class TweetPagination(Pagination):
         ]
 
     def next_page(self):
-        """Iterate to the next page.
+        """Change `content` property to the next page's contents..
 
         Raises
         --------
         :class:`NoPageAvailable`
-            Raises when no page available to change.
+            Raises when you reached the end of the pagination.
 
 
         .. versionadded:: 1.5.0
@@ -300,12 +300,12 @@ class TweetPagination(Pagination):
             self.pages_cache[len(self.pages_cache) + 1] = {tweet.id: tweet for tweet in self.content}
 
     def previous_page(self):
-        """Iterate to the previous page.
+        """Change `content` property to the previous page's contents..
 
         Raises
         --------
         :class:`NoPageAvailable`
-            Raises when no page available to change.
+            Raises when you reached the end of the pagination.
 
 
         .. versionadded:: 1.5.0
@@ -365,12 +365,12 @@ class ListPagination(Pagination):
         ]
 
     def next_page(self):
-        """Iterate to the next page.
+        """Change `content` property to the next page's contents..
 
         Raises
         --------
         :class:`NoPageAvailable`
-            Raises when no page available to change.
+            Raises when you reached the end of the pagination.
 
 
         .. versionadded:: 1.5.0
@@ -404,12 +404,12 @@ class ListPagination(Pagination):
             }
 
     def previous_page(self):
-        """Iterate to the previous page.
+        """Change `content` property to the previous page's contents..
 
         Raises
         --------
         :class:`NoPageAvailable`
-            Raises when no page available to change.
+            Raises when you reached the end of the pagination.
 
 
         .. versionadded:: 1.5.0
@@ -460,12 +460,12 @@ class MessagePagination(Pagination):
         super().__init__(data, item_type=DirectMessage, **kwargs)
 
     def next_page(self):
-        """Iterate to the next page.
+        """Change `content` property to the next page's contents..
 
         Raises
         --------
         :class:`NoPageAvailable`
-            Raises when no page available to change.
+            Raises when you reached the end of the pagination.
 
 
         .. versionadded:: 1.5.0
@@ -497,12 +497,12 @@ class MessagePagination(Pagination):
             self.pages_cache[len(self.pages_cache) + 1] = {message.id: message for message in self.content}
 
     def previous_page(self):
-        """Iterate to the previous page.
+        """Change `content` property to the previous page's contents..
 
         Raises
         --------
         :class:`NoPageAvailable`
-            Raises when no page available to change.
+            Raises when you reached the end of the pagination.
 
 
         .. versionadded:: 1.5.0
