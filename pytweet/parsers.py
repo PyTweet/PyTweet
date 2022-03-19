@@ -17,7 +17,7 @@ from .message import Message, DirectMessage
 from .user import User
 from .tweet import Tweet
 from .dataclass import TimezoneInfo, Location, SleepTimeSettings
-from .dataclass import ApplicationInfo
+from .dataclass import ApplicationInfo, EmbedImage
 
 if TYPE_CHECKING:
     from .type import Payload
@@ -50,23 +50,22 @@ class PayloadParser:
         return copy
 
     def parse_tweet_payload(self, payload: Payload):
-        copy = payload.copy()
-        copy["public_metrics"] = {
+        payload["public_metrics"] = {
             "quote_count": payload.get("quote_count"),
             "reply_count": payload.get("reply_count"),
             "retweet_count": payload.get("retweet_count"),
             "like_count": payload.get("favorite_count"),
         }
-        copy["includes"] = {}
-        copy["includes"]["mentions"] = [user.get("screen_name") for user in copy.get("entities").get("user_mentions")]
+        payload["includes"] = {}
+        payload["includes"]["mentions"] = [user.get("screen_name") for user in payload.get("entities").get("user_mentions")]
 
         if "timestamp_ms" in payload.keys():
-            copy["timestamp"] = payload.get("timestamp_ms")
+            payload["timestamp"] = payload.get("timestamp_ms")
 
         if "user" in payload.keys():
-            copy["includes"]["users"] = [self.parse_user_payload(payload.get("user"))]
+            payload["includes"]["users"] = [self.parse_user_payload(payload.get("user"))]
 
-        return copy
+        return payload
 
     def parse_time_zone_payload(self, payload: Payload):
         payload["name_info"] = payload.get("tzinfo_name")
@@ -92,6 +91,11 @@ class PayloadParser:
     def insert_list_owner(self, payload: Payload, owner: User) -> Payload:
         payload["includes"] = {}
         payload["includes"]["users"] = [owner._payload]
+        return payload
+
+    def insert_tweet_author(self, payload: Payload, author: User) -> Payload:
+        payload["includes"] = {}
+        payload["includes"]["users"] = [author._User__original_payload]
         return payload
 
     def insert_pagination_object_author(self, payload: Payload) -> list:
@@ -138,6 +142,12 @@ class PayloadParser:
                     if app.id == int(message_create.get("source_app_id", 0)):
                         message_create["target"]["source_application"] = app
         return data
+
+    def parse_embed_data(self, payload: Payload) -> Payload:
+        payload["status_code"] = payload.get("status") or payload.get("status_code")
+        if payload.get("status"):
+            del payload["status"]
+        return payload
 
 
 class EventParser:
