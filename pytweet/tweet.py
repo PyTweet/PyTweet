@@ -6,7 +6,15 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 from .attachments import Poll, Geo, File
 from .entities import Media
 from .enums import ReplySetting
-from .constants import TWEET_EXPANSION, TWEET_FIELD, USER_FIELD, PINNED_TWEET_EXPANSION, MEDIA_FIELD, PLACE_FIELD, POLL_FIELD
+from .constants import (
+    TWEET_EXPANSION,
+    TWEET_FIELD,
+    USER_FIELD,
+    PINNED_TWEET_EXPANSION,
+    MEDIA_FIELD,
+    PLACE_FIELD,
+    POLL_FIELD,
+)
 from .metrics import TweetPublicMetrics
 from .relations import RelationHide, RelationLike, RelationRetweet, RelationDelete
 from .user import User
@@ -68,7 +76,7 @@ class Tweet(Message):
         self.tweet_metrics = TweetPublicMetrics(self._payload)
         self.http_client = http_client
         self.deleted_timestamp = deleted_timestamp
-        
+
         if self._entities and self._entities.get("urls"):
             data = []
             for raw_data in self._entities["urls"]:
@@ -80,7 +88,7 @@ class Tweet(Message):
             self._embeds = data
         else:
             self._embeds = None
-        
+
         super().__init__(self._payload.get("text"), self._payload.get("id"), 1)
 
     def __repr__(self) -> str:
@@ -195,7 +203,7 @@ class Tweet(Message):
     @property
     def mentions(self) -> Optional[List[User]]:
         """Optional[List[:class:`User`]]: Returns a list of :class:`User` objects that were mentioned in the tweet or an empty list / `[]` if no users were mentioned.
-        
+
         .. versionadded:: 1.1.3
 
         .. versionchanged:: 1.5.0
@@ -255,21 +263,24 @@ class Tweet(Message):
         type = self._referenced_tweets[0].get("type", " ")
         for user in self._includes["users"]:
             if type == "replied_to" and user["id"] == self._payload.get("in_reply_to_user_id", 0):
-                #If the tweet count as a reply tweet,
-                #it would returns a user data that match the user's id with 'in_reply_to_user_id' data.
+                # If the tweet count as a reply tweet,
+                # it would returns a user data that match the user's id with 'in_reply_to_user_id' data.
                 return User(user, http_client=self.http_client)
 
             elif type == "quoted":
-                #If the tweet count as a quote tweet,
-                #it would returns a user data if the url contains the user's id. Every quote tweets have at least 1 url, the quoted tweet's url that contain the quoted tweet's author's id and the tweet id itself. 
+                # If the tweet count as a quote tweet,
+                # it would returns a user data if the url contains the user's id. Every quote tweets have at least 1 url, the quoted tweet's url that contain the quoted tweet's author's id and the tweet id itself.
                 for embed in self.embeds:
-                    if embed.expanded_url.startswith("https://twitter.com/") and embed.expanded_url.split("/")[3] == user["id"]:
+                    if (
+                        embed.expanded_url.startswith("https://twitter.com/")
+                        and embed.expanded_url.split("/")[3] == user["id"]
+                    ):
                         return User(user, http_client=self.http_client)
 
             elif type == "retweeted":
-                #If the tweet count as a retweet,
-                #it would returns a user data if the user are mention with a specific format, that is: 'RT @Mention: {The retweeted tweet's content}' 
-                #The code only checks characters before the colon with the colon includes (i.e 'RT @Mention:'). 
+                # If the tweet count as a retweet,
+                # it would returns a user data if the user are mention with a specific format, that is: 'RT @Mention: {The retweeted tweet's content}'
+                # The code only checks characters before the colon with the colon includes (i.e 'RT @Mention:').
                 for mentioned_user in self.mentions:
                     if self.text.startswith(f"RT {mentioned_user.mention}:"):
                         return mentioned_user
@@ -278,11 +289,11 @@ class Tweet(Message):
     @property
     def reference_tweet(self) -> Optional[Tweet]:
         """Optional[:class:`Tweet`]: Returns the tweet's parent tweet or the  referenced tweet. This can mean the parent tweet of the requested tweet is:
-        
-        A retweeted tweet (The child Tweet is a Retweet), 
+
+        A retweeted tweet (The child Tweet is a Retweet),
         A quoted tweet (The child Tweet is a Retweet with comment, also known as Quoted Tweet),
         A replied tweet (The child Tweet is a reply tweet).
-        
+
         .. versionadded:: 1.5.0
         """
         tweets = self._includes.get("tweets")
@@ -583,7 +594,7 @@ class Tweet(Message):
 
     def fetch_quoted_tweets(self) -> Optional[TweetPagination]:
         """Returns a pagination object for tweets that quoted the tweet
-        
+
         Returns
         ---------
         Optional[:class:`TweetPagination`]
@@ -601,9 +612,9 @@ class Tweet(Message):
             "poll.fields": POLL_FIELD,
             "max_results": 100,
         }
-        
+
         res = self.http_client.request("GET", "2", f"/tweets/{self.id}/quote_tweets", params=params)
-        
+
         if not res:
             return []
 

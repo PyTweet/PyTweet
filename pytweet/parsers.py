@@ -57,7 +57,9 @@ class PayloadParser:
             "like_count": payload.get("favorite_count"),
         }
         payload["includes"] = {}
-        payload["includes"]["mentions"] = [user.get("screen_name") for user in payload.get("entities").get("user_mentions")]
+        payload["includes"]["mentions"] = [
+            user.get("screen_name") for user in payload.get("entities").get("user_mentions")
+        ]
 
         if "timestamp_ms" in payload.keys():
             payload["timestamp"] = payload.get("timestamp_ms")

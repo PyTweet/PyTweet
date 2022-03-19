@@ -1,5 +1,6 @@
-from dataclasses import dataclass 
+from dataclasses import dataclass
 from typing import List, Optional
+
 
 @dataclass
 class EmbedImage:
@@ -11,9 +12,11 @@ class EmbedImage:
 
         Made as a dataclass rather then a standalone class.
     """
+
     url: str
     width: int
     height: int
+
 
 @dataclass
 class Embed:
@@ -21,11 +24,12 @@ class Embed:
 
     .. versionadded: 1.1.3
 
-    
+
     .. versionchanged: 1.5.0
 
         Made as a dataclass rather then a standalone class.
     """
+
     title: Optional[str] = None
     description: Optional[str] = None
     start: Optional[int] = None
