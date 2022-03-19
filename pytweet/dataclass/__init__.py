@@ -6,3 +6,4 @@ from .space import *
 from .stream import *
 from .app import *
 from .compliance import *
+from .embed import *
