@@ -13,155 +13,13 @@ from .user import User
 from .utils import time_parse_todt
 from .message import Message
 from .paginations import UserPagination, TweetPagination
+from .dataclass import Embed, EmbedImage
 
 if TYPE_CHECKING:
     from .http import HTTPClient
     from .type import ID
 
-__all__ = ("EmbedsImages", "Embed", "Tweet")
-
-
-class EmbedsImages:
-    """Represents the tweets embed images.
-
-    .. versionadded: 1.1.3
-    """
-
-    __slots__ = "_payload"
-
-    def __init__(self, data: Dict[str, Any]) -> None:
-        self._payload = data
-
-    def __repr__(self) -> str:
-        return "EmbedsImages(url={0.url} width={0.width} height={0.height})".format(self)
-
-    def __str__(self) -> str:
-        return self.url
-
-    @property
-    def width(self) -> int:
-        """:class:`int`: Return the image's width
-
-        .. versionadded: 1.1.3
-        """
-        return int(self._payload.get("width"))
-
-    @property
-    def height(self) -> int:
-        """:class:`int`: Return the image's height
-
-        .. versionadded: 1.1.3
-        """
-        return int(self._payload.get("height"))
-
-    @property
-    def url(self) -> str:
-        """:class:`str`: Return the image's url
-
-        .. versionadded: 1.1.3
-        """
-        return self._payload.get("url")
-
-
-class Embed:
-    """Represents the embedded urls in a tweet.
-
-    .. versionadded: 1.1.3
-    """
-
-    __slots__ = "_payload"
-
-    def __init__(self, data: Dict[str, Any]):
-        self._payload = data
-
-    def __repr__(self) -> str:
-        return "Embed(title={0.title} description={0.description} url={0.url})".format(self)
-
-    def __str__(self) -> str:
-        return self.url
-
-    @property
-    def title(self) -> str:
-        """:class:`str`: Return the embed's title
-
-        .. versionadded: 1.1.3
-        """
-        return self._payload.get("title")
-
-    @property
-    def description(self) -> str:
-        """:class:`str`: Return the embed's description
-
-        .. versionadded: 1.1.3
-        """
-        return self._payload.get("description")
-
-    @property
-    def start(self) -> int:
-        """:class:`int`: Return the embed's url startpoint start
-
-        .. versionadded: 1.1.3
-        """
-        return int(self._payload.get("start"))
-
-    @property
-    def end(self) -> int:
-        """:class:`int`: Return the embed's url endpoint.
-
-        .. versionadded: 1.1.3
-        """
-        return int(self._payload.get("end"))
-
-    @property
-    def url(self) -> str:
-        """:class:`str`: Return the embed's url
-
-        .. versionadded: 1.1.3
-        """
-        return self._payload.get("url")
-
-    @property
-    def expanded_url(self) -> str:
-        """:class:`str`: Return the expanded url
-
-        .. versionadded: 1.1.3
-        """
-        return self._payload.get("expanded_url")
-
-    @property
-    def display_url(self) -> str:
-        """:class:`str`: Return the display url
-
-        .. versionadded: 1.1.3
-        """
-        return self._payload.get("display_url")
-
-    @property
-    def unwound_url(self) -> str:
-        """:class:`str`: Return the unwound url
-
-        .. versionadded: 1.1.3
-        """
-        return self._payload.get("unwound_url")
-
-    @property
-    def images(self) -> Optional[List[EmbedsImages]]:
-        """List[:class:`EmbedsImages`]: Return a list of Embed's Images
-
-        .. versionadded:: 1.1.3
-        """
-        if self._payload.get("images"):
-            return [EmbedsImages(data) for data in self._payload.get("images")]
-
-        return None
-
-    @property
-    def status_code(self) -> int:
-        """:class:`int`: Return the embed's url HTTP status code
-
-        .. versionadded: 1.1.3
-        """
-        return int(self._payload.get("status"))
+__all__ = ("Tweet",)
 
 
 class Tweet(Message):
@@ -205,9 +63,24 @@ class Tweet(Message):
         self.__original_payload = data
         self._payload = data.get("data") or data
         self._includes = self.__original_payload.get("includes")
+        self._referenced_tweets = self._payload.get("referenced_tweets")
+        self._entities = self._payload.get("entities")
         self.tweet_metrics = TweetPublicMetrics(self._payload)
         self.http_client = http_client
         self.deleted_timestamp = deleted_timestamp
+        
+        if self._entities and self._entities.get("urls"):
+            data = []
+            for raw_data in self._entities["urls"]:
+                new_data = self.http_client.payload_parser.parse_embed_data(raw_data)
+                images = new_data.get("images", [])
+                for num, image in enumerate(images):
+                    raw_data["images"][num] = EmbedImage(**image)
+                data.append(Embed(**new_data))
+            self._embeds = data
+        else:
+            self._embeds = None
+        
         super().__init__(self._payload.get("text"), self._payload.get("id"), 1)
 
     def __repr__(self) -> str:
@@ -320,14 +193,21 @@ class Tweet(Message):
             return None
 
     @property
-    def mentions(self) -> Optional[List[str]]:
-        """Optional[List[:class:`str`]]: Return the mentioned user's username.
-
+    def mentions(self) -> Optional[List[User]]:
+        """Optional[List[:class:`User`]]: Returns a list of :class:`User` objects that were mentioned in the tweet or an empty list / `[]` if no users were mentioned.
+        
         .. versionadded:: 1.1.3
+
+        .. versionchanged:: 1.5.0
+
+            Now returns a list of :class:`User` objects rather then a list of :class:`str` objects.
         """
-        if self._includes and self._includes.get("mentions"):
-            return [user for user in self._includes.get("mentions")]
-        return None
+        users = []
+        for user in self._includes.get("users", {}):
+            for mention in self._entities.get("mentions", {}):
+                if user["id"] == mention["id"]:
+                    users.append(User(user, http_client=self.http_client))
+        return users
 
     @property
     def poll(self) -> Optional[Poll]:
@@ -350,7 +230,7 @@ class Tweet(Message):
         return None
 
     @property
-    def media(self) -> Optional[Media]:
+    def medias(self) -> Optional[Media]:
         """List[:class:`Media`]: Return a list of media(s) in a tweet.
 
         .. versionadded:: 1.1.0
@@ -360,14 +240,68 @@ class Tweet(Message):
         return None
 
     @property
+    def reference_user(self) -> Optional[User]:
+        """Optional[:class:`User`]: Returns the referenced user. This can means:
+
+        The tweet is a retweet, which means the method returns the retweeted tweet's author.
+        The tweet is a quote tweet(retweet with comments), which means the method returns the quoted tweet's author.
+        The tweet is a reply tweet, which means the method returns the replied tweet's author.
+
+        .. versionadded:: 1.5.0
+        """
+        if not self._includes or not self._includes.get("users") or not self._referenced_tweets:
+            return None
+
+        type = self._referenced_tweets[0].get("type", " ")
+        for user in self._includes["users"]:
+            if type == "replied_to" and user["id"] == self._payload.get("in_reply_to_user_id", 0):
+                #If the tweet count as a reply tweet,
+                #it would returns a user data that match the user's id with 'in_reply_to_user_id' data.
+                return User(user, http_client=self.http_client)
+
+            elif type == "quoted":
+                #If the tweet count as a quote tweet,
+                #it would returns a user data if the url contains the user's id. Every quote tweets have at least 1 url, the quoted tweet's url that contain the quoted tweet's author's id and the tweet id itself. 
+                for embed in self.embeds:
+                    if embed.expanded_url.startswith("https://twitter.com/") and embed.expanded_url.split("/")[3] == user["id"]:
+                        return User(user, http_client=self.http_client)
+
+            elif type == "retweeted":
+                #If the tweet count as a retweet,
+                #it would returns a user data if the user are mention with a specific format, that is: 'RT @Mention: {The retweeted tweet's content}' 
+                #The code only checks characters before the colon with the colon includes (i.e 'RT @Mention:'). 
+                for mentioned_user in self.mentions:
+                    if self.text.startswith(f"RT {mentioned_user.mention}:"):
+                        return mentioned_user
+        return None
+
+    @property
+    def reference_tweet(self) -> Optional[Tweet]:
+        """Optional[:class:`Tweet`]: Returns the tweet's parent tweet or the  referenced tweet. This can mean the parent tweet of the requested tweet is:
+        
+        A retweeted tweet (The child Tweet is a Retweet), 
+        A quoted tweet (The child Tweet is a Retweet with comment, also known as Quoted Tweet),
+        A replied tweet (The child Tweet is a reply tweet).
+        
+        .. versionadded:: 1.5.0
+        """
+        tweets = self._includes.get("tweets")
+        if not self._includes or not tweets or not self._referenced_tweets:
+            return None
+
+        for tweet in tweets:
+            if tweet["id"] == self._referenced_tweets[0]["id"]:
+                self.http_client.payload_parser.insert_tweet_author(tweet, self.reference_user)
+                return Tweet(tweet, http_client=self.http_client)
+        return None
+
+    @property
     def embeds(self) -> Optional[List[Embed]]:
-        """List[:class:`Embed`]: Return a list of Embedded url from that tweet
+        """List[:class:`Embed`]: Return a list of Embedded urls from the tweet
 
         .. versionadded:: 1.1.3
         """
-        if self._payload.get("entities") and self._payload.get("entities").get("urls"):
-            return [Embed(url) for url in self._payload.get("entities").get("urls")]
-        return None
+        return self._embeds
 
     @property
     def like_count(self) -> int:
@@ -645,26 +579,6 @@ class Tweet(Message):
                 "user.fields": USER_FIELD,
                 "tweet.fields": TWEET_FIELD,
             },
-        )
-
-    def fetch_replied_user(self) -> Optional[User]:
-        """Returns the replied user, a tweet count as reply tweet if the tweet startswith @Username or mention a user.
-
-        Returns
-        ---------
-        Optional[:class:`User`]
-            This method returns a :class:`User` object or `None` if the tweet was not a reply tweet.
-
-
-        .. versionadded:: 1.1.3
-        """
-        return (
-            self.http_client.fetch_user(
-                int(self._payload.get("in_reply_to_user_id")),
-                http_client=self.http_client,
-            )
-            if self._payload.get("in_reply_to_user_id")
-            else None
         )
 
     def fetch_quoted_tweets(self) -> Optional[TweetPagination]:
