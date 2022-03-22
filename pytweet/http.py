@@ -892,8 +892,10 @@ class HTTPClient:
 
         if reply_tweet:
             payload["reply"] = {}
-            payload["reply"]["in_reply_to_tweet_id"] = str(reply_tweet.id) if isinstance(reply_tweet, Tweet) else str(reply_tweet)
-            
+            payload["reply"]["in_reply_to_tweet_id"] = (
+                str(reply_tweet.id) if isinstance(reply_tweet, Tweet) else str(reply_tweet)
+            )
+
         if quote_tweet:
             payload["quote_tweet_id"] = str(quote_tweet.id) if isinstance(quote_tweet, Tweet) else str(quote_tweet)
 
