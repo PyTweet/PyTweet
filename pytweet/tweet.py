@@ -76,20 +76,17 @@ class Tweet(Message):
         self.tweet_metrics = TweetPublicMetrics(self._payload)
         self.http_client = http_client
         self.deleted_timestamp = deleted_timestamp
-
+        super().__init__(self._payload.get("text"), self._payload.get("id"), 1)
+        
         if self._entities and self._entities.get("urls"):
             data = []
-            for raw_data in self._entities["urls"]:
-                new_data = self.http_client.payload_parser.parse_embed_data(raw_data)
-                images = new_data.get("images", [])
-                for num, image in enumerate(images):
-                    raw_data["images"][num] = EmbedImage(**image)
-                data.append(Embed(**new_data))
+            for url in self._entities["urls"]:
+                url = self.http_client.payload_parser.parse_embed_data(url)
+                data.append(url)
             self._embeds = data
         else:
             self._embeds = None
-
-        super().__init__(self._payload.get("text"), self._payload.get("id"), 1)
+                        
 
     def __repr__(self) -> str:
         return "Tweet(text={0.text} id={0.id} author={0.author!r})".format(self)
@@ -312,7 +309,11 @@ class Tweet(Message):
 
         .. versionadded:: 1.1.3
         """
-        return self._embeds
+        for embed in self._embeds:
+            if embed.get("images"):
+                for index, image in enumerate(embed["images"]):
+                    embed["images"][index] = EmbedImage(**image)
+        return Embed(**self._embeds)
 
     @property
     def like_count(self) -> int:
