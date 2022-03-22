@@ -139,9 +139,6 @@ class HTTPClient:
     def oauth_session(self) -> OauthSession:
         return self._auth
 
-    def generate_thread_session(self):
-        return "".join((random.sample(string.ascii_lowercase, 10)))
-
     def dispatch(self, event_name: str, *args: Any, **kwargs: Any) -> Any:
         event = self.events.get(event_name)
         if not event:
@@ -895,10 +892,8 @@ class HTTPClient:
 
         if reply_tweet:
             payload["reply"] = {}
-            payload["reply"]["in_reply_to_tweet_id"] = (
-                reply_tweet.id if isinstance(reply_tweet, Tweet) else str(reply_tweet)
-            )
-
+            payload["reply"]["in_reply_to_tweet_id"] = str(reply_tweet.id) if isinstance(reply_tweet, Tweet) else str(reply_tweet)
+            
         if quote_tweet:
             payload["quote_tweet_id"] = str(quote_tweet.id) if isinstance(quote_tweet, Tweet) else str(quote_tweet)
 
