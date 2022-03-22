@@ -77,7 +77,7 @@ class Tweet(Message):
         self.http_client = http_client
         self.deleted_timestamp = deleted_timestamp
         super().__init__(self._payload.get("text"), self._payload.get("id"), 1)
-        
+
         if self._entities and self._entities.get("urls"):
             data = []
             for url in self._entities["urls"]:
@@ -86,7 +86,6 @@ class Tweet(Message):
             self._embeds = data
         else:
             self._embeds = None
-                        
 
     def __repr__(self) -> str:
         return "Tweet(text={0.text} id={0.id} author={0.author!r})".format(self)
