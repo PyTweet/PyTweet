@@ -900,7 +900,7 @@ class HTTPClient:
             )
 
         if quote_tweet:
-            payload["quote_tweet_id"] = quote_tweet.id if isinstance(quote_tweet, Tweet) else str(quote_tweet)
+            payload["quote_tweet_id"] = str(quote_tweet.id) if isinstance(quote_tweet, Tweet) else str(quote_tweet)
 
         if exclude_reply_users:
             ids = [str(user.id) if isinstance(user, User) else str(user) for user in exclude_reply_users]
