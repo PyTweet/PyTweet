@@ -26,8 +26,8 @@ sys.path.append(os.path.abspath("ext"))
 # -- Project information -----------------------------------------------------
 
 project = "PyTweet"
-copyright = "2021-present, TheGenocide, TheFarGG"
-author = "TheGenocide & TheFarGG"
+copyright = "2021-present, TheGenocide, UnrealFar"
+author = "TheGenocide & UnrealFar"
 
 
 # -- General configuration ---------------------------------------------------
@@ -51,8 +51,8 @@ autodoc_typehints = "none"
 autodoc_inherit_docstrings = False
 
 extlinks = {
-    "issue": ("https://github.com/TheFarGG/PyTweet/issues/%s", ""),
-    "gh": ("https://github.com/TheFarGG/PyTweet/%s", ""),
+    "issue": ("https://github.com/UnrealFar/PyTweet/issues/%s", ""),
+    "gh": ("https://github.com/UnrealFar/PyTweet/%s", ""),
     "discord": ("https://discord.com/invite/XHBhg6A4jJ/%s", ""),
 }
 

@@ -88,7 +88,7 @@ All files of this repo are protected and licensed with the [MIT License](https:/
 ```
 The MIT License (MIT)
 
-Copyright (c) 2021-present TheFarGG & TheGenocides
+Copyright (c) 2021-present UnrealFar & TheGenocides
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

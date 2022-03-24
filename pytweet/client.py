@@ -121,13 +121,16 @@ class Client:
         return "Client({0.account!r})".format(self)
 
     def account(self, *, update: bool = False) -> Optional[ClientAccount]:
-        """An alias to :meth:`Client.account`.
+        """Returns :class:`ClientAccount` object which hold the client's informations as a twitter user.
 
         Parameters
         ------------
-        update: :class:`bool`
-            Indicates to update the client's account information, setting update to True would make a request to the api and returns a new and updated data everytime. If sets to False, it will either make a request (if used the first time) or use the previous data stored in an instance variable.
+        .. versionchanged:: 1.5.0
 
+            update: :class:`bool`
+                Indicates to update the client's account information, setting update to True would make a request to the api and returns a new and updated data everytime. If sets to False, it will either make a request (if used the first time) or use the previous data stored in an instance variable.
+
+        
         Returns
         ---------
         Optional[:class:`ClientAccount`]
@@ -135,12 +138,6 @@ class Client:
 
 
         .. versionadded:: 1.2.0
-
-
-        .. versionchanged:: 1.5.0
-
-
-            Added an update argument and made as a function rather then a property.
         """
         account_user = self._account_user
         if account_user is None or update:
@@ -154,9 +151,12 @@ class Client:
 
         Parameters
         ------------
-        update: :class:`bool`
-            Indicates to update the client's account information, setting update to True would make a request to the api and returns a new and updated data everytime. If sets to False, it will either make a request (if used the first time) or use the previous data stored in an instance variable.
+        .. versionchanged:: 1.5.0
 
+            update: :class:`bool`
+                Indicates to update the client's account information, setting update to True would make a request to the api and returns a new and updated data everytime. If sets to False, it will either make a request (if used the first time) or use the previous data stored in an instance variable.
+
+        
         Returns
         ---------
         Optional[:class:`ClientAccount`]
@@ -164,12 +164,6 @@ class Client:
 
 
         .. versionadded:: 1.2.0
-
-
-        .. versionchanged:: 1.5.0
-
-
-            Added an update argument and made as a function rather then a property.
         """
         return self.account(update=update)
 
@@ -1091,7 +1085,7 @@ class Client:
             if not self.webhook and not ngrok:
                 self.webhook_url_path = urlparse(url).path
 
-            elif self.webhook and ngrok:
+            elif not self.webhook and ngrok:
                 ...  # TODO add ngrok support
 
             @app.route(self.webhook_url_path, methods=["POST", "GET"])

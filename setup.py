@@ -43,8 +43,8 @@ classifiers = [
 
 setup(
     name="PyTweet",
-    author="TheGenocide & TheFarGG",
-    maintainer=", ".join(("TheFarGG", "TheGenocide")),
+    author="TheGenocide & UnrealFar",
+    maintainer=", ".join(("UnrealFar", "TheGenocide")),
     url="https://github.com/PyTweet/PyTweet/",
     version=version,
     packages=["pytweet", "pytweet.dataclass", "pytweet.threads"],
