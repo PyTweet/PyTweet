@@ -318,7 +318,7 @@ class HTTPClient:
 
     def upload(self, file: File, command: str):
         assert command.upper() in ("INIT", "APPEND", "FINALIZE", "STATUS")
-        thread_session = self.payload_parser.generate_thread_session()
+        thread_session = self.thread_manager.generate_thread_session()
 
         def check_status(processing_info, media_id):
             if not processing_info:
@@ -783,7 +783,7 @@ class HTTPClient:
         quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
     ) -> Optional[NoReturn]:
-        thread_session = self.payload_parser.generate_thread_session()
+        thread_session = self.thread_manager.generate_thread_session()
         data = {
             "event": {
                 "type": "message_create",
@@ -855,7 +855,7 @@ class HTTPClient:
         media_tagged_users: Optional[List[User, ID]] = None,
         super_followers_only: bool = False,
     ) -> Optional[Tweet]:
-        thread_session = self.payload_parser.generate_thread_session()
+        thread_session = self.thread_manager.generate_thread_session()
         executor = self.thread_manager.create_new_executor(thread_name="post-tweet-request", session_id=thread_session)
 
         payload = {}
@@ -988,7 +988,7 @@ class HTTPClient:
         quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
     ) -> Optional[WelcomeMessage]:
-        thread_session = self.payload_parser.generate_thread_session()
+        thread_session = self.thread_manager.generate_thread_session()
         executor = self.thread_manager.create_new_executor(
             thread_name="create-welcome-message-file-request", session_id=thread_session
         )
@@ -1043,7 +1043,7 @@ class HTTPClient:
         quick_reply: Optional[QuickReply] = None,
         cta: Optional[CTA] = None,
     ):
-        thread_session = self.payload_parser.generate_thread_session()
+        thread_session = self.thread_manager.generate_thread_session()
         executor = self.thread_manager.create_new_executor(
             thread_name="update-welcome-message-file-request", session_id=thread_session
         )
