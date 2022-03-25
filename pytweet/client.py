@@ -130,7 +130,7 @@ class Client:
             update: :class:`bool`
                 Indicates to update the client's account information, setting update to True would make a request to the api and returns a new and updated data everytime. If sets to False, it will either make a request (if used the first time) or use the previous data stored in an instance variable.
 
-        
+
         Returns
         ---------
         Optional[:class:`ClientAccount`]
@@ -156,7 +156,7 @@ class Client:
             update: :class:`bool`
                 Indicates to update the client's account information, setting update to True would make a request to the api and returns a new and updated data everytime. If sets to False, it will either make a request (if used the first time) or use the previous data stored in an instance variable.
 
-        
+
         Returns
         ---------
         Optional[:class:`ClientAccount`]

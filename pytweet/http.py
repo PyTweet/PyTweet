@@ -301,7 +301,10 @@ class HTTPClient:
                     if error["type"] == "https://api.twitter.com/2/problems/not-authorized-for-resource":
                         if not error["parameter"] == "pinned_tweet_id":
                             raise UnauthorizedForResource(error["detail"])
-                    elif error["type"] == "https://api.twitter.com/2/problems/resource-not-found" and res.get("data", None) is None:
+                    elif (
+                        error["type"] == "https://api.twitter.com/2/problems/resource-not-found"
+                        and res.get("data", None) is None
+                    ):
                         raise ResourceNotFound(error["detail"])
 
                 if "meta" in res.keys():
