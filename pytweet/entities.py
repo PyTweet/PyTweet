@@ -1,64 +1,13 @@
-from typing import Any, Dict, Optional, Tuple
+from __future__ import annotations
+
+from typing import Any, Dict, Optional, Tuple, TYPE_CHECKING
 
 from .enums import MediaType
+from .dataclass import NonPublicMediaMetrics, OrganicMediaMetrics, PromotedMediaMetrics
+from .utils import convert
 
-
-class Media:
-    """Represents a media attachment in a message."""
-
-    __slots__ = (
-        "_payload",
-        "_url",
-        "_preview_image_url",
-        "_media_key",
-        "_type",
-        "_width",
-        "_height",
-    )
-
-    def __init__(self, data: Dict[str, Any]):
-        self._payload = data
-        self._url = self._payload.get("url")
-        self._preview_image_url = self._payload.get("preview_image_url")
-        self._media_key = self._payload.get("media_key")
-        self._type = MediaType(self._payload.get("type"))
-        self._width, self._height = self._payload.get("width"), self._payload.get("height")
-
-    @property
-    def url(self) -> str:
-        """:class:`str`: Returns the image's url, this method is only available if the media type is :class:`MediaType.photo`. If the media type is :class:`MediaType.video` consider using :class:`Media.preview_image_url`."""
-        return self._url
-
-    @property
-    def preview_image_url(self) -> str:
-        """:class:`str`: Returns the video's preview image url, This is only available when the media type is a :class:`MediaType.video` which is for video only."""
-        return self._preview_image_url
-
-    @property
-    def key(self) -> str:
-        """:class:`str`: Returns the media's key"""
-        return self._media_key
-
-    @property
-    def type(self) -> MediaType:
-        """:class:`str`: Returns the image's type in a :meth:`MediaType` object."""
-        return self._type
-
-    @property
-    def width(self) -> Optional[int]:
-        """Optional[:class:`int`]: Returns the image's width"""
-        try:
-            return int(self._width)
-        except (ValueError, TypeError):
-            return self._width
-
-    @property
-    def height(self) -> Optional[int]:
-        """Optional[:class:`int`]: Returns the image's height"""
-        try:
-            return int(self._height)
-        except (ValueError, TypeError):
-            return self._height
+if TYPE_CHECKING:
+    from .http import HTTPClient
 
 
 class Hashtag:
@@ -66,7 +15,7 @@ class Hashtag:
 
     __slots__ = ("_payload", "_text", "_startpoint", "_endpoint")
 
-    def __init__(self, data=Dict[str, Any]):
+    def __init__(self, data: Dict[str, Any]):
         self._payload = data
         self._text: Optional[str] = self._payload.get("text")
         self._startpoint, self._endpoint = self._payload.get("indices")
@@ -87,7 +36,7 @@ class UserMention:
 
     __slots__ = ("_payload", "_name", "_screen_name", "_id", "_startpoint", "_endpoint")
 
-    def __init__(self, data=Dict[str, Any]):
+    def __init__(self, data: Dict[str, Any]):
         self._payload: Dict[str, Any] = data
         self._name: str = self._payload.get("name")
         self._screen_name: str = self._payload.get("screen_name")
@@ -127,7 +76,7 @@ class Url:
         "_endpoint",
     )
 
-    def __init__(self, data=Dict[str, Any]):
+    def __init__(self, data: Dict[str, Any]):
         self._payload: Dict[str, Any] = data
         self._url: str = self._payload.get("url")
         self._display_url: str = self._payload.get("display_url")
