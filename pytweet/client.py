@@ -239,7 +239,7 @@ class Client:
         """
         return self.http.fetch_user_by_username(username)
 
-    def fetch_tweet(self, tweet_id: ID) -> Tweet:
+    def fetch_tweet(self, tweet_id: ID, *, organic_metrics: bool = False, promoted_metrics: bool = False) -> Tweet:
         """Fetches a tweet.
 
         .. warning::
@@ -249,6 +249,32 @@ class Client:
         ------------
         tweet_id: :class:`ID`
             Represents the tweet ID that you wish to get info with.
+        organic_metrics: :class:`bool`
+            Whether to return an organic metrics data. Grouping of public and non-public metrics attributed to an organic context (posted and viewed in a regular manner). Requires OAuth 1.0a User Context authentication.
+
+            versionadded:: 1.5.0
+
+        promoted_metrics: :class:`bool`
+            Whether to return a promoted metrics data. Grouping of public and non-public metrics attributed to a promoted context (posted or viewed as part of an Ads campaign).
+
+            Requires OAuth 1.0a User Context authentication and that the Tweet was promoted in an Ad. Promoted metrics are not included in these counts when a Twitter user is using their own Ads account to promote another Twitter user's Tweets.
+
+            Promoted metrics are included in these counts when:
+            * a Twitter user promotes their own Tweets.
+            * in an Ads account for a specific handle, the admin for that account may add another Twitter user as an account user so this second account user can promote Tweets for the handle
+
+            versionadded:: 1.5.0
+
+        Raises
+        --------
+        :class:`ResourceNotFound`
+            The tweet was not found
+
+        :class:`DisallowedResource:`
+            Examples of why this error raises are:
+            * If the tweet is older than 30 days and you fetch it with `organic_metrics` parameter.
+            * When you set promoted_metrics to True but the tweet has not been promoted.
+
 
         Returns
         ---------
@@ -258,7 +284,7 @@ class Client:
 
         .. versionadded:: 1.0.0
         """
-        return self.http.fetch_tweet(tweet_id)
+        return self.http.fetch_tweet(tweet_id, organic_metrics=organic_metrics, promoted_metrics=promoted_metrics)
 
     def fetch_direct_message(self, event_id: ID) -> DirectMessage:
         """Fetches a direct message.
