@@ -195,6 +195,7 @@ class ResourceNotFound(APIException):
     def __init__(self, message):
         super().__init__(message=message)
 
+
 class DisallowedResource(APIException):
     """This error class inherits :class:`APIException`. This error is a result of finding a none existent resource .
 
