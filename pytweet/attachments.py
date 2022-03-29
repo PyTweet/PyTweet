@@ -3,37 +3,134 @@ from __future__ import annotations
 import datetime
 import io
 import os
-from typing import Any, Dict, List, NoReturn, Optional, Union, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
 
 from .dataclass import PollOption, Option, Button
-from .entities import Media
-from .enums import ButtonType
-from .utils import time_parse_todt
+from .enums import ButtonType, MediaType
+from .utils import time_parse_todt, guess_mimetype, convert
 from .errors import PytweetException
 from .constants import LANGUAGES_CODES
 from .objects import Comparable
+from .dataclass import NonPublicMediaMetrics, OrganicMediaMetrics, PromotedMediaMetrics
 
 if TYPE_CHECKING:
     from .type import ID
+    from .http import HTTPClient
 
 __all__ = ("Poll", "QuickReply", "Geo", "CTA", "File", "SubFile")
 
 
-def guess_mimetype(byts: bytes):
-    if byts[6:10] == b"\x1a\n\x00\x00":
-        return "image/png"
+class Media:
+    """Represents a media attachment in a message.
 
-    elif byts[6:10] == b"JFIF":
-        return "image/jpeg"
+    Note that this object is different than :class:`File`. While you need :class:`File` to send attachment (this includes .png, .jpeg, .gif and .mp4) to a message, Media is like the final result of that File (after you initialize it through upload endpoints).
 
-    elif byts[6:10] == b"ypis":
-        return "video/mp4"
 
-    elif byts.startswith((b"\x47\x49\x46\x38\x37\x61", b"\x47\x49\x46\x38\x39\x61")):
-        return "image/gif"
+    """
 
-    else:
-        return "text/plain"
+    __slots__ = (
+        "http_client",
+        "_payload",
+        "_url",
+        "_preview_image_url",
+        "_media_key",
+        "_type",
+        "_width",
+        "_height",
+        "_public_metrics",
+        "_non_public_metrics",
+        "_organic_metrics",
+        "_promoted_metrics",
+    )
+
+    def __init__(self, data: Dict[str, Any], *, http_client: HTTPClient):
+        self.http_client = http_client
+        self._payload = data
+        self._url = self._payload.get("url")
+        self._preview_image_url = self._payload.get("preview_image_url")
+        self._media_key = self._payload.get("media_key")
+        self._type = MediaType(self._payload.get("type"))
+        self._width, self._height = self._payload.get("width"), self._payload.get("height")
+        self._public_metrics = self._payload.get("public_metrics")
+        self._non_public_metrics = self._payload.get("non_public_metrics")
+        self._organic_metrics = self._payload.get("organic_metrics")
+        self._promoted_metrics = self._payload.get("promoted_metrics")
+
+        if self._non_public_metrics:
+            non_public_metrics = self.http_client.payload_parser.parse_metric_data(self._non_public_metrics)
+            self._non_public_metrics = NonPublicMediaMetrics(**non_public_metrics)
+
+        if self._organic_metrics:
+            organic_metrics = self.http_client.payload_parser.parse_metric_data(self._organic_metrics)
+            self._organic_metrics = OrganicMediaMetrics(**organic_metrics)
+
+        if self._promoted_metrics:
+            promoted_metrics = self.http_client.payload_parser.parse_metric_data(self._promoted_metrics)
+            self._promoted_metrics = PromotedMediaMetrics(**promoted_metrics)
+
+    @property
+    def url(self) -> str:
+        """:class:`str`: Returns the image's url, this method is only available if the media type is :class:`MediaType.photo`. If the media type is :class:`MediaType.video` consider using :class:`Media.preview_image_url`."""
+        return self._url
+
+    @property
+    def preview_image_url(self) -> str:
+        """:class:`str`: Returns the video's preview image url, This is only available when the media type is a :class:`MediaType.video` which is for video only."""
+        return self._preview_image_url
+
+    @property
+    def key(self) -> str:
+        """:class:`str`: Returns the media's key"""
+        return self._media_key
+
+    @property
+    def type(self) -> MediaType:
+        """:class:`str`: Returns the image's type in a :meth:`MediaType` object."""
+        return self._type
+
+    @property
+    def width(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the image's width"""
+        return convert(self._width, int)
+
+    @property
+    def height(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the image's height"""
+        return convert(self._height, int)
+
+    @property
+    def view_count(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the media's `view_count` if the media count as a `video` type.
+
+        .. versionadded:: 1.5.0
+        """
+        if not self._public_metrics:
+            return None
+        return convert(self._public_metrics["view_count"], int)
+
+    @property
+    def non_public_metrics(self) -> Optional[NonPublicMediaMetrics]:
+        """Optional[:class:`NonPublicMediaMetrics`]: The media's metrics that are not available for anyone to view on Twitter, such as `video view quartiles`.
+
+        .. versionadded:: 1.5.0
+        """
+        return self._non_public_metrics
+
+    @property
+    def organic_metrics(self) -> Optional[OrganicMediaMetrics]:
+        """Optional[:class:`OrganicMediaMetrics`]: The media's metrics in organic context (posted and viewed in a regular manner), such as `video view quartiles`.
+
+        .. versionadded:: 1.5.0
+        """
+        return self._organic_metrics
+
+    @property
+    def promoted_metrics(self) -> Optional[PromotedMediaMetrics]:
+        """Optional[:class:`PromotedMediaMetrics`]: The tweet's metrics in promoted context (posted or viewed as part of an Ads campaign), such as `video view quartiles`.
+
+        .. versionadded:: 1.5.0
+        """
+        return self._promoted_metrics
 
 
 class Poll(Comparable):
