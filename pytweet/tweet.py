@@ -344,8 +344,10 @@ class Tweet(Message):
         for embed in self._embeds:
             if embed.get("images"):
                 for index, image in enumerate(embed["images"]):
+                    if isinstance(image, EmbedImage):
+                        break
                     embed["images"][index] = EmbedImage(**image)
-        return Embed(**self._embeds)
+        return [Embed(**data) for data in self._embeds]
 
     @property
     def like_count(self) -> Optional[int]:
