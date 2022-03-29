@@ -7,11 +7,13 @@ from dateutil import parser
 if TYPE_CHECKING:
     from .type import ID
 
+
 def convert(o: object, annotations: Any):
     try:
         return annotations(o)
     except (ValueError, TypeError):
         return object
+
 
 def guess_mimetype(byts: bytes):
     if byts[6:10] == b"\x1a\n\x00\x00":
@@ -28,6 +30,7 @@ def guess_mimetype(byts: bytes):
 
     else:
         return "text/plain"
+
 
 def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
     """Parse time return from twitter to datetime object!
