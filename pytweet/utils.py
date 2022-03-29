@@ -7,6 +7,27 @@ from dateutil import parser
 if TYPE_CHECKING:
     from .type import ID
 
+def convert(o: object, annotations: Any):
+    try:
+        return annotations(o)
+    except (ValueError, TypeError):
+        return object
+
+def guess_mimetype(byts: bytes):
+    if byts[6:10] == b"\x1a\n\x00\x00":
+        return "image/png"
+
+    elif byts[6:10] == b"JFIF":
+        return "image/jpeg"
+
+    elif byts[6:10] == b"ypis":
+        return "video/mp4"
+
+    elif byts.startswith((b"\x47\x49\x46\x38\x37\x61", b"\x47\x49\x46\x38\x39\x61")):
+        return "image/gif"
+
+    else:
+        return "text/plain"
 
 def time_parse_todt(date: Optional[Any]) -> datetime.datetime:
     """Parse time return from twitter to datetime object!
