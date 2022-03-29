@@ -15,9 +15,8 @@ from .constants import (
     USER_FIELD,
     LIST_FIELD,
 )
-from .metrics import UserPublicMetrics
 from .relations import RelationFollow
-from .utils import time_parse_todt
+from .utils import time_parse_todt, convert
 from .dataclass import UserSettings, Location
 from .paginations import UserPagination, TweetPagination, ListPagination
 from .list import List as TwitterList
@@ -60,7 +59,7 @@ class User(Comparable):
         "_includes",
         "_payload",
         "http_client",
-        "_metrics",
+        "_public_metrics",
     )
 
     def __init__(self, data: Dict[str, Any], http_client: Optional[HTTPClient] = None) -> None:
@@ -68,7 +67,9 @@ class User(Comparable):
         self._includes = self.__original_payload.get("includes")
         self._payload = self.__original_payload.get("data") or self.__original_payload
         self.http_client = http_client
-        self._metrics = UserPublicMetrics(self._payload) or self.__original_payload
+        self._public_metrics = self._payload.get("public_metrics", None) or self.__original_payload.get(
+            "public_metrics"
+        )
         super().__init__(self.id)
 
     def __str__(self) -> str:
@@ -210,36 +211,36 @@ class User(Comparable):
             return time_parse_todt(self._payload.get("created_at"))
 
     @property
-    def follower_count(self) -> int:
-        """:class:`int`: Return total of followers that a user has.
+    def follower_count(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns total of followers that the user has.
 
         .. versionadded: 1.1.0
         """
-        return self._metrics.follower_count
+        return convert(self._public_metrics.get("follower_count"), int)
 
     @property
-    def following_count(self) -> int:
-        """:class:`int`: Return total of following that a user has.
+    def following_count(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns total of following that the user has.
 
         .. versionadded: 1.1.0
         """
-        return self._metrics.following_count
+        return convert(self._public_metrics.get("following_count"), int)
 
     @property
-    def tweet_count(self) -> int:
-        """:class:`int`: Return total of tweet that a user has.
+    def tweet_count(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns total of tweet that the user has.
 
         .. versionadded: 1.1.0
         """
-        return self._metrics.tweet_count
+        return convert(self._public_metrics.get("tweet_count"), int)
 
     @property
-    def listed_count(self) -> int:
-        """:class:`int`: Return total of listed that a user has.
+    def listed_count(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns total of listed that the user has.
 
         .. versionadded: 1.1.0
         """
-        return self._metrics.listed_count
+        return convert(self._public_metrics.get("listed_count"), int)
 
     def send(
         self,
@@ -717,7 +718,7 @@ class User(Comparable):
             return None
 
         for data in res["data"]:
-            self.http_client.payload_parser.insert_list_owner(data, self)
+            self.http_client.payload_parser.insert_object_author(data, self)
 
         return [TwitterList(data, http_client=self.http_client) for data in res["data"]]
 
