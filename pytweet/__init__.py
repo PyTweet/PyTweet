@@ -24,10 +24,9 @@ from .constants import *
 from .http import *
 from .list import *
 from .message import *
-from .metrics import *
 from .objects import *
 from .paginations import *
-from .parsers import *
+from .parser import *
 from .relations import *
 from .space import *
 from .stream import *
