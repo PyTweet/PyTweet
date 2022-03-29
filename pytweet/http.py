@@ -5,8 +5,6 @@ import logging
 import sys
 import time
 import requests
-import random
-import string
 from json import JSONDecodeError
 from typing import Any, List, NoReturn, Optional, Union, TYPE_CHECKING
 
@@ -24,6 +22,7 @@ from .errors import (
     FieldsTooLarge,
     UnauthorizedForResource,
     ResourceNotFound,
+    DisallowedResource,
 )
 from .constants import (
     TWEET_EXPANSION,
@@ -36,12 +35,15 @@ from .constants import (
     SPACE_FIELD,
     COMPLETE_SPACE_FIELD,
     TWEET_FIELD,
+    COMPLETE_TWEET_FIELD,
+    TWEET_FIELD_WITH_ORGANIC_METRICS,
+    TWEET_FIELD_WITH_PROMOTED_METRICS,
     USER_FIELD,
     TOPIC_FIELD,
     LIST_FIELD,
 )
 from .message import DirectMessage, WelcomeMessage, WelcomeMessageRule
-from .parsers import EventParser
+from .parser import EventParser
 from .space import Space
 from .tweet import Tweet
 from .user import User, ClientAccount
@@ -307,6 +309,9 @@ class HTTPClient:
                     ):
                         raise ResourceNotFound(error["detail"])
 
+                    elif error["type"] == "https://api.twitter.com/2/problems/disallowed-resource":
+                        raise DisallowedResource(error["detail"])
+
                 if "meta" in res.keys():
                     try:
                         if res["meta"]["result_count"] == 0:
@@ -562,13 +567,23 @@ class HTTPClient:
         self.user_cache[user.id] = user
         return user
 
-    def fetch_tweet(self, tweet_id: ID) -> Optional[Tweet]:
+    def fetch_tweet(
+        self, tweet_id: ID, *, organic_metrics: bool = False, promoted_metrics: bool = False
+    ) -> Optional[Tweet]:
+        field = TWEET_FIELD
+        if organic_metrics and promoted_metrics:
+            field = COMPLETE_TWEET_FIELD
+        elif organic_metrics:
+            field = TWEET_FIELD_WITH_ORGANIC_METRICS
+        elif promoted_metrics:
+            field = TWEET_FIELD_WITH_PROMOTED_METRICS
+
         res = self.request(
             "GET",
             "2",
             f"/tweets/{tweet_id}",
             params={
-                "tweet.fields": TWEET_FIELD,
+                "tweet.fields": field,
                 "user.fields": USER_FIELD,
                 "expansions": TWEET_EXPANSION,
                 "media.fields": MEDIA_FIELD,
