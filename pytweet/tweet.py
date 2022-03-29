@@ -3,8 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from .attachments import Poll, Geo, File
-from .entities import Media
+from .attachments import Poll, Geo, File, Media
 from .enums import ReplySetting
 from .constants import (
     TWEET_EXPANSION,
@@ -15,13 +14,19 @@ from .constants import (
     PLACE_FIELD,
     POLL_FIELD,
 )
-from .metrics import TweetPublicMetrics
 from .relations import RelationHide, RelationLike, RelationRetweet, RelationDelete
 from .user import User
-from .utils import time_parse_todt
+from .utils import time_parse_todt, convert
 from .message import Message
 from .paginations import UserPagination, TweetPagination
-from .dataclass import Embed, EmbedImage
+from .dataclass import (
+    Embed,
+    EmbedImage,
+    PublicTweetMetrics,
+    NonPublicTweetMetrics,
+    OrganicTweetMetrics,
+    PromotedTweetMetrics,
+)
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -59,6 +64,10 @@ class Tweet(Message):
         "tweet_metrics",
         "http_client",
         "deleted_timestamp",
+        "_public_metrics",
+        "_non_public_metrics",
+        "_organic_metrics",
+        "_promoted_metrics",
     )
 
     def __init__(
@@ -73,10 +82,31 @@ class Tweet(Message):
         self._includes = self.__original_payload.get("includes")
         self._referenced_tweets = self._payload.get("referenced_tweets")
         self._entities = self._payload.get("entities")
-        self.tweet_metrics = TweetPublicMetrics(self._payload)
         self.http_client = http_client
         self.deleted_timestamp = deleted_timestamp
-        super().__init__(self._payload.get("text"), self._payload.get("id"), 1)
+        self._public_metrics = PublicTweetMetrics(
+            **self._payload.get("public_metrics", None) or self.__original_payload.get("public_metrics")
+        )
+        self._non_public_metrics = self._payload.get("non_public_metrics", None) or self.__original_payload.get(
+            "non_public_metrics"
+        )
+        self._organic_metrics = self._payload.get("organic_metrics", None) or self.__original_payload.get(
+            "organic_metrics"
+        )
+        self._promoted_metrics = self._payload.get("promoted_metrics", None) or self.__original_payload.get(
+            "promoted_metrics"
+        )
+        if self._non_public_metrics:
+            non_public_metrics = self.http_client.payload_parser.parse_metric_data(self._non_public_metrics)
+            self._non_public_metrics = NonPublicTweetMetrics(**non_public_metrics)
+
+        if self._organic_metrics:
+            organic_metrics = self.http_client.payload_parser.parse_metric_data(self._organic_metrics)
+            self._organic_metrics = OrganicTweetMetrics(**organic_metrics)
+
+        if self._promoted_metrics:
+            promoted_metrics = self.http_client.payload_parser.parse_metric_data(self._promoted_metrics)
+            self._promoted_metrics = PromotedTweetMetrics(**promoted_metrics)
 
         if self._entities and self._entities.get("urls"):
             data = []
@@ -87,12 +117,14 @@ class Tweet(Message):
         else:
             self._embeds = None
 
+        super().__init__(self._payload.get("text"), self._payload.get("id"), 1)
+
     def __repr__(self) -> str:
         return "Tweet(text={0.text} id={0.id} author={0.author!r})".format(self)
 
     @property
     def author(self) -> Optional[User]:
-        """Optional[:class:`User`]: Return a user (object) who posted the tweet.
+        """Optional[:class:`User`]: Returns a user (object) who posted the tweet.
 
         .. versionadded: 1.0.0
         """
@@ -102,7 +134,7 @@ class Tweet(Message):
 
     @property
     def possibly_sensitive(self) -> bool:
-        """:class:`bool`: Return True if the tweet is possible sensitive to some users, else False.
+        """:class:`bool`: Returns True if the tweet is possible sensitive to some users, else False.
 
         .. versionadded: 1.0.0
         """
@@ -118,7 +150,7 @@ class Tweet(Message):
 
     @property
     def created_at(self) -> datetime.datetime:
-        """:class:`datetime.datetime`: Return a :class:`datetime.datetime` object when the tweet was created.
+        """:class:`datetime.datetime`: Returns a :class:`datetime.datetime` object when the tweet was created.
 
         .. versionadded: 1.0.0
         """
@@ -128,7 +160,7 @@ class Tweet(Message):
 
     @property
     def deleted_at(self) -> Optional[datetime.datetime]:
-        """Optional[:class:`datetime.datetime`]: Return a :class:`datetime.datetime` object when the tweet was deleted. Returns None when the tweet is not deleted.
+        """Optional[:class:`datetime.datetime`]: Returns a :class:`datetime.datetime` object when the tweet was deleted. Returns None when the tweet is not deleted.
 
         .. note::
             This property can only returns :class:`datetime.datetime` object through a tweet object from `on_tweet_delete` event.
@@ -141,7 +173,7 @@ class Tweet(Message):
 
     @property
     def source(self) -> str:
-        """:class:`str`: Return the source of the tweet. e.g if you post a tweet from a website, the source is gonna be 'Twitter Web App'
+        """:class:`str`: Returns the source of the tweet. e.g if you post a tweet from a website, the source is gonna be 'Twitter Web App'
 
         .. versionadded: 1.0.0
         """
@@ -149,7 +181,7 @@ class Tweet(Message):
 
     @property
     def reply_setting(self) -> ReplySetting:
-        """:class:`ReplySetting`: Return a :class:`ReplySetting` object with the tweet's reply setting. If everyone can reply, this method return :class:`ReplySetting.everyone`.
+        """:class:`ReplySetting`: Returns a :class:`ReplySetting` object with the tweet's reply setting. If everyone can reply, this method return :class:`ReplySetting.everyone`.
 
         .. versionadded: 1.3.5
         """
@@ -157,7 +189,7 @@ class Tweet(Message):
 
     @property
     def raw_reply_setting(self) -> str:
-        """:class:`str`: Return the raw reply setting value. If everyone can replied, this method return 'Everyone'.
+        """:class:`str`: Returns the raw reply setting value. If everyone can replied, this method return 'Everyone'.
 
         .. versionadded: 1.0.0
         """
@@ -165,7 +197,7 @@ class Tweet(Message):
 
     @property
     def lang(self) -> str:
-        """:class:`str`: Return the tweet's lang, if its english it return en.
+        """:class:`str`: Returns the tweet's lang, if its english it return en.
 
         .. versionadded: 1.0.0
         """
@@ -189,6 +221,7 @@ class Tweet(Message):
         .. versionadded:: 1.1.0
 
         .. versionchanged:: 1.5.0
+
             Returns None if the author is invalid or the tweet doesn't have id.
         """
         try:
@@ -215,7 +248,7 @@ class Tweet(Message):
 
     @property
     def poll(self) -> Optional[Poll]:
-        """:class:`Poll`: Return a Poll object with the tweet's poll.
+        """:class:`Poll`: Returns a Poll object with the tweet's poll.
 
         .. versionadded:: 1.1.0
         """
@@ -234,13 +267,13 @@ class Tweet(Message):
         return None
 
     @property
-    def medias(self) -> Optional[Media]:
-        """List[:class:`Media`]: Return a list of media(s) in a tweet.
+    def medias(self) -> Optional[List[Media]]:
+        """Optional[List[:class:`Media`]]: Returns a list of media(s) in a tweet.
 
         .. versionadded:: 1.1.0
         """
         if self._includes and self._includes.get("media"):
-            return [Media(img) for img in self._includes.get("media")]
+            return [Media(img, http_client=self.http_client) for img in self._includes.get("media")]
         return None
 
     @property
@@ -298,13 +331,13 @@ class Tweet(Message):
 
         for tweet in tweets:
             if tweet["id"] == self._referenced_tweets[0]["id"]:
-                self.http_client.payload_parser.insert_tweet_author(tweet, self.reference_user)
+                self.http_client.payload_parser.insert_object_author(tweet, self.reference_user)
                 return Tweet(tweet, http_client=self.http_client)
         return None
 
     @property
     def embeds(self) -> Optional[List[Embed]]:
-        """List[:class:`Embed`]: Return a list of Embedded urls from the tweet
+        """List[:class:`Embed`]: Returns a list of Embedded urls from the tweet
 
         .. versionadded:: 1.1.3
         """
@@ -315,36 +348,60 @@ class Tweet(Message):
         return Embed(**self._embeds)
 
     @property
-    def like_count(self) -> int:
-        """:class:`int`: Return the total of likes in a tweet.
+    def like_count(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the total of likes in the tweet.
 
         .. versionadded: 1.1.0
         """
-        return self.tweet_metrics.like_count
+        return convert(self._metrics.like_count, int)
 
     @property
-    def retweet_count(self) -> int:
-        """:class:`int`: Return the total of retweetes in a tweet.
+    def retweet_count(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the total of retweetes in the tweet.
 
         .. versionadded: 1.1.0
         """
-        return self.tweet_metrics.retweet_count
+        return convert(self._metrics.retweet_count, int)
 
     @property
-    def reply_count(self) -> int:
-        """:class:`int`: Return the total of replies in a tweet.
+    def reply_count(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the total of replies in the tweet.
 
         .. versionadded: 1.1.0
         """
-        return self.tweet_metrics.reply_count
+        return convert(self._metrics.reply_count, int)
 
     @property
-    def quote_count(self) -> int:
-        """:class:`int`: Return the total of quotes in a tweet.
+    def quote_count(self) -> Optional[int]:
+        """Optional[:class:`int`]: Returns the total of quotes in the tweet.
 
         .. versionadded: 1.1.0
         """
-        return self.tweet_metrics.quote_count
+        return convert(self._metrics.quote_count, int)
+
+    @property
+    def non_public_metrics(self) -> Optional[OrganicTweetMetrics]:
+        """Optional[:class:`OrganicTweetMetrics`]: The tweet's metrics that are not available for anyone to view on Twitter, such as `impressions_count` and `video view quartiles`.
+
+        .. versionadded:: 1.5.0
+        """
+        return self._non_public_metrics
+
+    @property
+    def organic_metrics(self) -> Optional[OrganicTweetMetrics]:
+        """Optional[:class:`OrganicTweetMetrics`]: The tweet's metrics in organic context (posted and viewed in a regular manner), such as `impression_count`, `user_profile_clicks` and `url_link_clicks`.
+
+        .. versionadded:: 1.5.0
+        """
+        return self._organic_metrics
+
+    @property
+    def promoted_metrics(self) -> Optional[PromotedTweetMetrics]:
+        """Optional[:class:`PromotedTweetMetrics`]: The tweet's metrics in promoted context (posted or viewed as part of an Ads campaign), such as `impression_count`, `user_profile_clicks` and `url_link_clicks`.
+
+        .. versionadded:: 1.5.0
+        """
+        return self._promoted_metrics
 
     def like(self) -> Optional[RelationLike]:
         """Like the tweet.
@@ -358,10 +415,7 @@ class Tweet(Message):
         .. versionadded:: 1.2.0
         """
         my_id = self.http_client.access_token.partition("-")[0]
-
-        payload = {"tweet_id": str(self.id)}
-        res = self.http_client.request("POST", "2", f"/users/{my_id}/likes", json=payload, auth=True)
-
+        res = self.http_client.request("POST", "2", f"/users/{my_id}/likes", json={"tweet_id": str(self.id)}, auth=True)
         return RelationLike(res)
 
     def unlike(self) -> Optional[RelationLike]:
