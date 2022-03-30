@@ -1,3 +1,9 @@
+.. image:: pytweetround.png
+    :width: 200
+    :height: 200
+    :alt: Alternative text
+    :align: center
+
 Welcome to PyTweet's documentation!
 ===================================
 PyTweet is a Synchronous python API wrapper for twitter's api, Its filled with rich features and is very easy to use.
