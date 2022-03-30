@@ -1,13 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Tuple, TYPE_CHECKING
-
-from .enums import MediaType
-from .dataclass import NonPublicMediaMetrics, OrganicMediaMetrics, PromotedMediaMetrics
-from .utils import convert
-
-if TYPE_CHECKING:
-    from .http import HTTPClient
+from typing import Any, Dict, Optional, Tuple
 
 
 class Hashtag:

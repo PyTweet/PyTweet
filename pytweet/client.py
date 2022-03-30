@@ -125,10 +125,10 @@ class Client:
 
         Parameters
         ------------
-        .. versionchanged:: 1.5.0
+        update: :class:`bool`
+            Indicates to update the client's account information, setting update to True would make a request to the api and returns a new and updated data everytime. If sets to False, it will either make a request (if used the first time) or use the previous data stored in an instance variable.
 
-            update: :class:`bool`
-                Indicates to update the client's account information, setting update to True would make a request to the api and returns a new and updated data everytime. If sets to False, it will either make a request (if used the first time) or use the previous data stored in an instance variable.
+            .. versionadded:: 1.5.0
 
 
         Returns
@@ -151,10 +151,10 @@ class Client:
 
         Parameters
         ------------
-        .. versionchanged:: 1.5.0
+        update: :class:`bool`
+            Indicates to update the client's account information, setting update to True would make a request to the api and returns a new and updated data everytime. If sets to False, it will either make a request (if used the first time) or use the previous data stored in an instance variable.
 
-            update: :class:`bool`
-                Indicates to update the client's account information, setting update to True would make a request to the api and returns a new and updated data everytime. If sets to False, it will either make a request (if used the first time) or use the previous data stored in an instance variable.
+            .. versionadded:: 1.5.0
 
 
         Returns
@@ -1193,7 +1193,7 @@ class Client:
         env_label: :class:`str`
             The environment's label.
         ngrok: :class:`bool`
-            indicates to use ngrok for tunneling your localhost. This usually uses for users that use localhost url.
+            indicates to use ngrok for tunneling your localhost. This is usually use for users that use localhost url.
         make_new: :class:`bool`
             A kwarg indicates to make a new webhook url when the api can't find the url passed. Default to True.
 
