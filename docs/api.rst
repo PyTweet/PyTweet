@@ -129,12 +129,12 @@ WelcomeMessageRule
 Twitter Dataclass
 -------------------------
 
-These following section documented objects that use `dataclasses.dataclass` decorator.
+These following section documented objects derive from `dataclass` folder and use `dataclasses.dataclass` decorator. The following objects are not meant to be create as an instance rather its for knowledge of what you can do with them.
 
 ApplicationInfo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: ApplicationInfo()
+.. autoclass:: ApplicationInfo
     :members:
 
 
@@ -180,17 +180,68 @@ Space Objects
 .. autoclass:: Topic
     :members:
 
+Embed Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Embed
+    :members:
+
+.. autoclass:: EmbedImage
+    :members:
+
 Stream Objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: StreamRule
     :members:
 
+Compliance Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: JobResult
+    :members:
+
+Message Object
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: InitiatedVia
+    :members:
+
+Metrics Objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: PublicTweetMetrics
+    :members:
+
+.. autoclass:: NonPublicTweetMetrics
+    :members:
+
+.. autoclass:: OrganicTweetMetrics
+    :members:
+
+.. autoclass:: PromotedTweetMetrics
+    :members:
+
+.. autoclass:: NonPublicMediaMetrics
+    :members:
+
+.. autoclass:: OrganicMediaMetrics
+    :members:
+
+.. autoclass:: PromotedMediaMetrics
+    :members:
 
 Attachments
 ---------------------
 
 Attachments is a way to attach additional part to a message, this include tweet and direct message. You may contruct the following objects except :class:`CustomProfile` and :class:`Geo`. Consider using :class:`Client.create_custom_profile` for making a custom profile attachment and :class:`Client.search_geo` for searching a geo-location.
+
+Media
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: Media
+    :members:
+
 
 CustomProfile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -263,7 +314,7 @@ StreamConnection
 Oauth
 -------------
 
-Oauth is a way to authenticate a twitter user account. You can do this with 3 legged authentication via :meth:`OauthSession.create_oauth_url` to generate an oauth url and :meth:`OauthSession.post_oauth_token` to post an oauth token and verifier. This also required in every request you've made for identification! This section will show you what you can do with oauth, You can use `Client.http.oauth_session` to get the client's `OauthSession`.
+Oauth is a way to authenticate a twitter user account. You can do this with 3 legged authentication via :meth:`OauthSession.create_oauth_url` to create an oauth url and :meth:`OauthSession.post_oauth_token` to post an oauth token and verifier. This also required in every request you've made for identification! This section will show you what you can do with oauth, You can use `Client.http.oauth_session` to get the client's `OauthSession`.
 
 OauthSession
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -368,25 +419,6 @@ RelationHide
     :members:
 
 
-Embeds
-----------------
-
-The embedded urls object returned by :class:`Tweet.embeds`.
-
-Embed
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: Embed()
-    :members:
-
-
-EmbedsImages
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: EmbedsImages()
-    :members:
-
-
 Entities
 ----------------
 
@@ -415,13 +447,6 @@ Symbol
 
 .. autoclass:: Symbol()
     :members:
-
-Media
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: Media()
-    :members:
-
 
 Event Objects
 ----------------
@@ -477,11 +502,13 @@ Action events are events trigger by or from a user
     :members:
     :inherited-members:
 
+.. autoclass:: UserFollowActionEvent()
+    :members:
+    :inherited-members:
 
 .. autoclass:: UserUnfollowActionEvent()
     :members:
     :inherited-members:
-
 
 .. autoclass:: UserBlockActionEvent()
     :members:
@@ -772,6 +799,22 @@ All of these enums are a subclass of :class:`enum.Enum`
     .. attribute:: expired
     
         Indicates if the Job is expired.
+
+.. class:: MediaType
+
+    .. attribute:: photo
+
+        Indicates if the media is a photo.
+
+
+    .. attribute:: video
+
+        Indicates if the media is a video.
+
+
+    .. attribute:: gif
+
+        Indicates if the media is a gif.
 
 
 .. class:: Timezone
