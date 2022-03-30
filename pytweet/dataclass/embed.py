@@ -3,6 +3,7 @@ from typing import List, Optional
 
 __all__ = ("Embed", "EmbedImage")
 
+
 @dataclass
 class EmbedImage:
     """Represents a dataclass for an embed image.
