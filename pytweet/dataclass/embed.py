@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
+__all__ = ("Embed", "EmbedImage")
 
 @dataclass
 class EmbedImage:

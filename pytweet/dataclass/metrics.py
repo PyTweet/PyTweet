@@ -17,6 +17,18 @@ __all__ = (
 
 @dataclass
 class PublicUserMetrics:
+    """A public metrics for :class:`User`
+
+    The following properties return an object from the metrics.
+    
+    * :meth:`User.follower_count` 
+    * :meth:`User.following_count`
+    * :meth:`User.tweet_count`
+    * :meth:`User.listed_count`
+
+
+    .. versionadded:: 1.5.0
+    """
     follower_count: Union[int, str]
     following_count: Union[int, str]
     tweet_count: Union[int, str]
@@ -25,6 +37,18 @@ class PublicUserMetrics:
 
 @dataclass
 class PublicTweetMetrics:
+    """A public metrics for :class:`Tweet`
+
+    The following properties return an object from the metrics.
+    
+    * :meth:`Tweet.like_count` 
+    * :meth:`Tweet.retweet_count`
+    * :meth:`Tweet.quote_count`
+    * :meth:`Tweet.reply_count`
+
+
+    .. versionadded:: 1.5.0
+    """
     like_count: Union[int, str]
     retweet_count: Union[int, str]
     quote_count: Union[int, str]
@@ -33,6 +57,13 @@ class PublicTweetMetrics:
 
 @dataclass
 class NonPublicTweetMetrics:
+    """A non public metrics for :class:`Tweet`
+
+    To get the metrics you can use `Tweet.non_public_metrics`.
+
+
+    .. versionadded:: 1.5.0
+    """
     impression_count: Union[int, str]
     user_profile_clicks: Union[int, str]
     url_link_clicks: Optional[Union[int, str]] = None
@@ -40,6 +71,13 @@ class NonPublicTweetMetrics:
 
 @dataclass
 class OrganicTweetMetrics:
+    """An organic metrics for :class:`Tweet`
+
+    To get the metrics you can use `Tweet.organic_metrics`.
+
+
+    .. versionadded:: 1.5.0
+    """
     like_count: Union[int, str]
     retweet_count: Union[int, str]
     reply_count: Union[int, str]
@@ -50,6 +88,13 @@ class OrganicTweetMetrics:
 
 @dataclass
 class PromotedTweetMetrics:
+    """A promoted metrics for :class:`Tweet`
+
+    To get the metrics you can use `Tweet.promoted_metrics`.
+
+
+    .. versionadded:: 1.5.0
+    """
     like_count: Union[int, str]
     retweet_count: Union[int, str]
     reply_count: Union[int, str]
@@ -60,6 +105,13 @@ class PromotedTweetMetrics:
 
 @dataclass
 class NonPublicMediaMetrics:
+    """A non public metrics for :class:`Media`
+
+    To get the metrics you can use `Media.non_public_metrics`.
+
+
+    .. versionadded:: 1.5.0
+    """
     playback_0_count: Union[str, int]
     playback_100_count: Union[str, int]
     playback_25_count: Union[str, int]
@@ -69,6 +121,13 @@ class NonPublicMediaMetrics:
 
 @dataclass
 class OrganicMediaMetrics:
+    """An organic metrics for :class:`Media`
+
+    To get the metrics you can use `Media.organic_metrics`.
+
+
+    .. versionadded:: 1.5.0
+    """
     playback_0_count: Union[str, int]
     playback_100_count: Union[str, int]
     playback_25_count: Union[str, int]
@@ -79,6 +138,13 @@ class OrganicMediaMetrics:
 
 @dataclass
 class PromotedMediaMetrics:
+    """A promoted metrics for :class:`Media`
+
+    To get the metrics you can use `Media.promoted_metrics`.
+
+
+    .. versionadded:: 1.5.0
+    """
     playback_0_count: Union[str, int]
     playback_100_count: Union[str, int]
     playback_25_count: Union[str, int]

@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from .type import ID
     from .http import HTTPClient
 
-__all__ = ("Poll", "QuickReply", "Geo", "CTA", "File", "SubFile")
+__all__ = ("Media", "Poll", "QuickReply", "Geo", "CTA", "File", "SubFile")
 
 
 class Media:
