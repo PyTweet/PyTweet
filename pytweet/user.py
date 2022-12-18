@@ -466,80 +466,6 @@ class User(Comparable):
             },
         )
 
-    def fetch_blockers(self) -> Optional[UserPagination]:
-        """Fetches users from the user's block list then paginate it.
-
-        Returns
-        ---------
-        Optional[:class:`UserPagination`]
-            This method returns a :class:`UserPagination` object.
-
-
-        .. versionadded:: 1.5.0
-        """
-        blockers = self.http_client.request(
-            "GET",
-            "2",
-            f"/users/{self.id}/blocking",
-            params={
-                "expansions": PINNED_TWEET_EXPANSION,
-                "user.fields": USER_FIELD,
-                "tweet.fields": TWEET_FIELD,
-            },
-            auth=True,
-        )
-
-        if not blockers:
-            return []
-
-        return UserPagination(
-            blockers,
-            endpoint_request=f"/users/{self.id}/blocking",
-            http_client=self.http_client,
-            params={
-                "expansions": PINNED_TWEET_EXPANSION,
-                "user.fields": USER_FIELD,
-                "tweet.fields": TWEET_FIELD,
-            },
-        )
-
-    def fetch_muters(self) -> Optional[UserPagination]:
-        """Fetches users from the user's mute list then paginate it.
-
-        Returns
-        ---------
-        Optional[:class:`UserPagination`]
-            This method returns a :class:`UserPagination` object.
-
-
-        .. versionadded:: 1.5.0
-        """
-        muters = self.http_client.request(
-            "GET",
-            "2",
-            f"/users/{self.id}/muting",
-            params={
-                "expansions": PINNED_TWEET_EXPANSION,
-                "user.fields": USER_FIELD,
-                "tweet.fields": TWEET_FIELD,
-            },
-            auth=True,
-        )
-
-        if not muters:
-            return []
-
-        return UserPagination(
-            muters,
-            endpoint_request=f"/users/{self.id}/muting",
-            http_client=self.http_client,
-            params={
-                "expansions": PINNED_TWEET_EXPANSION,
-                "user.fields": USER_FIELD,
-                "tweet.fields": TWEET_FIELD,
-            },
-        )
-
     def fetch_timelines(
         self,
         *,
@@ -996,3 +922,106 @@ class ClientAccount(User):
         .. versionadded:: 1.5.0
         """
         self.http_client.request("POST", "1.1", "/account/remove_profile_banner.json", auth=True)
+
+    def fetch_blockers(self) -> Optional[UserPagination]:
+        """Fetches users from the client's block list then paginate it.
+
+        Returns
+        ---------
+        Optional[:class:`UserPagination`]
+            This method returns a :class:`UserPagination` object.
+
+
+        .. versionadded:: 1.5.0
+        """
+        blockers = self.http_client.request(
+            "GET",
+            "2",
+            f"/users/{self.id}/blocking",
+            params={
+                "expansions": PINNED_TWEET_EXPANSION,
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
+            auth=True,
+        )
+
+        if not blockers:
+            return []
+
+        return UserPagination(
+            blockers,
+            endpoint_request=f"/users/{self.id}/blocking",
+            http_client=self.http_client,
+            params={
+                "expansions": PINNED_TWEET_EXPANSION,
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
+        )
+
+    def fetch_muters(self) -> Optional[UserPagination]:
+        """Fetches users from the client's mute list then paginate it.
+
+        Returns
+        ---------
+        Optional[:class:`UserPagination`]
+            This method returns a :class:`UserPagination` object.
+
+
+        .. versionadded:: 1.5.0
+        """
+        muters = self.http_client.request(
+            "GET",
+            "2",
+            f"/users/{self.id}/muting",
+            params={
+                "expansions": PINNED_TWEET_EXPANSION,
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
+            auth=True,
+        )
+
+        if not muters:
+            return []
+
+        return UserPagination(
+            muters,
+            endpoint_request=f"/users/{self.id}/muting",
+            http_client=self.http_client,
+            params={
+                "expansions": PINNED_TWEET_EXPANSION,
+                "user.fields": USER_FIELD,
+                "tweet.fields": TWEET_FIELD,
+            },
+        )
+
+    def fetch_bookmarks(self) -> Optional[TweetPagination]:
+        """"""
+        params = {
+            "expansions": TWEET_EXPANSION,
+            "user.fields": USER_FIELD,
+            "tweet.fields": TWEET_FIELD,
+            "media.fields": MEDIA_FIELD,
+            "place.fields": PLACE_FIELD,
+            "poll.fields": POLL_FIELD,
+        }
+        
+        tweets = self.http_client.request(
+            "GET",
+            "2",
+            f"/users/{self.id}/bookmarks",
+            params=params,
+            auth=True,
+        )
+
+        if not tweets:
+            return []
+
+        return UserPagination(
+            tweets,
+            endpoint_request=f"/users/{self.id}/bookmarks",
+            http_client=self.http_client,
+            params=params,
+        )

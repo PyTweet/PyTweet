@@ -1,4 +1,7 @@
 <h2 align="center">Pytweet</h2>
+
+> :warning: This repository has been archived until further notice. There is a chance we'll restart the development, but as of now, it'll stay archived due to the stagnation in development. If you have any queries, please join our [Discord Server](https://discord.gg/XHBhg6A4jJ).
+
 <div>
 <img src="https://img.shields.io/pypi/v/PyTweet?logo=pypi&style=plastic">  
 
