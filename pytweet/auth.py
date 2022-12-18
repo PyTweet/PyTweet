@@ -86,26 +86,26 @@ class Scope:
         block_read: bool = False,
         block_write: bool = False,
         bookmarks_read: bool = False,
-        bookmarks_write: bool = False
+        bookmarks_write: bool = False,
     ):
-        self.tweet_read = tweet_read #"tweet.read" if tweet_read else None
-        self.tweet_write = tweet_write #"tweet.write" if tweet_write else None
-        self.tweet_moderate_write = tweet_moderate_write #"tweet.moderate.write" if tweet_moderate_write else None
-        self.users_read = users_read #"users.read" if users_read else None
-        self.follows_read = follows_read #"follows.read" if follows_read else None
-        self.follows_write = follows_write #"follows.write" if follows_write else None
-        self.offline_access = offline_access #"offline.access" if offline_access else None
-        self.space_read = space_read #"space.read" if space_read else None
-        self.mute_read = mute_read #"mute.read" if mute_read else None
-        self.mute_write = mute_write #"mute.write" if mute_write else None
-        self.like_read = like_read #"like.read" if like_read else None
-        self.like_write = like_write #"like.write" if like_write else None
-        self.list_read = list_read #"list.read" if list_read else None
-        self.list_write = list_write #"list.write" if list_write else None
-        self.block_read = block_read #"block.read" if block_read else None
-        self.block_write = block_write #"block.write" if block_write else None
-        self.bookmarks_read = bookmarks_read #"bookmarks.read" if bookmarks_read else None 
-        self.bookmarks_write = bookmarks_write #"bookmarks.write" if bookmarks_write else None
+        self.tweet_read = tweet_read  # "tweet.read" if tweet_read else None
+        self.tweet_write = tweet_write  # "tweet.write" if tweet_write else None
+        self.tweet_moderate_write = tweet_moderate_write  # "tweet.moderate.write" if tweet_moderate_write else None
+        self.users_read = users_read  # "users.read" if users_read else None
+        self.follows_read = follows_read  # "follows.read" if follows_read else None
+        self.follows_write = follows_write  # "follows.write" if follows_write else None
+        self.offline_access = offline_access  # "offline.access" if offline_access else None
+        self.space_read = space_read  # "space.read" if space_read else None
+        self.mute_read = mute_read  # "mute.read" if mute_read else None
+        self.mute_write = mute_write  # "mute.write" if mute_write else None
+        self.like_read = like_read  # "like.read" if like_read else None
+        self.like_write = like_write  # "like.write" if like_write else None
+        self.list_read = list_read  # "list.read" if list_read else None
+        self.list_write = list_write  # "list.write" if list_write else None
+        self.block_read = block_read  # "block.read" if block_read else None
+        self.block_write = block_write  # "block.write" if block_write else None
+        self.bookmarks_read = bookmarks_read  # "bookmarks.read" if bookmarks_read else None
+        self.bookmarks_write = bookmarks_write  # "bookmarks.write" if bookmarks_write else None
 
     def __repr__(self) -> str:
         s = "Scopes("
@@ -114,7 +114,6 @@ class Scope:
                 scope = getattr(self, attr, None)
                 s += f"{attr}={scope} "
         return s.rstrip(" ") + ")"
-        
 
     @classmethod
     def read_only(cls, *, offline_access: bool = False):
@@ -195,7 +194,7 @@ class Scope:
             block_read=True,
             block_write=True,
             bookmarks_read=True,
-            bookmarks_write=True
+            bookmarks_write=True,
         )
 
     @property

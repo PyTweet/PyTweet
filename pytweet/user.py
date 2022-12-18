@@ -1007,7 +1007,7 @@ class ClientAccount(User):
             "place.fields": PLACE_FIELD,
             "poll.fields": POLL_FIELD,
         }
-        
+
         tweets = self.http_client.request(
             "GET",
             "2",
